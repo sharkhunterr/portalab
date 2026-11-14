@@ -165,7 +165,7 @@ export function TasteDeck({ initial, limit = 12 }: { initial?: TasteCard[] | und
           onPointerCancel={() => setDrag(null)}
         >
           <span className="taste-deck__poster">
-            <Poster src={imageUrl(card.image_id)} kind={card.kind} />
+            <Poster src={imageUrl(card.image_id)} kind={card.kind} mediaId={card.id} />
           </span>
           <div className="taste-deck__text">
             <h3 className="taste-deck__title">

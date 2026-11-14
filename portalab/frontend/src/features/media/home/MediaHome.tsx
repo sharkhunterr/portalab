@@ -64,7 +64,7 @@ function JournalRail({
         const body = (
           <>
             <span className="media-card__frame">
-              <Poster src={src} kind={item.kind} />
+              <Poster src={src} kind={item.kind} mediaId={item.id} />
               <PosterTickets mediaId={item.id} />
               <span className="media-card__kind" title={t(`media:kind.${item.kind}`)}>
                 <Icon name={KIND_ICONS[item.kind] ?? "film"} size={12} />

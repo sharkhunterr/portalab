@@ -83,6 +83,7 @@ export interface UiPreferences {
   pluginLooks: Record<string, string>;
   /** Issue 229: the actor's own portrait in a round badge by their character's image, on the media cards. */
   cardActorBadge: boolean;
+  cardAgeBadge: boolean; // issue 434: a title's age rating on its thumbnails (always on its page)
 }
 
 export interface UiPolicy {
@@ -113,6 +114,7 @@ export const DEFAULT_PREFERENCES: UiPreferences = {
   colorMode: "dark",
   pluginLooks: {},
   cardActorBadge: true,
+  cardAgeBadge: true,
 };
 
 export const DEFAULT_POLICY: UiPolicy = {
@@ -153,6 +155,7 @@ export const PREFERENCE_KEYS: Record<keyof UiPreferences, string> = {
   colorMode: "ui.colorMode",
   pluginLooks: "ui.pluginLooks",
   cardActorBadge: "ui.cardActorBadge",
+  cardAgeBadge: "ui.cardAgeBadge",
 };
 
 /** Accept only known fields with valid values (an option removed by an update falls back to its default). */
@@ -195,6 +198,7 @@ export function sanitize(input: object): UiPreferences {
   }
   if (typeof raw.soundEnabled === "boolean") out.soundEnabled = raw.soundEnabled;
   if (typeof raw.cardActorBadge === "boolean") out.cardActorBadge = raw.cardActorBadge;
+  if (typeof raw.cardAgeBadge === "boolean") out.cardAgeBadge = raw.cardAgeBadge;
   if (typeof raw.textScale === "number" && Number.isFinite(raw.textScale)) out.textScale = raw.textScale;
   if (typeof raw.notificationDurationSeconds === "number") {
     out.notificationDurationSeconds = Math.min(60, Math.max(2, Math.round(raw.notificationDurationSeconds)));

@@ -1547,6 +1547,8 @@
   "setting.ui.campaignThemes.label": "Campaign themes",
   "setting.ui.cardActorBadge.hint": "Show the actor's portrait in a badge next to their character on cards.",
   "setting.ui.cardActorBadge.label": "Actor badge on cards",
+  "setting.ui.cardAgeBadge.hint": "Show a title's age rating as a badge on its thumbnails (it always shows on the title's page).",
+  "setting.ui.cardAgeBadge.label": "Age rating on thumbnails",
   "setting.ui.celebration.hint": "Effect played for rewards (theme: the theme's own); some are sold in the shop.",
   "setting.ui.celebration.label": "Reward celebration",
   "setting.ui.colorMode.choice.dark": "Dark",

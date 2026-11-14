@@ -16,16 +16,10 @@ const REASONS = ["age", "unrated", "genre", "type", "title"];
 /** A title above the profile's age rating: what it is, and « Ask for access » to the account's master. */
 export function LockedTitle({ problem }: { problem: ApiError }) {
   const t = useT();
-  const format = useFormat();
-  const ask = useAskAccess();
-  const [note, setNote] = useState("");
   const ref = String(problem.extensions.object_id ?? "");
   const title = String(problem.extensions.name ?? "") || "…";
   const rating = problem.extensions.rating ? String(problem.extensions.rating) : null;
   const reason = String(problem.extensions.reason ?? "age");
-  // the profile's latest request for this title: waiting, refused, or none
-  const last = (useAccessRequests().data ?? []).find((r) => r.kind === "media" && r.subject_ref === ref);
-  const pending = last?.status === "pending";
   return (
     <section className="household-locked" aria-labelledby="household-locked">
       <span className="household-locked__icon" aria-hidden="true">
@@ -34,44 +28,100 @@ export function LockedTitle({ problem }: { problem: ApiError }) {
       <h1 id="household-locked">{t("household:locked.title")}</h1>
       {rating ? <span className="household-badge">{t("household:locked.rating", { rating })}</span> : null}
       <p>{t(`household:locked.why.${REASONS.includes(reason) ? reason : "age"}`, { title })}</p>
-      {problem.extensions.can_ask === false ? (
-        <p>{t("household:locked.noAsk")}</p>
-      ) : ask.isSuccess || pending ? (
-        <p role="status" className="household-locked__pending">
-          <Icon name="hourglass" size={16} />
-          {last?.created_at && !ask.isSuccess
-            ? t("household:locked.pendingSince", { date: format.dateTime(last.created_at) })
-            : t("household:locked.asked")}
-        </p>
-      ) : (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            ask.mutate({ ref, title, rating, ...(note.trim() ? { note: note.trim() } : {}) });
-          }}
-        >
-          <TextAreaField
-            label={t("household:locked.note")}
-            value={note}
-            maxLength={300}
-            rows={2}
-            onChange={(event) => setNote(event.target.value)}
-          />
-          {last?.status === "denied" && last.decided_at ? (
-            <p className="household-locked__denied">
-              {t("household:locked.denied", { date: format.dateTime(last.decided_at) })}
-            </p>
-          ) : null}
-          <Button type="submit" disabled={ask.isPending || !ref}>
-            <Icon name="key" size={16} />
-            {t("household:locked.ask")}
-          </Button>
-          {ask.isError ? <p role="alert">{t("household:error")}</p> : null}
-        </form>
-      )}
+      <AskAccess objectId={ref} title={title} rating={rating} canAsk={problem.extensions.can_ask !== false} />
       <Link to="/media" className="ds-link">
         {t("household:locked.back")}
       </Link>
     </section>
+  );
+}
+
+/** Issue 432: a title shown to the profile (its page opens) but kept from it — why, and « Ask for access ». */
+export function KeptNotice({
+  objectId,
+  title,
+  kept,
+}: {
+  objectId: string;
+  title: string;
+  kept: { rating?: string | null; reason?: string | null; can_ask?: boolean };
+}) {
+  const t = useT();
+  const reason = kept.reason && REASONS.includes(kept.reason) ? kept.reason : "age";
+  return (
+    <section className="household-kept-notice" aria-labelledby={`kept-${objectId}`}>
+      <span className="household-locked__icon" aria-hidden="true">
+        <Icon name="lock" size={22} />
+      </span>
+      <div>
+        <h2 id={`kept-${objectId}`}>{t("household:kept.title", { title })}</h2>
+        {kept.rating ? (
+          <span className="household-badge">{t("household:locked.rating", { rating: kept.rating })}</span>
+        ) : null}
+        <p>{t(`household:locked.why.${reason}`, { title })}</p>
+        <AskAccess
+          objectId={objectId}
+          title={title}
+          rating={kept.rating ?? null}
+          canAsk={kept.can_ask !== false}
+        />
+      </div>
+    </section>
+  );
+}
+
+/** « Ask for access »: the profile's latest request for this title (waiting, refused), or the form. */
+function AskAccess({
+  objectId,
+  title,
+  rating,
+  canAsk,
+}: {
+  objectId: string;
+  title: string;
+  rating: string | null;
+  canAsk: boolean;
+}) {
+  const t = useT();
+  const format = useFormat();
+  const ask = useAskAccess();
+  const [note, setNote] = useState("");
+  const last = (useAccessRequests().data ?? []).find((r) => r.kind === "media" && r.subject_ref === objectId);
+  const pending = last?.status === "pending";
+  if (!canAsk) return <p>{t("household:locked.noAsk")}</p>;
+  if (ask.isSuccess || pending)
+    return (
+      <p role="status" className="household-locked__pending">
+        <Icon name="hourglass" size={16} />
+        {last?.created_at && !ask.isSuccess
+          ? t("household:locked.pendingSince", { date: format.dateTime(last.created_at) })
+          : t("household:locked.asked")}
+      </p>
+    );
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        ask.mutate({ ref: objectId, title, rating, ...(note.trim() ? { note: note.trim() } : {}) });
+      }}
+    >
+      <TextAreaField
+        label={t("household:locked.note")}
+        value={note}
+        maxLength={300}
+        rows={2}
+        onChange={(event) => setNote(event.target.value)}
+      />
+      {last?.status === "denied" && last.decided_at ? (
+        <p className="household-locked__denied">
+          {t("household:locked.denied", { date: format.dateTime(last.decided_at) })}
+        </p>
+      ) : null}
+      <Button type="submit" disabled={ask.isPending || !objectId}>
+        <Icon name="key" size={16} />
+        {t("household:locked.ask")}
+      </Button>
+      {ask.isError ? <p role="alert">{t("household:error")}</p> : null}
+    </form>
   );
 }

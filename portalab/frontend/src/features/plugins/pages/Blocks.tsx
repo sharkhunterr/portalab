@@ -195,7 +195,11 @@ function MediaItems({ items }: { items: Item[] }) {
           const image = typeof item.image_id === "string" && IMAGE.test(item.image_id) ? item.image_id : null;
           return (
             <Link key={String(item.item)} to={`/media/${String(item.item)}`} className="media-card">
-              <Poster src={imageUrl(image)} kind={String(item.kind ?? "movie")} />
+              <Poster
+                src={imageUrl(image)}
+                kind={String(item.kind ?? "movie")}
+                mediaId={/^[0-9a-f-]{36}$/.test(String(item.item)) ? String(item.item) : null}
+              />
               <span className="media-card__title">{String(item.title ?? "")}</span>
               {item.year ? <span className="media-card__meta">{String(item.year)}</span> : null}
             </Link>

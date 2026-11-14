@@ -413,6 +413,14 @@ export function AppearanceSettings() {
             onChange={(event) => set("cardActorBadge")(event.target.checked)}
           />
         ))}
+        {field("ui.cardAgeBadge", (disabled) => (
+          <CheckboxField
+            label={t("media:age.onThumbnails")}
+            checked={preferences.cardAgeBadge}
+            disabled={disabled}
+            onChange={(event) => set("cardAgeBadge")(event.target.checked)}
+          />
+        ))}
         {field("ui.textScale", (disabled) => (
           <div className="ds-field appearance-scale">
             <label htmlFor="ui-text-scale">{strings.textScale}</label>

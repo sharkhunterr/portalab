@@ -54,7 +54,13 @@ function ArrivalEntry({ entry }: { entry: Entry }) {
   const item = entry.arrival as FeedItem;
   return (
     <Link to={`/media/${item.object_id}`} className="feed-entry__body">
-      <Poster src={item.image_id ? `/api/v1/media/images/${item.image_id}` : null} kind={item.kind} />
+      <span className="feed-entry__frame">
+        <Poster
+          src={item.image_id ? `/api/v1/media/images/${item.image_id}` : null}
+          kind={item.kind}
+          mediaId={item.object_id}
+        />
+      </span>
       <span className="feed-entry__text">
         <strong className="feed-entry__title">
           {item.title}

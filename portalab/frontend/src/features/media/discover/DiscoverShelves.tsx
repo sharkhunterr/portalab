@@ -19,7 +19,7 @@ export function RequestableCard({ item }: { item: Requestable }) {
       <li className="media-card discover-card" data-locked>
         <span className="media-card__link" aria-disabled="true">
           <span className="media-card__frame">
-            <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} />
+            <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} mediaId={item.object_id} />
             <span className="media-card__lock" title={t("household:lockedBadge")}>
               <Icon name="lock" size={22} />
               <span className="visually-hidden">{t("household:lockedBadge")}</span>
@@ -38,7 +38,7 @@ export function RequestableCard({ item }: { item: Requestable }) {
     <li className="media-card discover-card" data-status={item.status}>
       <Link to={item.route} className="media-card__link">
         <span className="media-card__frame">
-          <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} />
+          <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} mediaId={item.object_id} />
           <PosterTickets mediaId={item.object_id} />
           <span className="discover-card__badge">
             <StatusBadge item={item} />

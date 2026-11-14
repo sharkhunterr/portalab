@@ -91,7 +91,9 @@ def test_the_strictest_rating_holds_and_genres_are_recognised() -> None:
     assert genre_of("Policier") == "crime" and genre_of("Guerre") == "war"
     assert genre_of("Comédie") is None and genre_of("Science-Fiction") is None
     assert parse({"genres": ["horror", "horror"]}).genres == ["horror"]
-    assert parse({"genres": ["cooking"]}) == CHILD  # not a genre one may keep out: restricted
+    # issue 432: any genre of the catalog, kept by its words
+    assert parse({"genres": ["Science-Fiction", "Policier"]}).genres == ["crime", "science fiction"]
+    assert parse({"genres": [42]}) == CHILD  # not a genre at all: restricted
     assert "horror" in CHILD.genres
 
 
@@ -133,3 +135,30 @@ def test_a_profile_may_be_kept_to_the_portal() -> None:
 def test_the_games_boards_stand_for_an_age(rating: str, age: int | None) -> None:
     """Issue 421: IGDB's boards, as RomM keeps them — numbers, words and letters."""
     assert age_of(rating) == age
+
+
+def test_a_weekly_plan_hours_and_a_bonus_shape_the_day() -> None:
+    """Issue 432: minutes per weekday, allowed hours (overnight spans too), minutes given for one day."""
+    from datetime import date, time
+
+    from pydantic import ValidationError
+
+    from portalab.modules.household.rules import RestrictionSettings
+
+    plan = RestrictionSettings(
+        daily_minutes=60, week_minutes=[30, 30, 30, 30, 90, 180, None], hours_from="08:00", hours_to="20:30"
+    )
+    today = date(2026, 11, 14)  # a Saturday
+    limits = plan.restrictions(today, bonus_minutes=30, bonus_day=today)
+    assert limits.minutes_on(today) == 180 + 30  # Saturday's plan and today's bonus
+    assert limits.minutes_on(date(2026, 11, 15)) is None  # Sunday: no limit
+    assert limits.minutes_on(date(2026, 11, 16)) == 30  # Monday, no bonus
+    assert limits.allowed_at(time(9, 0)) and not limits.allowed_at(time(21, 0))
+    late = RestrictionSettings(hours_from="20:00", hours_to="07:00").restrictions(today)
+    assert late.allowed_at(time(23, 0)) and not late.allowed_at(time(12, 0))
+    for wrong in ({"week_minutes": [30] * 6}, {"week_minutes": [2000] * 7}, {"hours_from": "25:00"}):
+        try:
+            RestrictionSettings(**wrong)  # type: ignore[arg-type]
+        except ValidationError:
+            continue
+        raise AssertionError(wrong)

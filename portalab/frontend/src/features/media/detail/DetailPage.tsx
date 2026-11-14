@@ -7,7 +7,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useAssistantPage } from "../../ai/pageContext";
-import { LockedTitle, RESTRICTED } from "../../household/LockedTitle";
+import { KeptNotice, LockedTitle, RESTRICTED } from "../../household/LockedTitle";
 import { TitleRestrictions } from "../../household/TitleRestrictions";
 import {
   imageUrl,
@@ -802,6 +802,14 @@ function Read({ objectId }: { objectId: string }) {
   );
 }
 
+/** 032: why nothing opens now — the day's screen time spent, or (issue 432) outside the allowed hours. */
+function screenUp(error: unknown, t: ReturnType<typeof useT>): string {
+  const hours = error instanceof ApiError ? error.extensions.hours : undefined;
+  if (error instanceof ApiError && error.extensions.reason === "hours" && Array.isArray(hours))
+    return t("household:screen.hours", { from: String(hours[0] ?? ""), to: String(hours[1] ?? "") });
+  return t("household:screen.up");
+}
+
 /** 027 (#2): watch here, in the portal's own player — the service's page stays one click away. */
 function WatchVideo({ objectId, kind }: { objectId: string; kind: string }) {
   const t = useT();
@@ -850,7 +858,7 @@ function WatchVideo({ objectId, kind }: { objectId: string; kind: string }) {
         // 032: a household profile's screen time of the day is spent
         <p className="media-watch-hint" role="status">
           <Icon name="clock" size={14} />
-          {t("household:screen.up")}
+          {screenUp(player.error, t)}
         </p>
       ) : null}
       {code === "media.player_unlinked" ? (
@@ -1039,7 +1047,7 @@ export function DetailPage() {
         badges={<TitleBadges media={media} />}
         rating={<AgeBadge age={media.age_rating?.age} sources={ageSources(media.age_rating, t)} />}
         primary={
-          media.available ? (
+          media.restricted ? null : media.available ? (
             <Watch objectId={media.id} kind={media.kind} title={media.title} image={media.image_id} />
           ) : requested ? null : (
             <RequestButton objectId={media.id} kind={media.kind} tmdb={media.ids?.tmdb} />
@@ -1069,6 +1077,10 @@ export function DetailPage() {
           />
         </div>
       </TitleHero>
+      {media.restricted ? (
+        // issue 432: shown to this profile, never played — why, and « Ask for access »
+        <KeptNotice objectId={media.id} title={media.title} kept={media.restricted} />
+      ) : null}
       <LeavingNotice objectId={media.id} title={media.title} />
       <RequestJourney objectId={media.id} title={media.title} />
       {/* issue 299: what the news sources say of it */}

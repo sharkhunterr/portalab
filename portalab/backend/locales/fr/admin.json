@@ -1547,6 +1547,8 @@
   "setting.ui.campaignThemes.label": "Thèmes de campagne",
   "setting.ui.cardActorBadge.hint": "Affiche le portrait de l'acteur dans un badge à côté de son personnage sur les cartes.",
   "setting.ui.cardActorBadge.label": "Badge de l'acteur sur les cartes",
+  "setting.ui.cardAgeBadge.hint": "Affiche la classification d'âge d'un titre en badge sur ses miniatures (elle reste toujours visible sur sa fiche).",
+  "setting.ui.cardAgeBadge.label": "Classification d'âge sur les miniatures",
   "setting.ui.celebration.hint": "Effet joué lors des gains (thème : celui du thème) ; certains sont vendus en boutique.",
   "setting.ui.celebration.label": "Célébration des gains",
   "setting.ui.colorMode.choice.dark": "Sombre",

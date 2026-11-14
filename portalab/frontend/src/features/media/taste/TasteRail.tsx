@@ -21,7 +21,7 @@ export function TasteRail({ items, label, grid }: { items: TasteCard[]; label: s
           <li key={card.id} className="media-card" data-available={card.available}>
             <Link to={`/media/${card.id}`} className="media-card__link" title={why?.like ?? undefined}>
               <span className="media-card__frame">
-                <Poster src={imageUrl(card.image_id)} kind={card.kind} />
+                <Poster src={imageUrl(card.image_id)} kind={card.kind} mediaId={card.id} />
                 <PosterTickets mediaId={card.id} />
                 <span className="media-card__kind" title={t(`media:kind.${card.kind}`)}>
                   <Icon name={KIND_ICONS[card.kind] ?? "film"} size={12} />

@@ -254,6 +254,7 @@
   transform: scale(0.97);
 }
 .taste-deck__poster {
+  position: relative; /* issue 434: the age badge sits on the poster */
   min-block-size: 0;
   overflow: hidden;
   border-radius: var(--radius-md);

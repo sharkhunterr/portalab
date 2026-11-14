@@ -22,6 +22,7 @@
   "cta.play": "Play here",
   "cta.resume": "Resume",
   "error.disabled": "Playing games in the portal is switched off.",
+  "error.hours": "This profile can't play at this hour.",
   "error.nothing": "This game cannot be played in the portal: no emulator here runs its console, or the library no longer has its file.",
   "error.restricted": "This game is not available on this profile.",
   "error.screen": "Screen time is up for today. See you tomorrow!",

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -21,7 +21,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import { chooseProfile } from "../../../src/features/household/api";
 import HouseholdPage from "../../../src/features/household/HouseholdPage";
-import { LockedTitle } from "../../../src/features/household/LockedTitle";
+import { KeptNotice, LockedTitle } from "../../../src/features/household/LockedTitle";
 import { ProfileGate } from "../../../src/features/household/ProfilePicker";
 import { ApiError } from "../../../src/state/regions";
 import { json } from "../../support/fake-api";
@@ -246,6 +246,82 @@ describe("my household", () => {
     expect((within(editor).getByLabelText("May ask for access") as HTMLInputElement).checked).toBe(true);
   });
 
+  it("gives time in a few taps: minutes more today, no limits for a while, the limits back", async () => {
+    const posted: Array<[string, unknown]> = [];
+    let household: unknown = {
+      ...HOUSEHOLD,
+      members: HOUSEHOLD.members.map((m) =>
+        m.id === LEA
+          ? {
+              ...m,
+              restrictions: { ...("restrictions" in m ? m.restrictions : {}), daily_minutes: 60 },
+              bonus_minutes: 15,
+            }
+          : m,
+      ),
+    };
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, household);
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (request.method === "POST" && /\/profiles\/.+\/(minutes|free)$/.test(path)) {
+        posted.push([path.split("/").at(-1) ?? "", await request.json()]);
+        return json(204, null);
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage />);
+    const tools = await screen.findByRole("region", { name: "Screen time" });
+    expect(within(tools).getByText(/\+15 min today/)).toBeTruthy();
+    fireEvent.click(within(tools).getByRole("button", { name: "+30 min" }));
+    await waitFor(() => expect(posted).toEqual([["minutes", { minutes: 30 }]]));
+    fireEvent.click(within(tools).getByRole("button", { name: "1 hour" }));
+    await waitFor(() => expect(posted.at(-1)).toEqual(["free", { minutes: 60 }]));
+
+    household = {
+      ...HOUSEHOLD,
+      members: HOUSEHOLD.members.map((m) =>
+        m.id === LEA ? { ...m, free_until: new Date(Date.now() + 3_600_000).toISOString() } : m,
+      ),
+    };
+    cleanup();
+    show(<HouseholdPage />);
+    const freed = await screen.findByRole("region", { name: "Screen time" });
+    expect(within(freed).getByText(/No limits until/)).toBeTruthy();
+    fireEvent.click(within(freed).getByRole("button", { name: "Limits back" }));
+    await waitFor(() => expect(posted.at(-1)).toEqual(["free", { minutes: null }]));
+  });
+
+  it("keeps out any genre, plans each day and sets the allowed hours", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, HOUSEHOLD);
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (path === "/api/v1/media/facets")
+        return json(200, { years: {}, genres: ["Science-Fiction", "Animation"] });
+      return json(404, {});
+    };
+    show(<HouseholdPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
+    fireEvent.change(within(editor).getByLabelText(/Add a genre/), { target: { value: "Science-Fiction" } });
+    fireEvent.click(within(editor).getByRole("button", { name: "Add" }));
+    expect(within(editor).getByRole("button", { name: "Remove science fiction" })).toBeTruthy();
+    fireEvent.click(within(editor).getByRole("button", { name: "Remove science fiction" }));
+    expect(within(editor).queryByRole("button", { name: "Remove science fiction" })).toBeNull();
+
+    fireEvent.click(within(editor).getByLabelText("A plan for each day of the week"));
+    expect(within(editor).getByLabelText("Monday")).toBeTruthy();
+    expect(within(editor).getByLabelText("Sunday")).toBeTruthy();
+    fireEvent.click(within(editor).getByLabelText("Allowed hours"));
+    expect((within(editor).getByLabelText(/^From/) as HTMLInputElement).value).toBe("08:00");
+    expect((within(editor).getByLabelText(/^To/) as HTMLInputElement).value).toBe("20:00");
+    fireEvent.click(within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }));
+    expect(
+      (within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }) as HTMLInputElement).checked,
+    ).toBe(true);
+  });
+
   it("hides the master's tools from a profile", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
@@ -313,5 +389,32 @@ describe("a locked title", () => {
     expect(sent).toEqual([
       { kind: "media", ref: REQUEST.subject_ref, title: "Alien", rating: "16", note: "please" },
     ]);
+  });
+});
+
+describe("a title shown to a profile, never played (issue 432)", () => {
+  it("says why and asks the master for access", async () => {
+    const asked: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household/requests" && request.method === "GET") return json(200, []);
+      if (path === "/api/v1/household/requests") {
+        asked.push(await request.json());
+        return json(201, { id: "r1" });
+      }
+      return json(404, {});
+    };
+    show(
+      <KeptNotice
+        objectId={REQUEST.subject_ref}
+        title="Alien"
+        kept={{ rating: "16+", reason: "age", can_ask: true }}
+      />,
+    );
+    expect(screen.getByRole("heading", { name: /Alien/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Ask for access" }));
+    await waitFor(() =>
+      expect(asked).toMatchObject([{ ref: REQUEST.subject_ref, title: "Alien", rating: "16+" }]),
+    );
   });
 });

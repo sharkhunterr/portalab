@@ -1367,6 +1367,10 @@
     "advanced": false,
     "group": "general"
   },
+  "ui.cardAgeBadge": {
+    "advanced": false,
+    "group": "general"
+  },
   "ui.celebration": {
     "advanced": false,
     "group": "general"

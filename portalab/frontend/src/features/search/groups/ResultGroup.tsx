@@ -70,7 +70,11 @@ function PosterResult({ item }: { item: ItemOut }) {
     <li className="search-poster">
       <Link to={item.url_ref} className="search-poster__link">
         <span className="media-card__frame search-poster__frame">
-          <Poster src={src} kind={item.facets?.type ?? "movie"} />
+          <Poster
+            src={src}
+            kind={item.facets?.type ?? "movie"}
+            mediaId={/^\/media\/([0-9a-f-]{36})/.exec(item.url_ref ?? "")?.[1]}
+          />
           <PosterBadge status={status} />
           <PosterTickets mediaId={/^\/media\/([0-9a-f-]{36})/.exec(item.url_ref ?? "")?.[1]} />
         </span>

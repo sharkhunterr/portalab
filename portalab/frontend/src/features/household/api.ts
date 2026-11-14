@@ -183,3 +183,42 @@ export function useScreenTime(profile: string | null, enabled = true) {
       ).data as ScreenTime | null,
   });
 }
+
+/** Issue 432: minutes of screen time more today, for a profile (the master). */
+export function useGiveMinutes() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async ({ id, minutes }: { id: string; minutes: number }) => {
+      const { error } = await api.POST("/api/v1/household/profiles/{profile_id}/minutes", {
+        params: { path: { profile_id: id } },
+        body: { minutes },
+      });
+      if (error) throw new Error("household.minutes");
+    },
+    onSuccess: refresh,
+  });
+}
+
+/** Issue 432: no limits for a while (``minutes``), or the limits back now (``null``). */
+export function useFreeProfile() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async ({ id, minutes }: { id: string; minutes: number | null }) => {
+      const { error } = await api.POST("/api/v1/household/profiles/{profile_id}/free", {
+        params: { path: { profile_id: id } },
+        body: { minutes },
+      });
+      if (error) throw new Error("household.free");
+    },
+    onSuccess: refresh,
+  });
+}
+
+export const EXTRA_MINUTES = [15, 30, 60, 120] as const;
+
+/** Minutes until the end of the day (local), within what the portal accepts. */
+export function minutesLeftToday(now = new Date()): number {
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return Math.min(1440, Math.max(15, Math.ceil((midnight.getTime() - now.getTime()) / 60_000)));
+}

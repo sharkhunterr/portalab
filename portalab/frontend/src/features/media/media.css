@@ -1778,6 +1778,21 @@ a.media-person__row:hover {
   color: var(--color-text);
   background: color-mix(in srgb, var(--color-surface) 35%, transparent);
 }
+/* issue 432 — shown to a profile, never played */
+.media-card__kept {
+  position: absolute;
+  inset-block-start: 0.4rem;
+  inset-inline-end: 0.4rem;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  color: var(--color-text);
+  box-shadow: var(--shadow-1);
+}
 /* issue 434 — a title's age rating, coloured by age */
 .age-badge {
   --tone: var(--state-available-fg);
@@ -1805,6 +1820,9 @@ a.media-person__row:hover {
 }
 .age-badge[data-tier="18"] {
   --tone: var(--state-error-fg);
+}
+.age-badge[data-tier="unknown"] {
+  --tone: var(--color-text-muted);
 }
 .age-badge[data-compact] {
   position: absolute;

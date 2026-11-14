@@ -4629,6 +4629,11 @@
             ],
             "title": "Image Id"
           },
+          "kept": {
+            "default": false,
+            "title": "Kept",
+            "type": "boolean"
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -9276,6 +9281,26 @@
         "title": "HouseholdFigures",
         "type": "object"
       },
+      "HouseholdFreeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "minutes": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 15.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          }
+        },
+        "title": "HouseholdFreeIn",
+        "type": "object"
+      },
       "HouseholdMemberOut": {
         "properties": {
           "age": {
@@ -9288,6 +9313,11 @@
               }
             ],
             "title": "Age"
+          },
+          "bonus_minutes": {
+            "default": 0,
+            "title": "Bonus Minutes",
+            "type": "integer"
           },
           "color": {
             "title": "Color",
@@ -9311,6 +9341,18 @@
               }
             ],
             "title": "Effective Age"
+          },
+          "free_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Until"
           },
           "has_avatar": {
             "title": "Has Avatar",
@@ -9415,6 +9457,22 @@
           "has_pin"
         ],
         "title": "HouseholdMemberTile",
+        "type": "object"
+      },
+      "HouseholdMinutesIn": {
+        "additionalProperties": false,
+        "properties": {
+          "minutes": {
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "minutes"
+        ],
+        "title": "HouseholdMinutesIn",
         "type": "object"
       },
       "HouseholdOut": {
@@ -10228,6 +10286,36 @@
           "refunded"
         ],
         "title": "InventoryItemOut",
+        "type": "object"
+      },
+      "KeptOut": {
+        "description": "432: why a title shown to a household profile is kept from it \u2014 what \u00ab Ask for access \u00bb needs.",
+        "properties": {
+          "can_ask": {
+            "title": "Can Ask",
+            "type": "boolean"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "can_ask"
+        ],
+        "title": "KeptOut",
         "type": "object"
       },
       "KeptTitle": {
@@ -12356,6 +12444,22 @@
         "title": "MeasuresIn",
         "type": "object"
       },
+      "MediaAgesOut": {
+        "properties": {
+          "ages": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Ages",
+            "type": "object"
+          }
+        },
+        "required": [
+          "ages"
+        ],
+        "title": "MediaAgesOut",
+        "type": "object"
+      },
       "MediaCard": {
         "properties": {
           "age": {
@@ -12411,6 +12515,11 @@
               }
             ],
             "title": "Image Id"
+          },
+          "kept": {
+            "default": false,
+            "title": "Kept",
+            "type": "boolean"
           },
           "kind": {
             "title": "Kind",
@@ -12568,6 +12677,11 @@
             ],
             "title": "Image Id"
           },
+          "kept": {
+            "default": false,
+            "title": "Kept",
+            "type": "boolean"
+          },
           "kind": {
             "title": "Kind",
             "type": "string"
@@ -12626,6 +12740,16 @@
             "default": false,
             "title": "Requested",
             "type": "boolean"
+          },
+          "restricted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KeptOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sections": {
             "items": {
@@ -19606,9 +19730,31 @@
             "items": {
               "type": "string"
             },
-            "maxItems": 4,
+            "maxItems": 40,
             "title": "Genres",
             "type": "array"
+          },
+          "hours_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours From"
+          },
+          "hours_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours To"
           },
           "max_age": {
             "anyOf": [
@@ -19624,6 +19770,7 @@
           "mode": {
             "default": "hide",
             "enum": [
+              "show",
               "hide",
               "lock"
             ],
@@ -19655,6 +19802,27 @@
             "maxItems": 6,
             "title": "Types",
             "type": "array"
+          },
+          "week_minutes": {
+            "anyOf": [
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Minutes"
           }
         },
         "title": "RestrictionSettings",
@@ -47583,6 +47751,100 @@
         ]
       }
     },
+    "/api/v1/household/profiles/{profile_id}/free": {
+      "post": {
+        "description": "Issue 432: a profile without limits for a while, or its limits back now (its master).",
+        "operationId": "free_profile_api_v1_household_profiles__profile_id__free_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdFreeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Free Profile",
+        "tags": [
+          "household"
+        ]
+      }
+    },
+    "/api/v1/household/profiles/{profile_id}/minutes": {
+      "post": {
+        "description": "Issue 432: screen time more for a profile, today only (its master).",
+        "operationId": "give_minutes_api_v1_household_profiles__profile_id__minutes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Profile Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdMinutesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Give Minutes",
+        "tags": [
+          "household"
+        ]
+      }
+    },
     "/api/v1/household/requests": {
       "get": {
         "operationId": "access_requests_api_v1_household_requests_get",
@@ -53643,6 +53905,51 @@
         "summary": "Open Media Tickets",
         "tags": [
           "support"
+        ]
+      }
+    },
+    "/api/v1/media/ages": {
+      "get": {
+        "description": "Issue 434: the age ratings of the titles a page shows (its thumbnails' badges), in one call.",
+        "operationId": "media_ages_api_v1_media_ages_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ids",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 4000,
+              "title": "Ids",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaAgesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Media Ages",
+        "tags": [
+          "media"
         ]
       }
     },

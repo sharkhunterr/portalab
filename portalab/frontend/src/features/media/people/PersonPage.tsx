@@ -291,7 +291,7 @@ export function KnownCard({
   const frame = (
     <>
       <span className="media-card__frame">
-        <Poster src={src} kind={credit.kind} />
+        <Poster src={src} kind={credit.kind} mediaId={credit.object_id} />
         <PosterBadge status={credit.status} />
         <PosterTickets mediaId={credit.object_id} />
       </span>

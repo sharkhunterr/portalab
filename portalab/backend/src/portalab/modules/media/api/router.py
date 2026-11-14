@@ -99,6 +99,7 @@ class MediaCard(BaseModel):
         False  # 032: above this household profile's age rating, shown locked by its master's choice
     )
     age: int | None = None  # issue 434: the strictest age its ratings stand for (its badge)
+    kept: bool = False  # 432: kept from this household profile, shown with a padlock (its master's choice)
 
 
 class MediaPage(BaseModel):
@@ -119,8 +120,17 @@ class AgeRating(BaseModel):
     ratings: list[AgeRatingSource] = []
 
 
+class KeptOut(BaseModel):
+    """432: why a title shown to a household profile is kept from it — what « Ask for access » needs."""
+
+    rating: str | None = None
+    reason: str
+    can_ask: bool
+
+
 class MediaDetail(MediaCard):
     age_rating: AgeRating = AgeRating()
+    restricted: KeptOut | None = None
     status: str
     parent_id: UUID | None
     position: int | None
@@ -860,11 +870,38 @@ async def object_metadata(_: Reader, object_id: UUID, module: Module) -> dict[st
     return {"provider": row.provider, "language": row.language, "fetched_at": row.fetched_at, **row.data}
 
 
+class MediaAgesOut(BaseModel):
+    ages: dict[str, int]  # issue 434: each title's age rating, -1 for an unrated one (unknown ids left out)
+
+
+@router.get("/media/ages", response_model=MediaAgesOut)
+async def media_ages(
+    _: Reader, module: Module, ids: Annotated[str, Query(max_length=4000)] = ""
+) -> MediaAgesOut:
+    """Issue 434: the age ratings of the titles a page shows (its thumbnails' badges), in one call."""
+    wanted: list[UUID] = []
+    for part in ids.split(",")[:100]:
+        try:
+            wanted.append(UUID(part.strip()))
+        except ValueError:
+            continue
+    known = await module.gate.ages(wanted, unrated=-1)
+    return MediaAgesOut(ages={str(k): v for k, v in known.items()})
+
+
 @router.get("/media/{object_id}", response_model=MediaDetail)
 async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDetail:
     view = _detail(await module.catalog.get(principal, object_id))
     rating = await module.gate.rating(object_id)  # 032: shown on the title's page
-    return view.model_copy(update={"age_rating": AgeRating.model_validate(rating)})
+    kept = await module.gate.kept(principal, object_id, view.title)  # 432: shown, not opened
+    return view.model_copy(
+        update={
+            "age_rating": AgeRating.model_validate(rating),
+            "restricted": KeptOut(rating=kept["rating"], reason=kept["reason"], can_ask=kept["can_ask"])
+            if kept is not None
+            else None,
+        }
+    )
 
 
 @router.get("/media/{object_id}/journey")

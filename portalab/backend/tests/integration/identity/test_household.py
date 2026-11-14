@@ -140,11 +140,14 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "birth_date": None,
         "mode": "hide",
         "requests": True,
-        "genres": ["horror"],
+        "genres": ["crime", "horror", "thriller", "war"],  # issue 432: at least these for a child
         "types": [],
         "titles": [],
         "daily_minutes": None,
         "services": False,
+        "week_minutes": None,
+        "hours_from": None,
+        "hours_to": None,
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 
@@ -251,3 +254,39 @@ async def test_an_account_holds_a_bounded_number_of_profiles(app: FastAPI, clien
         await _profile(client, f"P{number}")
     full = await client.post("/api/v1/household/profiles", json={"display_name": "One more"})
     assert full.status_code == 409 and full.json()["code"] == "household.limit"
+
+
+async def test_the_master_gives_time_in_a_few_taps(app: FastAPI, client: httpx.AsyncClient) -> None:
+    """Issue 432: minutes more today, no limits for a while, the limits back — the master only."""
+    _, _, lea, tom = await _family(app, client)
+    week = [30, 30, 30, 30, 60, 120, 120]
+    changed = await client.patch(
+        f"/api/v1/household/profiles/{lea}",
+        json={
+            "restrictions": {"max_age": 12, "week_minutes": week, "hours_from": "08:00", "hours_to": "20:00"}
+        },
+    )
+    assert changed.status_code == 204, changed.text
+    base = await households(app).restrictions_of(lea)
+    assert base is not None and base.week_minutes == tuple(week) and base.hours == ("08:00", "20:00")
+
+    minutes, free = f"/api/v1/household/profiles/{lea}/minutes", f"/api/v1/household/profiles/{lea}/free"
+    assert (await client.post(minutes, json={"minutes": 30})).status_code == 204
+    assert (await client.post(minutes, json={"minutes": 15})).status_code == 204
+    given = await households(app).restrictions_of(lea)
+    assert given is not None and given.bonus_minutes == 45
+    odd = await client.post(minutes, json={"minutes": 7})
+    assert odd.status_code == 409 and odd.json()["code"] == "household.invalid_minutes"
+    tile = next(m for m in (await client.get("/api/v1/household")).json()["members"] if m["id"] == str(lea))
+    assert tile["bonus_minutes"] == 45
+
+    assert (await client.post(free, json={"minutes": 60})).status_code == 204
+    assert await households(app).restrictions_of(lea) is None  # no limits for an hour
+    tile = next(m for m in (await client.get("/api/v1/household")).json()["members"] if m["id"] == str(lea))
+    assert tile["free_until"] is not None
+    assert (await client.post(free, json={})).status_code == 204
+    assert await households(app).restrictions_of(lea) is not None  # the limits back
+
+    await _switch(client, tom)
+    refused = await client.post(minutes, json={"minutes": 30})
+    assert refused.status_code == 403  # a profile gives no time

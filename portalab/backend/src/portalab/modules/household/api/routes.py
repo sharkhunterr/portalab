@@ -64,6 +64,8 @@ class HouseholdMemberOut(HouseholdMemberTile):
     restrictions: RestrictionSettings | None = None
     age: int | None = None  # from its birth date
     effective_age: int | None = None  # the age its titles are held to (None: no limit)
+    bonus_minutes: int = 0  # issue 432: screen time given for today
+    free_until: datetime | None = None  # no limits until then
 
 
 class HouseholdOut(BaseModel):
@@ -216,6 +218,32 @@ async def set_pin(
     member_id: UUID, body: HouseholdPinIn, module: Module, principal: Principal = require(SELF)
 ) -> Response:
     await module.service.set_pin(principal, member_id, body.pin, body.current)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class HouseholdMinutesIn(_Strict):
+    minutes: int = Field(ge=1, le=120)  # issue 432: 15, 30, 60 or 120 more today
+
+
+class HouseholdFreeIn(_Strict):
+    minutes: int | None = Field(default=None, ge=15, le=1440)  # issue 432: none — the limits back now
+
+
+@router.post("/profiles/{profile_id}/minutes", status_code=status.HTTP_204_NO_CONTENT)
+async def give_minutes(
+    profile_id: UUID, body: HouseholdMinutesIn, module: Module, principal: Principal = require(SELF)
+) -> Response:
+    """Issue 432: screen time more for a profile, today only (its master)."""
+    await module.service.give_minutes(principal, profile_id, body.minutes)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/profiles/{profile_id}/free", status_code=status.HTTP_204_NO_CONTENT)
+async def free_profile(
+    profile_id: UUID, body: HouseholdFreeIn, module: Module, principal: Principal = require(SELF)
+) -> Response:
+    """Issue 432: a profile without limits for a while, or its limits back now (its master)."""
+    await module.service.free(principal, profile_id, body.minutes)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

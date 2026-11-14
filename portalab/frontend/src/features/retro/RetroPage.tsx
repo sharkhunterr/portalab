@@ -140,7 +140,8 @@ function reasonOf(error: unknown): string {
   const code = error instanceof ApiError ? error.code : undefined;
   if (code === "retro.disabled") return "disabled";
   if (code === "retro.not_playable") return "nothing";
-  if (code === "household.screen_time_up") return "screen";
+  if (code === "household.screen_time_up")
+    return error instanceof ApiError && error.extensions.reason === "hours" ? "hours" : "screen"; // 432
   if (code === "household.restricted" || (error instanceof ApiError && error.status === 403))
     return "restricted";
   return "unavailable";

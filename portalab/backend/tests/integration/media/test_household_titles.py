@@ -5,7 +5,7 @@ master and members without restrictions see everything."""
 
 from datetime import UTC, datetime
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import httpx
 import pytest
@@ -79,7 +79,8 @@ async def test_a_child_profile_sees_its_age_only(
 
     assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
     assert await _titles(client) == {"Toy Story", "Coco"}  # 12 at most, rated titles only
-    assert await _titles(client, "book") == {"Le Petit Prince"}  # books carry no rating
+    # issue 432: an unrated book is kept like any unrated title (a child read the unrated « Aliens »)
+    assert await _titles(client, "book") == set()
     locked = await client.get(f"/api/v1/media/{ids['Alien']}")
     assert locked.status_code == 403
     problem = locked.json()
@@ -102,7 +103,7 @@ async def test_a_child_profile_sees_its_age_only(
     assert (await client.get(f"/api/v1/media/{ids['Alien']}")).status_code == 200
 
     blocked = await media.module.gate.blocked(Principal(user_id=lea, profile_of=people["zoe"]))
-    assert blocked == frozenset({ids["Nameless"]})
+    assert blocked == frozenset({ids["Nameless"], ids["Le Petit Prince"]})  # issue 432: unrated books too
     assert await media.module.gate.blocked(Principal(user_id=people["zoe"])) == frozenset()
 
 
@@ -322,7 +323,7 @@ async def test_the_request_services_titles_follow_the_profile(app: FastAPI, medi
 
 async def test_a_rated_game_is_held_to_the_profiles_age(app: FastAPI, media: MediaHarness) -> None:
     """Issue 421: a game rated above a child's limit (PEGI, ESRB… from IGDB, through RomM) is kept from it;
-    an unrated game — most retro games are older than the boards — stays open."""
+    issue 432: an unrated game too, while the profile keeps unrated titles out (like any other title)."""
     people = await users(app, media, "zoe")
     one = media.service(1)
     media.library(one)
@@ -339,7 +340,7 @@ async def test_a_rated_game_is_held_to_the_profiles_age(app: FastAPI, media: Med
     owner = Principal(user_id=people["zoe"])
     created = await households(app).create(owner, display_name="Léa", kind="child", color=None, pin=None)
     viewer = Principal(user_id=UUID(str(created["id"])), profile_of=people["zoe"])
-    assert await media.module.gate.blocked(viewer) == frozenset({ids["Doom"]})
+    assert await media.module.gate.blocked(viewer) == frozenset({ids["Doom"], ids["Pong"]})
     assert (await media.module.gate.rating(ids["Doom"]))["age"] == 18
 
 
@@ -352,4 +353,40 @@ async def test_every_card_carries_its_age_rating(
     await login(client, "zoe")
     items = (await client.get("/api/v1/media", params={"kind": "movie"})).json()["items"]
     ages = {item["title"]: item["age"] for item in items}
-    assert ages["Alien"] == 16 and ages["Toy Story"] == 0 and ages["Nameless"] is None
+    assert ages["Alien"] == 16 and ages["Toy Story"] == 0 and ages["Nameless"] == -1  # -1: unrated
+
+    # any thumbnail asks the ages of the titles it shows (one call for a whole shelf)
+    ids = {item["title"]: item["id"] for item in items}
+    found = (await client.get("/api/v1/media/ages", params={"ids": ",".join(ids.values())})).json()["ages"]
+    assert found[ids["Alien"]] == 16 and found[ids["Nameless"]] == -1
+    odd = (await client.get("/api/v1/media/ages", params={"ids": f"not-an-id,{uuid4()}"})).json()
+    assert odd == {"ages": {}}  # what is no title of the library says nothing
+
+
+async def test_a_shown_title_opens_its_page_but_not_its_player(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 432: the third mode — a title above the profile's limit is shown (its page, its request
+    panel), never played."""
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    created = await households(app).create(
+        Principal(user_id=people["zoe"]), display_name="Léa", kind="child", color=None, pin=None
+    )
+    lea = UUID(str(created["id"]))
+    await login(client, "zoe")
+    changed = await client.patch(
+        f"/api/v1/household/profiles/{lea}",
+        json={"restrictions": {"max_age": 12, "allow_unrated": True, "mode": "show", "genres": []}},
+    )
+    assert changed.status_code == 204, changed.text
+    media.module.gate.forget()
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    items = (await client.get("/api/v1/media", params={"kind": "movie"})).json()["items"]
+    kept = {item["title"]: item["kept"] for item in items}
+    assert kept == {"Toy Story": False, "Alien": True, "Coco": False, "Nameless": False}
+    page = await client.get(f"/api/v1/media/{ids['Alien']}")
+    assert page.status_code == 200, page.text
+    assert page.json()["restricted"]["rating"] == "16+" and page.json()["restricted"]["can_ask"] is True
+    assert (await client.get(f"/api/v1/media/{ids['Coco']}")).json()["restricted"] is None
+    assert (await client.get(f"/api/v1/media/{ids['Alien']}/player")).status_code == 403

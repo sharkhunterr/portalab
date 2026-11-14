@@ -7,9 +7,10 @@ The households are this module's; the accounts behind them, the sessions and the
 identity's (``identity.profile_accounts``). Nothing here touches a connected service."""
 
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,6 +45,7 @@ from portalab.modules.household.settings import MAX_KEY
 CACHE_S = 15.0
 ATTENTION_ENTRY = "shell.household"  # the navigation entry of « My household »
 CATEGORY = "household.requests"
+EXTRA_MINUTES = (15, 30, 60, 120)  # issue 432: screen time given for today
 log = get_logger("portalab.household")
 
 
@@ -135,8 +137,11 @@ class HouseholdService:
         async with self.database.session() as session:
             row = await session.get(HouseholdMember, user)
         found = None
-        if row is not None and row.kind != "owner":
-            restrictions = parse(row.restrictions).restrictions()
+        free = row is not None and row.free_until is not None and row.free_until > self.now()
+        if row is not None and row.kind != "owner" and not free:  # issue 432: no limits for a while
+            restrictions = parse(row.restrictions).restrictions(
+                bonus_minutes=row.bonus_minutes or 0, bonus_day=row.bonus_day
+            )
             found = restrictions if restrictions.restricts else None
         self._restrictions[user] = (time.monotonic(), found)
         return found
@@ -266,6 +271,45 @@ class HouseholdService:
         return {"active_id": target}
 
     # --- the household page --------------------------------------------------------------------------
+    async def _local_today(self) -> date:
+        """The portal's day (its economy's time zone), as the screen time counts it."""
+        zone = ZoneInfo("UTC")
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                zone = ZoneInfo(str((await providers[0].provider.get("economy.timezone")).value or "UTC"))
+        except Exception:  # noqa: S110 — the day falls back to UTC's
+            pass
+        return self.now().astimezone(zone).date()
+
+    async def give_minutes(self, principal: Principal, profile: UUID, minutes: int) -> None:
+        """Issue 432: minutes of screen time more, today only (added to what was given today already)."""
+        owner = self._manager(principal)
+        if minutes not in EXTRA_MINUTES:
+            raise Conflict("Choose 15, 30, 60 or 120 minutes.", code="household.invalid_minutes")
+        today = await self._local_today()
+        async with self.database.unit_of_work() as uow:
+            member = await self._profile(uow.session, owner, profile)
+            already = member.bonus_minutes if member.bonus_day == today else 0
+            member.bonus_minutes, member.bonus_day = min(already + minutes, 24 * 60), today
+            member.updated_at = self.now()
+            await self._audit(
+                uow.session, "household.minutes_given", principal, profile, {"minutes": minutes}
+            )
+        self._restrictions.pop(profile, None)
+
+    async def free(self, principal: Principal, profile: UUID, minutes: int | None) -> None:
+        """Issue 432: no limits for a while (``minutes``; ``None``: the limits back now)."""
+        owner = self._manager(principal)
+        if minutes is not None and not 15 <= minutes <= 24 * 60:
+            raise Conflict("From 15 minutes to a day.", code="household.invalid_minutes")
+        async with self.database.unit_of_work() as uow:
+            member = await self._profile(uow.session, owner, profile)
+            member.free_until = self.now() + timedelta(minutes=minutes) if minutes is not None else None
+            member.updated_at = self.now()
+            await self._audit(uow.session, "household.freed", principal, profile, {"minutes": minutes})
+        self._restrictions.pop(profile, None)
+
     async def overview(self, principal: Principal) -> dict[str, Any]:
         """Every household member sees the household: its wallet (the master's balances, which hold every
         profile's earnings) and each member's figures; the restrictions to the master and to the profile."""
@@ -283,6 +327,10 @@ class HouseholdService:
                 tile["restrictions"] = settings.model_dump(mode="json")
                 tile["age"] = settings.age(today)
                 tile["effective_age"] = settings.effective_age(today)
+                local = await self._local_today()
+                tile["bonus_minutes"] = member.bonus_minutes if member.bonus_day == local else 0
+                free = member.free_until if member.free_until and member.free_until > self.now() else None
+                tile["free_until"] = free
             tiles.append(tile)
         return {
             "enabled": True,

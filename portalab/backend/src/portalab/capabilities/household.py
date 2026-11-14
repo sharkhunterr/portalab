@@ -11,7 +11,7 @@ Nothing here changes a connected service."""
 import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, time
 from typing import Literal, Protocol, get_args, runtime_checkable
 from uuid import UUID
 
@@ -49,6 +49,14 @@ SCREEN_MINUTES: tuple[int, ...] = (15, 30, 45, 60, 90, 120, 180, 240, 300)
 _WORD = re.compile(r"[^\W\d_]+")
 
 
+def genre_key(value: str) -> str:
+    """A genre as a profile keeps it out (issue 432: any genre of the catalog): one of the four known ones'
+    keys (``horror``…, whatever the language), else its words, lowercased (« Science Fiction » →
+    ``science fiction``)."""
+    known = genre_of(value)
+    return known if known is not None else " ".join(_WORD.findall(value.casefold()))[:60]
+
+
 def genre_of(tag: str) -> str | None:
     """The kept-out genre a title's genre tag stands for (« Épouvante-horreur » → ``horror``), if any."""
     words = set(_WORD.findall(tag.casefold()))
@@ -66,7 +74,7 @@ FEATURE_PERMISSIONS: dict[str, tuple[str, ...]] = {
 }
 
 
-Mode = Literal["hide", "lock"]
+Mode = Literal["show", "hide", "lock"]  # issue 432: « show » — listed as any title, a padlock, never opened
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,6 +94,30 @@ class Restrictions:
     titles: frozenset[str] = frozenset()  # titles its master kept out one by one
     daily_minutes: int | None = None  # screen time a day in the portal's player and reader
     services: bool = True  # may open a title in its service (Plex, Grimmory, RomM…), not only in the portal
+    # issue 432: a weekly plan (Monday first; ``None`` a day without limit), the hours it may watch
+    # (« HH:MM », local time) and what its master gave for one day
+    week_minutes: tuple[int | None, ...] | None = None
+    hours: tuple[str, str] | None = None
+    bonus_minutes: int = 0
+    bonus_day: date | None = None
+
+    def minutes_on(self, day: date) -> int | None:
+        """Its screen time on that day: the plan's (or every day's), and what its master added for it."""
+        planned = (
+            self.week_minutes[day.weekday()]
+            if self.week_minutes is not None and len(self.week_minutes) == 7
+            else self.daily_minutes
+        )
+        if planned is None:
+            return None
+        return planned + (self.bonus_minutes if self.bonus_day == day else 0)
+
+    def allowed_at(self, moment: time) -> bool:
+        """Whether this time of day is within its hours (an overnight span too: « 20:00 » to « 07:00 »)."""
+        if self.hours is None:
+            return True
+        start, end = (time.fromisoformat(h) for h in self.hours)
+        return start <= moment < end if start <= end else moment >= start or moment < end
 
     @property
     def limits_titles(self) -> bool:
@@ -98,7 +130,8 @@ class Restrictions:
     @property
     def restricts(self) -> bool:
         """Whether anything at all is restricted (titles, features, screen time, the services)."""
-        return self.limits_titles or bool(self.blocked) or self.daily_minutes is not None or not self.services
+        timed = self.daily_minutes is not None or self.week_minutes is not None or self.hours is not None
+        return self.limits_titles or bool(self.blocked) or timed or not self.services
 
     @property
     def kinds(self) -> frozenset[str]:

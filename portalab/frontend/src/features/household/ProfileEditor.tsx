@@ -7,6 +7,7 @@ import { Dialog, DialogActions } from "../../design-system/components/Overlays";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError } from "../../state/regions";
 import { Switch } from "../account/SettingsKit";
+import { useCatalogFacets } from "../media/api";
 import {
   AGES,
   FEATURES,
@@ -43,7 +44,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       blocked: ["ai", "community", "requests", "shop"],
       mode: "hide",
       requests: true,
-      genres: ["horror"],
+      genres: ["crime", "horror", "thriller", "war"], // issue 432: at least these for a child
       services: false,
     },
     community: false,
@@ -61,6 +62,14 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
   },
 };
 const KIND_ICONS: Record<ProfileKind, string> = { standard: "user", child: "smile", custom: "sliders" };
+const MODES = ["show", "hide", "lock"] as const;
+const MODE_ICONS: Record<(typeof MODES)[number], string> = { show: "eye", hide: "hide", lock: "lock" };
+const DAYS = [0, 1, 2, 3, 4, 5, 6] as const; // Monday first
+
+/** A genre as the portal keeps it out: its words, lowercased (the server knows the four usual ones). */
+export function genreKey(value: string): string {
+  return (value.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).join(" ").slice(0, 60);
+}
 
 /** A list with ``key`` in it or not. */
 function flip(list: readonly string[] | undefined, key: string, on: boolean): string[] {
@@ -256,7 +265,7 @@ export function ProfileEditor({
           </SelectField>
           <fieldset className="household-editor__modes">
             <legend className="household-editor__label">{t("household:editor.mode")}</legend>
-            {(["hide", "lock"] as const).map((mode) => (
+            {MODES.map((mode) => (
               <label key={mode} data-checked={restrictions.mode === mode || undefined}>
                 <input
                   type="radio"
@@ -265,7 +274,7 @@ export function ProfileEditor({
                   checked={restrictions.mode === mode}
                   onChange={() => setRestrictions((r) => ({ ...r, mode }))}
                 />
-                <Icon name={mode === "hide" ? "hide" : "lock"} size={18} />
+                <Icon name={MODE_ICONS[mode]} size={18} />
                 <span>
                   <strong>{t(`household:editor.mode_${mode}`)}</strong>
                   <small>{t(`household:editor.mode_${mode}Hint`)}</small>
@@ -304,22 +313,10 @@ export function ProfileEditor({
           </div>
         </fieldset>
 
-        <fieldset className="household-editor__section">
-          <legend>{t("household:editor.genres")}</legend>
-          <p className="household-editor__hint">{t("household:editor.genresHint")}</p>
-          <div className="household-switches">
-            {GENRES.map((genre) => (
-              <Switch
-                key={genre}
-                label={t(`household:genre.${genre}`)}
-                checked={(restrictions.genres ?? []).includes(genre)}
-                onChange={(event) =>
-                  setRestrictions((r) => ({ ...r, genres: flip(r.genres, genre, event.target.checked) }))
-                }
-              />
-            ))}
-          </div>
-        </fieldset>
+        <GenresField
+          genres={restrictions.genres ?? []}
+          onChange={(genres) => setRestrictions((r) => ({ ...r, genres }))}
+        />
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.titles")}</legend>
@@ -369,27 +366,7 @@ export function ProfileEditor({
           </div>
         </fieldset>
 
-        <fieldset className="household-editor__section">
-          <legend>{t("household:editor.screen")}</legend>
-          <SelectField
-            label={t("household:editor.screenLabel")}
-            hint={t("household:editor.screenHint")}
-            value={restrictions.daily_minutes ?? ""}
-            onChange={(event) =>
-              setRestrictions((r) => ({
-                ...r,
-                daily_minutes: event.target.value === "" ? null : Number(event.target.value),
-              }))
-            }
-          >
-            <option value="">{t("household:editor.screenNone")}</option>
-            {SCREEN_MINUTES.map((minutes) => (
-              <option key={minutes} value={minutes}>
-                {t("household:editor.screenMinutes", { minutes })}
-              </option>
-            ))}
-          </SelectField>
-        </fieldset>
+        <ScreenField restrictions={restrictions} onChange={setRestrictions} />
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.community")}</legend>
@@ -481,5 +458,185 @@ export function ProfileEditor({
         </DialogActions>
       </form>
     </Dialog>
+  );
+}
+
+/** Issue 432: the genres kept out — the usual four as switches, any other genre of the catalog by name. */
+function GenresField({ genres, onChange }: { genres: string[]; onChange: (genres: string[]) => void }) {
+  const t = useT();
+  const listId = useId();
+  const [typed, setTyped] = useState("");
+  const facets = useCatalogFacets(undefined);
+  const known = new Set<string>(GENRES);
+  const others = genres.filter((genre) => !known.has(genre));
+  const offered = [...new Set((facets.data?.genres ?? []).map((genre) => genre.trim()).filter(Boolean))]
+    .filter((genre) => !genres.includes(genreKey(genre)))
+    .sort((a, b) => a.localeCompare(b));
+  const add = () => {
+    const key = genreKey(typed);
+    if (key && !genres.includes(key)) onChange([...genres, key].sort());
+    setTyped("");
+  };
+  return (
+    <fieldset className="household-editor__section">
+      <legend>{t("household:editor.genres")}</legend>
+      <p className="household-editor__hint">{t("household:editor.genresHint")}</p>
+      <div className="household-switches">
+        {GENRES.map((genre) => (
+          <Switch
+            key={genre}
+            label={t(`household:genre.${genre}`)}
+            checked={genres.includes(genre)}
+            onChange={(event) => onChange(flip(genres, genre, event.target.checked))}
+          />
+        ))}
+      </div>
+      {others.length ? (
+        <ul className="household-genres" aria-label={t("household:editor.genresOther")}>
+          {others.map((genre) => (
+            <li key={genre}>
+              <span>{genre}</span>
+              <button
+                type="button"
+                aria-label={t("household:editor.genresRemove", { genre })}
+                onClick={() => onChange(genres.filter((g) => g !== genre))}
+              >
+                <Icon name="close" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <div className="household-genres__add">
+        <TextField
+          label={t("household:editor.genresAdd")}
+          hint={t("household:editor.genresAddHint")}
+          value={typed}
+          maxLength={60}
+          list={listId}
+          onChange={(event) => setTyped(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              add();
+            }
+          }}
+        />
+        <datalist id={listId}>
+          {offered.map((genre) => (
+            <option key={genre} value={genre} />
+          ))}
+        </datalist>
+        <Button variant="secondary" type="button" disabled={!genreKey(typed)} onClick={add}>
+          <Icon name="plus" size={16} />
+          {t("household:editor.genresAddButton")}
+        </Button>
+      </div>
+    </fieldset>
+  );
+}
+
+/** Issue 432: the screen time — one limit for every day or a plan for each, and the allowed hours. */
+function ScreenField({
+  restrictions,
+  onChange,
+}: {
+  restrictions: RestrictionSettings;
+  onChange: (change: (r: RestrictionSettings) => RestrictionSettings) => void;
+}) {
+  const t = useT();
+  const week = restrictions.week_minutes ?? null;
+  const minutesOptions = (
+    <>
+      <option value="">{t("household:editor.screenNone")}</option>
+      {SCREEN_MINUTES.map((minutes) => (
+        <option key={minutes} value={minutes}>
+          {t("household:editor.screenMinutes", { minutes })}
+        </option>
+      ))}
+    </>
+  );
+  const asNumber = (value: string) => (value === "" ? null : Number(value));
+  const hours = Boolean(restrictions.hours_from && restrictions.hours_to);
+  return (
+    <fieldset className="household-editor__section">
+      <legend>{t("household:editor.screen")}</legend>
+      <Switch
+        label={t("household:editor.week")}
+        checked={week !== null}
+        onChange={(event) =>
+          onChange((r) => ({
+            ...r,
+            week_minutes: event.target.checked ? DAYS.map(() => r.daily_minutes ?? null) : null,
+          }))
+        }
+      />
+      {week === null ? (
+        <SelectField
+          label={t("household:editor.screenLabel")}
+          hint={t("household:editor.screenHint")}
+          value={restrictions.daily_minutes ?? ""}
+          onChange={(event) => onChange((r) => ({ ...r, daily_minutes: asNumber(event.target.value) }))}
+        >
+          {minutesOptions}
+        </SelectField>
+      ) : (
+        <>
+          <p className="household-editor__hint">
+            {t("household:editor.weekHint")} {t("household:editor.screenHint")}
+          </p>
+          <div className="household-week">
+            {DAYS.map((day) => (
+              <SelectField
+                key={day}
+                label={t(`household:editor.day.${day}`)}
+                value={week[day] ?? ""}
+                onChange={(event) =>
+                  onChange((r) => {
+                    const next = [...(r.week_minutes ?? DAYS.map(() => null))];
+                    next[day] = asNumber(event.target.value);
+                    return { ...r, week_minutes: next };
+                  })
+                }
+              >
+                {minutesOptions}
+              </SelectField>
+            ))}
+          </div>
+        </>
+      )}
+      <Switch
+        label={t("household:editor.hours")}
+        checked={hours}
+        onChange={(event) =>
+          onChange((r) => ({
+            ...r,
+            hours_from: event.target.checked ? "08:00" : null,
+            hours_to: event.target.checked ? "20:00" : null,
+          }))
+        }
+      />
+      {hours ? (
+        <>
+          <p className="household-editor__hint">{t("household:editor.hoursHint")}</p>
+          <div className="household-hours">
+            <TextField
+              label={t("household:editor.hoursFrom")}
+              type="time"
+              required
+              value={restrictions.hours_from ?? ""}
+              onChange={(event) => onChange((r) => ({ ...r, hours_from: event.target.value || "00:00" }))}
+            />
+            <TextField
+              label={t("household:editor.hoursTo")}
+              type="time"
+              required
+              value={restrictions.hours_to ?? ""}
+              onChange={(event) => onChange((r) => ({ ...r, hours_to: event.target.value || "00:00" }))}
+            />
+          </div>
+        </>
+      ) : null}
+    </fieldset>
   );
 }

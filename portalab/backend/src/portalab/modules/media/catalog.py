@@ -320,7 +320,7 @@ class CatalogQuery:
             if row is None or (row.status == "hidden" and not await self._can(principal, MEDIA_MANAGE)):
                 raise MediaNotFound("This object does not exist.")
             if self.gate is not None:
-                await self.gate.check(principal, row.id, row.title)
+                await self.gate.check(principal, row.id, row.title, viewing=True)  # 432: « show »
             ids = {
                 scheme: value
                 for scheme, value in await session.execute(

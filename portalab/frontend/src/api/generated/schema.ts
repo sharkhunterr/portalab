@@ -7291,6 +7291,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/household/profiles/{profile_id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Free Profile
+         * @description Issue 432: a profile without limits for a while, or its limits back now (its master).
+         */
+        post: operations["free_profile_api_v1_household_profiles__profile_id__free_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/household/profiles/{profile_id}/minutes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Give Minutes
+         * @description Issue 432: screen time more for a profile, today only (its master).
+         */
+        post: operations["give_minutes_api_v1_household_profiles__profile_id__minutes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/household/requests": {
         parameters: {
             query?: never;
@@ -9692,6 +9732,26 @@ export interface paths {
          * @description #354: per media, how many open tickets about it I may see — the warning badge on its posters.
          */
         get: operations["open_media_tickets_api_v1_media_tickets_open_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/ages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Media Ages
+         * @description Issue 434: the age ratings of the titles a page shows (its thumbnails' badges), in one call.
+         */
+        get: operations["media_ages_api_v1_media_ages_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -14608,6 +14668,11 @@ export interface components {
             id: string;
             /** Image Id */
             image_id?: string | null;
+            /**
+             * Kept
+             * @default false
+             */
+            kept: boolean;
             /** Kind */
             kind: string;
             /**
@@ -16259,10 +16324,20 @@ export interface components {
             /** Xp */
             xp: number;
         };
+        /** HouseholdFreeIn */
+        HouseholdFreeIn: {
+            /** Minutes */
+            minutes?: number | null;
+        };
         /** HouseholdMemberOut */
         HouseholdMemberOut: {
             /** Age */
             age?: number | null;
+            /**
+             * Bonus Minutes
+             * @default 0
+             */
+            bonus_minutes: number;
             /** Color */
             color: string;
             /** Community Visible */
@@ -16271,6 +16346,8 @@ export interface components {
             display_name: string;
             /** Effective Age */
             effective_age?: number | null;
+            /** Free Until */
+            free_until?: string | null;
             /** Has Avatar */
             has_avatar: boolean;
             /** Has Pin */
@@ -16318,6 +16395,11 @@ export interface components {
              * @default false
              */
             needs_pin: boolean;
+        };
+        /** HouseholdMinutesIn */
+        HouseholdMinutesIn: {
+            /** Minutes */
+            minutes: number;
         };
         /** HouseholdOut */
         HouseholdOut: {
@@ -16584,6 +16666,18 @@ export interface components {
             state: string;
             /** Type */
             type: string;
+        };
+        /**
+         * KeptOut
+         * @description 432: why a title shown to a household profile is kept from it — what « Ask for access » needs.
+         */
+        KeptOut: {
+            /** Can Ask */
+            can_ask: boolean;
+            /** Rating */
+            rating?: string | null;
+            /** Reason */
+            reason: string;
         };
         /**
          * KeptTitle
@@ -17342,6 +17436,13 @@ export interface components {
                 [key: string]: unknown;
             }[];
         };
+        /** MediaAgesOut */
+        MediaAgesOut: {
+            /** Ages */
+            ages: {
+                [key: string]: number;
+            };
+        };
         /** MediaCard */
         MediaCard: {
             /** Age */
@@ -17359,6 +17460,11 @@ export interface components {
             id: string;
             /** Image Id */
             image_id?: string | null;
+            /**
+             * Kept
+             * @default false
+             */
+            kept: boolean;
             /** Kind */
             kind: string;
             /**
@@ -17426,6 +17532,11 @@ export interface components {
             };
             /** Image Id */
             image_id?: string | null;
+            /**
+             * Kept
+             * @default false
+             */
+            kept: boolean;
             /** Kind */
             kind: string;
             /**
@@ -17446,6 +17557,7 @@ export interface components {
              * @default false
              */
             requested: boolean;
+            restricted?: components["schemas"]["KeptOut"] | null;
             /** Sections */
             sections: string[];
             /** Status */
@@ -19849,6 +19961,10 @@ export interface components {
             daily_minutes?: number | null;
             /** Genres */
             genres?: string[];
+            /** Hours From */
+            hours_from?: string | null;
+            /** Hours To */
+            hours_to?: string | null;
             /** Max Age */
             max_age?: number | null;
             /**
@@ -19856,7 +19972,7 @@ export interface components {
              * @default hide
              * @enum {string}
              */
-            mode: "hide" | "lock";
+            mode: "show" | "hide" | "lock";
             /**
              * Requests
              * @default true
@@ -19871,6 +19987,8 @@ export interface components {
             titles?: components["schemas"]["KeptTitle"][];
             /** Types */
             types?: string[];
+            /** Week Minutes */
+            week_minutes?: (number | null)[] | null;
         };
         /** ResyncIn */
         ResyncIn: {
@@ -36581,6 +36699,72 @@ export interface operations {
             };
         };
     };
+    free_profile_api_v1_household_profiles__profile_id__free_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdFreeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    give_minutes_api_v1_household_profiles__profile_id__minutes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdMinutesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     access_requests_api_v1_household_requests_get: {
         parameters: {
             query?: never;
@@ -40731,6 +40915,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: number;
                     };
+                };
+            };
+        };
+    };
+    media_ages_api_v1_media_ages_get: {
+        parameters: {
+            query?: {
+                ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaAgesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

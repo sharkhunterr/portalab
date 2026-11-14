@@ -7,10 +7,21 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from portalab.capabilities.household import AGES, FEATURES, GENRES, SCREEN_MINUTES, TYPES, Mode, Restrictions
+from portalab.capabilities.household import (
+    AGES,
+    FEATURES,
+    SCREEN_MINUTES,
+    TYPES,
+    Mode,
+    Restrictions,
+    genre_key,
+)
 from portalab.core.errors import BadRequest, Conflict, Forbidden
 
 PIN = re.compile(r"\d{4,6}")
+HOUR = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d")
+MAX_GENRES = 40
+DAY_MINUTES = 24 * 60
 COLOR = re.compile(r"#[0-9a-fA-F]{6}")
 COLORS = ("#6366f1", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#8b5cf6", "#ef4444", "#84cc16")
 PROFILE_KINDS = ("standard", "child", "custom")
@@ -40,11 +51,32 @@ class RestrictionSettings(BaseModel):
     blocked: list[str] = Field(default_factory=list, max_length=len(FEATURES))
     mode: Mode = "hide"
     requests: bool = True
-    genres: list[str] = Field(default_factory=list, max_length=len(GENRES))
+    genres: list[str] = Field(default_factory=list, max_length=MAX_GENRES)  # issue 432: any genre
     types: list[str] = Field(default_factory=list, max_length=len(TYPES))
     titles: list[KeptTitle] = Field(default_factory=list, max_length=500)
     daily_minutes: int | None = None
     services: bool = True  # « Open in Plex, Grimmory, RomM… » offered, or the portal's player and reader only
+    # issue 432: a weekly plan (Monday first; ``None`` a day without limit, 0 a day without screen) and the
+    # hours it may watch (« HH:MM », both or none; an overnight span too)
+    week_minutes: list[int | None] | None = None
+    hours_from: str | None = None
+    hours_to: str | None = None
+
+    @field_validator("week_minutes")
+    @classmethod
+    def _week(cls, value: list[int | None] | None) -> list[int | None] | None:
+        if value is None:
+            return None
+        if len(value) != 7 or any(m is not None and not 0 <= m <= DAY_MINUTES for m in value):
+            raise ValueError("week_minutes: seven days, each from 0 to 1440 minutes or none")
+        return value
+
+    @field_validator("hours_from", "hours_to")
+    @classmethod
+    def _hour(cls, value: str | None) -> str | None:
+        if value is not None and not HOUR.fullmatch(value):
+            raise ValueError("an hour as HH:MM")
+        return value
 
     @field_validator("types")
     @classmethod
@@ -69,10 +101,10 @@ class RestrictionSettings(BaseModel):
     @field_validator("genres")
     @classmethod
     def _genres(cls, value: list[str]) -> list[str]:
-        unknown = [genre for genre in value if genre not in GENRES]
-        if unknown:
-            raise ValueError(f"unknown genres {unknown}")
-        return sorted(set(value))
+        """Issue 432: any genre of the catalog — kept as its key (the four known ones, whatever their
+        language), else its words lowercased."""
+        keys = {genre_key(genre) for genre in value if genre.strip()}
+        return sorted(key for key in keys if key)
 
     @field_validator("birth_date")
     @classmethod
@@ -110,7 +142,10 @@ class RestrictionSettings(BaseModel):
             return self.max_age
         return None if age >= ADULT else age
 
-    def restrictions(self, today: date | None = None) -> Restrictions:
+    def restrictions(
+        self, today: date | None = None, *, bonus_minutes: int = 0, bonus_day: date | None = None
+    ) -> Restrictions:
+        hours = (self.hours_from, self.hours_to) if self.hours_from and self.hours_to else None
         return Restrictions(
             self.effective_age(today or datetime.now(UTC).date()),
             self.allow_unrated,
@@ -122,6 +157,10 @@ class RestrictionSettings(BaseModel):
             frozenset(str(title.id) for title in self.titles),
             self.daily_minutes,
             self.services,
+            tuple(self.week_minutes) if self.week_minutes is not None else None,
+            hours,
+            bonus_minutes,
+            bonus_day,
         )
 
 
@@ -130,7 +169,7 @@ CHILD = RestrictionSettings(
     max_age=12,
     allow_unrated=False,
     blocked=["ai", "community", "requests", "shop"],
-    genres=["horror"],
+    genres=["horror", "thriller", "crime", "war"],  # issue 432: at least these, whatever their rating
     services=False,  # the portal's player and reader only: its screen time counts, its rules hold
 )
 

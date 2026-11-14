@@ -2,11 +2,11 @@
 each a member of its own (their accounts are identity's: the foreign keys to ``identity.users`` are the
 migration's, deleting with the account) — and the profiles' access requests."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, Index, Integer, String, text
+from sqlalchemy import Boolean, CheckConstraint, Date, Index, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -51,6 +51,10 @@ class HouseholdMember(HouseholdBase):
     )
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # issue 432: what its master gave for a while — minutes more on one day, no limits until a moment
+    bonus_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    bonus_day: Mapped[date | None] = mapped_column(Date)
+    free_until: Mapped[datetime | None] = mapped_column(TZDateTime)
 
 
 class AccessRequest(HouseholdBase):

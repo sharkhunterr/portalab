@@ -100,6 +100,7 @@ USER_SETTINGS: tuple[tuple[str, Any, Any, str], ...] = (
     ("ui.colorMode", Literal["dark", "light", "system"], "dark", "Light or dark variant of a theme family."),
     # #229: the actor's own portrait in a round badge by their character's image, on the media cards
     ("ui.cardActorBadge", bool, True, "The actor's portrait in a badge by their character, on the cards."),
+    ("ui.cardAgeBadge", bool, True, "A title's age rating as a badge on its thumbnail (issue 434)."),
     # #68, #70: where the « live weather » ambience looks at the sky — each member's own place, the value
     # the administrators set as everyone's default (empty: no weather asked)
     (

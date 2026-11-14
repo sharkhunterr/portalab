@@ -21,17 +21,16 @@ from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
-from portalab.capabilities.household import Household, Restrictions, genre_of, strictest_age
+from portalab.capabilities.household import Household, Restrictions, genre_key, strictest_age
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Forbidden
 from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag, PlaybackSession
 
-RATED = ("movie", "series")
-# issue 421: games are held to their age rating when they have one (PEGI, ESRB…); an unrated game stays open —
-# most of a retro library is older than the rating boards
-RATED_GAMES = ("game",)
+# issue 432: every kind a rating may hold to — the unrated rule too (books, games: « unrated titles » off
+# keeps their unrated ones out as well); music has no rating system
+RATED = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "game")
 CACHE_S = 30.0
 ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
@@ -64,12 +63,6 @@ def labelled(data: Mapping[str, Any] | None, server: str | None) -> list[tuple[s
 
 def ratings(data: Mapping[str, Any] | None, server: str | None) -> list[str]:
     return [value for _, value in labelled(data, server)]
-
-
-def _allowed(restrictions: Restrictions, kind: str, age: int | None) -> bool:
-    if kind in RATED_GAMES and age is None:
-        return True  # an unrated game is no unrated film
-    return restrictions.allows_age(age)
 
 
 def excluded(column: Any, blocked: frozenset[UUID]) -> Any:
@@ -124,25 +117,25 @@ class TitleGate:
                         ObjectMetadata,
                         (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
                     )
-                    .where(MediaObject.kind.in_((*RATED, *RATED_GAMES)))
+                    .where(MediaObject.kind.in_(RATED))
                 )
             ).all()
             works = {
                 work
                 for work, kind, data, server in rows
                 if str(work) not in granted
-                and not _allowed(restrictions, kind, strictest_age(ratings(data, server)))
+                and not restrictions.allows_age(strictest_age(ratings(data, server)))
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
                 tags = await session.execute(
                     select(ObjectTag.object_id, ObjectTag.value)
                     .join(MediaObject, MediaObject.id == ObjectTag.object_id)
-                    .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_((*RATED, *RATED_GAMES)))
+                    .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_(RATED))
                 )
                 works |= {
                     work
                     for work, tag in tags
-                    if str(work) not in granted and genre_of(str(tag)) in restrictions.genres
+                    if str(work) not in granted and genre_key(str(tag)) in restrictions.genres
                 }
             works |= {
                 UUID(title) for title in restrictions.titles
@@ -174,7 +167,7 @@ class TitleGate:
         """The titles left out of the lists — those kept from the viewer, unless its master chose to show
         them locked."""
         restrictions = await self.restrictions(viewer)
-        if restrictions is None or restrictions.mode == "lock":
+        if restrictions is None or restrictions.mode in ("lock", "show"):  # 432: shown, a padlock
             return frozenset()
         return await self.blocked(viewer)
 
@@ -182,22 +175,25 @@ class TitleGate:
         """Cards (pydantic models with ``id`` and ``locked``) of titles kept from the viewer, shown locked —
         issue 434: and each card's age rating (``age``, the strictest of its ratings), for its badge."""
         blocked = await self.blocked(viewer)
+        restrictions = await self.restrictions(viewer) if blocked else None
+        flag = "kept" if restrictions is not None and restrictions.mode == "show" else "locked"
         aged = [c for c in cards if "age" in type(c).model_fields]
-        ages = await self.ages([c.id for c in aged]) if aged else {}
+        ages = await self.ages([c.id for c in aged], unrated=-1) if aged else {}
         if not blocked and not ages:
             return cards
         out = []
         for card in cards:
             update: dict[str, Any] = {}
-            if card.id in blocked:
-                update["locked"] = True
+            if card.id in blocked and flag in type(card).model_fields:
+                update[flag] = True  # 432: blurred with a padlock (« lock »), or a padlock only (« show »)
             if card.id in ages and "age" in type(card).model_fields:
                 update["age"] = ages[card.id]
             out.append(card.model_copy(update=update) if update else card)
         return out
 
-    async def ages(self, ids: Iterable[UUID]) -> dict[UUID, int]:
-        """Issue 434: the strictest age each title's ratings stand for (unrated ones left out)."""
+    async def ages(self, ids: Iterable[UUID], *, unrated: int | None = None) -> dict[UUID, int]:
+        """Issue 434: the strictest age each title's ratings stand for — an unrated one left out, or given
+        ``unrated`` (« ? » on its badge); unknown ids left out."""
         wanted = list(dict.fromkeys(ids))
         if not wanted:
             return {}
@@ -219,6 +215,8 @@ class TitleGate:
             age = strictest_age(ratings(data, server))
             if age is not None:
                 out[object_id] = max(age, out.get(object_id, age))
+            elif unrated is not None and object_id not in out:
+                out[object_id] = unrated
         return out
 
     async def screen_today(self, viewer: Principal | UUID | None) -> tuple[int, int] | None:
@@ -226,9 +224,12 @@ class TitleGate:
         profile its master gave a screen time — ``None`` otherwise. The day is the economy's."""
         restrictions = await self.restrictions_any(viewer)
         user = viewer_of(viewer)
-        if restrictions is None or restrictions.daily_minutes is None or user is None:
+        if restrictions is None or user is None:
             return None
         start = await self._day_start()
+        allowed = restrictions.minutes_on(start.date())  # 432: the weekly plan's, and today's extra minutes
+        if allowed is None:
+            return None
         async with self.database.session() as session:
             ended = await session.scalar(
                 select(func.coalesce(func.sum(Activity.watched_s), 0.0)).where(
@@ -251,10 +252,20 @@ class TitleGate:
                 )
             )
         used = int((float(ended or 0) + max(0.0, float(running or 0))) // 60)
-        return used, restrictions.daily_minutes
+        return used, allowed
 
     async def check_screen(self, viewer: Principal | UUID | None) -> None:
-        """Refuse to open a title once the profile's screen time of the day is spent."""
+        """Refuse to open a title once the profile's screen time of the day is spent — 432: or outside the
+        hours its master set."""
+        restrictions = await self.restrictions_any(viewer)
+        if restrictions is not None and restrictions.hours is not None:
+            now = await self._day_start()
+            local = datetime.now(now.tzinfo).time()
+            if not restrictions.allowed_at(local):
+                raise ScreenTimeUp(
+                    "This profile may not watch at this hour.",
+                    extensions={"hours": list(restrictions.hours), "reason": "hours"},
+                )
         today = await self.screen_today(viewer)
         if today is not None and today[0] >= today[1]:
             raise ScreenTimeUp(
@@ -302,31 +313,46 @@ class TitleGate:
             )
             if not kept:
                 out.append(item)
-            elif restrictions.mode == "lock":
+            elif restrictions.mode in ("lock", "show"):
                 out.append({**item, "locked": True})
         return out
 
     def forget(self) -> None:
         self._cache.clear()
 
-    async def check(self, viewer: Principal | UUID | None, object_id: UUID, title: str = "") -> None:
-        """Refuse one title the viewer may not open, telling enough for « Ask for access »."""
-        if object_id in await self.blocked(viewer):
-            found = await self.rating(object_id)
-            restrictions = await self.restrictions(viewer)
-            reason = await self._reason(object_id, restrictions, found["age"])
-            raise Restricted(
-                "This title is kept from this profile.",
-                extensions={
-                    "object_id": str(object_id),
-                    "name": title,
-                    "rating": f"{found['age']}+" if found["age"] is not None else None,
-                    # why: its age, no rating yet, a genre, a kind of content or the title kept out by hand
-                    "reason": reason,
-                    # the master's own choices (a title, a kind) are not asked again title by title
-                    "can_ask": (restrictions is None or restrictions.requests) and reason in ASKABLE,
-                },
-            )
+    async def check(
+        self, viewer: Principal | UUID | None, object_id: UUID, title: str = "", *, viewing: bool = False
+    ) -> None:
+        """Refuse one title the viewer may not open, telling enough for « Ask for access » — issue 432: its
+        page (``viewing``) stays open to a profile whose master shows such titles (« show »)."""
+        kept = await self.kept(viewer, object_id, title)
+        if kept is None:
+            return
+        if viewing and kept.pop("shown", False):
+            return
+        kept.pop("shown", None)
+        raise Restricted("This title is kept from this profile.", extensions=kept)
+
+    async def kept(
+        self, viewer: Principal | UUID | None, object_id: UUID, title: str = ""
+    ) -> dict[str, Any] | None:
+        """Why a title is kept from a profile, and whether it is still shown (``shown``: its master's
+        « show » choice) — ``None``: it is not kept."""
+        if object_id not in await self.blocked(viewer):
+            return None
+        found = await self.rating(object_id)
+        restrictions = await self.restrictions(viewer)
+        reason = await self._reason(object_id, restrictions, found["age"])
+        return {
+            "object_id": str(object_id),
+            "name": title,
+            "rating": f"{found['age']}+" if found["age"] is not None else None,
+            # why: its age, no rating yet, a genre, a kind of content or the title kept out by hand
+            "reason": reason,
+            # the master's own choices (a title, a kind) are not asked again title by title
+            "can_ask": (restrictions is None or restrictions.requests) and reason in ASKABLE,
+            "shown": restrictions is not None and restrictions.mode == "show",
+        }
 
     async def _reason(self, object_id: UUID, restrictions: Restrictions | None, age: int | None) -> str:
         """Why a title is kept from a profile: ``title``, ``type``, ``genre``, ``unrated`` or ``age``."""
@@ -357,7 +383,7 @@ class TitleGate:
                         ObjectTag.tag_kind == "genre", ObjectTag.object_id.in_([found for found, _ in chain])
                     )
                 )
-                if any(genre_of(str(tag)) in restrictions.genres for tag in tags):
+                if any(genre_key(str(tag)) in restrictions.genres for tag in tags):
                     return "genre"
         return "unrated" if age is None else "age"
 

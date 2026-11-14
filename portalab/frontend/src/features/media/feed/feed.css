@@ -314,6 +314,10 @@
 .feed-entry__body .media-card__poster {
   aspect-ratio: 2 / 3;
 }
+.feed-entry__frame {
+  position: relative; /* issue 434: the age badge sits on the poster */
+  display: block;
+}
 .feed-entry__picture {
   display: grid;
   place-items: center;
