@@ -1410,3 +1410,62 @@ button.first-steps__start:focus-visible {
   margin: 0;
   font-size: var(--font-size-sm);
 }
+
+/* issue 428 — the family step: the household's profiles, one more in a name and a kind */
+.onboarding-family {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.onboarding-family li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+}
+.onboarding-family small {
+  color: var(--color-text-muted);
+}
+.onboarding-family__add {
+  display: grid;
+  gap: var(--space-3);
+}
+.onboarding-family__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.onboarding-family__kinds label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 2.5rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+  cursor: pointer;
+}
+.onboarding-family__kinds label[data-checked] {
+  border-color: var(--color-accent, var(--color-text));
+  background: color-mix(in srgb, var(--color-accent, var(--color-text)) 15%, transparent);
+}
+.onboarding-family__kinds input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.onboarding-family__kinds label:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent, var(--color-text));
+  outline-offset: 2px;
+}
+.onboarding-family__add > button {
+  justify-self: start;
+}

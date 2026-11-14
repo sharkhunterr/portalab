@@ -16,6 +16,8 @@ import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
 import { PRESENCE_CHOICES, type PresenceLevel, setPresence, usePresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
+import { useCreateProfile, useHousehold, useHouseholdSession } from "../household/api";
+import { ProfileFace } from "../household/ProfilePicker";
 import { useLinks } from "../media/api";
 import { RetroAccountList, useRetroAccounts } from "../retro/RetroAccounts";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
@@ -39,6 +41,7 @@ const STEPS = [
   "profile",
   "accounts",
   "retro",
+  "family",
   "play",
   "presence",
   "home",
@@ -53,6 +56,7 @@ const ART: Record<Step, string> = {
   profile: "user",
   accounts: "link",
   retro: "joystick",
+  family: "users",
   home: "heart",
   play: "gamepad",
   presence: "eye",
@@ -124,8 +128,12 @@ export function WelcomeFlow() {
     .filter((a) => (links.data ?? []).some((l) => l.verified && l.service_id === a.service_id))
     .map((a) => a.service_id);
   const toAuthorise = (retro.data ?? []).some((a) => mapped.includes(a.service_id) && a.state !== "linked");
+  // issue 428: the account's holder makes its household's profiles here (not a profile itself)
+  const session = useHouseholdSession(open && !profile);
+  const family = Boolean(session.data?.enabled) && !profile;
   const steps = STEPS.filter(
     (s) =>
+      (s !== "family" || family) &&
       (s !== "presence" || presence.available) &&
       (s !== "retro" || (!profile && mapped.length > 0 && (toAuthorise || step === "retro"))) &&
       !(profile && (s === "accounts" || s === "presence")),
@@ -187,6 +195,9 @@ export function WelcomeFlow() {
 
               {step === "retro" ? (
                 <RetroStep titleId={titleId} only={mapped} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
+              {step === "family" ? (
+                <FamilyStep titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
               {step === "play" ? (
                 <PlayChoice
@@ -768,6 +779,81 @@ function RetroStep({ titleId, only, nav }: { titleId: string; only: readonly str
       <DialogPrimitive.Title id={titleId}>{t("onboarding:retro.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:retro.lead")}</p>
       <RetroAccountList only={only} />
+      {nav}
+    </>
+  );
+}
+
+/** Issue 428: the household — a profile for each person sharing the account (a name and a kind; the rest is
+ * set later in « My household »). */
+function FamilyStep({ titleId, nav }: { titleId: string; nav: ReactNode }) {
+  const t = useT();
+  const household = useHousehold();
+  const create = useCreateProfile();
+  const [name, setName] = useState("");
+  const [kind, setKind] = useState<"standard" | "child">("child");
+  const profiles = (household.data?.members ?? []).filter((m) => m.kind !== "owner");
+  const full = household.data ? profiles.length >= household.data.max_profiles : false;
+  const add = () => {
+    if (!name.trim() || full) return;
+    create.mutate({ display_name: name.trim(), kind }, { onSuccess: () => setName("") });
+  };
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:family.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:family.lead")}</p>
+      {profiles.length ? (
+        <ul className="onboarding-family" aria-label={t("onboarding:family.made")}>
+          {profiles.map((member) => (
+            <li key={member.id}>
+              <ProfileFace member={member} size="sm" />
+              <span>{member.display_name}</span>
+              <small>{t(`household:kind.${member.kind}`)}</small>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {full ? (
+        <p className="onboarding-welcome__lead">{t("onboarding:family.full")}</p>
+      ) : (
+        <form
+          className="onboarding-family__add"
+          onSubmit={(event) => {
+            event.preventDefault();
+            add();
+          }}
+        >
+          <TextField
+            label={t("onboarding:family.name")}
+            value={name}
+            maxLength={64}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <fieldset className="onboarding-family__kinds">
+            <legend className="visually-hidden">{t("household:editor.kind")}</legend>
+            {(["child", "standard"] as const).map((option) => (
+              <label key={option} data-checked={kind === option || undefined}>
+                <input
+                  type="radio"
+                  name={`${titleId}-kind`}
+                  checked={kind === option}
+                  onChange={() => setKind(option)}
+                />
+                <Icon name={option === "child" ? "smile" : "user"} size={16} />
+                {t(`household:kind.${option}`)}
+              </label>
+            ))}
+          </fieldset>
+          <Button type="submit" variant="secondary" disabled={!name.trim() || create.isPending}>
+            <Icon name="plus" size={16} />
+            {t("onboarding:family.add")}
+          </Button>
+          {create.isError ? <p role="alert">{t("household:error")}</p> : null}
+        </form>
+      )}
+      <p className="onboarding-welcome__hint">
+        <Link to="/household/profiles">{t("onboarding:family.later")}</Link>
+      </p>
       {nav}
     </>
   );

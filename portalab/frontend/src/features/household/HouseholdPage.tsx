@@ -1,11 +1,11 @@
 import { useState } from "react";
+import { Link, Navigate } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
 import { Dialog, DialogActions } from "../../design-system/components/Overlays";
 import { PageHeader } from "../../design-system/components/PageHeader";
-import { Tabs } from "../../design-system/components/Tabs";
 import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -26,6 +26,7 @@ import {
   useScreenTime,
   useSetPin,
 } from "./api";
+import { FamilyDashboard } from "./FamilyDashboard";
 import { ProfileEditor } from "./ProfileEditor";
 import { ProfileFace } from "./ProfilePicker";
 import "./household.css";
@@ -35,13 +36,18 @@ import "./household.css";
  * balances hold every profile's earnings) and each member's figures; the master adds and sets profiles,
  * reads their activity and answers their access requests.
  */
-export default function HouseholdPage() {
+export type HouseholdView = "overview" | "profiles" | "requests";
+
+export default function HouseholdPage({ view = "overview" }: { view?: HouseholdView }) {
   const t = useT();
   const household = useHousehold();
   const requests = useAccessRequests();
   const [editing, setEditing] = useState<HouseholdMember | "new" | null>(null);
   const [watching, setWatching] = useState<HouseholdMember | null>(null);
   const [pinOf, setPinOf] = useState<HouseholdMember | null>(null);
+  // issue 428: the old « ?tab=requests » links open the requests tab
+  if (view === "overview" && new URLSearchParams(globalThis.location?.search).get("tab") === "requests")
+    return <Navigate to="/household/requests" replace />;
   if (household.isPending) return <FunctionalState state="loading" />;
   if (household.isError || !household.data)
     return <FunctionalState state="unavailable" onRetry={() => household.refetch()} />;
@@ -51,9 +57,9 @@ export default function HouseholdPage() {
   return (
     <div className="household-page">
       <PageHeader
-        title={t("household:page.title")}
-        context={t("household:page.subtitle")}
-        icon="users"
+        title={t(`household:page.${view}Title`)}
+        context={t(`household:page.${view}Subtitle`)}
+        icon={view === "overview" ? "dashboard" : view === "profiles" ? "user" : "key"}
         primary={
           data.can_manage && profiles.length < data.max_profiles ? (
             <Button onClick={() => setEditing("new")}>
@@ -81,47 +87,53 @@ export default function HouseholdPage() {
           </Button>
         </p>
       ) : null}
-      <Wallet household={data} />
-      <Tabs
-        label={t("household:page.title")}
-        defaultValue={
-          new URLSearchParams(globalThis.location?.search).get("tab") === "requests" ? "requests" : "members"
-        }
-        items={[
-          {
-            value: "members",
-            label: t("household:tabs.members"),
-            content: (
-              <>
-                {profiles.length === 0 && data.can_manage ? (
-                  <p className="household-note">{t("household:page.empty")}</p>
-                ) : null}
-                <p className="household-count">
-                  {t("household:page.count", { count: profiles.length, max: data.max_profiles })}
-                </p>
-                <ul className="household-members">
-                  {data.members.map((member) => (
-                    <MemberCard
-                      key={member.id}
-                      member={member}
-                      me={member.id === data.me}
-                      manage={data.can_manage && member.kind !== "owner"}
-                      onEdit={() => setEditing(member)}
-                      onActivity={() => setWatching(member)}
-                      onPin={() => setPinOf(member)}
-                    />
-                  ))}
-                </ul>
-              </>
-            ),
-          },
-          {
-            value: "requests",
-            label: pending ? `${t("household:tabs.requests")} (${pending})` : t("household:tabs.requests"),
-            content: <Requests items={requests.data ?? []} household={data} />,
-          },
-        ]}
-      />
+      {view === "overview" ? (
+        <>
+          <Wallet household={data} />
+          {data.can_manage && pending ? (
+            <p className="household-advice" role="note">
+              <Icon name="key" size={16} />
+              {t("household:family.pending", { count: pending })}
+              <Link className="ds-button ds-button--secondary" to="/household/requests">
+                {t("household:family.answer")}
+              </Link>
+            </p>
+          ) : null}
+          {profiles.length === 0 && data.can_manage ? (
+            <p className="household-note">
+              {t("household:page.empty")}{" "}
+              <Link to="/household/profiles" className="ds-link">
+                {t("household:page.add")}
+              </Link>
+            </p>
+          ) : null}
+          <FamilyDashboard household={data} />
+        </>
+      ) : view === "profiles" ? (
+        <>
+          <p className="household-count">
+            {t("household:page.count", { count: profiles.length, max: data.max_profiles })}
+          </p>
+          {profiles.length === 0 && data.can_manage ? (
+            <p className="household-note">{t("household:page.empty")}</p>
+          ) : null}
+          <ul className="household-members">
+            {data.members.map((member) => (
+              <MemberCard
+                key={member.id}
+                member={member}
+                me={member.id === data.me}
+                manage={data.can_manage && member.kind !== "owner"}
+                onEdit={() => setEditing(member)}
+                onActivity={() => setWatching(member)}
+                onPin={() => setPinOf(member)}
+              />
+            ))}
+          </ul>
+        </>
+      ) : (
+        <Requests items={requests.data ?? []} household={data} />
+      )}
       {editing ? (
         <ProfileEditor
           member={editing === "new" ? null : editing}

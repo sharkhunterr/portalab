@@ -7419,6 +7419,133 @@
         "title": "ExportOut",
         "type": "object"
       },
+      "FamilyActivityOut": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyMemberOut"
+            },
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "members"
+        ],
+        "title": "FamilyActivityOut",
+        "type": "object"
+      },
+      "FamilyLastOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "object_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Object Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "kind",
+          "at"
+        ],
+        "title": "FamilyLastOut",
+        "type": "object"
+      },
+      "FamilyMemberOut": {
+        "properties": {
+          "finished": {
+            "title": "Finished",
+            "type": "integer"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FamilyLastOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "plays": {
+            "title": "Plays",
+            "type": "integer"
+          },
+          "screen": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "series": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "streak": {
+            "title": "Streak",
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "minutes",
+          "plays",
+          "finished",
+          "kinds",
+          "series",
+          "streak"
+        ],
+        "title": "FamilyMemberOut",
+        "type": "object"
+      },
       "FeedItemOut": {
         "properties": {
           "at": {
@@ -50745,6 +50872,52 @@
           }
         },
         "summary": "My History",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/household": {
+      "get": {
+        "description": "Issue 428: the household's dashboard \u2014 each member's watching lately (every member sees it).",
+        "operationId": "family_api_v1_me_media_household_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyActivityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Family",
         "tags": [
           "media"
         ]

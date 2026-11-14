@@ -132,16 +132,40 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "required_permission": "users.self.manage",
     },
     {
-        "key": "shell.household",  # 032: « My household » — its profiles, its wallet, its requests
+        "key": "shell.household",  # 032: « My household » — 428: the family's dashboard
         "owner": "module:shell",
         "kind": "entry",  # its own section of the main navigation (a command shows in the palette only)
         "label_key": "nav.household",
-        "icon": "users",
+        "icon": "dashboard",
         "route": "/household",
         "group": "household",
         "order_hint": 8,
         "required_permission": "users.self.manage",
         "keywords": ("household", "profiles", "family", "foyer", "profils", "famille"),
+    },
+    {
+        "key": "shell.household.profiles",  # issue 428: the household's profiles, set by its master
+        "owner": "module:shell",
+        "kind": "entry",
+        "label_key": "nav.household_profiles",
+        "icon": "user",
+        "route": "/household/profiles",
+        "group": "household",
+        "order_hint": 9,
+        "required_permission": "users.self.manage",
+        "keywords": ("profiles", "screen time", "profils", "temps d'écran", "contrôle parental"),
+    },
+    {
+        "key": "shell.household.requests",  # issue 428: the profiles' access requests
+        "owner": "module:shell",
+        "kind": "entry",
+        "label_key": "nav.household_requests",
+        "icon": "key",
+        "route": "/household/requests",
+        "group": "household",
+        "order_hint": 10,
+        "required_permission": "users.self.manage",
+        "keywords": ("requests", "access", "demandes", "accès"),
     },
     {
         "key": "ui.appearance",

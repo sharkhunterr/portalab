@@ -219,3 +219,16 @@ export function minutesLeftToday(now = new Date()): number {
   midnight.setHours(24, 0, 0, 0);
   return Math.min(1440, Math.max(15, Math.ceil((midnight.getTime() - now.getTime()) / 60_000)));
 }
+
+export type FamilyActivity = components["schemas"]["FamilyActivityOut"];
+export type FamilyMember = components["schemas"]["FamilyMemberOut"];
+
+/** Issue 428: each member's watching, reading and playing lately (the household's dashboard). */
+export function useFamilyActivity(days: number) {
+  return useQuery({
+    queryKey: ["household", "family", days],
+    staleTime: 60_000,
+    queryFn: async () =>
+      (await api.GET("/api/v1/me/media/household", { params: { query: { days } } })).data as FamilyActivity,
+  });
+}

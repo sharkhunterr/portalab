@@ -635,6 +635,7 @@
   "kind.episode": "Episode",
   "kind.game": "Game",
   "kind.movie": "Movie",
+  "kind.radio": "Radio",
   "kind.season": "Season",
   "kind.series": "Series",
   "kind.track": "Track",

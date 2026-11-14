@@ -46,6 +46,7 @@ interface Backend {
   welcome?: { enabled: boolean; message: string };
   quests?: unknown[];
   assistant?: boolean;
+  household?: boolean; // issue 428: profiles turned on
 }
 
 function backend({
@@ -55,7 +56,9 @@ function backend({
   assistant = false,
   links = [],
   retro = [],
+  household = false,
 }: Backend) {
+  const made: unknown[] = [];
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
   const visibility: Array<[string, unknown]> = [];
@@ -70,6 +73,10 @@ function backend({
       const { level } = (await request.json()) as { level: string };
       visibility.push([path.split("/").pop() ?? "", level]);
       return json(200, { effective: true });
+    }
+    if (request.method === "POST" && path === "/api/v1/household/profiles") {
+      made.push(await request.json());
+      return json(201, { id: "00000000-0000-0000-0000-0000000000c1" });
     }
     if (request.method === "POST") {
       posts.push(path);
@@ -93,6 +100,30 @@ function backend({
     if (path === "/api/v1/me/quests") return json(200, quests);
     if (path === "/api/v1/me/media/links") return json(200, links);
     if (path === "/api/v1/retro/accounts") return json(200, retro);
+    if (path === "/api/v1/household/session")
+      return household
+        ? json(200, { enabled: true, owner_id: ME.id, active_id: ME.id, must_choose: false, members: [] })
+        : json(404, {});
+    if (path === "/api/v1/household")
+      return json(200, {
+        enabled: true,
+        owner_id: ME.id,
+        me: ME.id,
+        can_manage: true,
+        max_profiles: 8,
+        palette: ["#6366f1"],
+        totals: null,
+        members: made.map((body, i) => ({
+          ...(body as object),
+          id: `00000000-0000-0000-0000-0000000000c${i + 1}`,
+          color: "#6366f1",
+          has_avatar: false,
+          has_pin: false,
+          needs_pin: false,
+          community_visible: false,
+          progress: { xp: 0, level: 0, coins: 0, contribution: 0 },
+        })),
+      });
     if (path === "/api/v1/ai/status")
       return json(200, {
         available: assistant,
@@ -101,7 +132,7 @@ function backend({
       });
     return json(404, {});
   };
-  return { puts, posts, visibility, resets };
+  return { puts, posts, visibility, resets, made };
 }
 
 const mission = (key: string, done = false) => ({
@@ -160,6 +191,22 @@ describe("welcome", () => {
     expect(screen.getByRole("button", { name: /Authorise Portalab/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "How far do you want to play?" })).toBeInTheDocument();
+  });
+
+  it("lets the account's holder make the household's profiles (issue 428)", async () => {
+    window.localStorage.clear();
+    const { made } = backend({ household: true });
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your media accounts" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Your family" })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Léa" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add this profile" }));
+    await waitFor(() => expect(made).toEqual([{ display_name: "Léa", kind: "child" }]));
+    expect(await screen.findByText("Léa")).toBeInTheDocument();
   });
 
   it("stays closed once seen elsewhere, or when the administrator turned it off", async () => {

@@ -79,7 +79,7 @@ describe("the screen planner", () => {
     expect(within(editor).getByRole("alert").textContent).toContain("overlaps");
     expect((within(editor).getByRole("button", { name: "Apply" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(within(editor).getByRole("button", { name: "Delete the span" }));
-    expect((seen.at(-1)?.slots as Span[]).map((s) => s.start)).toEqual(["14:00"]);
+    expect(((seen.at(-1)?.slots ?? []) as Span[]).map((s) => s.start)).toEqual(["14:00"]);
   });
 
   it("draws a span with the pointer, snapped to half hours", () => {

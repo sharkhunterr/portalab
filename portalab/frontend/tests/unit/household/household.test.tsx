@@ -185,7 +185,59 @@ describe("who's there", () => {
 });
 
 describe("my household", () => {
-  it("shows the wallet, every member and the master's tools; the master answers a request", async () => {
+  it("shows the family's dashboard: the wallet, each member's watching, the requests waiting", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, HOUSEHOLD);
+      if (path === "/api/v1/household/requests") return json(200, [REQUEST]);
+      if (path === "/api/v1/me/media/household")
+        return json(200, {
+          days: 7,
+          members: [
+            {
+              user_id: OWNER,
+              minutes: 0,
+              plays: 0,
+              finished: 0,
+              kinds: {},
+              series: [0, 0, 0, 0, 0, 0, 0],
+              streak: 0,
+            },
+            {
+              user_id: LEA,
+              minutes: 95,
+              plays: 4,
+              finished: 1,
+              kinds: { movie: 60, book: 35 },
+              series: [0, 0, 10, 20, 0, 30, 35],
+              streak: 2,
+              last: {
+                title: "Coco",
+                kind: "movie",
+                object_id: REQUEST.subject_ref,
+                at: "2026-11-14T18:00:00Z",
+              },
+              screen: { used: 35, allowed: 60, open: true, slots: [] },
+            },
+          ],
+        });
+      return json(404, {});
+    };
+    show(<HouseholdPage />);
+    expect(await screen.findByRole("heading", { name: "Family dashboard" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Household wallet" })).toBeTruthy();
+    expect(await screen.findByText(/1 access request waits/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Answer" }).getAttribute("href")).toBe("/household/requests");
+    const lea = (await screen.findByRole("heading", { name: "Léa" })).closest("li") as HTMLElement;
+    expect(within(lea).getByRole("link", { name: "Coco" })).toBeTruthy();
+    expect(within(lea).getByText("Screen time today: 35 / 60 min")).toBeTruthy();
+    expect(within(lea).getAllByText(/2 days in a row/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/2 days · Léa/)).toBeTruthy(); // the longest streak
+    fireEvent.click(screen.getByRole("button", { name: "30 days" }));
+    expect(screen.getByRole("button", { name: "30 days" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("lists the profiles and the master's tools; the master answers a request", async () => {
     const decisions: unknown[] = [];
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
@@ -197,17 +249,13 @@ describe("my household", () => {
       }
       return json(404, {});
     };
-    show(<HouseholdPage />);
-    expect(await screen.findByRole("heading", { name: "My household" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Household wallet" })).toBeTruthy();
-    expect(screen.getAllByText("120").length).toBeGreaterThan(0);
-    expect(screen.getByText("Up to 12+")).toBeTruthy();
+    show(<HouseholdPage view="profiles" />);
+    expect(await screen.findByText("Up to 12+")).toBeTruthy();
     expect(screen.getByText("Hidden from the community")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Edit Léa" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Add a profile" })).toBeTruthy();
-
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "Requests (1)" }));
-    fireEvent.click(screen.getByRole("tab", { name: "Requests (1)" }));
+    cleanup();
+    show(<HouseholdPage view="requests" />);
     expect(await screen.findByText("Léa asks for “Alien”")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Allow for 1 day" }));
     await waitFor(() => expect(decisions).toEqual([{ approve: true, days: 1 }]));
@@ -220,7 +268,7 @@ describe("my household", () => {
       if (path === "/api/v1/household/requests") return json(200, []);
       return json(404, {});
     };
-    show(<HouseholdPage />);
+    show(<HouseholdPage view="profiles" />);
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
     expect((within(editor).getByLabelText("Maximum age rating") as HTMLSelectElement).value).toBe("12");
@@ -270,7 +318,7 @@ describe("my household", () => {
       }
       return json(404, {});
     };
-    show(<HouseholdPage />);
+    show(<HouseholdPage view="profiles" />);
     const tools = await screen.findByRole("region", { name: "Screen time" });
     expect(within(tools).getByText(/\+15 min today/)).toBeTruthy();
     fireEvent.click(within(tools).getByRole("button", { name: "+30 min" }));
@@ -285,7 +333,7 @@ describe("my household", () => {
       ),
     };
     cleanup();
-    show(<HouseholdPage />);
+    show(<HouseholdPage view="profiles" />);
     const freed = await screen.findByRole("region", { name: "Screen time" });
     expect(within(freed).getByText(/No limits until/)).toBeTruthy();
     fireEvent.click(within(freed).getByRole("button", { name: "Limits back" }));
@@ -301,7 +349,7 @@ describe("my household", () => {
         return json(200, { years: {}, genres: ["Science-Fiction", "Animation"] });
       return json(404, {});
     };
-    show(<HouseholdPage />);
+    show(<HouseholdPage view="profiles" />);
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
     fireEvent.change(within(editor).getByLabelText(/Add a genre/), { target: { value: "Science-Fiction" } });
@@ -325,8 +373,8 @@ describe("my household", () => {
       if (path === "/api/v1/household/requests") return json(200, []);
       return json(404, {});
     };
-    show(<HouseholdPage />);
-    expect(await screen.findByRole("heading", { name: "Household wallet" })).toBeTruthy();
+    show(<HouseholdPage view="profiles" />);
+    expect(await screen.findByRole("button", { name: "My PIN" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Edit Léa" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Add a profile" })).toBeNull();
     expect(screen.getByRole("button", { name: "My PIN" })).toBeTruthy();

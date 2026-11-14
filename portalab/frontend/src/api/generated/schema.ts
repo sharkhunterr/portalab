@@ -8429,6 +8429,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/household": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Family
+         * @description Issue 428: the household's dashboard — each member's watching lately (every member sees it).
+         */
+        get: operations["family_api_v1_me_media_household_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/insights/locked": {
         parameters: {
             query?: never;
@@ -15677,6 +15697,51 @@ export interface components {
             requested_at: string;
             /** Status */
             status: string;
+        };
+        /** FamilyActivityOut */
+        FamilyActivityOut: {
+            /** Days */
+            days: number;
+            /** Members */
+            members: components["schemas"]["FamilyMemberOut"][];
+        };
+        /** FamilyLastOut */
+        FamilyLastOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Kind */
+            kind: string;
+            /** Object Id */
+            object_id?: string | null;
+            /** Title */
+            title: string;
+        };
+        /** FamilyMemberOut */
+        FamilyMemberOut: {
+            /** Finished */
+            finished: number;
+            /** Kinds */
+            kinds: {
+                [key: string]: number;
+            };
+            last?: components["schemas"]["FamilyLastOut"] | null;
+            /** Minutes */
+            minutes: number;
+            /** Plays */
+            plays: number;
+            screen?: components["schemas"]["ScreenTimeOut"] | null;
+            /** Series */
+            series: number[];
+            /** Streak */
+            streak: number;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
         };
         /** FeedItemOut */
         FeedItemOut: {
@@ -38701,6 +38766,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MediaHistoryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    family_api_v1_me_media_household_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamilyActivityOut"];
                 };
             };
             /** @description Validation Error */

@@ -81,6 +81,9 @@
   "nav.group.me": "My account",
   "nav.guide": "Guide",
   "nav.home": "Home",
+  "nav.household": "Overview",
+  "nav.household_profiles": "Profiles",
+  "nav.household_requests": "Requests",
   "nav.hub.ai": "Assistant",
   "nav.hub.appearance": "Appearance",
   "nav.hub.automations": "Automations",
@@ -126,6 +129,7 @@
   "nav.section.content": "News",
   "nav.section.games": "Games",
   "nav.section.home": "Home",
+  "nav.section.household": "My household",
   "nav.section.marketplace": "Marketplace",
   "nav.section.me": "Me",
   "nav.section.media": "Media",
@@ -148,7 +152,5 @@
   "nav.topic.extensions": "Extensions",
   "nav.topic.services": "Services & monitoring",
   "nav.topic.system": "System",
-  "nav.wiki": "Wiki",
-  "nav.household": "My household",
-  "nav.section.household": "My household"
+  "nav.wiki": "Wiki"
 }

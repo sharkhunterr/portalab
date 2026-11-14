@@ -3,7 +3,7 @@ the unrated ones): not in the catalog, locked on their page (with what « Ask fo
 media widgets' lists; its master's approval opens one title; unrated kinds (books) are never held back; the
 master and members without restrictions see everything."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -425,3 +425,47 @@ async def test_spans_shape_what_a_profile_may_open_now(
         with pytest.raises(ScreenTimeUp) as up:
             await media.module.gate.check_screen(viewer)
         assert up.value.extensions["reason"] == "hours"
+
+
+async def test_the_household_dashboard_shows_each_members_watching(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 428: every member sees the family's watching lately — minutes, sittings, kinds, day by day, the
+    days in a row, the last title; a restricted profile its screen time now."""
+    from portalab.modules.media.insights.portal import PortalActivity
+
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    created = await households(app).create(
+        Principal(user_id=people["zoe"]), display_name="Léa", kind="child", color=None, pin=None
+    )
+    lea = UUID(str(created["id"]))
+    store = PortalActivity(media.database)
+    now = datetime.now(UTC)
+    for days_ago, minutes in ((0, 30), (1, 20), (2, 15)):
+        await store.store(
+            ref=f"portal:lea{days_ago}",
+            user=lea,
+            service=media.service(1).service_id,
+            object_id=ids["Toy Story"],
+            kind="movie",
+            watched=minutes * 60,
+            duration=None,
+            share=None,
+            ended=now - timedelta(days=days_ago),
+        )
+    await login(client, "zoe")
+    seen = await client.get("/api/v1/me/media/household", params={"days": 7})
+    assert seen.status_code == 200, seen.text
+    members = {m["user_id"]: m for m in seen.json()["members"]}
+    assert set(members) == {str(people["zoe"]), str(lea)}
+    child = members[str(lea)]
+    assert child["minutes"] == 65 and child["plays"] == 3 and child["kinds"] == {"movie": 65}
+    assert len(child["series"]) == 7 and child["series"][-1] == 30
+    assert child["streak"] == 3 and child["last"]["title"] == "Toy Story"
+    assert members[str(people["zoe"])]["minutes"] == 0 and members[str(people["zoe"])]["screen"] is None
+
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    again = (await client.get("/api/v1/me/media/household")).json()  # a profile sees its household too
+    assert {m["user_id"] for m in again["members"]} == {str(people["zoe"]), str(lea)}
+    assert (await client.get("/api/v1/me/media/household", params={"days": 99})).status_code == 422

@@ -31,6 +31,7 @@ from portalab.modules.media.insights.continuing import in_progress, recently, re
 from portalab.modules.media.insights.deep import portraits
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
+from portalab.modules.media.insights.family import family_activity
 from portalab.modules.media.insights.progress import history_task
 from portalab.modules.media.links.household import link_holder
 from portalab.modules.media.models import (
@@ -677,6 +678,66 @@ async def screen_time(principal: Reader, module: Module, profile: UUID | None = 
         raise MediaNotFound("This profile does not exist.")
     now = await module.gate.screen_now(whom)
     return ScreenTimeOut.model_validate(now) if now is not None else None
+
+
+class FamilyLastOut(BaseModel):
+    title: str
+    kind: str
+    object_id: UUID | None = None
+    at: datetime
+
+
+class FamilyMemberOut(BaseModel):
+    user_id: UUID
+    minutes: int  # watched, read or played over the window
+    plays: int
+    finished: int
+    kinds: dict[str, int]  # minutes by kind of media
+    series: list[int]  # minutes day by day, the oldest first (today last)
+    streak: int  # days in a row with something watched
+    last: FamilyLastOut | None = None
+    screen: ScreenTimeOut | None = None  # a restricted profile's screen time now
+
+
+class FamilyActivityOut(BaseModel):
+    days: int
+    members: list[FamilyMemberOut]
+
+
+@router.get("/me/media/household", response_model=FamilyActivityOut)
+async def family(
+    principal: Reader, module: Module, days: Annotated[int, Query(ge=1, le=30)] = 7
+) -> FamilyActivityOut:
+    """Issue 428: the household's dashboard — each member's watching lately (every member sees it)."""
+    me = _me(principal)
+    owner = await link_holder(module.capabilities, me)
+    household = module.gate._household()
+    profiles: list[UUID] = []
+    if household is not None:
+        try:
+            profiles = sorted(await household.profiles_of(owner))
+        except Exception:
+            profiles = []
+    members = [owner, *profiles]
+    today = await module.gate._day_start()
+    found = await family_activity(module.database, members, today, days)
+    out = []
+    for member in found:
+        now = await module.gate.screen_now(member.user_id) if member.user_id != owner else None
+        out.append(
+            FamilyMemberOut(
+                user_id=member.user_id,
+                minutes=member.minutes,
+                plays=member.plays,
+                finished=member.finished,
+                kinds=member.kinds,
+                series=member.series,
+                streak=member.streak,
+                last=FamilyLastOut.model_validate(member.last) if member.last else None,
+                screen=ScreenTimeOut.model_validate(now) if now is not None else None,
+            )
+        )
+    return FamilyActivityOut(days=days, members=out)
 
 
 @router.get("/me/media/insights/locked")

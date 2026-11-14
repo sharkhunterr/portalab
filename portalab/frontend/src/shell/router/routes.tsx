@@ -451,6 +451,17 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
         { path: "notifications", element: <Notifications />, handle: h({ crumb: "Notifications" }) },
         { path: "guide", element: <Guide />, handle: h({ crumb: "Guided tours" }) },
         { path: "household", element: <Household />, handle: h({ crumb: "My household" }) }, // 032
+        // issue 428: the household's hub — its dashboard, its profiles, its requests
+        {
+          path: "household/profiles",
+          element: <Household view="profiles" />,
+          handle: h({ crumb: "Profiles" }),
+        },
+        {
+          path: "household/requests",
+          element: <Household view="requests" />,
+          handle: h({ crumb: "Requests" }),
+        },
         // issue 14: « My settings » — every page a member sets things in, around one list and one search
         {
           element: <SettingsLayout />,

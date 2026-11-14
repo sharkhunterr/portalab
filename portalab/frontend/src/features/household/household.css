@@ -1111,3 +1111,224 @@
     display: none;
   }
 }
+
+/* issue 428 — the family's dashboard */
+.family {
+  display: grid;
+  gap: var(--space-4);
+}
+.family__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.family__head h2 {
+  margin: 0;
+  font-size: var(--font-size-xl, 1.25rem);
+}
+.family__periods {
+  display: inline-flex;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-surface);
+}
+.family__periods button {
+  min-block-size: 2.25rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill, 999px);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.family__periods button[data-active] {
+  background: var(--color-accent, var(--color-text));
+  color: var(--color-on-accent, var(--color-surface));
+}
+.family__totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+.family__totals > div {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised, var(--color-surface));
+}
+.family__totals dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+.family__totals dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-xl, 1.25rem);
+  font-weight: 700;
+}
+.family__members {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.family-card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-block-start: 4px solid var(--profile-color, var(--color-accent));
+  border-radius: var(--radius-lg, var(--radius-md));
+  background: var(--color-surface-raised, var(--color-surface));
+}
+.family-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.family-card__head > div {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+.family-card__head h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-lg, 1.125rem);
+}
+.family-card__sub {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+.family-card__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill, 999px);
+  background: color-mix(in srgb, var(--state-partial-fg) 20%, transparent);
+  color: var(--state-partial-fg);
+  font-weight: 800;
+}
+.family-card__figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+.family-card__figures > div {
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken, var(--color-surface));
+  text-align: center;
+}
+.family-card__figures dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs, 0.75rem);
+}
+.family-card__figures dd {
+  margin: 0;
+  font-weight: 700;
+}
+.family-card__chart {
+  margin: 0;
+}
+.family-card__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  block-size: 3.5rem;
+}
+.family-card__bars span {
+  flex: 1 1 0;
+  min-inline-size: 2px;
+  border-radius: 3px 3px 0 0;
+  background: color-mix(in srgb, var(--profile-color, var(--color-accent)) 55%, transparent);
+}
+.family-card__bars span[data-today] {
+  background: var(--profile-color, var(--color-accent));
+}
+.family-card__chart[data-days="30"] .family-card__bars {
+  gap: 1px;
+}
+.family-card__kindbar {
+  display: flex;
+  block-size: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-surface-sunken, var(--color-surface));
+}
+.family-card__kinds ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm, 0.875rem);
+}
+.family-card__kinds li::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  margin-inline-end: var(--space-1);
+  border-radius: 50%;
+  background: var(--kind-color);
+}
+[data-kind="movie"] {
+  --kind-color: var(--chart-1);
+}
+[data-kind="series"] {
+  --kind-color: var(--chart-2);
+}
+[data-kind="book"] {
+  --kind-color: var(--chart-3);
+}
+[data-kind="audiobook"] {
+  --kind-color: var(--chart-4);
+}
+[data-kind="comic"],
+[data-kind="manga"] {
+  --kind-color: var(--chart-5);
+}
+[data-kind="music"] {
+  --kind-color: var(--chart-6);
+}
+[data-kind="game"] {
+  --kind-color: var(--chart-7);
+}
+[data-kind="other"] {
+  --kind-color: var(--chart-8);
+}
+.family-card__kindbar span {
+  background: var(--kind-color);
+}
+.family-card__last,
+.family__more a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+.family-card__quiet,
+.family-card__last {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+.family-card__last a {
+  color: var(--color-text);
+}
+.family__more {
+  margin: 0;
+}

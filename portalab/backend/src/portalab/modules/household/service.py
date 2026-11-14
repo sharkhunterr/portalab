@@ -43,7 +43,7 @@ from portalab.modules.household.rules import (
 from portalab.modules.household.settings import MAX_KEY
 
 CACHE_S = 15.0
-ATTENTION_ENTRY = "shell.household"  # the navigation entry of « My household »
+ATTENTION_ENTRY = "shell.household.requests"  # issue 428: « My household »'s requests tab
 CATEGORY = "household.requests"
 EXTRA_MINUTES = (15, 30, 60, 120)  # issue 432: screen time given for today
 log = get_logger("portalab.household")
@@ -629,7 +629,7 @@ class HouseholdService:
                 "quote": row.note or "",
             },
             f"household:request:{row.id}",
-            "/household?tab=requests",
+            "/household/requests",
         )
         return {"id": row.id, "status": "pending", "created": True}
 

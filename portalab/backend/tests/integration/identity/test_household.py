@@ -198,7 +198,7 @@ async def test_access_requests(app: FastAPI, client: httpx.AsyncClient) -> None:
 
     badge = HouseholdAttention(households(app))
     master = (await _me(client))["id"]
-    assert await badge.counts(Principal(user_id=UUID(str(master)))) == {"shell.household": 1}
+    assert await badge.counts(Principal(user_id=UUID(str(master)))) == {"shell.household.requests": 1}
     assert await badge.counts(Principal(user_id=lea, profile_of=UUID(str(master)))) == {}
     pending = (await client.get("/api/v1/household/requests")).json()
     assert pending[0]["profile_name"] == "Léa" and pending[0]["status"] == "pending"
