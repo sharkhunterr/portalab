@@ -17532,6 +17532,8 @@ export interface components {
              * Format: uuid
              */
             service_id: string;
+            /** Username */
+            username?: string | null;
             /** Verified */
             verified: boolean;
         };

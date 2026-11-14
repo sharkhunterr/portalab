@@ -142,6 +142,8 @@
   "ready.title": "Tout est prêt, {name} !",
   "ready.tour": "Pour finir, une visite d'une minute te montre où tout se trouve, sur ton vrai écran.",
   "recommended": "Recommandé",
+  "retro.lead": "Vos jeux joués dans le portail peuvent aller sur votre propre compte RomM : parties, sauvegardes et états. Autorisez Portalab une fois : approuvez le code dans RomM, connecté avec votre compte.",
+  "retro.title": "Jouez avec votre compte RomM",
   "skip": "Passer",
   "steps.coins": "+{amount} Coins",
   "steps.done": "Fait",

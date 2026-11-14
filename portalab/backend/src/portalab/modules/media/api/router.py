@@ -226,6 +226,7 @@ class MediaLinkOut(BaseModel):
     external_user_id: str
     verified: bool
     created_at: datetime
+    username: str | None = None  # the account's name on the service, when it tells it
 
 
 class MediaMatchCandidateOut(BaseModel):
@@ -1069,7 +1070,7 @@ async def delete_link(principal: User, link_id: UUID, module: Module) -> Respons
 def vars_of(view: Any) -> dict[str, Any]:
     return {
         name: getattr(view, name)
-        for name in ("id", "service_id", "external_user_id", "verified", "created_at")
+        for name in ("id", "service_id", "external_user_id", "verified", "created_at", "username")
     }
 
 

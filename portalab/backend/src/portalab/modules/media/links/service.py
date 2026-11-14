@@ -4,22 +4,26 @@ otherwise by an Admin. Only verified links attribute activity — unlinked or un
 *unlinked* and never attributed (no matching on display names)."""
 
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
 
-from portalab.capabilities.media import PLAYBACK, unwrap
+from portalab.capabilities.media import ACCOUNTS, PLAYBACK, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, ValidationFailed
+from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.insights.ingest import attribute
 from portalab.modules.media.models import UserLink
+
+NAME_TIMEOUT_S = 10
+log = get_logger("portalab.media.links")
 
 
 class LinkUnverified(ValidationFailed):
@@ -39,10 +43,11 @@ class LinkView:
     external_user_id: str
     verified: bool
     created_at: datetime
+    username: str | None = None
 
 
 def _view(row: UserLink) -> LinkView:
-    return LinkView(row.id, row.service_id, row.external_user_id, row.verified, row.created_at)
+    return LinkView(row.id, row.service_id, row.external_user_id, row.verified, row.created_at, row.username)
 
 
 class UserLinkService:
@@ -69,7 +74,40 @@ class UserLinkService:
                 .scalars()
                 .all()
             )
-        return [_view(r) for r in rows]
+        views = [_view(r) for r in rows]
+        if any(v.username is None for v in views):
+            views = await self._named(views)
+        return views
+
+    async def _named(self, views: list[LinkView]) -> list[LinkView]:
+        """The accounts' names the services tell, for the links that have none yet (kept for next time)."""
+        try:
+            providers = {r.instance_ref: r.provider for r in self.capabilities.system_providers(ACCOUNTS)}
+        except Exception:
+            return views
+        names: dict[UUID, str] = {}
+        for service in {v.service_id for v in views if v.username is None}:
+            provider = providers.get(str(service))
+            if provider is None:
+                continue
+            try:
+                accounts = unwrap(await asyncio.wait_for(provider.list_accounts(), timeout=NAME_TIMEOUT_S))
+            except Exception:
+                log.info("account names not read", extra={"service": str(service)})
+                continue  # the service did not answer: its id for now
+            known = {a.external_id: (a.username or a.display_name) for a in accounts or ()}
+            for view in views:
+                found = known.get(view.external_user_id)
+                if view.service_id == service and view.username is None and found:
+                    names[view.id] = str(found)[:200]
+        if not names:
+            return views
+        async with self.database.unit_of_work() as uow:
+            for link_id, name in names.items():
+                await uow.session.execute(
+                    update(UserLink).where(UserLink.id == link_id).values(username=name)
+                )
+        return [replace(v, username=names.get(v.id, v.username)) for v in views]
 
     async def claim(
         self, user: UUID, service_id: UUID, external_user_id: str, *, verified: bool = False

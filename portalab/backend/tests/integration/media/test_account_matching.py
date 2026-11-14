@@ -159,3 +159,21 @@ async def test_requests_synced_before_the_mapping_are_attributed(
     )
     await login(client, "zoe")
     assert (await client.get("/api/v1/me/media/requests")).json()["items"] == []
+
+
+async def test_a_linked_account_shows_its_name(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """A member's linked accounts show their name on the service (« Zoé »), not their id — read from the
+    service the first time, kept since; an account the service does not know keeps its id."""
+    people = await users(app, media, "zoe", admin="boss")
+    service = media.service(7)
+    media.provide(ACCOUNTS, service, _Accounts())
+    await media.module.accounts.link(service.service_id, "1", people["zoe"])
+    await login(client, "zoe")
+    links = (await client.get("/api/v1/me/media/links")).json()
+    assert [(link["external_user_id"], link["username"]) for link in links] == [("1", "Zoé")]
+    async with media.database.session() as session:
+        from portalab.modules.media.models import UserLink
+
+        assert await session.scalar(select(UserLink.username)) == "Zoé"  # kept for next time

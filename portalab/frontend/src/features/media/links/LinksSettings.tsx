@@ -74,7 +74,7 @@ export function LinksSettings() {
                   </span>
                   <span className="settings-list__text">
                     <strong>{known?.name ?? t("account:media.service")}</strong>
-                    <span>{t("account:media.as", { account: link.external_user_id })}</span>
+                    <span>{t("account:media.as", { account: link.username ?? link.external_user_id })}</span>
                   </span>
                   <span className="settings-pill" data-tone={link.verified ? "ok" : "wait"}>
                     <Icon name={link.verified ? "check" : "clock"} size={12} />

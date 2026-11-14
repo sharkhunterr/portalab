@@ -33,7 +33,7 @@ Votre progression vous suit (votre profil, dans un foyer), sur tous vos appareil
 
 Par défaut, le portail écrit vos parties, sauvegardes et états sur le compte RomM qu'il utilise lui-même (partagé, chaque sauvegarde étiquetée avec son propriétaire). Pour les avoir sur **votre** compte RomM :
 
-1. Ouvrez *Paramètres › Comptes médias*, carte **« Mon compte de ludothèque »**, et touchez **« Autoriser Portalab »**.
+1. Ouvrez *Paramètres › Comptes médias*, carte **« Mon compte de ludothèque »**, et touchez **« Autoriser Portalab »** — l'accueil le propose aussi, dès que votre administrateur vous a associé à votre compte RomM.
 2. Un code s'affiche avec **« Approuver dans RomM »** : ouvrez-le (connecté à RomM avec votre compte) et approuvez le code.
 3. La carte indique **« Vos jeux vont sur votre compte … »** : vos parties, sauvegardes et états y vont désormais (ceux d'un profil du foyer vont sur le compte de son maître, étiquetés avec le profil).
 

@@ -57,7 +57,7 @@ export function Accounts({ titleId, nav }: { titleId: string; nav: ReactNode }) 
               <span className="onboarding-accounts__name">
                 <strong>{known?.name ?? t("account:media.service")}</strong>
                 <span className="onboarding-accounts__who">
-                  {t("account:media.as", { account: link.external_user_id })}
+                  {t("account:media.as", { account: link.username ?? link.external_user_id })}
                 </span>
               </span>
               <span className="onboarding-accounts__state">

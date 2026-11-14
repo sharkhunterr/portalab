@@ -1,6 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ChangeEvent, useEffect, useId, useRef, useState } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { api } from "../../api/client";
 import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
@@ -16,6 +16,8 @@ import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
 import { PRESENCE_CHOICES, type PresenceLevel, setPresence, usePresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
+import { useLinks } from "../media/api";
+import { RetroAccountList, useRetroAccounts } from "../retro/RetroAccounts";
 import { completeStep, MISSIONS_KEY, startTour, useWelcome, WELCOME_EVENT } from "./api";
 import { PlayScale } from "./PlayScale";
 import { type Play, TASTES, tasteOff, tastesFor, usePlay, useProfileDashboard } from "./play";
@@ -36,6 +38,7 @@ const STEPS = [
   "hello",
   "profile",
   "accounts",
+  "retro",
   "play",
   "presence",
   "home",
@@ -49,6 +52,7 @@ const ART: Record<Step, string> = {
   hello: "sparkles",
   profile: "user",
   accounts: "link",
+  retro: "joystick",
   home: "heart",
   play: "gamepad",
   presence: "eye",
@@ -113,8 +117,18 @@ export function WelcomeFlow() {
   const presence = usePresence();
   // 032: a household profile uses its master's media accounts, and its master decides its presence
   const profile = Boolean(me.data?.profile_of);
+  // issue 426: the game library accounts the administrator mapped this member to, to authorise Portalab on
+  const retro = useRetroAccounts();
+  const links = useLinks();
+  const mapped = (retro.data ?? [])
+    .filter((a) => (links.data ?? []).some((l) => l.verified && l.service_id === a.service_id))
+    .map((a) => a.service_id);
+  const toAuthorise = (retro.data ?? []).some((a) => mapped.includes(a.service_id) && a.state !== "linked");
   const steps = STEPS.filter(
-    (s) => (s !== "presence" || presence.available) && !(profile && (s === "accounts" || s === "presence")),
+    (s) =>
+      (s !== "presence" || presence.available) &&
+      (s !== "retro" || (!profile && mapped.length > 0 && (toAuthorise || step === "retro"))) &&
+      !(profile && (s === "accounts" || s === "presence")),
   );
   const index = Math.max(steps.indexOf(step), 0);
   const next = () => setStep(steps[Math.min(index + 1, steps.length - 1)] as Step);
@@ -171,6 +185,9 @@ export function WelcomeFlow() {
                 <Accounts titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
 
+              {step === "retro" ? (
+                <RetroStep titleId={titleId} only={mapped} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
               {step === "play" ? (
                 <PlayChoice
                   titleId={titleId}
@@ -738,6 +755,20 @@ function Ready({
           {t("onboarding:ready.go")}
         </Button>
       </div>
+    </>
+  );
+}
+
+/** Issue 426: play with one's own RomM account — the code approved in RomM, once (the administrator mapped
+ * this member to an account there). */
+function RetroStep({ titleId, only, nav }: { titleId: string; only: readonly string[]; nav: ReactNode }) {
+  const t = useT();
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:retro.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:retro.lead")}</p>
+      <RetroAccountList only={only} />
+      {nav}
     </>
   );
 }

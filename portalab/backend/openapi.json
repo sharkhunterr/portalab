@@ -12792,6 +12792,17 @@
             "title": "Service Id",
             "type": "string"
           },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
           "verified": {
             "title": "Verified",
             "type": "boolean"

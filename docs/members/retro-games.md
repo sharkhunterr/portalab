@@ -28,7 +28,7 @@ Your progress follows **you** (your profile, in a household), on every device:
 
 By default, the portal writes your play sessions, saves and states to the RomM account it uses itself (shared by everyone, each save labelled with its owner). To have them in **your own** RomM account:
 
-1. Open *Settings › Media accounts*, card **« My game library account »**, and tap **« Authorise Portalab »**.
+1. Open *Settings › Media accounts*, card **« My game library account »**, and tap **« Authorise Portalab »** — the welcome offers it too, once your administrator linked you to your RomM account.
 2. A code shows, with **« Approve in RomM »**: open it (signed in to RomM with your account) and approve the code.
 3. The card says **« Your games go to your account … »**: from then on your sessions, saves and states go there (a household profile's go to its master's account, labelled with the profile).
 

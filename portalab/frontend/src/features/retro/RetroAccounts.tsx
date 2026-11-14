@@ -56,12 +56,25 @@ function useAccountActions() {
 export function RetroAccounts() {
   const t = useT();
   const accounts = useRetroAccounts();
-  const actions = useAccountActions();
   if (!accounts.data?.length) return null;
   return (
     <SettingsCard icon="joystick" title={t("retro:account.title")} hint={t("retro:account.hint")}>
+      <RetroAccountList />
+    </SettingsCard>
+  );
+}
+
+/** The libraries' accounts — ``only`` some of them (the welcome: those the administrator mapped). */
+export function RetroAccountList({ only }: { only?: readonly string[] }) {
+  const t = useT();
+  const accounts = useRetroAccounts();
+  const actions = useAccountActions();
+  const shown = (accounts.data ?? []).filter((a) => !only || only.includes(a.service_id));
+  if (!shown.length) return null;
+  return (
+    <>
       <ul className="settings-list">
-        {accounts.data.map((account) => (
+        {shown.map((account) => (
           <AccountRow key={account.service_id} account={account} actions={actions} />
         ))}
       </ul>
@@ -70,7 +83,7 @@ export function RetroAccounts() {
           {t("retro:account.failed")}
         </p>
       ) : null}
-    </SettingsCard>
+    </>
   );
 }
 

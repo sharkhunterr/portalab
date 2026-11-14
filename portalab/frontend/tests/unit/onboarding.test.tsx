@@ -41,6 +41,8 @@ function show(element: ReactNode) {
 
 interface Backend {
   preferences?: Array<{ key: string; value: unknown }>;
+  links?: unknown[]; // the member's media accounts
+  retro?: unknown[]; // issue 426: the game libraries' accounts
   welcome?: { enabled: boolean; message: string };
   quests?: unknown[];
   assistant?: boolean;
@@ -51,6 +53,8 @@ function backend({
   welcome = { enabled: true, message: "" },
   quests = [],
   assistant = false,
+  links = [],
+  retro = [],
 }: Backend) {
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
@@ -87,6 +91,8 @@ function backend({
         ],
       });
     if (path === "/api/v1/me/quests") return json(200, quests);
+    if (path === "/api/v1/me/media/links") return json(200, links);
+    if (path === "/api/v1/retro/accounts") return json(200, retro);
     if (path === "/api/v1/ai/status")
       return json(200, {
         available: assistant,
@@ -123,6 +129,37 @@ describe("welcome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Skip" }));
     await waitFor(() => expect(puts.flatMap(Object.keys)).toContain("shell.onboarding.welcomedAt"));
     expect(screen.queryByRole("heading", { name: "A face and a name" })).toBeNull();
+  });
+
+  it("offers to play with one's own RomM account once the administrator mapped it", async () => {
+    window.localStorage.clear();
+    const romm = "00000000-0000-0000-0000-000000000009";
+    backend({
+      links: [
+        {
+          id: "00000000-0000-0000-0000-0000000000a1",
+          service_id: romm,
+          external_user_id: "1",
+          username: "jeremie",
+          verified: true,
+          created_at: "2026-11-14T10:00:00Z",
+        },
+      ],
+      retro: [{ service_id: romm, service_name: "RomM", state: "none", interval: 5 }],
+    });
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your media accounts" });
+    expect(screen.getByText("as jeremie")).toBeInTheDocument(); // the account's name, not its id
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(
+      await screen.findByRole("heading", { name: "Play with your own RomM account" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Authorise Portalab/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "How far do you want to play?" })).toBeInTheDocument();
   });
 
   it("stays closed once seen elsewhere, or when the administrator turned it off", async () => {

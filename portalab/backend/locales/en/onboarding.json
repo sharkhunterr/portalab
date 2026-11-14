@@ -142,6 +142,8 @@
   "ready.title": "All set, {name}!",
   "ready.tour": "Last of all, a one-minute tour shows you where everything is, on your real screen.",
   "recommended": "Recommended",
+  "retro.lead": "Your games played in the portal can go to your own RomM account — play sessions, saves and states. Authorise Portalab once: approve the code in RomM, signed in with your account.",
+  "retro.title": "Play with your own RomM account",
   "skip": "Skip",
   "steps.coins": "+{amount} Coins",
   "steps.done": "Done",

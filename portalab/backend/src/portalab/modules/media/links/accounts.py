@@ -128,6 +128,7 @@ class AccountMatching:
                 ).all()
             )
         linked_by_member = {(str(link.service_id), link.user_id) for link in links}
+        renamed: dict[UUID, str] = {}
         out: list[ServiceAccounts] = []
         for service_id, provider in providers.items():
             info = infos.get(service_id)
@@ -149,6 +150,9 @@ class AccountMatching:
             }
             for account in accounts:
                 link = by_external.get(account.external_id)
+                named = (account.username or account.display_name or "")[:200] or None
+                if link is not None and named and link.username != named:
+                    renamed[link.id] = named  # the member's page shows the name, not the id
                 row = AccountRow(
                     account.external_id,
                     account.username,
@@ -167,6 +171,12 @@ class AccountMatching:
             block.accounts.sort(key=lambda r: (r.linked_user_id is not None, normalize(r.username)))
             out.append(block)
         out.sort(key=lambda b: b.name.lower())
+        if renamed:
+            async with self.database.unit_of_work() as uow:
+                for link_id, name in renamed.items():
+                    await uow.session.execute(
+                        update(UserLink).where(UserLink.id == link_id).values(username=name)
+                    )
         return out, members
 
     async def link(self, service_id: UUID, external_user_id: str, user_id: UUID | None) -> int:

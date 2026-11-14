@@ -218,6 +218,8 @@ class UserLink(MediaBase):
     )
     verified: Mapped[bool] = mapped_column(Boolean, nullable=False)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # the account's name on the service (« jeremie »), shown in place of its id when the service tells it
+    username: Mapped[str | None] = mapped_column(String(200), info=pii("identifier"))
 
 
 class PlaybackSession(MediaBase):
