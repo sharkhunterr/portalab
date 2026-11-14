@@ -61,7 +61,7 @@
   "error": "Something went wrong. Try again.",
   "feature.ai": "AI assistant",
   "feature.community": "Community participation",
-  "feature.games": "Games",
+  "feature.games": "Portal mini-games",
   "feature.requests": "Requests",
   "feature.shop": "Shop",
   "feature.support": "Support",
@@ -165,7 +165,7 @@
   "title.saved": "Restrictions saved",
   "type.audiobooks": "Audiobooks",
   "type.books": "Books",
-  "type.games": "Games",
+  "type.games": "Video games",
   "type.movies": "Films",
   "type.music": "Music",
   "type.series": "Series"

@@ -61,7 +61,7 @@
   "error": "Un problème est survenu. Réessaie.",
   "feature.ai": "Assistant IA",
   "feature.community": "Participation à la communauté",
-  "feature.games": "Jeux",
+  "feature.games": "Mini-jeux du portail",
   "feature.requests": "Demandes de contenus",
   "feature.shop": "Boutique",
   "feature.support": "Support",
@@ -165,7 +165,7 @@
   "title.saved": "Restrictions enregistrées",
   "type.audiobooks": "Livres audio",
   "type.books": "Livres",
-  "type.games": "Jeux",
+  "type.games": "Jeux vidéo",
   "type.movies": "Films",
   "type.music": "Musique",
   "type.series": "Séries"
