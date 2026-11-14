@@ -52,6 +52,7 @@ from portalab.modules.identity.services.visits import record_visit
 from portalab.modules.identity.settings import HOUSEHOLD_ENABLED, HOUSEHOLD_MAX
 
 CACHE_S = 15.0
+ATTENTION_ENTRY = "shell.household"  # the navigation entry of « My household »
 CATEGORY = "identity.household"
 LIVE = AccountState.ACTIVE.value
 
@@ -134,7 +135,7 @@ class HouseholdService:
         found = None
         if row is not None and row.kind != "owner":
             restrictions = parse(row.restrictions).restrictions()
-            found = restrictions if restrictions.limits_titles or restrictions.blocked else None
+            found = restrictions if restrictions.restricts else None
         self._restrictions[user] = (time.monotonic(), found)
         return found
 
@@ -706,3 +707,21 @@ class HouseholdService:
                 )
         except Exception:
             log.warning("household notification not sent")
+
+
+class HouseholdAttention:
+    """``shell.attention``: the access requests waiting for a household's master (« My household » badge)."""
+
+    def __init__(self, service: HouseholdService) -> None:
+        self.service = service
+
+    async def counts(self, principal: Principal) -> dict[str, int]:
+        if principal.user_id is None or principal.profile_of is not None or principal.channel != "user":
+            return {}
+        async with self.service.ctx.database.session() as session:
+            waiting = await session.scalar(
+                select(func.count())
+                .select_from(AccessRequest)
+                .where(AccessRequest.owner_id == principal.user_id, AccessRequest.status == "pending")
+            )
+        return {ATTENTION_ENTRY: int(waiting or 0)} if waiting else {}

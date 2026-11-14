@@ -3,10 +3,11 @@
 import re
 from datetime import UTC, date, datetime
 from typing import Any
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from portalab.capabilities.household import AGES, FEATURES, GENRES, Mode, Restrictions
+from portalab.capabilities.household import AGES, FEATURES, GENRES, SCREEN_MINUTES, TYPES, Mode, Restrictions
 from portalab.core.errors import BadRequest, Conflict, Forbidden
 
 PIN = re.compile(r"\d{4,6}")
@@ -15,6 +16,15 @@ COLORS = ("#6366f1", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#8b5cf6", "#ef
 PROFILE_KINDS = ("standard", "child", "custom")
 MAX_PROFILES = 8
 ADULT = 18
+
+
+class KeptTitle(BaseModel):
+    """A title its master kept from a profile one by one (its name kept to list it)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    title: str = Field(default="", max_length=300)
 
 
 class RestrictionSettings(BaseModel):
@@ -31,6 +41,30 @@ class RestrictionSettings(BaseModel):
     mode: Mode = "hide"
     requests: bool = True
     genres: list[str] = Field(default_factory=list, max_length=len(GENRES))
+    types: list[str] = Field(default_factory=list, max_length=len(TYPES))
+    titles: list[KeptTitle] = Field(default_factory=list, max_length=500)
+    daily_minutes: int | None = None
+    services: bool = True  # « Open in Plex, Grimmory, RomM… » offered, or the portal's player and reader only
+
+    @field_validator("types")
+    @classmethod
+    def _types(cls, value: list[str]) -> list[str]:
+        unknown = [kind for kind in value if kind not in TYPES]
+        if unknown:
+            raise ValueError(f"unknown types {unknown}")
+        return sorted(set(value))
+
+    @field_validator("titles")
+    @classmethod
+    def _titles(cls, value: list[KeptTitle]) -> list[KeptTitle]:
+        return list({title.id: title for title in value}.values())
+
+    @field_validator("daily_minutes")
+    @classmethod
+    def _minutes(cls, value: int | None) -> int | None:
+        if value is not None and value not in SCREEN_MINUTES:
+            raise ValueError(f"daily_minutes must be one of {SCREEN_MINUTES}")
+        return value
 
     @field_validator("genres")
     @classmethod
@@ -84,12 +118,20 @@ class RestrictionSettings(BaseModel):
             self.mode,
             self.requests,
             frozenset(self.genres),
+            frozenset(self.types),
+            frozenset(str(title.id) for title in self.titles),
+            self.daily_minutes,
+            self.services,
         )
 
 
 OPEN = RestrictionSettings()
 CHILD = RestrictionSettings(
-    max_age=12, allow_unrated=False, blocked=["ai", "community", "requests", "shop"], genres=["horror"]
+    max_age=12,
+    allow_unrated=False,
+    blocked=["ai", "community", "requests", "shop"],
+    genres=["horror"],
+    services=False,  # the portal's player and reader only: its screen time counts, its rules hold
 )
 
 

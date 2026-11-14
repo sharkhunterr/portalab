@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import httpx
+import pytest
 from fastapi import FastAPI
 from sqlalchemy import select
 
@@ -144,6 +145,7 @@ async def test_locked_titles_show_and_requests_can_be_off(
     }
     locked = (await client.get(f"/api/v1/media/{ids['Alien']}")).json()
     assert locked["code"] == "household.restricted" and locked["can_ask"] is False
+    assert locked["reason"] == "age"
     asked = await client.post("/api/v1/household/requests", json={"ref": str(ids["Alien"]), "title": "Alien"})
     assert asked.status_code == 403 and asked.json()["code"] == "household.requests_off"
     household = await client.get("/api/v1/media/insights", params={"scope": "household"})
@@ -241,3 +243,57 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
     assert smile == {"age": 17, "ratings": [{"source": "FR", "value": "12"}, {"source": "US", "value": "R"}]}
     saw = (await client.get(f"/api/v1/media/{ids['Saw']}")).json()["age_rating"]
     assert saw == {"age": 16, "ratings": [{"source": "server", "value": "fr/-16"}]}
+
+
+async def test_kinds_titles_and_screen_time(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    from portalab.modules.identity.household.rules import KeptTitle
+    from portalab.modules.media.insights.portal import PortalActivity
+    from portalab.modules.media.restrictions import ScreenTimeUp
+
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    identity = module_of(app)
+    owner = Principal(user_id=people["zoe"])
+    created = await identity.household.create(
+        owner, display_name="Léa", kind="standard", color=None, pin=None
+    )
+    lea = UUID(str(created["id"]))
+    await identity.household.change(
+        owner,
+        lea,
+        restrictions=RestrictionSettings(
+            types=["books"], titles=[KeptTitle(id=ids["Coco"], title="Coco")], daily_minutes=15
+        ),
+    )
+    viewer = Principal(user_id=lea, profile_of=people["zoe"])
+    assert await media.module.gate.blocked(viewer) == frozenset({ids["Coco"], ids["Le Petit Prince"]})
+    assert await media.module.gate.screen_today(viewer) == (0, 15)
+    from portalab.modules.media.restrictions import Restricted
+
+    for title, reason in (("Coco", "title"), ("Le Petit Prince", "type")):
+        with pytest.raises(Restricted) as kept:
+            await media.module.gate.check(viewer, ids[title], title)
+        assert kept.value.extensions["reason"] == reason and kept.value.extensions["can_ask"] is False
+    await media.module.gate.check_screen(viewer)  # nothing watched yet
+
+    await PortalActivity(media.database).store(
+        ref="portal:t1",
+        user=lea,
+        service=media.service(1).service_id,
+        object_id=ids["Toy Story"],
+        kind="movie",
+        watched=20 * 60,
+        duration=None,
+        share=None,
+        ended=datetime.now(UTC),
+    )
+    assert await media.module.gate.screen_today(viewer) == (20, 15)
+    with pytest.raises(ScreenTimeUp):
+        await media.module.gate.check_screen(viewer)
+
+    await login(client, "zoe")
+    seen = await client.get("/api/v1/me/media/screen-time", params={"profile": str(lea)})
+    assert seen.json() == {"used": 20, "allowed": 15}  # its master sees it
+    assert (await client.get("/api/v1/me/media/screen-time")).json() is None  # the master has none

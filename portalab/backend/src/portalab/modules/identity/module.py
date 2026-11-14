@@ -9,13 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from portalab.capabilities.administration import BOOTSTRAP_CAPABILITY as BOOTSTRAP
 from portalab.capabilities.administration import AdminSurface, default_admin_surfaces
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
+from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.core.jobs.queue import enqueue
 from portalab.core.jobs.registry import JobRegistry
 from portalab.modules.identity import event_types as _event_types  # noqa: F401 — registers event types
 from portalab.modules.identity.context import OWNER, IdentityContext
 from portalab.modules.identity.household.service import CATEGORY as HOUSEHOLD_CATEGORY
-from portalab.modules.identity.household.service import HouseholdService
+from portalab.modules.identity.household.service import HouseholdAttention, HouseholdService
 from portalab.modules.identity.jobs import dormancy, finalize_deletion, sessions_prune, verification_expiry
 from portalab.modules.identity.search_provider import register_search
 from portalab.modules.identity.services.account_service import AccountService
@@ -72,6 +73,10 @@ class IdentityModule:
         register_search(self.ctx)
         if not self.ctx.capabilities.system_providers(HOUSEHOLD):
             self.ctx.capabilities.provide(HOUSEHOLD, self.household, instance_ref="identity", owner=OWNER)
+        if not any(p.instance_ref == "household" for p in self.ctx.capabilities.system_providers(ATTENTION)):
+            self.ctx.capabilities.provide(
+                ATTENTION, HouseholdAttention(self.household), instance_ref="household", owner=OWNER
+            )
         if default_categories.get(HOUSEHOLD_CATEGORY) is None:
             declare_category(
                 HOUSEHOLD_CATEGORY, OWNER, "household:category", default_channels=("portal", "email")

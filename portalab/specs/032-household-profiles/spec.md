@@ -71,6 +71,13 @@ about profiles.
   A title's age is now the strictest of TMDB's FR/US/GB/DE ratings and the media server's (Plex, Jellyfin),
   shown on its page; genres (horror, thriller, crime, war) may be kept out whatever their rating; the child
   preset keeps horror out.
+- Q: Session 4 (owner feedback): the master sets the policy simply (switches); he may also keep single
+  titles and kinds of content out, and limit the daily screen time. → Built: allowed content and features,
+  kept-out genres as switches, titles kept out from a title's page, a daily screen time in the portal's
+  player and reader.
+- Q: Session 5 (owner): an option to show or not « Open in Plex, Grimmory, RomM… » — forcing the profile to
+  use the portal, or giving it the services directly. → Built: « Open titles in their services » switch
+  (off for the child preset); the links are removed by the server.
 - Q: How does a child get a title above its rating? → A: the locked title offers « Ask for access »; the master
   is notified, approves (for good or for a number of days) or refuses; the profile is told.
 

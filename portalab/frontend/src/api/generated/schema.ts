@@ -8617,6 +8617,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/screen-time": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Screen Time
+         * @description 032: a household profile's screen time today — mine, or (its master) one of my profiles'.
+         */
+        get: operations["screen_time_api_v1_me_media_screen_time_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/taste": {
         parameters: {
             query?: never;
@@ -16345,6 +16365,22 @@ export interface components {
             /** Type */
             type: string;
         };
+        /**
+         * KeptTitle
+         * @description A title its master kept from a profile one by one (its name kept to list it).
+         */
+        KeptTitle: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+        };
         /** Layout */
         Layout: {
             /** Group Order */
@@ -19583,6 +19619,8 @@ export interface components {
             birth_date?: string | null;
             /** Blocked */
             blocked?: string[];
+            /** Daily Minutes */
+            daily_minutes?: number | null;
             /** Genres */
             genres?: string[];
             /** Max Age */
@@ -19598,6 +19636,15 @@ export interface components {
              * @default true
              */
             requests: boolean;
+            /**
+             * Services
+             * @default true
+             */
+            services: boolean;
+            /** Titles */
+            titles?: components["schemas"]["KeptTitle"][];
+            /** Types */
+            types?: string[];
         };
         /** ResyncIn */
         ResyncIn: {
@@ -19749,6 +19796,13 @@ export interface components {
             look?: string | null;
             /** Pack */
             pack?: string | null;
+        };
+        /** ScreenTimeOut */
+        ScreenTimeOut: {
+            /** Allowed */
+            allowed: number;
+            /** Used */
+            used: number;
         };
         /** SearchFacetOut */
         SearchFacetOut: {
@@ -38377,6 +38431,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    screen_time_api_v1_me_media_screen_time_get: {
+        parameters: {
+            query?: {
+                profile?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenTimeOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

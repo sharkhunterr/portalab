@@ -224,8 +224,14 @@ describe("my household", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
     expect((within(editor).getByLabelText("Maximum age rating") as HTMLSelectElement).value).toBe("12");
-    expect((within(editor).getByLabelText("Shop") as HTMLInputElement).checked).toBe(true);
-    expect((within(editor).getByLabelText("AI assistant") as HTMLInputElement).checked).toBe(false);
+    // 032: switches — a feature or a kind of content on is allowed, a genre on is kept out
+    expect((within(editor).getByLabelText("Shop") as HTMLInputElement).checked).toBe(false);
+    expect((within(editor).getByLabelText("AI assistant") as HTMLInputElement).checked).toBe(true);
+    expect((within(editor).getByLabelText("Books") as HTMLInputElement).checked).toBe(true);
+    expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(false);
+    fireEvent.click(within(editor).getByLabelText("Horror"));
+    expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(true);
+    expect(within(editor).getByLabelText("A day, in the portal's player and reader")).toBeTruthy();
     expect((within(editor).getByRole("radio", { name: /Child/ }) as HTMLInputElement).checked).toBe(true);
     // 032: a birth date sets the age (the fixed one is then disabled), hidden or locked titles, requests
     fireEvent.change(within(editor).getByLabelText("Birth date (optional)"), {
@@ -256,7 +262,23 @@ describe("my household", () => {
 });
 
 describe("a locked title", () => {
+  it("tells a request already waiting instead of asking again, and why it is locked", async () => {
+    fake.handler = () => json(200, [REQUEST]);
+    const problem = new ApiError(403, "restricted", "household.restricted", {
+      object_id: REQUEST.subject_ref,
+      name: "Hey Arnold!",
+      rating: null,
+      reason: "unrated",
+      can_ask: true,
+    });
+    show(<LockedTitle problem={problem} />);
+    expect(await screen.findByText(/waiting for the master's answer/)).toBeTruthy();
+    expect(screen.getByText(/has no age rating yet/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Ask for access" })).toBeNull();
+  });
+
   it("says when the profile cannot ask", () => {
+    fake.handler = () => json(200, []);
     const problem = new ApiError(403, "restricted", "household.restricted", {
       object_id: REQUEST.subject_ref,
       name: "Alien",
@@ -271,6 +293,7 @@ describe("a locked title", () => {
   it("asks the master for access", async () => {
     const sent: unknown[] = [];
     fake.handler = async (request) => {
+      if (request.method === "GET") return json(200, []); // no request yet
       sent.push(await request.json());
       return json(200, { id: REQUEST.id, status: "pending", created: true });
     };

@@ -19,6 +19,7 @@ import {
   useDecideAccess,
   useHousehold,
   useProfileActivity,
+  useScreenTime,
   useSetPin,
 } from "./api";
 import { ProfileEditor } from "./ProfileEditor";
@@ -219,6 +220,7 @@ function MemberCard({
           <dd>{format.number(member.progress.contribution)}</dd>
         </div>
       </dl>
+      {member.restrictions?.daily_minutes ? <ScreenLine member={member} /> : null}
       <div className="household-member__badges">
         {limited ? (
           <span className="household-badge">
@@ -460,5 +462,18 @@ function MyPin({
         </DialogActions>
       </form>
     </Dialog>
+  );
+}
+
+/** 032: how much of its screen time a profile spent today. */
+function ScreenLine({ member }: { member: HouseholdMember }) {
+  const t = useT();
+  const screen = useScreenTime(member.id).data;
+  if (!screen) return null;
+  return (
+    <p className="household-screen">
+      <Icon name="clock" size={14} />{" "}
+      {t("household:screen.today", { used: screen.used, allowed: screen.allowed })}
+    </p>
   );
 }

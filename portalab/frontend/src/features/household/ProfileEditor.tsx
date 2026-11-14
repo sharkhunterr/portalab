@@ -1,6 +1,6 @@
 import { type FormEvent, useId, useState } from "react";
 import { Button } from "../../design-system/components/Button";
-import { CheckboxField, SelectField, TextField } from "../../design-system/components/Field";
+import { SelectField, TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
 import { Dialog, DialogActions } from "../../design-system/components/Overlays";
@@ -14,6 +14,8 @@ import {
   type HouseholdMember,
   type ProfileKind,
   type RestrictionSettings,
+  SCREEN_MINUTES,
+  TYPES,
   useCreateProfile,
   useDeleteProfile,
   useSetPin,
@@ -24,7 +26,14 @@ import { ProfileFace } from "./ProfilePicker";
 const KINDS: ProfileKind[] = ["standard", "child", "custom"];
 const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; community: boolean }> = {
   standard: {
-    restrictions: { max_age: null, allow_unrated: true, blocked: [], mode: "hide", requests: true },
+    restrictions: {
+      max_age: null,
+      allow_unrated: true,
+      blocked: [],
+      mode: "hide",
+      requests: true,
+      services: true,
+    },
     community: true,
   },
   child: {
@@ -35,15 +44,29 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       mode: "hide",
       requests: true,
       genres: ["horror"],
+      services: false,
     },
     community: false,
   },
   custom: {
-    restrictions: { max_age: null, allow_unrated: true, blocked: [], mode: "hide", requests: true },
+    restrictions: {
+      max_age: null,
+      allow_unrated: true,
+      blocked: [],
+      mode: "hide",
+      requests: true,
+      services: true,
+    },
     community: true,
   },
 };
 const KIND_ICONS: Record<ProfileKind, string> = { standard: "user", child: "smile", custom: "sliders" };
+
+/** A list with ``key`` in it or not. */
+function flip(list: readonly string[] | undefined, key: string, on: boolean): string[] {
+  const rest = (list ?? []).filter((item) => item !== key);
+  return on ? [...rest, key].sort() : rest;
+}
 
 /** Its age today, from its birth date (« 2016-03-10 »). */
 export function ageOf(birth: string | null | undefined, today = new Date()): number | null {
@@ -199,7 +222,7 @@ export function ProfileEditor({
         </fieldset>
 
         <fieldset className="household-editor__section">
-          <legend>{t("household:editor.restrictions")}</legend>
+          <legend>{t("household:editor.ageSection")}</legend>
           <TextField
             label={t("household:editor.birthDate")}
             hint={
@@ -231,12 +254,6 @@ export function ProfileEditor({
               </option>
             ))}
           </SelectField>
-          <Switch
-            label={t("household:editor.unrated")}
-            checked={restrictions.allow_unrated ?? true}
-            onChange={(event) => setRestrictions((r) => ({ ...r, allow_unrated: event.target.checked }))}
-          />
-          <p className="household-editor__hint">{t("household:editor.unratedHint")}</p>
           <fieldset className="household-editor__modes">
             <legend className="household-editor__label">{t("household:editor.mode")}</legend>
             {(["hide", "lock"] as const).map((mode) => (
@@ -256,42 +273,122 @@ export function ProfileEditor({
               </label>
             ))}
           </fieldset>
-          <Switch
-            label={t("household:editor.requests")}
-            checked={restrictions.requests ?? true}
-            onChange={(event) => setRestrictions((r) => ({ ...r, requests: event.target.checked }))}
-          />
-          <p className="household-editor__hint">{t("household:editor.requestsHint")}</p>
-          <fieldset className="household-editor__features">
-            <legend className="household-editor__label">{t("household:editor.blocked")}</legend>
-            {FEATURES.map((feature) => (
-              <CheckboxField
-                key={feature}
-                label={t(`household:feature.${feature}`)}
-                checked={(restrictions.blocked ?? []).includes(feature)}
-                onChange={(event) => toggle(feature, event.target.checked)}
+          <div className="household-switches">
+            <Switch
+              label={t("household:editor.unrated")}
+              checked={restrictions.allow_unrated ?? true}
+              onChange={(event) => setRestrictions((r) => ({ ...r, allow_unrated: event.target.checked }))}
+            />
+            <Switch
+              label={t("household:editor.requests")}
+              checked={restrictions.requests ?? true}
+              onChange={(event) => setRestrictions((r) => ({ ...r, requests: event.target.checked }))}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.types")}</legend>
+          <p className="household-editor__hint">{t("household:editor.typesHint")}</p>
+          <div className="household-switches">
+            {TYPES.map((kind) => (
+              <Switch
+                key={kind}
+                label={t(`household:type.${kind}`)}
+                checked={!(restrictions.types ?? []).includes(kind)}
+                onChange={(event) =>
+                  setRestrictions((r) => ({ ...r, types: flip(r.types, kind, !event.target.checked) }))
+                }
               />
             ))}
-          </fieldset>
-          <fieldset className="household-editor__features">
-            <legend className="household-editor__label">{t("household:editor.genres")}</legend>
+          </div>
+        </fieldset>
+
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.genres")}</legend>
+          <p className="household-editor__hint">{t("household:editor.genresHint")}</p>
+          <div className="household-switches">
             {GENRES.map((genre) => (
-              <CheckboxField
+              <Switch
                 key={genre}
                 label={t(`household:genre.${genre}`)}
                 checked={(restrictions.genres ?? []).includes(genre)}
                 onChange={(event) =>
-                  setRestrictions((r) => ({
-                    ...r,
-                    genres: event.target.checked
-                      ? [...(r.genres ?? []), genre].sort()
-                      : (r.genres ?? []).filter((g) => g !== genre),
-                  }))
+                  setRestrictions((r) => ({ ...r, genres: flip(r.genres, genre, event.target.checked) }))
                 }
               />
             ))}
-          </fieldset>
-          <p className="household-editor__hint">{t("household:editor.genresHint")}</p>
+          </div>
+        </fieldset>
+
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.titles")}</legend>
+          {(restrictions.titles ?? []).length === 0 ? (
+            <p className="household-editor__hint">{t("household:editor.titlesEmpty")}</p>
+          ) : (
+            <ul className="household-kept">
+              {(restrictions.titles ?? []).map((title) => (
+                <li key={title.id}>
+                  <Icon name="blocked" size={16} />
+                  <span>{title.title || title.id}</span>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    onClick={() =>
+                      setRestrictions((r) => ({
+                        ...r,
+                        titles: (r.titles ?? []).filter((k) => k.id !== title.id),
+                      }))
+                    }
+                  >
+                    {t("household:editor.titlesRemove")}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </fieldset>
+
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.features")}</legend>
+          <Switch
+            label={t("household:editor.services")}
+            checked={restrictions.services ?? true}
+            onChange={(event) => setRestrictions((r) => ({ ...r, services: event.target.checked }))}
+          />
+          <p className="household-editor__hint">{t("household:editor.servicesHint")}</p>
+          <div className="household-switches">
+            {FEATURES.map((feature) => (
+              <Switch
+                key={feature}
+                label={t(`household:feature.${feature}`)}
+                checked={!(restrictions.blocked ?? []).includes(feature)}
+                onChange={(event) => toggle(feature, !event.target.checked)}
+              />
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="household-editor__section">
+          <legend>{t("household:editor.screen")}</legend>
+          <SelectField
+            label={t("household:editor.screenLabel")}
+            hint={t("household:editor.screenHint")}
+            value={restrictions.daily_minutes ?? ""}
+            onChange={(event) =>
+              setRestrictions((r) => ({
+                ...r,
+                daily_minutes: event.target.value === "" ? null : Number(event.target.value),
+              }))
+            }
+          >
+            <option value="">{t("household:editor.screenNone")}</option>
+            {SCREEN_MINUTES.map((minutes) => (
+              <option key={minutes} value={minutes}>
+                {t("household:editor.screenMinutes", { minutes })}
+              </option>
+            ))}
+          </SelectField>
         </fieldset>
 
         <fieldset className="household-editor__section">

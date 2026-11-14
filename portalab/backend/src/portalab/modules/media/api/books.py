@@ -153,6 +153,8 @@ def _relay(body: StreamBody, stack: AsyncExitStack, headers: dict[str, str]) -> 
 
 @router.get("/media/{object_id}/listen", response_model=ListenOut)
 async def listen_info(principal: Reader, object_id: UUID, module: Module) -> ListenOut:
+    await module.gate.check(principal, object_id)  # 032: a household profile's kept-out titles and kinds
+    await module.gate.check_screen(principal)  # 032: and its screen time of the day
     found = await module.books.listen(_me(principal), object_id)
     item = found.item
     return ListenOut(
@@ -212,6 +214,8 @@ async def listen_position(
 
 @router.get("/media/{object_id}/read", response_model=ReadOut)
 async def read_info(principal: Reader, object_id: UUID, module: Module) -> ReadOut:
+    await module.gate.check(principal, object_id)  # 032: a household profile's kept-out titles and kinds
+    await module.gate.check_screen(principal)  # 032: and its screen time of the day
     found = await module.books.read(_me(principal), object_id)
     book = found.book
     return ReadOut(

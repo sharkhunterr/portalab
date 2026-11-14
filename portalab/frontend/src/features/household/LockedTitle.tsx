@@ -3,22 +3,29 @@ import { Link } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { TextAreaField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
+import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import type { ApiError } from "../../state/regions";
-import { useAskAccess } from "./api";
+import { useAccessRequests, useAskAccess } from "./api";
 import "./household.css";
 
 /** The problem code of a title a household profile's age rating keeps from it (spec 032). */
 export const RESTRICTED = "household.restricted";
+const REASONS = ["age", "unrated", "genre", "type", "title"];
 
 /** A title above the profile's age rating: what it is, and « Ask for access » to the account's master. */
 export function LockedTitle({ problem }: { problem: ApiError }) {
   const t = useT();
+  const format = useFormat();
   const ask = useAskAccess();
   const [note, setNote] = useState("");
   const ref = String(problem.extensions.object_id ?? "");
   const title = String(problem.extensions.name ?? "") || "…";
   const rating = problem.extensions.rating ? String(problem.extensions.rating) : null;
+  const reason = String(problem.extensions.reason ?? "age");
+  // the profile's latest request for this title: waiting, refused, or none
+  const last = (useAccessRequests().data ?? []).find((r) => r.kind === "media" && r.subject_ref === ref);
+  const pending = last?.status === "pending";
   return (
     <section className="household-locked" aria-labelledby="household-locked">
       <span className="household-locked__icon" aria-hidden="true">
@@ -26,11 +33,16 @@ export function LockedTitle({ problem }: { problem: ApiError }) {
       </span>
       <h1 id="household-locked">{t("household:locked.title")}</h1>
       {rating ? <span className="household-badge">{t("household:locked.rating", { rating })}</span> : null}
-      <p>{t("household:locked.body", { title })}</p>
+      <p>{t(`household:locked.why.${REASONS.includes(reason) ? reason : "age"}`, { title })}</p>
       {problem.extensions.can_ask === false ? (
         <p>{t("household:locked.noAsk")}</p>
-      ) : ask.isSuccess ? (
-        <p role="status">{t("household:locked.asked")}</p>
+      ) : ask.isSuccess || pending ? (
+        <p role="status" className="household-locked__pending">
+          <Icon name="hourglass" size={16} />
+          {last?.created_at && !ask.isSuccess
+            ? t("household:locked.pendingSince", { date: format.dateTime(last.created_at) })
+            : t("household:locked.asked")}
+        </p>
       ) : (
         <form
           onSubmit={(event) => {
@@ -45,6 +57,11 @@ export function LockedTitle({ problem }: { problem: ApiError }) {
             rows={2}
             onChange={(event) => setNote(event.target.value)}
           />
+          {last?.status === "denied" && last.decided_at ? (
+            <p className="household-locked__denied">
+              {t("household:locked.denied", { date: format.dateTime(last.decided_at) })}
+            </p>
+          ) : null}
           <Button type="submit" disabled={ask.isPending || !ref}>
             <Icon name="key" size={16} />
             {t("household:locked.ask")}

@@ -93,3 +93,20 @@ def test_the_strictest_rating_holds_and_genres_are_recognised() -> None:
     assert parse({"genres": ["horror", "horror"]}).genres == ["horror"]
     assert parse({"genres": ["cooking"]}) == CHILD  # not a genre one may keep out: restricted
     assert "horror" in CHILD.genres
+
+
+def test_a_profile_may_be_kept_to_the_portal() -> None:
+    from portalab.modules.media.sections.service import without_links
+
+    assert CHILD.services is False and CHILD.restrictions().restricts
+    only = RestrictionSettings(services=False).restrictions()
+    assert only.restricts and not only.limits_titles  # nothing hidden, only the services' links
+    assert not RestrictionSettings().restrictions().restricts
+    data = {
+        "sources": [{"connector": "plex", "link": "https://plex/x", "item_link": "https://plex/x"}],
+        "n": 1,
+    }
+    assert without_links(data) == {
+        "sources": [{"connector": "plex", "link": None, "item_link": None}],
+        "n": 1,
+    }

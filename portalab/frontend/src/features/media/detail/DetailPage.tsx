@@ -8,6 +8,7 @@ import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
 import { useAssistantPage } from "../../ai/pageContext";
 import { LockedTitle, RESTRICTED } from "../../household/LockedTitle";
+import { TitleRestrictions } from "../../household/TitleRestrictions";
 import {
   imageUrl,
   MediaError,
@@ -789,7 +790,8 @@ function Read({ objectId }: { objectId: string }) {
 function WatchVideo({ objectId, kind }: { objectId: string; kind: string }) {
   const t = useT();
   const player = usePlayerInfo(objectId, null, PLAYABLE.includes(kind));
-  const code = player.error instanceof MediaError ? player.error.code : undefined;
+  const code =
+    player.error instanceof MediaError || player.error instanceof ApiError ? player.error.code : undefined;
   const item = player.data?.item;
   const resume = item && item.resume_s > 30 && (!item.duration_s || item.resume_s < item.duration_s * 0.95);
   const reset = useResetResume(objectId);
@@ -828,6 +830,13 @@ function WatchVideo({ objectId, kind }: { objectId: string; kind: string }) {
       ) : null}
       {reset.isError ? <p role="alert">{t("media:player.cta.resetFailed")}</p> : null}
       <OpenIn objectId={objectId} kind={kind} secondary={Boolean(item)} />
+      {code === "household.screen_time_up" ? (
+        // 032: a household profile's screen time of the day is spent
+        <p className="media-watch-hint" role="status">
+          <Icon name="clock" size={14} />
+          {t("household:screen.up")}
+        </p>
+      ) : null}
       {code === "media.player_unlinked" ? (
         <Link className="media-watch-hint" to="/settings/media-accounts">
           <Icon name="link" size={14} />
@@ -1029,6 +1038,8 @@ export function DetailPage() {
           ) : null}
           {/* issue 355: my review (a rating, a few words), in a dialog */}
           <ReviewButton objectId={media.id} title={media.title} poster={shownPoster} facts={dialogFacts} />
+          {/* 032: the master keeps this title out of one profile or another */}
+          <TitleRestrictions objectId={media.id} title={media.title} />
           {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
           {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
           {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}

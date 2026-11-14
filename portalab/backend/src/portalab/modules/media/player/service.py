@@ -348,12 +348,15 @@ class PlayerService:
         providers = self._registrations()
         if not providers:
             return Continuing([], set(), set())
-        holder = await link_holder(self.capabilities, user)  # 032: a profile's are its master's
+        if await link_holder(self.capabilities, user) != user:
+            # 032: a household profile — the server's « Continue » is the shared account's (its master's
+            # and the whole family's): its own sittings in the portal tell what it is in the middle of
+            return Continuing([], set(), set())
         async with self.database.session() as session:
             links = (
                 await session.execute(
                     select(UserLink.service_id, UserLink.external_user_id).where(
-                        UserLink.user_id == holder, UserLink.verified.is_(True)
+                        UserLink.user_id == user, UserLink.verified.is_(True)
                     )
                 )
             ).all()

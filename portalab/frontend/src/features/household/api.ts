@@ -23,6 +23,8 @@ export const CHOOSE_PROFILE_EVENT = "portalab:choose-profile";
 export const AGES = [0, 6, 10, 12, 14, 16, 18] as const;
 export const FEATURES = ["shop", "requests", "ai", "community", "games", "support"] as const;
 export const GENRES = ["horror", "thriller", "crime", "war"] as const; // 032: kept out whatever their rating
+export const TYPES = ["movies", "series", "books", "audiobooks", "music", "games"] as const;
+export const SCREEN_MINUTES = [15, 30, 45, 60, 90, 120, 180, 240, 300] as const;
 
 /** Opens the picker — on one member's PIN pad when ``member`` is given. */
 export function chooseProfile(member?: string) {
@@ -159,5 +161,25 @@ export function useDecideAccess() {
       });
     },
     onSuccess: refresh,
+  });
+}
+
+export interface ScreenTime {
+  used: number;
+  allowed: number;
+}
+
+/** A profile's screen time today (``null``: none set). */
+export function useScreenTime(profile: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["household", "screen", profile],
+    enabled,
+    retry: false,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/me/media/screen-time", {
+          params: { query: profile ? { profile } : {} },
+        })
+      ).data as ScreenTime | null,
   });
 }

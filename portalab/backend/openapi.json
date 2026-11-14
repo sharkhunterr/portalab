@@ -10158,6 +10158,28 @@
         "title": "InventoryItemOut",
         "type": "object"
       },
+      "KeptTitle": {
+        "additionalProperties": false,
+        "description": "A title its master kept from a profile one by one (its name kept to list it).",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "KeptTitle",
+        "type": "object"
+      },
       "Layout": {
         "additionalProperties": false,
         "properties": {
@@ -19464,6 +19486,17 @@
             "title": "Blocked",
             "type": "array"
           },
+          "daily_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Minutes"
+          },
           "genres": {
             "items": {
               "type": "string"
@@ -19496,6 +19529,27 @@
             "default": true,
             "title": "Requests",
             "type": "boolean"
+          },
+          "services": {
+            "default": true,
+            "title": "Services",
+            "type": "boolean"
+          },
+          "titles": {
+            "items": {
+              "$ref": "#/components/schemas/KeptTitle"
+            },
+            "maxItems": 500,
+            "title": "Titles",
+            "type": "array"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Types",
+            "type": "array"
           }
         },
         "title": "RestrictionSettings",
@@ -19946,6 +20000,24 @@
           }
         },
         "title": "SceneIn",
+        "type": "object"
+      },
+      "ScreenTimeOut": {
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "integer"
+          },
+          "used": {
+            "title": "Used",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "used",
+          "allowed"
+        ],
+        "title": "ScreenTimeOut",
         "type": "object"
       },
       "SearchFacetOut": {
@@ -50134,6 +50206,65 @@
           }
         },
         "summary": "My Requests Soon",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/screen-time": {
+      "get": {
+        "description": "032: a household profile's screen time today \u2014 mine, or (its master) one of my profiles'.",
+        "operationId": "screen_time_api_v1_me_media_screen_time_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "profile",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Profile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ScreenTimeOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Screen Time Api V1 Me Media Screen Time Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Screen Time",
         "tags": [
           "media"
         ]

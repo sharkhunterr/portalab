@@ -43,17 +43,17 @@ Dans **Statistiques**, l'onglet **« Mon foyer »** montre le cumul du foyer, vi
 
 ## Restreindre un profil
 
-Dans **« Modifier »** d'un profil :
+C'est vous, le titulaire, qui fixez la politique de chaque profil : **« Mon foyer » → « Modifier »**. Un profil ne peut rien en changer. Tout se règle avec des interrupteurs.
 
-- **Date de naissance** (facultatif) : l'âge suit alors le profil, un an de plus à chaque anniversaire, sans limite à partir de 18 ans. Sinon, choisissez un **âge maximum** fixe.
-- **Titres au-dessus de son âge** : **cachés** (ils n'apparaissent pas : médiathèque, recherche, recommandations, accueil) ou **affichés verrouillés** (listés floutés avec un cadenas, impossibles à ouvrir). Les livres, la musique et les jeux n'ont pas de classification et restent visibles.
-- **Peut demander l'accès** : sans cette case, un titre verrouillé ne propose pas de demande.
-- **Genres tenus à l'écart** : Horreur, Thriller, Policier, Guerre, quelle que soit leur classification (un profil enfant démarre avec l'horreur tenue à l'écart).
+- **Âge** : une **date de naissance** (l'âge suit le profil, un an de plus à chaque anniversaire, sans limite à partir de 18 ans) ou un **âge maximum** fixe. Les titres au-dessus sont **cachés** ou **affichés verrouillés** (floutés, avec un cadenas). Deux interrupteurs : **titres non classés** autorisés ou non, et **demandes d'accès** possibles ou non.
+- **Contenus autorisés** : Films, Séries, Livres, Livres audio, Musique, Jeux. Coupez un type et il disparaît pour ce profil.
+- **Genres interdits** : Horreur, Thriller, Policier, Guerre, quelle que soit leur classification. Un profil enfant démarre avec l'horreur interdite.
+- **Titres interdits** : sur la fiche d'un titre, **« Restrictions du foyer »** permet de l'interdire profil par profil. La liste se retrouve dans la fiche du profil, avec **« Autoriser à nouveau »**.
+- **Fonctions autorisées** : boutique, demandes de contenus, assistant IA, participation à la communauté, jeux, support. Et **« Ouvrir les titres dans leurs services »** : coupé, les boutons « Regarder sur Plex », « Lire sur Grimmory », « Jouer sur RomM »… disparaissent ; le profil n'utilise que le lecteur et la liseuse du portail, où son temps d'écran et toutes les règles s'appliquent (coupé d'office pour un profil enfant).
+- **Temps d'écran** : un nombre de minutes par jour dans le lecteur et la liseuse du portail. Une fois écoulé, plus rien ne s'ouvre jusqu'au lendemain. La carte du profil montre le temps déjà passé. Les lectures sur une télé avec l'appli Plex ou Jellyfin ne sont pas comptées.
+- **Visible dans la communauté** : sinon, le profil n'apparaît ni dans l'annuaire des membres ni dans les classements.
 
 L'âge d'un titre est le plus strict de ses classifications : celles de la France, des États-Unis, du Royaume-Uni et de l'Allemagne (via TMDB) et celle de votre serveur Plex ou Jellyfin. La France classe beaucoup de films d'horreur « 12 ans » quand les États-Unis les classent « R » : c'est « R » (17 ans) qui compte. La fiche de chaque titre affiche cet âge et ses sources.
-- **Autoriser les titres non classés** : sans cette case, les films et séries sans classification d'âge sont masqués aussi.
-- **Tenu à l'écart de** : la boutique, les demandes de contenus, l'assistant IA, la participation à la communauté, les jeux ou le support.
-- **Visible dans la communauté** : sinon, le profil n'apparaît ni dans l'annuaire des membres ni dans les classements. Un profil enfant démarre caché.
 
 ## Les demandes d'accès
 

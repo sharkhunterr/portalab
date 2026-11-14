@@ -708,3 +708,48 @@
     transition: none;
   }
 }
+
+/* 032: the master's policy as switches — two columns where there is room */
+.household-switches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-1) var(--space-4);
+}
+.household-kept {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.household-kept li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.household-kept li > span {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.household-screen {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.household-locked__pending {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+.household-locked__denied {
+  margin: 0;
+  color: var(--color-text-muted);
+}

@@ -79,6 +79,14 @@ class Section:
     data: dict[str, Any] = field(default_factory=dict)
 
 
+def without_links(data: dict[str, Any]) -> dict[str, Any]:
+    """The sources section without the services' pages (« Watch on Plex »…)."""
+    sources = [
+        {**s, "link": None, "item_link": None} for s in data.get("sources") or [] if isinstance(s, dict)
+    ]
+    return {**data, "sources": sources}
+
+
 class Sections:
     def __init__(
         self,
@@ -105,13 +113,23 @@ class Sections:
         view = await self.catalog.get(viewer, object_id)  # 404 for unknown/hidden objects
         loader = getattr(self, f"_{name}")
         try:
-            return await asyncio.wait_for(loader(view.id, view, viewer), timeout=10)
+            section: Section = await asyncio.wait_for(loader(view.id, view, viewer), timeout=10)
+            if name == "sources" and not await self._services(viewer):
+                section = Section(section.state, section.as_of, without_links(section.data))
+            return section
         except Exception as exc:
             log.info("media section unavailable", extra={"section": name, "reason": type(exc).__name__})
             return Section("unavailable", utc_now(self.clock))
 
     def _user(self, viewer: Principal) -> UUID | None:
         return viewer.acting_for or viewer.user_id
+
+    async def _services(self, viewer: Principal) -> bool:
+        """032: whether the viewer may open titles in their services (a profile its master keeps to the
+        portal's player and reader may not)."""
+        gate = self.catalog.gate
+        restrictions = await gate.restrictions_any(viewer) if gate is not None else None
+        return restrictions is None or restrictions.services
 
     async def _info(self, object_id: UUID, view: Any, viewer: Principal) -> Section:
         keep = (

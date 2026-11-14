@@ -26,6 +26,17 @@ GENRE_WORDS: dict[str, tuple[str, ...]] = {
     "war": ("war", "guerre"),
 }
 GENRES: tuple[str, ...] = tuple(GENRE_WORDS)
+# 032: the kinds of content a master may keep from a profile, by the catalog kinds they gather
+TYPE_KINDS: dict[str, tuple[str, ...]] = {
+    "movies": ("movie",),
+    "series": ("series", "season", "episode"),
+    "books": ("book", "comic", "manga", "magazine"),
+    "audiobooks": ("audiobook",),
+    "music": ("artist", "album", "track"),
+    "games": ("game",),
+}
+TYPES: tuple[str, ...] = tuple(TYPE_KINDS)
+SCREEN_MINUTES: tuple[int, ...] = (15, 30, 45, 60, 90, 120, 180, 240, 300)
 _WORD = re.compile(r"[^\W\d_]+")
 
 
@@ -62,10 +73,28 @@ class Restrictions:
     mode: Mode = "hide"
     requests: bool = True
     genres: frozenset[str] = frozenset()  # kept out whatever their rating (``horror``…)
+    types: frozenset[str] = frozenset()  # kinds of content kept out (``books``, ``games``…)
+    titles: frozenset[str] = frozenset()  # titles its master kept out one by one
+    daily_minutes: int | None = None  # screen time a day in the portal's player and reader
+    services: bool = True  # may open a title in its service (Plex, Grimmory, RomM…), not only in the portal
 
     @property
     def limits_titles(self) -> bool:
-        return self.max_age is not None or not self.allow_unrated or bool(self.genres)
+        return (
+            self.max_age is not None
+            or not self.allow_unrated
+            or bool(self.genres or self.types or self.titles)
+        )
+
+    @property
+    def restricts(self) -> bool:
+        """Whether anything at all is restricted (titles, features, screen time, the services)."""
+        return self.limits_titles or bool(self.blocked) or self.daily_minutes is not None or not self.services
+
+    @property
+    def kinds(self) -> frozenset[str]:
+        """The catalog kinds its kept-out types gather."""
+        return frozenset(kind for kept in self.types for kind in TYPE_KINDS.get(kept, ()))
 
     def withholds(self, permission: str) -> bool:
         return any(permission in FEATURE_PERMISSIONS.get(feature, ()) for feature in self.blocked)

@@ -629,6 +629,24 @@ async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | None:
     return await link_holder(module.capabilities, me) if scope == "household" else me
 
 
+class ScreenTimeOut(BaseModel):
+    used: int  # minutes today in the portal's player and reader
+    allowed: int  # minutes a day its master allows
+
+
+@router.get("/me/media/screen-time", response_model=ScreenTimeOut | None)
+async def screen_time(principal: Reader, module: Module, profile: UUID | None = None) -> ScreenTimeOut | None:
+    """032: a household profile's screen time today — mine, or (its master) one of my profiles'."""
+    me = _me(principal)
+    whom = profile or me
+    if whom != me and (
+        principal.profile_of is not None or await link_holder(module.capabilities, whom) != me
+    ):
+        raise MediaNotFound("This profile does not exist.")
+    today = await module.gate.screen_today(whom)
+    return ScreenTimeOut(used=today[0], allowed=today[1]) if today is not None else None
+
+
 @router.get("/me/media/insights/locked")
 async def locked_statistics(principal: Reader, module: Module) -> dict[str, list[str]]:
     """061: what is still to unlock in the shop — sections, tabs, filters and request statistics."""

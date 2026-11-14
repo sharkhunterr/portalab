@@ -10,24 +10,33 @@ restriction cost one cached lookup: nothing is computed for them."""
 import time
 from collections.abc import Iterable, Mapping
 from dataclasses import replace
+from datetime import datetime
 from typing import Any
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
-from sqlalchemy import Uuid, all_, literal, select
+from sqlalchemy import Uuid, all_, func, literal, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import aliased
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
 from portalab.capabilities.household import Household, Restrictions, genre_of, strictest_age
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Forbidden
-from portalab.modules.media.models import MediaObject, ObjectMetadata, ObjectTag
+from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag, PlaybackSession
 
 RATED = ("movie", "series")
 CACHE_S = 30.0
+ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
+
+
+class ScreenTimeUp(Forbidden):
+    default_code = "household.screen_time_up"
+    default_title = "Screen time spent for today"
 
 
 class Restricted(Forbidden):
@@ -123,6 +132,16 @@ class TitleGate:
                     for work, tag in tags
                     if str(work) not in granted and genre_of(str(tag)) in restrictions.genres
                 }
+            works |= {
+                UUID(title) for title in restrictions.titles
+            }  # kept out one by one: no request opens it
+            kept_kinds: set[UUID] = set()
+            if restrictions.kinds:  # kinds of content kept out (books, games…)
+                kept_kinds = set(
+                    await session.scalars(
+                        select(MediaObject.id).where(MediaObject.kind.in_(restrictions.kinds))
+                    )
+                )
             season = aliased(MediaObject)
             children: set[UUID] = set()
             if works:
@@ -133,7 +152,7 @@ class TitleGate:
                     children |= set(
                         await session.scalars(select(season.id).where(season.parent_id.in_(children)))
                     )
-        found = frozenset(works | children)
+        found = frozenset(works | children | kept_kinds)
         if len(self._cache) > 500:
             self._cache.clear()
         self._cache[user] = (time.monotonic(), found)
@@ -154,23 +173,119 @@ class TitleGate:
             return cards
         return [card.model_copy(update={"locked": True}) if card.id in blocked else card for card in cards]
 
+    async def screen_today(self, viewer: Principal | UUID | None) -> tuple[int, int] | None:
+        """032: ``(minutes used today, minutes allowed a day)`` in the portal's player and reader, for a
+        profile its master gave a screen time — ``None`` otherwise. The day is the economy's."""
+        restrictions = await self.restrictions_any(viewer)
+        user = viewer_of(viewer)
+        if restrictions is None or restrictions.daily_minutes is None or user is None:
+            return None
+        start = await self._day_start()
+        async with self.database.session() as session:
+            ended = await session.scalar(
+                select(func.coalesce(func.sum(Activity.watched_s), 0.0)).where(
+                    Activity.user_id == user, Activity.stopped_at >= start
+                )
+            )
+            running = await session.scalar(
+                select(
+                    func.coalesce(
+                        func.sum(
+                            PlaybackSession.max_position_s
+                            - func.coalesce(PlaybackSession.start_position_s, 0.0)
+                        ),
+                        0.0,
+                    )
+                ).where(
+                    PlaybackSession.played_by == user,
+                    PlaybackSession.ended.is_(False),
+                    PlaybackSession.started_at >= start,
+                )
+            )
+        used = int((float(ended or 0) + max(0.0, float(running or 0))) // 60)
+        return used, restrictions.daily_minutes
+
+    async def check_screen(self, viewer: Principal | UUID | None) -> None:
+        """Refuse to open a title once the profile's screen time of the day is spent."""
+        today = await self.screen_today(viewer)
+        if today is not None and today[0] >= today[1]:
+            raise ScreenTimeUp(
+                "This profile's screen time for today is spent.",
+                extensions={"used": today[0], "allowed": today[1]},
+            )
+
+    async def restrictions_any(self, viewer: Principal | UUID | None) -> Restrictions | None:
+        """A profile's restrictions, whatever they restrict."""
+        user, household = viewer_of(viewer), self._household()
+        if user is None or household is None:
+            return None
+        return await household.restrictions_of(user)
+
+    async def _day_start(self) -> datetime:
+        zone = ZoneInfo("UTC")
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                zone = ZoneInfo(str((await providers[0].provider.get("economy.timezone")).value or "UTC"))
+        except Exception:  # noqa: S110 — the day falls back to UTC's
+            pass
+        now = datetime.now(zone)
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
     def forget(self) -> None:
         self._cache.clear()
 
     async def check(self, viewer: Principal | UUID | None, object_id: UUID, title: str = "") -> None:
         """Refuse one title the viewer may not open, telling enough for « Ask for access »."""
         if object_id in await self.blocked(viewer):
-            rating = await self._rating(object_id)
+            found = await self.rating(object_id)
             restrictions = await self.restrictions(viewer)
+            reason = await self._reason(object_id, restrictions, found["age"])
             raise Restricted(
-                "This title is above this profile's age rating.",
+                "This title is kept from this profile.",
                 extensions={
                     "object_id": str(object_id),
                     "name": title,
-                    "rating": rating,
-                    "can_ask": restrictions is None or restrictions.requests,
+                    "rating": f"{found['age']}+" if found["age"] is not None else None,
+                    # why: its age, no rating yet, a genre, a kind of content or the title kept out by hand
+                    "reason": reason,
+                    # the master's own choices (a title, a kind) are not asked again title by title
+                    "can_ask": (restrictions is None or restrictions.requests) and reason in ASKABLE,
                 },
             )
+
+    async def _reason(self, object_id: UUID, restrictions: Restrictions | None, age: int | None) -> str:
+        """Why a title is kept from a profile: ``title``, ``type``, ``genre``, ``unrated`` or ``age``."""
+        if restrictions is None:
+            return "age"
+        async with self.database.session() as session:
+            chain: list[tuple[UUID, str]] = []
+            current: UUID | None = object_id
+            for _ in range(3):
+                if current is None:
+                    break
+                row = (
+                    await session.execute(
+                        select(MediaObject.parent_id, MediaObject.kind).where(MediaObject.id == current)
+                    )
+                ).one_or_none()
+                if row is None:
+                    break
+                chain.append((current, str(row.kind)))
+                current = row.parent_id
+            if any(str(found) in restrictions.titles for found, _ in chain):
+                return "title"
+            if chain and chain[0][1] in restrictions.kinds:
+                return "type"
+            if restrictions.genres:
+                tags = await session.scalars(
+                    select(ObjectTag.value).where(
+                        ObjectTag.tag_kind == "genre", ObjectTag.object_id.in_([found for found, _ in chain])
+                    )
+                )
+                if any(genre_of(str(tag)) in restrictions.genres for tag in tags):
+                    return "genre"
+        return "unrated" if age is None else "age"
 
     async def _rating(self, object_id: UUID) -> str | None:
         """The strictest age a title (or the series of an episode or a season) is rated for, as « 17+ »."""

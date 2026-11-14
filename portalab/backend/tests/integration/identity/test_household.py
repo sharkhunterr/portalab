@@ -134,6 +134,10 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "mode": "hide",
         "requests": True,
         "genres": ["horror"],
+        "types": [],
+        "titles": [],
+        "daily_minutes": None,
+        "services": False,
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 
@@ -179,6 +183,12 @@ async def test_access_requests(app: FastAPI, client: httpx.AsyncClient) -> None:
     assert refused.status_code == 403  # a profile decides nothing
 
     await _switch(client, (await _me(client))["profile_of"])  # type: ignore[arg-type]
+    from portalab.modules.identity.household.service import HouseholdAttention
+
+    badge = HouseholdAttention(module.household)
+    master = (await _me(client))["id"]
+    assert await badge.counts(Principal(user_id=UUID(str(master)))) == {"shell.household": 1}
+    assert await badge.counts(Principal(user_id=lea, profile_of=UUID(str(master)))) == {}
     pending = (await client.get("/api/v1/household/requests")).json()
     assert pending[0]["profile_name"] == "Léa" and pending[0]["status"] == "pending"
     assert not await module.household.granted(lea, "media", body["ref"])
