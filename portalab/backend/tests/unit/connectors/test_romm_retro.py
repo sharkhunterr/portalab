@@ -61,6 +61,18 @@ class _Server:
             return httpx.Response(200, json=[{"id": "dev-1", "client": "portalab"}, {"id": "dev-2"}])
         if path == "/api/play-sessions" and request.method == "POST":
             return httpx.Response(200, json={"results": [], "created_count": 1, "skipped_count": 0})
+        if path == "/api/states" and request.method == "POST":
+            assert request.url.params["rom_id"] == "12" and request.url.params["emulator"] == "snes9x"
+            assert b'name="stateFile"; filename="me.state"' in request.content
+            return httpx.Response(200, json={"id": 77})
+        if path == "/api/states/77" and request.method == "PUT":
+            return httpx.Response(200, json={"id": 77})
+        if path == "/api/states/66" and request.method == "PUT":
+            return httpx.Response(404, json={"detail": "gone"})
+        if path == "/api/states/77/labels":
+            return httpx.Response(200, json={"id": 77})
+        if path == "/api/saves/delete":
+            return httpx.Response(200, json={"successful_items": 1})
         if path == "/api/users/me":
             return httpx.Response(200, json={"id": 1, "username": "portal"})
         if path == "/api/roms":
@@ -171,3 +183,21 @@ async def test_a_session_goes_to_romm_as_the_portals_device(server: _Server) -> 
 async def test_the_history_leaves_out_the_portals_sessions(server: _Server) -> None:
     page = await _provider(server, ACTIVITY_HISTORY).history(since=None, cursor=None)
     assert [(item.ref, item.watched_s) for item in page.items] == [("session:2", 600.0)]
+
+
+async def test_saves_and_states_copied_and_labelled(server: _Server) -> None:
+    retro = _provider(server)
+    made = await retro.put_file("state", "12", "snes9x", "me.state", b"S", b"\x89PNG", ["Portalab", "Léa"])
+    assert made == "77"
+    sent = next(r for r in server.requests if r.url.path == "/api/states")
+    assert b'name="screenshotFile"' in sent.content
+    labels = [r for r in server.requests if r.url.path == "/api/states/77/labels"][-1]
+    assert json.loads(labels.content) == {"labels": ["Portalab", "Léa"]}
+    assert await retro.put_file("state", "12", "snes9x", "me.state", b"S2", None, ["Portalab"], "77") == "77"
+    assert server.requests[-2].method == "PUT" and server.requests[-2].url.path == "/api/states/77"
+    # RomM lost the copy to replace: a new one
+    assert await retro.put_file("state", "12", "snes9x", "me.state", b"S3", None, ["Portalab"], "66") == "77"
+    await retro.delete_file("save", "5")
+    assert json.loads(server.requests[-1].content) == {"saves": [5]}
+    await retro.delete_file("state", "not-an-id")  # never sent
+    assert server.requests[-1].url.path == "/api/saves/delete"

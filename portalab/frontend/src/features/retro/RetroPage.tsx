@@ -1,53 +1,52 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
+import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { ApiError } from "../../state/regions";
 import {
   beat,
   chooseFirmware,
+  dropState,
   emulatorLanguage,
   endSitting,
+  fetchSaves,
+  type Progress,
   type Sitting,
   startSitting,
   useRetroGame,
 } from "./api";
+import { emulator, picture, SaveKeeper } from "./saves";
 import "../media/player/player.css";
 import "./retro.css";
 
-type Emulator = {
-  pause?: (silent?: boolean) => void;
-  gameManager?: { saveSaveFiles?: () => void };
-};
-type EmulatorWindow = Window & Record<string, unknown> & { EJS_emulator?: Emulator };
 type Stage = "ready" | "starting" | "playing" | "over";
+const QUIT_WAIT_MS = 8000; // the most the page waits for its saves when the member leaves
 
 /** Leaving the game reloads the title's page: the portal's stricter policy comes back with it. */
 function leave(objectId: string) {
   window.location.assign(`/media/${objectId}`);
 }
 
-function emulator(): Emulator | undefined {
-  return (window as unknown as EmulatorWindow).EJS_emulator;
-}
+type Hooks = {
+  start(): void;
+  ready(): void;
+  saveState(state: Uint8Array): void;
+  loadState(): void;
+  saveSave(save: Uint8Array | null): void;
+  loadSave(): void;
+};
 
-/** The game's own saves written down before the page goes (they stay in this browser). */
-function keepSaves() {
-  try {
-    emulator()?.gameManager?.saveSaveFiles?.();
-  } catch {
-    // nothing to keep: the game had not started
-  }
-}
+const LOADER = "script[data-retro-loader]"; // EmulatorJS's settings are the page's globals: one game a load
 
-let launched = false; // EmulatorJS's settings are the page's globals: one game per page load
-
-/** RomM's EmulatorJS, as RomM starts it: the core of the game's platform, its file, its firmware. */
-function launch(sitting: Sitting, language: string, onStart: () => void) {
-  if (launched) return;
-  launched = true;
-  const w = window as unknown as EmulatorWindow;
+/**
+ * RomM's EmulatorJS, as RomM starts it: the core of the game's platform, its file, its firmware — and,
+ * issue 420, the saves taken over (the emulator's own save and load buttons go to the portal's slots).
+ */
+function launch(sitting: Sitting, language: string, hooks: Hooks) {
+  if (document.querySelector(LOADER)) return;
+  const w = window as unknown as Record<string, unknown>;
   w.EJS_player = "#retro-game";
   w.EJS_core = sitting.game.core;
   w.EJS_gameUrl = sitting.game_url;
@@ -55,15 +54,23 @@ function launch(sitting: Sitting, language: string, onStart: () => void) {
   w.EJS_pathtodata = sitting.emulator_path;
   const bios = chooseFirmware(sitting);
   if (bios) w.EJS_biosUrl = bios;
+  if (sitting.state_url) w.EJS_loadStateURL = sitting.state_url; // « Continue »
   w.EJS_threads = sitting.game.threads && window.crossOriginIsolated;
   w.EJS_startOnLoaded = true;
   w.EJS_disableDatabases = true; // each sitting's address is its own: nothing to find again in a cache
+  w.EJS_defaultOptions = { "save-save-interval": "60" }; // the game's own save written every minute
   w.EJS_language = language;
   w.EJS_disableAutoLang = true;
-  w.EJS_onGameStart = onStart;
+  w.EJS_onGameStart = hooks.start;
+  w.EJS_ready = hooks.ready;
+  w.EJS_onSaveState = (event: { state?: Uint8Array }) => event.state && hooks.saveState(event.state);
+  w.EJS_onLoadState = hooks.loadState;
+  w.EJS_onSaveSave = (event: { save?: Uint8Array | null }) => hooks.saveSave(event.save ?? null);
+  w.EJS_onLoadSave = hooks.loadSave;
   const script = document.createElement("script");
   script.src = `${sitting.emulator_path}loader.js`;
   script.async = true;
+  script.dataset.retroLoader = "true";
   document.body.appendChild(script);
 }
 
@@ -80,11 +87,13 @@ function reasonOf(error: unknown): string {
 /**
  * ``/media/:objectId/play`` (issue 419): a library's game over the whole window, in the library's own
  * emulator — a page of its own, entered by a full load (its policy lets the emulator compile and run its
- * cores). The sitting starts with « Play », is kept alive while the game runs and ends when the page goes;
- * a household profile's screen time ends it once spent.
+ * cores). The sitting starts with « Play » (or « Continue », from the latest save state — issue 420), is kept
+ * alive while the game runs and ends when the page goes; a household profile's screen time ends it once spent.
+ * The game's own save follows the member; states go to slots; leaving keeps where the game was.
  */
 export function RetroPage() {
   const t = useT();
+  const format = useFormat();
   const { objectId = "" } = useParams();
   const { language } = useLocaleContext();
   const game = useRetroGame(objectId);
@@ -92,7 +101,15 @@ export function RetroPage() {
   const [stage, setStage] = useState<Stage>("ready");
   const [failure, setFailure] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null);
+  const [progress, setProgress] = useState<Progress | null>(null);
+  const [panel, setPanel] = useState(false);
+  const [slot, setSlot] = useState(1);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const current = useRef<string | null>(null);
+  const keeper = useRef<SaveKeeper | null>(null);
+  const active = useRef(1);
+  active.current = slot;
 
   useEffect(() => {
     document.documentElement.dataset.playing = "true"; // the shell steps aside
@@ -101,8 +118,19 @@ export function RetroPage() {
     };
   }, []);
 
-  const finish = useCallback(() => {
-    keepSaves();
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  const refresh = useCallback(() => {
+    if (current.current) void fetchSaves(current.current).then(setProgress, () => undefined);
+  }, []);
+
+  /** The sitting ends: the game's own save last sent (as much as a page going away may send). */
+  const finish = useCallback((goingAway = false) => {
+    if (goingAway) void keeper.current?.keepSram(keeper.current.currentSram(), true);
     if (current.current) {
       void endSitting(current.current);
       current.current = null;
@@ -110,17 +138,72 @@ export function RetroPage() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("pagehide", finish);
-    return () => window.removeEventListener("pagehide", finish);
+    const away = () => finish(true);
+    window.addEventListener("pagehide", away);
+    return () => window.removeEventListener("pagehide", away);
   }, [finish]);
 
-  const start = async () => {
+  /** Where the game is, kept in slot 0 with the game's own save (« Continue » starts there). */
+  const keepPlace = useCallback(async () => {
+    const saves = keeper.current;
+    if (!saves) return;
+    await Promise.race([
+      Promise.allSettled([saves.keepSram(saves.currentSram()), saves.saveCurrent(0)]),
+      new Promise((resolve) => window.setTimeout(resolve, QUIT_WAIT_MS)),
+    ]);
+  }, []);
+
+  const saveTo = async (target: number) => {
+    setSlot(target);
+    const ok = await keeper.current?.saveCurrent(target);
+    setNotice(t(ok ? "retro:saves.saved" : "retro:saves.failed", { slot: target }));
+    refresh();
+  };
+
+  const loadFrom = async (target: number) => {
+    setSlot(target || active.current);
+    const ok = await keeper.current?.loadState(target);
+    setNotice(t(ok ? "retro:saves.loaded" : "retro:saves.failed", { slot: target }));
+    if (ok) setPanel(false);
+  };
+
+  const remove = async (target: number) => {
+    if (!current.current) return;
+    await dropState(current.current, target).catch(() => undefined);
+    refresh();
+  };
+
+  const start = async (resume: number | null) => {
     setStage("starting");
     try {
-      const started = await startSitting(objectId);
+      const started = await startSitting(objectId, resume);
       current.current = started.id;
+      const saves = new SaveKeeper(started);
+      keeper.current = saves;
       setSitting(started);
-      launch(started, emulatorLanguage(language), () => setStage("playing"));
+      setProgress(game.data?.progress ?? null);
+      const sram = Boolean(game.data?.progress?.sram_at);
+      launch(started, emulatorLanguage(language), {
+        start: () => {
+          setStage("playing");
+          // a state carries the game's own save: it is loaded only for a new game
+          if (sram && !started.state_url) void saves.loadSram();
+        },
+        ready: () =>
+          emulator()?.on?.("saveSaveFiles", (data) => void saves.keepSram(data as Uint8Array | null)),
+        saveState: (state) => {
+          const target = active.current;
+          void picture()
+            .then((shot) => saves.keepState(target, state, shot))
+            .then((ok) => {
+              setNotice(t(ok ? "retro:saves.saved" : "retro:saves.failed", { slot: target }));
+              refresh();
+            });
+        },
+        loadState: () => void loadFrom(active.current),
+        saveSave: (save) => void saves.keepSram(save),
+        loadSave: () => void saves.loadSram(),
+      });
     } catch (error) {
       setFailure(reasonOf(error));
       setStage("ready");
@@ -132,10 +215,11 @@ export function RetroPage() {
     const timer = window.setInterval(() => {
       if (document.visibilityState !== "visible") return; // a hidden tab does not count
       beat(sitting.id)
-        .then((answer) => {
+        .then(async (answer) => {
           setLeft(answer.minutes_left ?? null);
           if (answer.stop) {
             emulator()?.pause?.(true);
+            await keepPlace();
             finish();
             setStage("over");
           }
@@ -143,9 +227,14 @@ export function RetroPage() {
         .catch(() => undefined); // a beat missed is caught up by the next one
     }, sitting.heartbeat_s * 1000);
     return () => window.clearInterval(timer);
-  }, [sitting, stage, finish]);
+  }, [sitting, stage, finish, keepPlace]);
 
-  const quit = () => {
+  const quit = async () => {
+    if (stage === "playing") {
+      setLeaving(true);
+      emulator()?.pause?.(true);
+      await keepPlace();
+    }
     finish();
     leave(objectId);
   };
@@ -187,18 +276,28 @@ export function RetroPage() {
     );
   }
   const info = game.data;
+  const saved = info.progress;
+  const latest = saved?.states.find((s) => s.slot === saved.latest_slot);
   return (
     <div className="retro-page" data-stage={stage}>
       <header className="retro-bar">
-        <button type="button" className="player-icon retro-icon" onClick={quit} aria-label={t("retro:quit")}>
+        <button
+          type="button"
+          className="player-icon retro-icon"
+          onClick={() => void quit()}
+          disabled={leaving}
+          aria-label={t("retro:quit")}
+        >
           <Icon name="chevron-left" size={22} />
         </button>
         <div className="retro-bar__title">
           <strong>{info.title}</strong>
           <small>
-            {info.service_name
-              ? t("retro:platform", { platform: info.platform.toUpperCase(), service: info.service_name })
-              : info.platform.toUpperCase()}
+            {leaving
+              ? t("retro:saves.leaving")
+              : info.service_name
+                ? t("retro:platform", { platform: info.platform.toUpperCase(), service: info.service_name })
+                : info.platform.toUpperCase()}
           </small>
         </div>
         {left !== null ? (
@@ -206,22 +305,78 @@ export function RetroPage() {
             {t("retro:left", { count: left })}
           </span>
         ) : null}
+        {stage === "playing" ? (
+          <button
+            type="button"
+            className="player-icon retro-icon"
+            aria-pressed={panel}
+            aria-label={t("retro:saves.title")}
+            title={t("retro:saves.title")}
+            onClick={() => setPanel((open) => !open)}
+          >
+            <Icon name="floppy" size={20} />
+          </button>
+        ) : null}
       </header>
       <main className="retro-stage">
         <div id="retro-game" className="retro-game" />
+        {notice ? (
+          <p className="retro-notice" role="status">
+            {notice}
+          </p>
+        ) : null}
+        {panel && sitting && keeper.current ? (
+          <SavesPanel
+            keeper={keeper.current}
+            progress={progress}
+            active={slot}
+            onSave={(target) => void saveTo(target)}
+            onLoad={(target) => void loadFrom(target)}
+            onDelete={(target) => void remove(target)}
+            onClose={() => setPanel(false)}
+            when={(value) => format.dateTime(value)}
+          />
+        ) : null}
         {stage === "ready" || stage === "starting" ? (
           <div className="retro-start">
             <Icon name="joystick" size={40} />
             <p>{t("retro:intro", { title: info.title })}</p>
-            <button
-              type="button"
-              className="player-pill"
-              data-primary
-              disabled={stage === "starting"}
-              onClick={() => void start()}
-            >
-              {t(stage === "starting" ? "retro:starting" : "retro:play")}
-            </button>
+            {latest ? (
+              <>
+                <small className="retro-hint">
+                  {t("retro:saves.last", { when: format.dateTime(latest.updated_at) })}
+                </small>
+                <div className="retro-start__actions">
+                  <button
+                    type="button"
+                    className="player-pill"
+                    data-primary
+                    disabled={stage === "starting"}
+                    onClick={() => void start(latest.slot)}
+                  >
+                    {t(stage === "starting" ? "retro:starting" : "retro:continue")}
+                  </button>
+                  <button
+                    type="button"
+                    className="player-pill"
+                    disabled={stage === "starting"}
+                    onClick={() => void start(null)}
+                  >
+                    {t("retro:newGame")}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="player-pill"
+                data-primary
+                disabled={stage === "starting"}
+                onClick={() => void start(null)}
+              >
+                {t(stage === "starting" ? "retro:starting" : "retro:play")}
+              </button>
+            )}
             {info.threads && !window.crossOriginIsolated ? (
               <small className="retro-hint">{t("retro:threads")}</small>
             ) : null}
@@ -238,6 +393,90 @@ export function RetroPage() {
         ) : null}
       </main>
     </div>
+  );
+}
+
+/** Issue 420: the slots — where the game was left (0) and the member's own (1…), with the screen's picture. */
+function SavesPanel({
+  keeper,
+  progress,
+  active,
+  onSave,
+  onLoad,
+  onDelete,
+  onClose,
+  when,
+}: {
+  keeper: SaveKeeper;
+  progress: Progress | null;
+  active: number;
+  onSave(slot: number): void;
+  onLoad(slot: number): void;
+  onDelete(slot: number): void;
+  onClose(): void;
+  when(value: string): string;
+}) {
+  const t = useT();
+  const count = progress?.slots ?? 5;
+  const slots = Array.from({ length: count + 1 }, (_, i) => i);
+  return (
+    <aside className="retro-saves" aria-label={t("retro:saves.title")}>
+      <header className="retro-saves__head">
+        <h2>{t("retro:saves.title")}</h2>
+        <button
+          type="button"
+          className="player-icon retro-icon"
+          onClick={onClose}
+          aria-label={t("retro:saves.close")}
+        >
+          <Icon name="close" size={20} />
+        </button>
+      </header>
+      <p className="retro-hint">{t("retro:saves.hint", { slot: active })}</p>
+      <ul>
+        {slots.map((slot) => {
+          const state = progress?.states.find((s) => s.slot === slot);
+          const name = slot === 0 ? t("retro:saves.auto") : t("retro:saves.slot", { slot });
+          return (
+            <li key={slot} className="retro-slot" data-active={slot === active || undefined}>
+              <div className="retro-slot__picture">
+                {state?.has_picture ? (
+                  <img src={keeper.pictureUrl(slot, state.updated_at)} alt="" />
+                ) : (
+                  <Icon name="floppy" size={22} />
+                )}
+              </div>
+              <div className="retro-slot__text">
+                <strong>{name}</strong>
+                <small>{state ? when(state.updated_at) : t("retro:saves.empty")}</small>
+              </div>
+              <div className="retro-slot__actions">
+                {slot > 0 ? (
+                  <button type="button" className="player-pill" onClick={() => onSave(slot)}>
+                    {t("retro:saves.save")}
+                  </button>
+                ) : null}
+                {state ? (
+                  <button type="button" className="player-pill" onClick={() => onLoad(slot)}>
+                    {t("retro:saves.load")}
+                  </button>
+                ) : null}
+                {state && slot > 0 ? (
+                  <button
+                    type="button"
+                    className="player-icon retro-icon"
+                    onClick={() => onDelete(slot)}
+                    aria-label={t("retro:saves.delete", { name })}
+                  >
+                    <Icon name="trash" size={18} />
+                  </button>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
   );
 }
 

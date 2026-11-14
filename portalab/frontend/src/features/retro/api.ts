@@ -6,6 +6,8 @@ import type { components } from "../../api/generated/schema";
 export type RetroGame = components["schemas"]["RetroGameOut"];
 export type Sitting = components["schemas"]["SittingOut"];
 export type Beat = components["schemas"]["BeatOut"];
+export type Progress = components["schemas"]["RetroProgressOut"];
+export type SavedState = components["schemas"]["RetroStateOut"];
 
 /** Whether the title plays here (its platform has an emulator, the library has its file) — quiet otherwise. */
 export function useRetroGame(objectId: string, enabled = true) {
@@ -24,9 +26,11 @@ export function useRetroGame(objectId: string, enabled = true) {
   });
 }
 
-export async function startSitting(objectId: string): Promise<Sitting> {
+/** 420: ``resume`` — the save state the game starts from (« Continue »); none: a new game. */
+export async function startSitting(objectId: string, resume: number | null = null): Promise<Sitting> {
   const { data } = await api.POST("/api/v1/retro/games/{object_id}/sittings", {
     params: { path: { object_id: objectId } },
+    body: { resume },
   });
   if (!data) throw new Error("empty sitting");
   return data;
@@ -73,4 +77,45 @@ export function emulatorLanguage(language: string): string {
 export function chooseFirmware(sitting: Sitting): string | null {
   const best = [...sitting.firmware].sort((a, b) => Number(b.verified) - Number(a.verified))[0];
   return best ? best.url : null;
+}
+
+/** 420: the player's saves and states in this sitting (slot 0: where the game was left). */
+export async function fetchSaves(sitting: string): Promise<Progress> {
+  const { data } = await api.GET("/api/v1/retro/sittings/{sitting_id}/saves", {
+    params: { path: { sitting_id: sitting } },
+  });
+  if (!data) throw new Error("empty saves");
+  return data;
+}
+
+export async function dropState(sitting: string, slot: number): Promise<void> {
+  await api.DELETE("/api/v1/retro/sittings/{sitting_id}/states/{slot}", {
+    params: { path: { sitting_id: sitting, slot } },
+  });
+}
+
+/** An emulator's memory (or a picture) kept by the portal, as raw bytes. */
+export async function putBytes(url: string, data: Uint8Array | Blob, keepalive = false): Promise<boolean> {
+  const headers: Record<string, string> = { "Content-Type": "application/octet-stream" };
+  const token = csrfToken();
+  if (token) headers[CSRF_HEADER] = token;
+  const body = data instanceof Blob ? data : new Blob([data as BlobPart]);
+  const response = await fetch(url, { method: "PUT", credentials: "include", keepalive, headers, body });
+  return response.ok;
+}
+
+export async function getBytes(url: string): Promise<Uint8Array | null> {
+  const response = await fetch(url, { credentials: "include" });
+  if (!response.ok) return null;
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+/** A short fingerprint of a save, to send it only when the game changed it. */
+export function fingerprint(data: Uint8Array): string {
+  let hash = 2166136261;
+  for (let i = 0; i < data.length; i += 1) {
+    hash ^= data[i] ?? 0;
+    hash = Math.imul(hash, 16777619);
+  }
+  return `${data.length}:${(hash >>> 0).toString(16)}`;
 }

@@ -11114,7 +11114,8 @@ export interface paths {
         };
         /**
          * Retro Game
-         * @description Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``).
+         * @description Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``) — and
+         *     the player's progress in it.
          */
         get: operations["retro_game_api_v1_retro_games__object_id__get"];
         put?: never;
@@ -11174,6 +11175,40 @@ export interface paths {
         /** End Sitting */
         post: operations["end_sitting_api_v1_retro_sittings__sitting_id__end_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/sittings/{sitting_id}/saves": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitting Saves */
+        get: operations["sitting_saves_api_v1_retro_sittings__sitting_id__saves_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/retro/sittings/{sitting_id}/states/{slot}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Drop State */
+        delete: operations["drop_state_api_v1_retro_sittings__sitting_id__states__slot__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -19762,12 +19797,41 @@ export interface components {
             core: string;
             /** Platform */
             platform: string;
+            progress?: components["schemas"]["RetroProgressOut"] | null;
             /** Service Name */
             service_name?: string | null;
             /** Threads */
             threads: boolean;
             /** Title */
             title: string;
+        };
+        /**
+         * RetroProgressOut
+         * @description 420: the player's progress in the game — its own save, its save states (slot 0: where it was left).
+         */
+        RetroProgressOut: {
+            /** Latest Slot */
+            latest_slot: number | null;
+            /** Slots */
+            slots: number;
+            /** Sram At */
+            sram_at: string | null;
+            /** States */
+            states: components["schemas"]["RetroStateOut"][];
+        };
+        /** RetroStateOut */
+        RetroStateOut: {
+            /** Has Picture */
+            has_picture: boolean;
+            /** Size */
+            size: number;
+            /** Slot */
+            slot: number;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** ReverseIn */
         ReverseIn: {
@@ -20260,6 +20324,11 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** SittingIn */
+        SittingIn: {
+            /** Resume */
+            resume?: number | null;
+        };
         /** SittingOut */
         SittingOut: {
             /** Emulator Path */
@@ -20278,6 +20347,10 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Saves Path */
+            saves_path: string;
+            /** State Url */
+            state_url?: string | null;
         };
         /** SourceDayOut */
         SourceDayOut: {
@@ -42944,7 +43017,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SittingIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             201: {
@@ -43003,6 +43080,67 @@ export interface operations {
             header?: never;
             path: {
                 sitting_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sitting_saves_api_v1_retro_sittings__sitting_id__saves_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sitting_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetroProgressOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    drop_state_api_v1_retro_sittings__sitting_id__states__slot__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sitting_id: string;
+                slot: number;
             };
             cookie?: never;
         };

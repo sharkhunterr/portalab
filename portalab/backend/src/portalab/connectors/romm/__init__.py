@@ -23,6 +23,7 @@ from urllib.parse import quote
 
 from pydantic import BaseModel, Field
 
+from portalab.capabilities.connector_http import ConnectorHttpError
 from portalab.capabilities.connector_sdk import (
     CapabilityBinding,
     ServiceHandle,
@@ -43,7 +44,7 @@ from portalab.capabilities.media import (
     StreamBody,
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
-from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame
+from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame, SaveKind
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding, parse_time, safe_id
 
 PAGE = 100
@@ -492,6 +493,83 @@ class _Retro:
                 ],
             },
         )
+
+    async def put_file(
+        self,
+        kind: SaveKind,
+        external_id: str,
+        core: str,
+        file_name: str,
+        data: bytes,
+        screenshot: bytes | None,
+        labels: Sequence[str],
+        remote_id: str | None = None,
+    ) -> str:
+        """420: RomM's ``/api/saves`` or ``/api/states`` — the copy replaced in place when RomM still has it,
+        else a new one; labelled (the portal's account in RomM is everyone's)."""
+        folder, field = ("saves", "saveFile") if kind == "save" else ("states", "stateFile")
+        files: dict[str, tuple[str, bytes, str]] = {field: (file_name, data, "application/octet-stream")}
+        if screenshot:
+            files["screenshotFile"] = (f"{file_name}.png", screenshot, "image/png")
+        made: Any = None
+        if remote_id and remote_id.isdigit():
+            made = await self._multipart("PUT", f"/api/{folder}/{remote_id}", files, None)
+        if made is None:
+            if not external_id.isdigit():
+                raise ProviderNotFound("no such game")
+            made = await self._multipart(
+                "POST", f"/api/{folder}", files, {"rom_id": external_id, "emulator": core[:64]}
+            )
+        if not isinstance(made, Mapping) or made.get("id") is None:
+            raise InvalidPayload(f"unexpected /api/{folder} payload")
+        found = str(made["id"])
+        await self.connector.request(
+            self.service,
+            "PUT",
+            f"/api/{folder}/{safe_id(found)}/labels",
+            json_body={"labels": [label[:64] for label in labels if label][:8]},
+        )
+        return found
+
+    async def delete_file(self, kind: SaveKind, remote_id: str) -> None:
+        if not remote_id.isdigit():
+            return
+        folder = "saves" if kind == "save" else "states"
+        try:
+            await self.connector.request(
+                self.service, "POST", f"/api/{folder}/delete", json_body={folder: [int(remote_id)]}
+            )
+        except ProviderNotFound:
+            return  # gone already
+
+    async def _multipart(
+        self,
+        method: str,
+        path: str,
+        files: Mapping[str, tuple[str, bytes, str]],
+        params: Mapping[str, str] | None,
+    ) -> Any:
+        """A file sent to RomM (``None``: RomM no longer has the item replaced)."""
+        try:
+            answer = await self.connector._http(self.service).request(
+                method,
+                path,
+                headers={"Accept": "application/json", **self.connector.auth_headers(self.service)},
+                files=dict(files),
+                **({"params": dict(params)} if params else {}),
+            )
+        except ConnectorHttpError as exc:
+            raise ConnectionError(str(exc)) from exc
+        if answer.status_code == 404 and method == "PUT":
+            return None
+        if answer.status_code in (401, 403):
+            raise ProviderAuthError("RomM refused this account")
+        if answer.status_code >= 400:
+            raise ConnectionError(f"RomM answered HTTP {answer.status_code}")
+        try:
+            return answer.json()
+        except ValueError as exc:
+            raise InvalidPayload("RomM did not answer with JSON") from exc
 
     async def _device(self) -> str | None:
         """The portal's device in RomM (created once, found again after): its sessions are the portal's."""

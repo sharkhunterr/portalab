@@ -1,19 +1,22 @@
 """Retro play's routes (issue 419): whether a title plays here, a sitting (started, kept alive, ended),
-and the files the play page loads — the game, its firmware, the emulator — relayed from the library."""
+and the files the play page loads — the game, its firmware, the emulator — relayed from the library; issue
+420: the player's saves and save states (kept by the portal, copied to the library)."""
 
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack
+from datetime import datetime
 from typing import Annotated
 from urllib.parse import quote
 from uuid import UUID
 
-from fastapi import APIRouter, Header, Path, status
+from fastapi import APIRouter, Header, Path, Request, status
 from fastapi.responses import Response, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from portalab.capabilities.media import StreamBody
 from portalab.modules.retro.api.deps import Module, Player
-from portalab.modules.retro.service import HEARTBEAT_S, NotPlayable, Playable
+from portalab.modules.retro.saves import SLOTS, Progress, StateInfo
+from portalab.modules.retro.service import HEARTBEAT_S, NotPlayable, Playable, player_of
 
 router = APIRouter(prefix="/api/v1/retro", tags=["retro"])
 PRIVATE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
@@ -31,12 +34,33 @@ FIRMWARE = r"^[0-9A-Za-z_-]{1,64}$"
 EMULATOR_PATH = r"^[A-Za-z0-9_-][A-Za-z0-9_./-]{0,199}$"  # no ``..`` either (checked below)
 
 
+class RetroStateOut(BaseModel):
+    slot: int
+    size: int
+    updated_at: datetime
+    has_picture: bool
+
+
+class RetroProgressOut(BaseModel):
+    """420: the player's progress in the game — its own save, its save states (slot 0: where it was left)."""
+
+    sram_at: datetime | None
+    states: list[RetroStateOut]
+    latest_slot: int | None
+    slots: int
+
+
 class RetroGameOut(BaseModel):
     title: str
     platform: str
     core: str
     threads: bool
     service_name: str | None = None
+    progress: RetroProgressOut | None = None
+
+
+class SittingIn(BaseModel):
+    resume: int | None = Field(default=None, ge=0, le=SLOTS)  # 420: the save state to start from
 
 
 class FirmwareOut(BaseModel):
@@ -54,6 +78,8 @@ class SittingOut(BaseModel):
     firmware: list[FirmwareOut]
     emulator_path: str
     heartbeat_s: int
+    saves_path: str  # 420: ``sram``, ``states/{slot}`` (and ``/picture``) under it
+    state_url: str | None = None  # the state the game starts from (« Continue »)
 
 
 class BeatOut(BaseModel):
@@ -61,13 +87,30 @@ class BeatOut(BaseModel):
     stop: bool = False
 
 
-def _game(playable: Playable) -> RetroGameOut:
+def _state(state: StateInfo) -> RetroStateOut:
+    return RetroStateOut(
+        slot=state.slot, size=state.size, updated_at=state.updated_at, has_picture=state.has_picture
+    )
+
+
+def _progress(progress: Progress) -> RetroProgressOut:
+    latest = progress.latest
+    return RetroProgressOut(
+        sram_at=progress.sram_at,
+        states=[_state(s) for s in progress.states],
+        latest_slot=latest.slot if latest is not None else None,
+        slots=SLOTS,
+    )
+
+
+def _game(playable: Playable, progress: Progress | None = None) -> RetroGameOut:
     return RetroGameOut(
         title=playable.game.title or playable.source.title,
         platform=playable.game.platform,
         core=playable.core,
         threads=playable.threads,
         service_name=playable.service_name,
+        progress=_progress(progress) if progress is not None else None,
     )
 
 
@@ -99,14 +142,27 @@ def _file_name(name: str, multi: bool) -> str:
 
 @router.get("/games/{object_id}", response_model=RetroGameOut)
 async def retro_game(principal: Player, module: Module, object_id: UUID) -> RetroGameOut:
-    """Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``)."""
-    return _game(await module.service.game(principal, object_id))
+    """Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``) — and
+    the player's progress in it."""
+    playable = await module.service.game(principal, object_id)
+    progress = await module.saves.progress(
+        player_of(principal), playable.source.service_id, playable.game.external_id
+    )
+    return _game(playable, progress)
 
 
 @router.post("/games/{object_id}/sittings", response_model=SittingOut, status_code=status.HTTP_201_CREATED)
-async def start_sitting(principal: Player, module: Module, object_id: UUID) -> SittingOut:
+async def start_sitting(
+    principal: Player, module: Module, object_id: UUID, body: SittingIn | None = None
+) -> SittingOut:
     started = await module.service.start(principal, object_id)
     playable, sitting = started.playable, started.sitting
+    progress = await module.saves.progress(
+        player_of(principal), playable.source.service_id, playable.game.external_id
+    )
+    resume = body.resume if body is not None else None
+    if resume is not None and all(s.slot != resume for s in progress.states):
+        resume = None  # nothing there (deleted meanwhile): a new game
     name = _file_name(playable.game.file_name, playable.game.multi)
     base = f"/api/v1/retro/sittings/{sitting}"
     return SittingOut(
@@ -125,6 +181,8 @@ async def start_sitting(principal: Player, module: Module, object_id: UUID) -> S
         ],
         emulator_path=f"/api/v1/retro/libraries/{playable.source.service_id}/emulator/",
         heartbeat_s=HEARTBEAT_S,
+        saves_path=f"{base}/",
+        state_url=f"{base}/states/{resume}" if resume is not None else None,
     )
 
 
@@ -212,3 +270,65 @@ async def library_emulator(
     body = await module.service.open_emulator(service_id, path, stack)
     kind = EMULATOR_TYPES.get(path.rsplit(".", 1)[-1].lower(), "application/octet-stream")
     return _relay(body, stack, EMULATOR, kind)
+
+
+# --- 420: saves and save states -------------------------------------------------------------------------
+SLOT = Annotated[int, Path(ge=0, le=SLOTS)]
+
+
+def _bytes(data: bytes, media_type: str = "application/octet-stream") -> Response:
+    return Response(content=data, media_type=media_type, headers=PRIVATE)
+
+
+@router.get("/sittings/{sitting_id}/saves", response_model=RetroProgressOut)
+async def sitting_saves(principal: Player, module: Module, sitting_id: UUID) -> RetroProgressOut:
+    _, progress = await module.saves.of_sitting(principal, sitting_id)
+    return _progress(progress)
+
+
+@router.get("/sittings/{sitting_id}/sram", include_in_schema=False)
+async def sitting_sram(principal: Player, module: Module, sitting_id: UUID) -> Response:
+    """The game's own save, loaded when the game starts."""
+    return _bytes(await module.saves.read(principal, sitting_id, "sram", 0))
+
+
+@router.put("/sittings/{sitting_id}/sram", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
+async def keep_sram(principal: Player, module: Module, sitting_id: UUID, request: Request) -> None:
+    """The game's own save, as the emulator just wrote it (raw bytes)."""
+    await module.saves.write(principal, sitting_id, "sram", 0, await request.body())
+
+
+@router.get("/sittings/{sitting_id}/states/{slot}", include_in_schema=False)
+async def sitting_state(principal: Player, module: Module, sitting_id: UUID, slot: SLOT) -> Response:
+    return _bytes(await module.saves.read(principal, sitting_id, "state", slot))
+
+
+@router.put("/sittings/{sitting_id}/states/{slot}", response_model=RetroStateOut, include_in_schema=False)
+async def keep_state(
+    principal: Player, module: Module, sitting_id: UUID, slot: SLOT, request: Request
+) -> RetroStateOut:
+    """A save state in a slot (raw bytes), replacing the slot's."""
+    return _state(await module.saves.write(principal, sitting_id, "state", slot, await request.body()))
+
+
+@router.delete("/sittings/{sitting_id}/states/{slot}", status_code=status.HTTP_204_NO_CONTENT)
+async def drop_state(principal: Player, module: Module, sitting_id: UUID, slot: SLOT) -> None:
+    await module.saves.remove(principal, sitting_id, slot)
+
+
+@router.get("/sittings/{sitting_id}/states/{slot}/picture", include_in_schema=False)
+async def state_picture(principal: Player, module: Module, sitting_id: UUID, slot: SLOT) -> Response:
+    data, kind = await module.saves.picture(principal, sitting_id, slot)
+    return _bytes(data, kind)
+
+
+@router.put(
+    "/sittings/{sitting_id}/states/{slot}/picture",
+    status_code=status.HTTP_204_NO_CONTENT,
+    include_in_schema=False,
+)
+async def keep_state_picture(
+    principal: Player, module: Module, sitting_id: UUID, slot: SLOT, request: Request
+) -> None:
+    """The screen when the state was saved (PNG, JPEG or WebP)."""
+    await module.saves.write_picture(principal, sitting_id, slot, await request.body())

@@ -63,6 +63,7 @@ async def test_a_member_plays_a_game_of_the_library(
         "core": "snes9x",
         "threads": False,
         "service_name": None,
+        "progress": {"sram_at": None, "states": [], "latest_slot": None, "slots": 5},  # 420: nothing saved
     }
     sitting = await _sitting(client, ids["Super Metroid"])
     base = f"/api/v1/retro/sittings/{sitting['id']}"

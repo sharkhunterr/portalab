@@ -19650,6 +19650,16 @@
             "title": "Platform",
             "type": "string"
           },
+          "progress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RetroProgressOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "service_name": {
             "anyOf": [
               {
@@ -19677,6 +19687,82 @@
           "threads"
         ],
         "title": "RetroGameOut",
+        "type": "object"
+      },
+      "RetroProgressOut": {
+        "description": "420: the player's progress in the game \u2014 its own save, its save states (slot 0: where it was left).",
+        "properties": {
+          "latest_slot": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Slot"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "integer"
+          },
+          "sram_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sram At"
+          },
+          "states": {
+            "items": {
+              "$ref": "#/components/schemas/RetroStateOut"
+            },
+            "title": "States",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sram_at",
+          "states",
+          "latest_slot",
+          "slots"
+        ],
+        "title": "RetroProgressOut",
+        "type": "object"
+      },
+      "RetroStateOut": {
+        "properties": {
+          "has_picture": {
+            "title": "Has Picture",
+            "type": "boolean"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "slot": {
+            "title": "Slot",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot",
+          "size",
+          "updated_at",
+          "has_picture"
+        ],
+        "title": "RetroStateOut",
         "type": "object"
       },
       "ReverseIn": {
@@ -21168,6 +21254,25 @@
         "title": "SiteOut",
         "type": "object"
       },
+      "SittingIn": {
+        "properties": {
+          "resume": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resume"
+          }
+        },
+        "title": "SittingIn",
+        "type": "object"
+      },
       "SittingOut": {
         "properties": {
           "emulator_path": {
@@ -21200,6 +21305,21 @@
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "saves_path": {
+            "title": "Saves Path",
+            "type": "string"
+          },
+          "state_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Url"
           }
         },
         "required": [
@@ -21209,7 +21329,8 @@
           "game_name",
           "firmware",
           "emulator_path",
-          "heartbeat_s"
+          "heartbeat_s",
+          "saves_path"
         ],
         "title": "SittingOut",
         "type": "object"
@@ -56938,7 +57059,7 @@
     },
     "/api/v1/retro/games/{object_id}": {
       "get": {
-        "description": "Whether the title plays in the portal \u2014 its platform and emulator (404 ``retro.not_playable``).",
+        "description": "Whether the title plays in the portal \u2014 its platform and emulator (404 ``retro.not_playable``) \u2014 and\nthe player's progress in it.",
         "operationId": "retro_game_api_v1_retro_games__object_id__get",
         "parameters": [
           {
@@ -56995,6 +57116,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SittingIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "content": {
@@ -57098,6 +57236,96 @@
           }
         },
         "summary": "End Sitting",
+        "tags": [
+          "retro"
+        ]
+      }
+    },
+    "/api/v1/retro/sittings/{sitting_id}/saves": {
+      "get": {
+        "operationId": "sitting_saves_api_v1_retro_sittings__sitting_id__saves_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sitting_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sitting Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetroProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sitting Saves",
+        "tags": [
+          "retro"
+        ]
+      }
+    },
+    "/api/v1/retro/sittings/{sitting_id}/states/{slot}": {
+      "delete": {
+        "operationId": "drop_state_api_v1_retro_sittings__sitting_id__states__slot__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sitting_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sitting Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "slot",
+            "required": true,
+            "schema": {
+              "maximum": 5,
+              "minimum": 0,
+              "title": "Slot",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Drop State",
         "tags": [
           "retro"
         ]

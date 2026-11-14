@@ -7,13 +7,14 @@ from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Any
 
 import pytest
 from fastapi import FastAPI
 
 from portalab.capabilities.media import StreamBody
 from portalab.capabilities.results import Available, CapabilityResult, Unavailable
-from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame
+from portalab.capabilities.retro import RETRO_SOURCE, FileKind, RetroFirmware, RetroGame, SaveKind
 from portalab.core.time import FixedClock
 from portalab.modules.retro.module import RetroModule
 from tests.integration.media.conftest import MediaHarness, client, clock, media  # noqa: F401 — fixtures
@@ -26,6 +27,9 @@ class FakeRetro:
     opened: list[tuple[str, str, str, str | None]] = field(default_factory=list)
     sessions: list[tuple[str, int]] = field(default_factory=list)
     refuse_sessions: bool = False
+    copies: list[dict[str, Any]] = field(default_factory=list)  # 420: the saves and states copied
+    deleted: list[tuple[str, str]] = field(default_factory=list)
+    refuse_copies: bool = False
 
     async def game(self, external_id: str) -> CapabilityResult[RetroGame | None]:
         return Available(self.games.get(external_id), as_of=datetime.now(UTC))
@@ -57,6 +61,37 @@ class FakeRetro:
         if self.refuse_sessions:
             return Unavailable(detail="down")
         self.sessions.append((external_id, duration_ms))
+        return Available(None, as_of=datetime.now(UTC))
+
+    async def put_file(
+        self,
+        kind: SaveKind,
+        external_id: str,
+        core: str,
+        file_name: str,
+        data: bytes,
+        screenshot: bytes | None,
+        labels: Sequence[str],
+        remote_id: str | None = None,
+    ) -> CapabilityResult[str]:
+        if self.refuse_copies:
+            return Unavailable(detail="down")
+        self.copies.append(
+            {
+                "kind": kind,
+                "rom": external_id,
+                "core": core,
+                "name": file_name,
+                "data": data,
+                "picture": screenshot,
+                "labels": list(labels),
+                "replaces": remote_id,
+            }
+        )
+        return Available(remote_id or str(100 + len(self.copies)), as_of=datetime.now(UTC))
+
+    async def delete_file(self, kind: SaveKind, remote_id: str) -> CapabilityResult[None]:
+        self.deleted.append((kind, remote_id))
         return Available(None, as_of=datetime.now(UTC))
 
 

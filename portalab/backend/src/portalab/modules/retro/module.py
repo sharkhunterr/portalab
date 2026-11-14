@@ -14,6 +14,7 @@ from portalab.core.jobs.periodic import register_periodic
 from portalab.core.jobs.registry import JobRegistry
 from portalab.core.time import Clock
 from portalab.modules.retro import permissions as _permissions  # noqa: F401 — declares its permissions
+from portalab.modules.retro.saves import SaveService
 from portalab.modules.retro.service import RetroService
 
 KEY = "retro"
@@ -33,6 +34,7 @@ class RetroModule:
         self.database = database
         self.capabilities = capabilities
         self.service = RetroService(database, capabilities, clock=clock, events=events)
+        self.saves = SaveService(database, capabilities, self.service, clock=clock)  # 420
 
     def register(self) -> None:
         """Nothing to provide: the module plays what the libraries (``media.retro_source``) and the catalog
@@ -42,6 +44,7 @@ class RetroModule:
         async def sweep() -> None:
             while await self.service.sweep():
                 pass
+            await self.saves.sync()  # 420: the saves the library did not take yet
 
         # the sittings whose page went away without a word end, every five minutes
         return [register_periodic(jobs, self.database, SWEEP_JOB, timedelta(minutes=5), sweep, owner=OWNER)]

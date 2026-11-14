@@ -101,3 +101,98 @@
 .retro-start .player-pill {
   font-size: var(--font-size-lg);
 }
+.retro-start__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+/* issue 420 — a word when a state is saved or loaded, and the slots over the game */
+.retro-notice {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-start: 50%;
+  z-index: 3;
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: var(--player-scrim);
+  color: var(--player-ink);
+  font-weight: var(--font-weight-semibold);
+  pointer-events: none;
+}
+.retro-saves {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  inline-size: min(100%, 26rem);
+  padding: var(--space-3);
+  overflow-y: auto;
+  background: var(--player-stage);
+  border-inline-start: 1px solid color-mix(in srgb, var(--player-ink) 18%, transparent);
+}
+.retro-saves__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.retro-saves__head h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+.retro-saves ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.retro-slot {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--player-ink) 18%, transparent);
+  border-radius: var(--radius-md, 0.5rem);
+}
+.retro-slot[data-active] {
+  border-color: var(--player-accent);
+}
+.retro-slot__picture {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: color-mix(in srgb, var(--player-ink) 8%, transparent);
+  color: var(--player-ink-muted);
+}
+.retro-slot__picture img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+.retro-slot__text {
+  display: grid;
+  min-inline-size: 0;
+}
+.retro-slot__text small {
+  color: var(--player-ink-muted);
+}
+.retro-slot__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+.retro-slot__actions .player-pill {
+  padding: 0.35rem 0.8rem;
+}

@@ -21,6 +21,7 @@ from portalab.core.authz_port import Principal
 RETRO_SOURCE = "media.retro_source"
 GAME_SOURCE = "media.game_source"
 FileKind = Literal["rom", "firmware", "emulator"]
+SaveKind = Literal["save", "state"]  # 420: a game's own save (its battery memory), a save state
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +61,25 @@ class RetroSource(Protocol):
     ) -> None:
         """A play session, told to the library (which keeps the account's play time) — as the portal's own
         device, whose sessions the library's history then leaves out (the portal counted them already)."""
+        ...
+
+    async def put_file(
+        self,
+        kind: SaveKind,
+        external_id: str,
+        core: str,
+        file_name: str,
+        data: bytes,
+        screenshot: bytes | None,
+        labels: Sequence[str],
+        remote_id: str | None = None,
+    ) -> str:
+        """420: a member's save or state copied to the library (``remote_id``: the copy to replace, gone
+        or not), labelled with who it is (the library's account is shared); its id there."""
+        ...
+
+    async def delete_file(self, kind: SaveKind, remote_id: str) -> None:
+        """420: a copy removed from the library (gone already: nothing to do)."""
         ...
 
 

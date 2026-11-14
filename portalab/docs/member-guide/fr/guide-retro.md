@@ -12,8 +12,17 @@ Quand votre serveur a une ludothèque **RomM**, ses jeux se jouent **directement
 - **« Jouer ici »** apparaît sur la fiche d'un jeu quand le portail sait le faire tourner : sa console a un émulateur (NES, Super Nintendo, Game Boy, GBA, Mega Drive, PlayStation, Nintendo 64, DS, arcade et bien d'autres) et la ludothèque a son fichier. **« Jouer sur RomM »** reste à côté.
 - Le jeu s'ouvre en plein écran. Touchez **« Jouer »** : l'émulateur, le cœur de la console et le jeu se chargent, puis la partie commence. La barre de l'émulateur (en bas) donne ses commandes, le plein écran, les sauvegardes d'état, la manette et la manette tactile sur téléphone.
 - La flèche en haut à gauche ferme le jeu et revient à sa fiche.
-- Votre progression **dans** le jeu (ses propres sauvegardes) reste pour l'instant dans ce navigateur. Les sauvegardes rattachées à votre profil et synchronisées avec RomM arrivent ensuite.
 - Quelques consoles (DOS, PSP, 3DS) demandent une page isolée des autres sites ; celle du jeu l'est. Si un tel jeu ne démarre pas, rechargez la page.
+
+## Sauvegardes
+
+Votre progression vous suit (votre profil, dans un foyer), sur tous vos appareils :
+
+- **La sauvegarde du jeu** (celle que le jeu fait lui-même, comme sur la console) est gardée chaque minute pendant la partie et quand vous partez, puis rechargée à la partie suivante.
+- **Les sauvegardes d'état** : ouvrez **Sauvegardes** (la disquette en haut à droite pendant la partie) et touchez **« Sauvegarder ici »** sur l'un des 5 emplacements — il garde une image de l'écran — puis **« Charger »** quand vous voulez. Les boutons *Sauvegarder l'état* / *Charger l'état* de l'émulateur utilisent le dernier emplacement choisi.
+- **Là où vous en étiez** : quitter le jeu garde votre progression. La fois suivante, la page propose **« Continuer »** (depuis là, ou depuis votre dernier état) ou **« Nouvelle partie »** (la sauvegarde du jeu reste là).
+- Chaque sauvegarde est aussi **copiée dans RomM**, étiquetée « Portalab » et avec votre nom, pour la retrouver dans RomM. Les sauvegardes d'un membre ou d'un profil ne sont jamais celles d'un autre, même si le portail utilise un seul compte RomM.
+- Une sauvegarde d'état contient toute la mémoire de l'émulateur : pour les plus grosses consoles, elle peut dépasser ce que le portail accepte (10 Mo sauf réglage de l'administrateur).
 
 ## Ce qui compte
 
