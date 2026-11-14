@@ -225,10 +225,17 @@ async def start_sitting(
     )
 
 
+class BeatIn(BaseModel):
+    active: bool = True  # the game in front (a page in the background keeps its sitting without counting)
+
+
 @router.post("/sittings/{sitting_id}/beat", response_model=BeatOut)
-async def beat_sitting(principal: Player, module: Module, sitting_id: UUID) -> BeatOut:
-    """The game still runs (sent every ``heartbeat_s`` while it does): a profile's screen time left today."""
-    beat = await module.service.beat(principal, sitting_id)
+async def beat_sitting(
+    principal: Player, module: Module, sitting_id: UUID, body: BeatIn | None = None
+) -> BeatOut:
+    """The page is still there (sent every ``heartbeat_s``): the time counts while the game is in front;
+    a profile's screen time left today."""
+    beat = await module.service.beat(principal, sitting_id, active=body.active if body is not None else True)
     return BeatOut(minutes_left=beat.minutes_left, stop=beat.stop)
 
 

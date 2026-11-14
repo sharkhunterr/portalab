@@ -11233,7 +11233,8 @@ export interface paths {
         put?: never;
         /**
          * Beat Sitting
-         * @description The game still runs (sent every ``heartbeat_s`` while it does): a profile's screen time left today.
+         * @description The page is still there (sent every ``heartbeat_s``): the time counts while the game is in front;
+         *     a profile's screen time left today.
          */
         post: operations["beat_sitting_api_v1_retro_sittings__sitting_id__beat_post"];
         delete?: never;
@@ -14029,6 +14030,14 @@ export interface components {
             limit_days?: number | null;
             /** Supply */
             supply?: number | null;
+        };
+        /** BeatIn */
+        BeatIn: {
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
         };
         /** BeatOut */
         BeatOut: {
@@ -43391,7 +43400,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BeatIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

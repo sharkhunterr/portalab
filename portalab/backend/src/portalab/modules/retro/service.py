@@ -56,7 +56,7 @@ TIMEOUT_S = 20.0
 STREAM_TIMEOUT_S = 90.0
 HEARTBEAT_S = 30  # how often the page tells the game still runs
 GAP_S = 90.0  # the most one beat counts (a tab asleep, a laptop closed: not played)
-IDLE = timedelta(minutes=3)  # nothing heard for this long: the sitting is over
+IDLE = timedelta(minutes=5)  # nothing heard for this long (a background tab still beats): the sitting is over
 RETELL = timedelta(days=2)  # a library told nothing for this long after a sitting is no longer retried
 SOURCE = "retro"
 log = get_logger("portalab.retro")
@@ -256,14 +256,16 @@ class RetroService:
             raise SittingNotFound("No such game in progress.")
         return row
 
-    async def beat(self, viewer: Principal, sitting: UUID) -> Beat:
+    async def beat(self, viewer: Principal, sitting: UUID, *, active: bool = True) -> Beat:
+        """The page is still there: its time counts while the game is in front (``active``); a page in the
+        background (a phone locked, another app) keeps its sitting open without counting."""
         now = utc_now(self.clock)
         player = player_of(viewer)
         async with self.database.unit_of_work() as uow:
             row = await uow.session.get(Sitting, sitting, with_for_update=True)
             if row is None or row.user_id != player or row.ended_at is not None:
                 raise SittingNotFound("No such game in progress.")
-            self._count(row, now)
+            self._count(row, now, active=active)
             played = row.played_s
         today: tuple[int, int] | None = await _call(self._locator().screen(viewer))
         if today is None:
@@ -285,8 +287,9 @@ class RetroService:
             await self._close(uow.session, row, now)
         await self._tell(sitting)
 
-    def _count(self, row: Sitting, now: datetime) -> None:
-        row.played_s += max(0.0, min((now - row.last_seen_at).total_seconds(), GAP_S))
+    def _count(self, row: Sitting, now: datetime, *, active: bool = True) -> None:
+        if active:
+            row.played_s += max(0.0, min((now - row.last_seen_at).total_seconds(), GAP_S))
         row.last_seen_at = now
 
     async def _close(self, session: Any, row: Sitting, now: datetime) -> None:

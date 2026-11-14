@@ -407,3 +407,48 @@ describe("the game's page (issue 420)", () => {
     await waitFor(() => expect(body).toEqual({ resume: null, rom: "r2" }));
   });
 });
+
+describe("a sitting kept while the page is in the background (streaks)", () => {
+  it("says when the game is not in front, and opens a new sitting when its own was closed", async () => {
+    const beats: Array<[string, unknown]> = [];
+    const opened: unknown[] = [];
+    const SECOND = { ...SITTING, id: "0190f0a0-0000-7000-8000-0000000000ee" };
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === `/api/v1/retro/games/${OBJECT}`) return json(200, GAME);
+      if (path === `/api/v1/retro/games/${OBJECT}/sittings`) {
+        opened.push(await request.json());
+        return json(201, opened.length === 1 ? SITTING : SECOND);
+      }
+      if (path.endsWith("/beat")) {
+        beats.push([path, await request.json()]);
+        return path.includes(SITTING.id)
+          ? json(404, { code: "retro.sitting_not_found", title: "Gone" })
+          : json(200, { minutes_left: null, stop: false });
+      }
+      return json(404, {});
+    };
+    show(<RetroPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Play" }));
+    const w = window as unknown as Record<string, unknown>;
+    await waitFor(() => expect(typeof w.EJS_onGameStart).toBe("function"));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    act(() => (w.EJS_onGameStart as () => void)());
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "hidden" });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30_000);
+    });
+    expect(beats[0]).toEqual([`/api/v1/retro/sittings/${SITTING.id}/beat`, { active: false }]);
+    await waitFor(() =>
+      expect(opened).toEqual([
+        { resume: null, rom: "r1" },
+        { resume: null, rom: "r1" },
+      ]),
+    );
+    Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "visible" });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30_000);
+    });
+    expect(beats.at(-1)).toEqual([`/api/v1/retro/sittings/${SECOND.id}/beat`, { active: true }]);
+  });
+});

@@ -178,6 +178,7 @@ export function RetroPage() {
   const active = useRef(1);
   active.current = slot;
   const preferred = useRef<string | null>(null); // 421: the settings the game started with
+  const reopening = useRef(false); // a sitting closed under the page, opened again
 
   useEffect(() => {
     document.documentElement.dataset.playing = "true"; // the shell steps aside
@@ -300,8 +301,8 @@ export function RetroPage() {
   useEffect(() => {
     if (!sitting || stage !== "playing") return;
     const timer = window.setInterval(() => {
-      if (document.visibilityState !== "visible") return; // a hidden tab does not count
-      beat(sitting.id)
+      // a page in the background still says it is there (its time is not counted): its sitting stays open
+      beat(sitting.id, document.visibilityState === "visible")
         .then(async (answer) => {
           setLeft(answer.minutes_left ?? null);
           if (answer.stop) {
@@ -311,10 +312,27 @@ export function RetroPage() {
             setStage("over");
           }
         })
-        .catch(() => undefined); // a beat missed is caught up by the next one
+        .catch((error: unknown) => {
+          // the sitting was closed meanwhile (the page frozen too long in the background): the game goes on
+          // in a new one — its time counted again — without starting the game again
+          if (error instanceof ApiError && error.code === "retro.sitting_not_found" && !reopening.current) {
+            reopening.current = true;
+            startSitting(objectId, null, sitting.game.rom ?? null)
+              .then((again) => {
+                current.current = again.id;
+                keeper.current = new SaveKeeper(again);
+                setSitting(again);
+              })
+              .catch(() => undefined)
+              .finally(() => {
+                reopening.current = false;
+              });
+          }
+          // any other missed beat is caught up by the next one
+        });
     }, sitting.heartbeat_s * 1000);
     return () => window.clearInterval(timer);
-  }, [sitting, stage, finish, keepPlace]);
+  }, [sitting, stage, finish, keepPlace, objectId]);
 
   const quit = async () => {
     if (stage === "playing" && sitting?.game.engine !== "ruffle") {

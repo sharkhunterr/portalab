@@ -41,9 +41,11 @@ export async function startSitting(
   return data;
 }
 
-export async function beat(sitting: string): Promise<Beat> {
+/** The page is still there; its time counts while the game is in front (``active``). */
+export async function beat(sitting: string, active = true): Promise<Beat> {
   const { data } = await api.POST("/api/v1/retro/sittings/{sitting_id}/beat", {
     params: { path: { sitting_id: sitting } },
+    body: { active },
   });
   return data ?? { minutes_left: null, stop: false };
 }

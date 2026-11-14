@@ -3104,6 +3104,17 @@
         "title": "AvailabilityIn",
         "type": "object"
       },
+      "BeatIn": {
+        "properties": {
+          "active": {
+            "default": true,
+            "title": "Active",
+            "type": "boolean"
+          }
+        },
+        "title": "BeatIn",
+        "type": "object"
+      },
       "BeatOut": {
         "properties": {
           "minutes_left": {
@@ -57659,7 +57670,7 @@
     },
     "/api/v1/retro/sittings/{sitting_id}/beat": {
       "post": {
-        "description": "The game still runs (sent every ``heartbeat_s`` while it does): a profile's screen time left today.",
+        "description": "The page is still there (sent every ``heartbeat_s``): the time counts while the game is in front;\na profile's screen time left today.",
         "operationId": "beat_sitting_api_v1_retro_sittings__sitting_id__beat_post",
         "parameters": [
           {
@@ -57673,6 +57684,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BeatIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {

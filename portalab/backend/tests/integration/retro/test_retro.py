@@ -208,10 +208,15 @@ async def test_the_sweep_ends_a_silent_page_and_retells_the_library(
     clock.advance(timedelta(seconds=45))
     await client.post(f"/api/v1/retro/sittings/{sitting['id']}/beat")
     retro.refuse_sessions = True
-    clock.advance(timedelta(minutes=2))
+    for _ in range(4):  # the page in the background (a phone locked): kept open, its time not counted
+        clock.advance(timedelta(minutes=2))
+        hidden = await client.post(f"/api/v1/retro/sittings/{sitting['id']}/beat", json={"active": False})
+        assert hidden.status_code == 200
+        assert await retro_module.service.sweep() == 0
+    clock.advance(timedelta(minutes=4))
     assert await retro_module.service.sweep() == 0  # not silent for long enough yet
     clock.advance(timedelta(minutes=2))
-    assert await retro_module.service.sweep() == 1
+    assert await retro_module.service.sweep() == 1  # the page went away
     assert retro.sessions == []  # the library was down
     retro.refuse_sessions = False
     assert await retro_module.service.sweep() == 0
