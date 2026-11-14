@@ -1984,6 +1984,9 @@
 .games-bingo__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  inline-size: min(100%, 46rem); /* issue 427: a card to read at a glance, not squares of a quarter screen */
+  justify-self: center;
+  margin-inline: auto;
   gap: var(--space-2);
   margin: 0;
   padding: 0;

@@ -289,7 +289,7 @@
 }
 .booster-odds li {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem 3.2rem;
+  grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem max-content;
   gap: var(--space-2);
   align-items: center;
 }
@@ -299,6 +299,7 @@
 /* what a duplicate of that rarity gives back */
 .booster-odds__refund {
   display: inline-flex;
+  white-space: nowrap; /* « +10 XC » on one line, never a letter a line */
   align-items: center;
   justify-content: flex-end;
   gap: 0.2rem;

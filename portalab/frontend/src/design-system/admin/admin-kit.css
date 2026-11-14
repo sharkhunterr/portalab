@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: var(--space-4);
   inline-size: 100%;
-  max-inline-size: 72rem;
+  /* issue 427: the whole width of the screen — the cards' grids add columns rather than leave it empty */
   min-inline-size: 0;
 }
 .admin-page[data-wide] {

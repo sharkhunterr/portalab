@@ -253,11 +253,13 @@
 }
 .feed-stream {
   display: grid;
+  /* issue 427: two columns (or more) on a wide screen rather than one narrow one and the rest empty */
+  grid-template-columns: repeat(auto-fill, minmax(min(34rem, 100%), 1fr));
+  align-items: start;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
-  max-inline-size: 60rem;
 }
 .feed-stream__day {
   margin: var(--space-3) 0 var(--space-1);

@@ -573,7 +573,13 @@ class HouseholdService:
         await self._notify(
             owner,
             "household:notify.request",
-            {"profile": card.display_name if card else "", "title": row.title},
+            {
+                # #431: the detailed e-mail — who asks, for what, its rating, their words
+                "profile": card.display_name if card else "",
+                "title": row.title,
+                "rating": f"{row.rating}+" if row.rating and row.rating.isdigit() else (row.rating or ""),
+                "quote": row.note or "",
+            },
             f"household:request:{row.id}",
             "/household?tab=requests",
         )
@@ -601,7 +607,7 @@ class HouseholdService:
         await self._notify(
             row.profile_id,
             f"household:notify.{row.status}",
-            {"title": row.title, "days": days or 0},
+            {"title": row.title, "days": days or 0, "until": days or 0},
             f"household:decision:{row.id}",
             f"/media/{row.subject_ref}" if row.kind == "media" else "/household",
         )

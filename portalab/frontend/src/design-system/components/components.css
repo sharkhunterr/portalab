@@ -200,7 +200,7 @@
 }
 .ds-container {
   width: 100%;
-  max-width: 72rem;
+  max-width: var(--content-max); /* issue 427: the page's width, not a fixed one */
   margin-inline: auto;
   padding-inline: var(--space-4);
 }

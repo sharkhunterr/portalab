@@ -60,7 +60,8 @@ export function PersonalMenu({
       onSelect: () => onNavigate("/progression"),
     },
     ...entries
-      .filter((entry) => entry.route && entry.route !== profile)
+      // the profile and the progression are above: an entry going there again is not repeated
+      .filter((entry) => entry.route && entry.route !== profile && entry.route !== "/progression")
       .map((entry, index) => ({
         key: entry.key,
         label: strings.label(entry.label_key),

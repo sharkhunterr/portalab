@@ -359,45 +359,48 @@ export function AddServiceWizard() {
   return <ConfigureService key={chosen.key} connector={chosen} onBack={() => setChosen(null)} />;
 }
 
-function SyncHistory({ service }: { service: ServiceItem }) {
+function SyncHistory({ service, onDemand }: { service: ServiceItem; onDemand: boolean }) {
   const t = useT();
   const label = t("admin:services.historyOf", { name: service.name });
   return (
-    <DataRegion<SyncRunItem[]>
-      label={label}
-      queryKey={[...SERVICES_KEY, service.id, "runs"]}
-      queryFn={async () =>
-        (
-          await unwrap<{ items: SyncRunItem[] }>(
-            api.GET("/api/v1/services/{service_id}/sync-runs", {
-              params: { path: { service_id: service.id } },
-            }),
+    <>
+      {onDemand ? <p className="admin-muted">{t("admin:services.onDemandHint")}</p> : null}
+      <DataRegion<SyncRunItem[]>
+        label={label}
+        queryKey={[...SERVICES_KEY, service.id, "runs"]}
+        queryFn={async () =>
+          (
+            await unwrap<{ items: SyncRunItem[] }>(
+              api.GET("/api/v1/services/{service_id}/sync-runs", {
+                params: { path: { service_id: service.id } },
+              }),
+            )
+          ).items
+        }
+      >
+        {(runs) =>
+          runs.length === 0 ? (
+            <p className="admin-muted">{t("admin:services.noHistory")}</p>
+          ) : (
+            <ul aria-label={label} className="services-admin__runs">
+              {runs.map((run) => (
+                <li key={run.id} data-status={run.status}>
+                  {t("admin:services.run", {
+                    kind: run.kind,
+                    status: run.status,
+                    added: run.added,
+                    modified: run.modified,
+                    removed: run.removed,
+                  })}
+                  {run.errored ? ` !${run.errored}` : ""}
+                  {run.last_error ? ` — ${run.last_error}` : ""}
+                </li>
+              ))}
+            </ul>
           )
-        ).items
-      }
-    >
-      {(runs) =>
-        runs.length === 0 ? (
-          <p className="admin-muted">{t("admin:services.noHistory")}</p>
-        ) : (
-          <ul aria-label={label} className="services-admin__runs">
-            {runs.map((run) => (
-              <li key={run.id} data-status={run.status}>
-                {t("admin:services.run", {
-                  kind: run.kind,
-                  status: run.status,
-                  added: run.added,
-                  modified: run.modified,
-                  removed: run.removed,
-                })}
-                {run.errored ? ` !${run.errored}` : ""}
-                {run.last_error ? ` — ${run.last_error}` : ""}
-              </li>
-            ))}
-          </ul>
-        )
-      }
-    </DataRegion>
+        }
+      </DataRegion>
+    </>
   );
 }
 
@@ -738,7 +741,7 @@ function ServiceActions({
         closeLabel={t("admin:services.close")}
         trigger={<span hidden />}
       >
-        <SyncHistory service={service} />
+        <SyncHistory service={service} onDemand={continuous(connector)} />
       </Dialog>
       <Dialog
         open={disconnecting}

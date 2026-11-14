@@ -98,6 +98,15 @@ async def test_an_email_tells_the_facts_rewards_and_words_of_its_notification(
     assert "Resolved" not in html  # « none »: nothing to say
     assert "« Fixed by a restart" in plain
 
+    # issue 431: a profile asking its master for a title — who, what, its rating, its words, the button
+    asked = {"profile": "Léa", "title": "Alien", "rating": "16+", "quote": "Juste la fin, promis"}
+    await notify.module.send(send(alex, "ask", "household:notify.request", asked, "/household?tab=requests"))
+    subject, plain, html = await mailed(notify, "ask")
+    assert subject == "Léa asks to watch “Alien”."
+    for shown in ("Profile", "Léa", "Title", "Alien", "Rated", "16+", "Juste la fin, promis", "My household"):
+        assert shown in html, shown
+    assert "https://portal.example/household?tab=requests" in plain
+
     names = {"en": "Winter festival", "fr": "Fête d'hiver"}
     await notify.module.send(
         send(alex, "camp", "campaigns:notify.announcement", {"campaign": names, "message": "Come!"}, "/c")
