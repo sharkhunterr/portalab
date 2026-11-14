@@ -34,6 +34,7 @@ export const SETTINGS_PAGES = [
   { key: "accounts", to: "/settings/media-accounts", icon: "link", items: ["media"] },
   { key: "privacy", to: "/privacy", icon: "lock", items: ["visibility", "retention", "export"] },
   { key: "play", to: "/settings/play", icon: "gamepad", items: ["play", "cards", "presence"] },
+  { key: "household", to: "/household", icon: "users", items: ["profiles", "pins", "requests"] }, // 032
 ] as const;
 
 type Page = (typeof SETTINGS_PAGES)[number];

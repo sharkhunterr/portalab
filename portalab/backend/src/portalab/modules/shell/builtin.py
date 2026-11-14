@@ -133,10 +133,12 @@ BUILTIN: tuple[dict[str, object], ...] = (
     {
         "key": "identity.household",  # 032: « My household » — its profiles, its wallet, its requests
         "owner": "module:identity",
-        "kind": "command",
+        "kind": "entry",  # an entry of « Me »: the avatar menu (a command shows in the palette only)
         "label_key": "nav.household",
         "icon": "users",
         "route": "/household",
+        "group": "me",
+        "order_hint": 8,
         "required_permission": "users.self.manage",
         "keywords": ("household", "profiles", "family", "foyer", "profils", "famille"),
     },
