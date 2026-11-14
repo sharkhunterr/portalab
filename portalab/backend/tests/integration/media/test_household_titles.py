@@ -341,3 +341,15 @@ async def test_a_rated_game_is_held_to_the_profiles_age(app: FastAPI, media: Med
     viewer = Principal(user_id=UUID(str(created["id"])), profile_of=people["zoe"])
     assert await media.module.gate.blocked(viewer) == frozenset({ids["Doom"]})
     assert (await media.module.gate.rating(ids["Doom"]))["age"] == 18
+
+
+async def test_every_card_carries_its_age_rating(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 434: the catalog's cards carry their age rating (the strictest), for everyone — its badge."""
+    await users(app, media, "zoe")
+    await _library(app, media)
+    await login(client, "zoe")
+    items = (await client.get("/api/v1/media", params={"kind": "movie"})).json()["items"]
+    ages = {item["title"]: item["age"] for item in items}
+    assert ages["Alien"] == 16 and ages["Toy Story"] == 0 and ages["Nameless"] is None

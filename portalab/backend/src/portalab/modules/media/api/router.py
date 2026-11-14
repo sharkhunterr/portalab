@@ -98,6 +98,7 @@ class MediaCard(BaseModel):
     locked: bool = (
         False  # 032: above this household profile's age rating, shown locked by its master's choice
     )
+    age: int | None = None  # issue 434: the strictest age its ratings stand for (its badge)
 
 
 class MediaPage(BaseModel):

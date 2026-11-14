@@ -179,11 +179,47 @@ class TitleGate:
         return await self.blocked(viewer)
 
     async def mark(self, viewer: Principal | UUID | None, cards: list[Any]) -> list[Any]:
-        """Cards (pydantic models with ``id`` and ``locked``) of titles kept from the viewer, shown locked."""
+        """Cards (pydantic models with ``id`` and ``locked``) of titles kept from the viewer, shown locked —
+        issue 434: and each card's age rating (``age``, the strictest of its ratings), for its badge."""
         blocked = await self.blocked(viewer)
-        if not blocked:
+        aged = [c for c in cards if "age" in type(c).model_fields]
+        ages = await self.ages([c.id for c in aged]) if aged else {}
+        if not blocked and not ages:
             return cards
-        return [card.model_copy(update={"locked": True}) if card.id in blocked else card for card in cards]
+        out = []
+        for card in cards:
+            update: dict[str, Any] = {}
+            if card.id in blocked:
+                update["locked"] = True
+            if card.id in ages and "age" in type(card).model_fields:
+                update["age"] = ages[card.id]
+            out.append(card.model_copy(update=update) if update else card)
+        return out
+
+    async def ages(self, ids: Iterable[UUID]) -> dict[UUID, int]:
+        """Issue 434: the strictest age each title's ratings stand for (unrated ones left out)."""
+        wanted = list(dict.fromkeys(ids))
+        if not wanted:
+            return {}
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(
+                        MediaObject.id, ObjectMetadata.data, MediaObject.effective["content_rating"].astext
+                    )
+                    .outerjoin(
+                        ObjectMetadata,
+                        (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
+                    )
+                    .where(MediaObject.id.in_(wanted))
+                )
+            ).all()
+        out: dict[UUID, int] = {}
+        for object_id, data, server in rows:
+            age = strictest_age(ratings(data, server))
+            if age is not None:
+                out[object_id] = max(age, out.get(object_id, age))
+        return out
 
     async def screen_today(self, viewer: Principal | UUID | None) -> tuple[int, int] | None:
         """032: ``(minutes used today, minutes allowed a day)`` in the portal's player and reader, for a

@@ -11,6 +11,8 @@
   "admin.score": "Similarité {score}",
   "admin.status": "Éléments non résolus : {unresolved} · sessions non liées : {unlinked}",
   "admin.title": "Identité des médias",
+  "age.all": "Tous",
+  "age.label": "{age, plural, =0 {Tous publics} other {Déconseillé aux moins de # ans}}",
   "ask.admin.save": "Enregistrer",
   "ask.admin.saved": "Réglages enregistrés.",
   "ask.admin.settings": "Réglages",

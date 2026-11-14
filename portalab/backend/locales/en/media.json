@@ -11,6 +11,8 @@
   "admin.score": "Similarity {score}",
   "admin.status": "Unresolved items: {unresolved} · unlinked sessions: {unlinked}",
   "admin.title": "Media identity",
+  "age.all": "All",
+  "age.label": "{age, plural, =0 {All ages} other {Rated {age}+}}",
   "ask.admin.save": "Save",
   "ask.admin.saved": "Settings saved.",
   "ask.admin.settings": "Settings",

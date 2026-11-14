@@ -14593,6 +14593,8 @@ export interface components {
         };
         /** CollectionItemOut */
         CollectionItemOut: {
+            /** Age */
+            age?: number | null;
             /** At */
             at?: string | null;
             /** Available */
@@ -17342,6 +17344,8 @@ export interface components {
         };
         /** MediaCard */
         MediaCard: {
+            /** Age */
+            age?: number | null;
             /** At */
             at?: string | null;
             /** Available */
@@ -17395,6 +17399,8 @@ export interface components {
         };
         /** MediaDetail */
         MediaDetail: {
+            /** Age */
+            age?: number | null;
             /**
              * @default {
              *       "ratings": []

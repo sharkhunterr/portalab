@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { PosterTickets } from "../support/tickets/MediaTickets";
+import { AgeBadge } from "./AgeBadge";
 import { imageUrl, type MediaCard } from "./api";
 import { PosterBadge } from "./discover/StatusBadge";
 
@@ -69,6 +70,7 @@ export function MediaGrid({
                   <span className="visually-hidden">{t("household:lockedBadge")}</span>
                 </span>
               ) : null}
+              {"age" in item ? <AgeBadge age={item.age} compact /> : null}
               <PosterTickets mediaId={item.id} />
               {badge ? (
                 badge(item)

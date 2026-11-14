@@ -4575,6 +4575,17 @@
       },
       "CollectionItemOut": {
         "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
           "at": {
             "anyOf": [
               {
@@ -12347,6 +12358,17 @@
       },
       "MediaCard": {
         "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
           "at": {
             "anyOf": [
               {
@@ -12472,6 +12494,17 @@
       },
       "MediaDetail": {
         "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
           "age_rating": {
             "$ref": "#/components/schemas/AgeRating",
             "default": {

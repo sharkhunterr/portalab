@@ -17,6 +17,7 @@ export function TitleHero({
   poster,
   backdrop,
   badges,
+  rating,
   primary,
   secondary,
   children,
@@ -29,6 +30,7 @@ export function TitleHero({
   poster: string | null;
   backdrop: string | null;
   badges?: ReactNode;
+  rating?: ReactNode; // issue 434: the age rating's badge, beside the title
   primary?: ReactNode;
   secondary?: ReactNode;
   children?: ReactNode;
@@ -49,7 +51,12 @@ export function TitleHero({
             primary={primary}
             secondary={secondary}
           />
-          {badges ? <div className="discover-title__state">{badges}</div> : null}
+          {badges || rating ? (
+            <div className="discover-title__state">
+              {rating}
+              {badges}
+            </div>
+          ) : null}
           {children}
         </div>
       </div>

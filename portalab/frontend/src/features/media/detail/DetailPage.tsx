@@ -29,6 +29,7 @@ import { useRetroGame } from "../../retro/api";
 import { RetroPlayButtons } from "../../retro/Resume";
 import { MediaTickets, MediaTicketsBadge } from "../../support/tickets/MediaTickets";
 import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
+import { AgeBadge } from "../AgeBadge";
 import { useListenInfo, useReadInfo } from "../books/api";
 import { CollectionRow } from "../collections/CollectionRow";
 import { useDiscoverTitle } from "../discover/api";
@@ -944,8 +945,8 @@ function DirectRequest({
 
 const TASTED = ["movie", "series", "season", "episode", "book", "audiobook", "game"];
 
-/** 032: « 17+ (FR 12 · US R) » — the strictest age a title's ratings stand for, then each source's. */
-function ageFact(
+/** 032: « FR 12 · US R » — each source's rating (the strictest age is the badge's, issue 434). */
+function ageSources(
   rating: components["schemas"]["MediaDetail"]["age_rating"] | undefined,
   t: ReturnType<typeof useT>,
 ): string | null {
@@ -953,8 +954,7 @@ function ageFact(
   const sources = (rating.ratings ?? [])
     .map((r) => `${r.source === "server" ? t("household:rating.server") : r.source} ${r.value}`)
     .join(" · ");
-  const age = t("household:rating.age", { age: rating.age });
-  return sources ? `${age} (${sources})` : age;
+  return sources || null;
 }
 
 export function DetailPage() {
@@ -1025,7 +1025,7 @@ export function DetailPage() {
           media.platform ?? null,
           t(`media:kind.${media.kind}`),
           metadata.data?.runtime_min ? measures.duration(metadata.data.runtime_min * 60) : null,
-          ageFact(media.age_rating, t), // 032: the strictest age its ratings stand for, and each one
+          ageSources(media.age_rating, t), // 032: each source's rating (the strictest: the badge)
           metadata.data?.vote_average
             ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
             : null,
@@ -1037,6 +1037,7 @@ export function DetailPage() {
           ...bookFacts,
         ]}
         badges={<TitleBadges media={media} />}
+        rating={<AgeBadge age={media.age_rating?.age} sources={ageSources(media.age_rating, t)} />}
         primary={
           media.available ? (
             <Watch objectId={media.id} kind={media.kind} title={media.title} image={media.image_id} />

@@ -1778,3 +1778,42 @@ a.media-person__row:hover {
   color: var(--color-text);
   background: color-mix(in srgb, var(--color-surface) 35%, transparent);
 }
+/* issue 434 — a title's age rating, coloured by age */
+.age-badge {
+  --tone: var(--state-available-fg);
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 2.4rem;
+  block-size: 2.4rem;
+  padding: 0 0.45rem;
+  border: 2px solid var(--tone);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--tone) 22%, var(--color-surface));
+  color: var(--color-text);
+  font-weight: 800;
+  font-size: var(--font-size-md, 1rem);
+  line-height: 1;
+}
+.age-badge[data-tier="7"] {
+  --tone: var(--chart-4);
+}
+.age-badge[data-tier="12"] {
+  --tone: var(--chart-9);
+}
+.age-badge[data-tier="16"] {
+  --tone: var(--state-partial-fg);
+}
+.age-badge[data-tier="18"] {
+  --tone: var(--state-error-fg);
+}
+.age-badge[data-compact] {
+  position: absolute;
+  inset-block-end: 0.4rem;
+  inset-inline-start: 0.4rem;
+  z-index: 2;
+  min-inline-size: 1.9rem;
+  block-size: 1.6rem;
+  border-width: 1.5px;
+  font-size: var(--font-size-xs, 0.75rem);
+  background: color-mix(in srgb, var(--tone) 35%, var(--color-surface));
+}
