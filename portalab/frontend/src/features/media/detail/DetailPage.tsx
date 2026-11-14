@@ -26,6 +26,7 @@ import { WorkCollection } from "../../cards/WorkCollection";
 import { ExternalNews } from "../../news/ExternalNews";
 import { PluginSlot } from "../../plugins/slots/PluginSlot";
 import { useRetroGame } from "../../retro/api";
+import { RetroPlayButtons } from "../../retro/Resume";
 import { MediaTickets, MediaTicketsBadge } from "../../support/tickets/MediaTickets";
 import { ReportMediaProblem } from "../../support/tickets/ReportMedia";
 import { useListenInfo, useReadInfo } from "../books/api";
@@ -727,16 +728,10 @@ function Watch({
 
 /** 419: play here, in the library's own emulator (a page of its own) — the library's page one click away. */
 function PlayGame({ objectId }: { objectId: string }) {
-  const t = useT();
   const game = useRetroGame(objectId, useHasPermission("retro.play"));
   return (
     <div className="media-watch">
-      {game.data ? (
-        <a className="ds-button ds-button--primary media-watch-here" href={`/media/${objectId}/play`}>
-          <Icon name="joystick" size={18} />
-          {t("retro:cta.play")}
-        </a>
-      ) : null}
+      {game.data ? <RetroPlayButtons objectId={objectId} game={game.data} /> : null}
       <OpenIn objectId={objectId} kind="game" secondary={Boolean(game.data)} />
     </div>
   );

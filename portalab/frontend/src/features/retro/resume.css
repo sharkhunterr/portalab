@@ -1,0 +1,80 @@
+/* issue 420 — choosing the save state to resume from (the game's page, the play page) */
+.retro-resume {
+  order: 10; /* after the buttons, the library's too */
+  flex-basis: 100%;
+  display: grid;
+  gap: var(--space-2);
+}
+.retro-resume p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.retro-chooser {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.retro-chooser__item {
+  display: grid;
+  gap: var(--space-1);
+  inline-size: 100%;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.retro-chooser__item:hover,
+.retro-chooser__item[aria-pressed="true"] {
+  border-color: var(--color-accent);
+}
+.retro-chooser__item[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+.retro-chooser__item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-accent);
+  outline-offset: var(--focus-ring-offset);
+}
+.retro-chooser__picture {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-surface-sunken, var(--color-surface));
+  color: var(--color-text-muted);
+}
+.retro-chooser__picture img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+.retro-chooser__text {
+  display: grid;
+}
+.retro-chooser__text small {
+  color: var(--color-text-muted);
+}
+/* on the play page, over the player's stage */
+.retro-start .retro-chooser {
+  inline-size: min(100%, 40rem);
+}
+.retro-start .retro-chooser__item {
+  border-color: color-mix(in srgb, var(--player-ink) 25%, transparent);
+  background: color-mix(in srgb, var(--player-ink) 6%, transparent);
+  color: var(--player-ink);
+}
+.retro-start .retro-chooser__item[aria-pressed="true"] {
+  border-color: var(--player-accent);
+  box-shadow: 0 0 0 2px var(--player-accent);
+}
+.retro-start .retro-chooser__text small {
+  color: var(--player-ink-muted);
+}

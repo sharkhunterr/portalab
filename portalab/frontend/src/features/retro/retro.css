@@ -196,3 +196,91 @@
 .retro-slot__actions .player-pill {
   padding: 0.35rem 0.8rem;
 }
+/* issue 420 — the game loading, step by step */
+.retro-steps {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: min(100%, 26rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+.retro-step {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: start;
+}
+.retro-step[data-state="todo"] {
+  color: var(--player-ink-muted);
+}
+.retro-step__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 2px solid color-mix(in srgb, var(--player-ink) 30%, transparent);
+  border-radius: 50%;
+}
+.retro-step[data-state="done"] .retro-step__mark {
+  border-color: var(--player-accent);
+  background: var(--player-accent);
+  color: var(--color-accent-contrast);
+}
+.retro-step[data-state="active"] .retro-step__mark {
+  border-color: var(--player-accent);
+}
+.retro-step__spin {
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  border: 2px solid var(--player-track);
+  border-top-color: var(--player-accent);
+  border-radius: 50%;
+  animation: player-spin 0.9s linear infinite;
+}
+.retro-step__text {
+  display: grid;
+  gap: 0.2rem;
+  min-inline-size: 0;
+}
+.retro-step__text small {
+  color: var(--player-ink-muted);
+}
+.retro-step__bar {
+  display: block;
+  block-size: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--player-track);
+}
+.retro-step__bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--player-accent);
+  transition: inline-size var(--motion-duration-normal) var(--motion-easing);
+}
+.retro-step__bar[data-indeterminate] > span {
+  animation: retro-indeterminate 1.4s ease-in-out infinite;
+}
+@keyframes retro-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(330%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .retro-step__spin,
+  .retro-step__bar[data-indeterminate] > span {
+    animation: none;
+  }
+}
+.retro-start__error {
+  max-inline-size: 30rem;
+  margin: 0;
+  color: var(--player-ink);
+  white-space: pre-line;
+}

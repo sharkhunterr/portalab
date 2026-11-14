@@ -36,6 +36,12 @@ async def test_a_members_saves_and_states(
     assert (await client.put(f"{saves}states/1/picture", content=PNG)).status_code == 204
     picture = await client.get(f"{saves}states/1/picture")
     assert picture.headers["content-type"] == "image/png" and picture.content == PNG
+    # the game's page shows it too, to choose where to resume (no sitting needed)
+    shown = await client.get(f"/api/v1/retro/games/{ids['Super Metroid']}/states/1/picture")
+    assert shown.status_code == 200 and shown.content == PNG
+    assert (
+        await client.get(f"/api/v1/retro/games/{ids['Super Metroid']}/states/3/picture")
+    ).status_code == 404
 
     progress = (await client.get(f"{saves}saves")).json()
     assert progress["sram_at"] is not None and progress["latest_slot"] == 1 and progress["slots"] == 5
@@ -79,7 +85,11 @@ async def test_what_is_refused(
     assert refused.status_code == 400  # a picture the portal keeps, nothing else
     assert (await client.put(f"{saves}states/4/picture", content=PNG)).status_code == 404
 
-    await login(client, "max")  # another member: neither reads nor writes them
+    await client.put(f"{saves}states/2/picture", content=PNG)
+    await login(client, "max")  # another member: neither reads nor writes them, nor sees their pictures
+    assert (
+        await client.get(f"/api/v1/retro/games/{ids['Super Metroid']}/states/2/picture")
+    ).status_code == 404
     for method in ("GET", "PUT"):
         response = await client.request(method, f"{saves}states/2", content=b"x")
         assert response.status_code == 404, method

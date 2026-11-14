@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
@@ -20,6 +20,9 @@ import {
   startSitting,
   useRetroGame,
 } from "./api";
+import { LoadingSteps } from "./LoadingSteps";
+import { type StepKey, useEmulatorLoading } from "./loading";
+import { SaveChooser, statesOf } from "./Resume";
 import { emulator, picture, SaveKeeper } from "./saves";
 import "../media/player/player.css";
 import "./retro.css";
@@ -154,6 +157,7 @@ export function RetroPage() {
   const t = useT();
   const format = useFormat();
   const { objectId = "" } = useParams();
+  const [params] = useSearchParams();
   const { language } = useLocaleContext();
   const game = useRetroGame(objectId);
   const [sitting, setSitting] = useState<Sitting | null>(null);
@@ -165,6 +169,8 @@ export function RetroPage() {
   const [slot, setSlot] = useState(1);
   const [notice, setNotice] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const [choice, setChoice] = useState<number | null | undefined>(undefined); // 420: the save to resume
+  const [resumed, setResumed] = useState<number | null>(null);
   const current = useRef<string | null>(null);
   const keeper = useRef<SaveKeeper | null>(null);
   const active = useRef(1);
@@ -244,6 +250,7 @@ export function RetroPage() {
   };
 
   const start = async (resume: number | null) => {
+    setResumed(resume);
     setStage("starting");
     try {
       const started = await startSitting(objectId, resume);
@@ -296,8 +303,8 @@ export function RetroPage() {
         .then(async (answer) => {
           setLeft(answer.minutes_left ?? null);
           if (answer.stop) {
+            await keepPlace(); // the screen pictured while the game still runs (paused, it is black)
             emulator()?.pause?.(true);
-            await keepPlace();
             finish();
             setStage("over");
           }
@@ -310,12 +317,15 @@ export function RetroPage() {
   const quit = async () => {
     if (stage === "playing" && sitting?.game.engine !== "ruffle") {
       setLeaving(true);
+      await keepPlace(); // the screen pictured while the game still runs (paused, it is black)
       emulator()?.pause?.(true);
-      await keepPlace();
     }
     finish();
     leave(objectId);
   };
+
+  // 420: the loading, step by step — EmulatorJS's own progress, read from its screen
+  const tracked = useEmulatorLoading(stage === "starting" && sitting !== null);
 
   if (game.isPending) {
     return (
@@ -354,8 +364,28 @@ export function RetroPage() {
     );
   }
   const info = game.data;
-  const saved = info.progress;
-  const latest = saved?.states.find((s) => s.slot === saved.latest_slot);
+  const states = statesOf(info);
+  const asked = params.get("resume");
+  const wanted = asked !== null && states.some((s) => String(s.slot) === asked) ? Number(asked) : null;
+  const chosen =
+    choice !== undefined ? choice : params.get("new") ? null : (wanted ?? states[0]?.slot ?? null);
+  const ruffle = info.engine === "ruffle";
+  const steps: StepKey[] = ruffle
+    ? ["sitting", "emulator", "start"]
+    : [
+        "sitting",
+        "emulator",
+        "core",
+        ...(sitting?.firmware.length ? (["bios"] as const) : []),
+        "game",
+        ...(resumed !== null ? (["state"] as const) : []),
+        "start",
+      ];
+  const reached: StepKey = !sitting
+    ? "sitting"
+    : tracked.loading && steps.includes(tracked.loading.key)
+      ? tracked.loading.key
+      : "emulator";
   return (
     <div className="retro-page" data-stage={stage}>
       <header className="retro-bar">
@@ -415,49 +445,71 @@ export function RetroPage() {
             when={(value) => format.dateTime(value)}
           />
         ) : null}
-        {stage === "ready" || stage === "starting" ? (
+        {stage === "ready" ? (
           <div className="retro-start">
             <Icon name="joystick" size={40} />
             <p>{t("retro:intro", { title: info.title })}</p>
-            {latest ? (
+            {states.length ? (
               <>
-                <small className="retro-hint">
-                  {t("retro:saves.last", { when: format.dateTime(latest.updated_at) })}
-                </small>
+                <small className="retro-hint">{t("retro:resume.choose")}</small>
+                <SaveChooser
+                  objectId={objectId}
+                  states={states}
+                  selected={chosen}
+                  onSelect={setChoice}
+                  label={t("retro:resume.choose")}
+                />
                 <div className="retro-start__actions">
                   <button
                     type="button"
                     className="player-pill"
                     data-primary
-                    disabled={stage === "starting"}
-                    onClick={() => void start(latest.slot)}
+                    disabled={chosen === null}
+                    onClick={() => void start(chosen)}
                   >
-                    {t(stage === "starting" ? "retro:starting" : "retro:continue")}
+                    {t("retro:continue")}
                   </button>
-                  <button
-                    type="button"
-                    className="player-pill"
-                    disabled={stage === "starting"}
-                    onClick={() => void start(null)}
-                  >
+                  <button type="button" className="player-pill" onClick={() => void start(null)}>
                     {t("retro:newGame")}
                   </button>
                 </div>
               </>
             ) : (
-              <button
-                type="button"
-                className="player-pill"
-                data-primary
-                disabled={stage === "starting"}
-                onClick={() => void start(null)}
-              >
-                {t(stage === "starting" ? "retro:starting" : "retro:play")}
+              <button type="button" className="player-pill" data-primary onClick={() => void start(null)}>
+                {t("retro:play")}
               </button>
             )}
             {info.threads && !window.crossOriginIsolated ? (
               <small className="retro-hint">{t("retro:threads")}</small>
             ) : null}
+          </div>
+        ) : null}
+        {stage === "starting" ? (
+          <div className="retro-start" role="status">
+            {tracked.error ? (
+              <>
+                <Icon name="warning" size={36} />
+                <p className="retro-start__error">{t("retro:loading.failed", { reason: tracked.error })}</p>
+                <div className="retro-start__actions">
+                  <button
+                    type="button"
+                    className="player-pill"
+                    data-primary
+                    onClick={() => window.location.reload()}
+                  >
+                    {t("retro:retry")}
+                  </button>
+                  <button type="button" className="player-pill" onClick={() => leave(objectId)}>
+                    {t("retro:back")}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p>{t(resumed !== null ? "retro:loading.resuming" : "retro:loading.title")}</p>
+                <LoadingSteps steps={steps} current={reached} loading={tracked.loading} core={info.core} />
+              </>
+            )}
           </div>
         ) : null}
         {stage === "over" ? (

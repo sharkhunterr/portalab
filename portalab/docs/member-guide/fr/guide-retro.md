@@ -10,7 +10,7 @@ Quand votre serveur a une ludothèque **RomM**, ses jeux se jouent **directement
 ## Jouer
 
 - **« Jouer ici »** apparaît sur la fiche d'un jeu quand le portail sait le faire tourner — les mêmes consoles que RomM : NES, Super Nintendo, Game Boy, GBA, Mega Drive, Master System, PlayStation, Nintendo 64, DS, PSP, arcade, Commodore, Amstrad, Atari et bien d'autres, et les jeux **Flash** (avec Ruffle) — et la ludothèque a son fichier. **« Jouer sur RomM »** reste à côté.
-- Le jeu s'ouvre en plein écran. Touchez **« Jouer »** : l'émulateur, le cœur de la console et le jeu se chargent, puis la partie commence. La barre de l'émulateur (en bas) donne ses commandes, le plein écran, les sauvegardes d'état, la manette et la manette tactile sur téléphone.
+- Le jeu s'ouvre en plein écran. Touchez **« Jouer »** : la page montre chaque étape du chargement — l'émulateur, le cœur de la console, son BIOS, le jeu, votre sauvegarde — avec sa progression, puis la partie commence ; en cas d'échec, elle dit pourquoi. La barre de l'émulateur (en bas) donne ses commandes, le plein écran, les sauvegardes d'état, la manette et la manette tactile sur téléphone.
 - La flèche en haut à gauche ferme le jeu et revient à sa fiche.
 - Quelques consoles (DOS, PSP, 3DS) demandent une page isolée des autres sites ; celle du jeu l'est. Si un tel jeu ne démarre pas, rechargez la page.
 
@@ -25,7 +25,7 @@ Votre progression vous suit (votre profil, dans un foyer), sur tous vos appareil
 
 - **La sauvegarde du jeu** (celle que le jeu fait lui-même, comme sur la console) est gardée chaque minute pendant la partie et quand vous partez, puis rechargée à la partie suivante.
 - **Les sauvegardes d'état** : ouvrez **Sauvegardes** (la disquette en haut à droite pendant la partie) et touchez **« Sauvegarder ici »** sur l'un des 5 emplacements — il garde une image de l'écran — puis **« Charger »** quand vous voulez. Les boutons *Sauvegarder l'état* / *Charger l'état* de l'émulateur utilisent le dernier emplacement choisi.
-- **Là où vous en étiez** : quitter le jeu garde votre progression. La fois suivante, la page propose **« Continuer »** (depuis là, ou depuis votre dernier état) ou **« Nouvelle partie »** (la sauvegarde du jeu reste là).
+- **Reprendre** : quitter le jeu garde votre progression (« Là où vous en étiez », avec une image de l'écran). La fiche du jeu propose alors **« Reprendre »** — choisissez la sauvegarde, chacune avec son image et sa date — ou **« Nouvelle partie »** (la sauvegarde du jeu reste là).
 - Chaque sauvegarde est aussi **copiée dans RomM**, étiquetée « Portalab » et avec votre nom, pour la retrouver dans RomM. Les sauvegardes d'un membre ou d'un profil ne sont jamais celles d'un autre.
 - Une sauvegarde d'état contient toute la mémoire de l'émulateur : pour les plus grosses consoles, elle peut dépasser ce que le portail accepte (10 Mo sauf réglage de l'administrateur).
 

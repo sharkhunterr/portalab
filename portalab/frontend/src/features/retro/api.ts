@@ -140,3 +140,13 @@ export function keepPreferences(core: string, data: EmulatorPreferences): Promis
     body: JSON.stringify({ data }),
   });
 }
+
+/** A save state's picture on the game's page (the viewer's own), outside any sitting. */
+export function gamePictureUrl(objectId: string, slot: number, version: string): string {
+  return `/api/v1/retro/games/${objectId}/states/${slot}/picture?v=${encodeURIComponent(version)}`;
+}
+
+/** The play page of a game: a new game, or resuming from one of its save states. */
+export function playUrl(objectId: string, resume: number | null): string {
+  return resume === null ? `/media/${objectId}/play?new=1` : `/media/${objectId}/play?resume=${resume}`;
+}

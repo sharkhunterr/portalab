@@ -328,6 +328,13 @@ async def state_picture(principal: Player, module: Module, sitting_id: UUID, slo
     return _bytes(data, kind)
 
 
+@router.get("/games/{object_id}/states/{slot}/picture", include_in_schema=False)
+async def game_state_picture(principal: Player, module: Module, object_id: UUID, slot: SLOT) -> Response:
+    """A save state's picture, for choosing where to resume from the game's page."""
+    data, kind = await module.saves.picture_of_game(principal, object_id, slot)
+    return _bytes(data, kind)
+
+
 @router.put(
     "/sittings/{sitting_id}/states/{slot}/picture",
     status_code=status.HTTP_204_NO_CONTENT,

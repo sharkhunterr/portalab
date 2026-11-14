@@ -20,6 +20,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { chooseFirmware, emulatorLanguage, type Sitting } from "../../../src/features/retro/api";
+import { RetroPlayButtons } from "../../../src/features/retro/Resume";
 import RetroPage from "../../../src/features/retro/RetroPage";
 import { json } from "../../support/fake-api";
 
@@ -200,7 +201,9 @@ describe("saves and states (issue 420)", () => {
       },
     };
     show(<RetroPage />);
-    expect(await screen.findByText(/Last saved/)).toBeTruthy();
+    expect(await screen.findByText("Which save do you resume from?")).toBeTruthy();
+    const latest = screen.getByRole("button", { name: /Where you left off/ });
+    expect(latest.getAttribute("aria-pressed")).toBe("true"); // the latest, chosen
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     await waitFor(() => expect(w.EJS_loadStateURL).toBe(`${BASE}/states/0`));
     expect(started).toEqual({ resume: 0 });
@@ -291,5 +294,74 @@ describe("engines and controls (issue 421)", () => {
     ]);
     delete w.EJS_emulator;
     delete w.EJS_controlScheme;
+  });
+});
+
+describe("loading, step by step (issue 420)", () => {
+  it("shows the emulator's progress, then its error", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === `/api/v1/retro/games/${OBJECT}`) return json(200, GAME);
+      if (path === `/api/v1/retro/games/${OBJECT}/sittings`) return json(201, SITTING);
+      return json(404, {});
+    };
+    show(<RetroPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Play" }));
+    expect(await screen.findByText("Loading the emulator")).toBeTruthy();
+    const steps = () =>
+      Array.from(document.querySelectorAll(".retro-step")).map((li) => li.getAttribute("data-state"));
+    const stage = document.getElementById("retro-game") as HTMLElement;
+    const line = document.createElement("div");
+    line.className = "ejs_loading_text";
+    stage.appendChild(line);
+    act(() => {
+      line.textContent = "Download Game Core 45%";
+    });
+    expect(await screen.findByText("Downloading · 45 %")).toBeTruthy();
+    // sitting, emulator done; the core under way; the BIOS, the game, the start to come
+    await waitFor(() => expect(steps()).toEqual(["done", "done", "active", "todo", "todo", "todo"]));
+    act(() => {
+      line.textContent = "Download Game Data 1.50MB";
+    });
+    expect(await screen.findByText("Downloading · 1.5 MB")).toBeTruthy();
+    await waitFor(() => expect(steps()).toEqual(["done", "done", "done", "done", "active", "todo"]));
+    act(() => {
+      line.className = "ejs_loading_text ejs_error_text";
+      line.textContent = "Network Error";
+    });
+    expect(await screen.findByText("The game could not start: Network Error")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+});
+
+describe("the game's page (issue 420)", () => {
+  it("offers to resume, choosing the save, or a new game", async () => {
+    const saved = {
+      ...GAME,
+      progress: {
+        sram_at: null,
+        latest_slot: 2,
+        slots: 5,
+        states: [
+          { slot: 0, size: 8, updated_at: "2026-11-14T20:00:00Z", has_picture: true },
+          { slot: 2, size: 8, updated_at: "2026-11-14T21:00:00Z", has_picture: false },
+        ],
+      },
+    };
+    show(<RetroPlayButtons objectId={OBJECT} game={saved} />);
+    expect(screen.getByRole("link", { name: /New game/ }).getAttribute("href")).toBe(
+      `/media/${OBJECT}/play?new=1`,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Resume/ }));
+    const choices = screen.getAllByRole("button", { name: /Slot 2|Where you left off/ });
+    expect(choices.map((c) => c.textContent)).toEqual([
+      expect.stringMatching(/^Slot 2/),
+      expect.stringMatching(/^Where you left off/),
+    ]);
+    expect(document.querySelector(".retro-chooser img")?.getAttribute("src")).toContain(
+      `/api/v1/retro/games/${OBJECT}/states/0/picture`,
+    );
+    fireEvent.click(choices[0] as HTMLElement);
+    expect(assign).toHaveBeenCalledWith(`/media/${OBJECT}/play?resume=2`);
   });
 });

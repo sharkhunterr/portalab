@@ -31,7 +31,7 @@ from portalab.core.errors import BadRequest, NotFound
 from portalab.core.logging import get_logger
 from portalab.core.time import Clock, utc_now
 from portalab.modules.retro.models import GameSave, Preference, Sitting
-from portalab.modules.retro.service import TIMEOUT_S, LibraryDenied, RetroService, _value, player_of
+from portalab.modules.retro.service import TIMEOUT_S, LibraryDenied, RetroService, _call, _value, player_of
 
 SLOTS = 5  # the member's own slots (slot 0: where the game was left)
 MAX_BYTES = 9 * 1024 * 1024  # under the portal's default request cap (an emulator's whole memory)
@@ -138,6 +138,33 @@ class SaveService:
         found = await self._find(row, "state", _slot("state", slot), "screenshot")
         kind = picture_type(found.screenshot or b"")
         if found.screenshot is None or kind is None:
+            raise SaveNotFound("No picture for this slot.")
+        return found.screenshot, kind
+
+    async def picture_of_game(self, viewer: Principal, object_id: UUID, slot: int) -> tuple[bytes, str]:
+        """A state's picture for the game's page (the viewer's own; a profile's restrictions hold)."""
+        libraries = self.retro._libraries()
+        sources = await _call_sources(self.retro, viewer, object_id, list(libraries))
+        keys = [(s.service_id, s.external_id) for s in sources]
+        if not keys:
+            raise SaveNotFound("No picture for this slot.")
+        async with self.database.session() as session:
+            rows = list(
+                await session.scalars(
+                    select(GameSave)
+                    .options(undefer(GameSave.screenshot))
+                    .where(
+                        GameSave.user_id == player_of(viewer),
+                        GameSave.object_id == object_id,
+                        GameSave.kind == "state",
+                        GameSave.slot == _slot("state", slot),
+                    )
+                    .order_by(GameSave.updated_at.desc())
+                )
+            )
+        found = next((r for r in rows if (r.service_id, r.external_id) in keys and r.screenshot), None)
+        kind = picture_type(found.screenshot or b"") if found is not None else None
+        if found is None or found.screenshot is None or kind is None:
             raise SaveNotFound("No picture for this slot.")
         return found.screenshot, kind
 
@@ -363,3 +390,7 @@ class SaveService:
                     set_={"data": data, "updated_at": now},
                 )
             )
+
+
+async def _call_sources(retro: RetroService, viewer: Principal, object_id: UUID, services: list[str]) -> Any:
+    return await _call(retro._locator().sources(object_id, viewer, services))
