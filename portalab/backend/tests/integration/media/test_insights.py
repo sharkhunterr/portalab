@@ -562,11 +562,26 @@ async def test_recently_added_and_recent_releases(
                 "e2", kind="episode", title="Two", parent="se1", position=2, at=at(24), released="2026-09-23"
             ),
             library_record("m3", title="Coming", at=at(10), released="2027-01-01"),
+            library_record("b1", kind="book", title="Dune", at=at(3), released="1965-08-01"),
+            library_record("g1", kind="game", title="Zelda", at=at(4)),
         ],
         one,
     )
     await login(client, "zoe")
-    added = (await client.get("/api/v1/media/discovery/new")).json()["items"]
+    # issue 435: one kind's shelf — its own works only, however many episodes came after them
+    books = (await client.get("/api/v1/media/discovery/new", params={"kind": "book"})).json()["items"]
+    assert [i["title"] for i in books] == ["Dune"]
+    games = (await client.get("/api/v1/media/discovery/new", params={"kind": "game"})).json()["items"]
+    assert [i["title"] for i in games] == ["Zelda"]
+    shows = (await client.get("/api/v1/media/discovery/released", params={"kind": "series"})).json()
+    assert [i["title"] for i in shows["items"]] == ["Andor"]
+    bad = await client.get("/api/v1/media/discovery/new", params={"kind": "../x"})
+    assert bad.status_code == 422
+    added = [
+        i
+        for i in (await client.get("/api/v1/media/discovery/new")).json()["items"]
+        if i["kind"] in ("movie", "series")
+    ]
     assert [(i["title"], i["episode"]) for i in added] == [
         ("Andor", "S02E01"),
         ("New film", None),
@@ -578,6 +593,7 @@ async def test_recently_added_and_recent_releases(
         ("Andor", "2026-09-24"),
         ("Old film", "2026-09-20"),
         ("New film", "2021-05-01"),
+        ("Dune", "1965-08-01"),
     ]  # « Coming » is not out yet
     zoe, ctx = Principal(user_id=people["zoe"]), LocaleContext()
     films = await _widget(media, "media.recent_releases").load(zoe, {"kind": "movie"}, ctx)

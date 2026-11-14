@@ -163,12 +163,13 @@ export function useSection(id: string, name: string) {
   });
 }
 
-export function useShelf(shelf: ShelfName) {
+/** A discovery shelf — issue 435: « new » and « released » of one kind of media (``kind``) too. */
+export function useShelf(shelf: ShelfName, kind?: string) {
   return useQuery({
-    queryKey: [...KEY, "shelf", shelf],
+    queryKey: [...KEY, "shelf", shelf, kind ?? ""],
     queryFn: async () => {
       const { data, error, response } = await api.GET("/api/v1/media/discovery/{shelf}", {
-        params: { path: { shelf } },
+        params: { path: { shelf }, query: kind ? { kind } : {} },
       });
       if (!data) fail(error, response);
       return data;

@@ -9950,7 +9950,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Discovery */
+        /**
+         * Discovery
+         * @description A discovery shelf — issue 435: « new » and « released » of one kind of media (``kind``) too.
+         */
         get: operations["discovery_api_v1_media_discovery__shelf__get"];
         put?: never;
         post?: never;
@@ -41355,7 +41358,9 @@ export interface operations {
     };
     discovery_api_v1_media_discovery__shelf__get: {
         parameters: {
-            query?: never;
+            query?: {
+                kind?: string | null;
+            };
             header?: never;
             path: {
                 shelf: string;

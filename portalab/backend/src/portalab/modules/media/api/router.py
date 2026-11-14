@@ -408,7 +408,13 @@ async def facets(
 
 
 @router.get("/media/discovery/{shelf}", response_model=MediaShelf)
-async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf:
+async def discovery(
+    principal: Reader,
+    shelf: str,
+    module: Module,
+    kind: Annotated[str | None, Query(pattern=r"^[a-z]{2,12}$")] = None,
+) -> MediaShelf:
+    """A discovery shelf — issue 435: « new » and « released » of one kind of media (``kind``) too."""
     if shelf == "leaving":
         return await _leaving_shelf(module)
     if shelf not in SHELVES:
@@ -416,7 +422,10 @@ async def discovery(principal: Reader, shelf: str, module: Module) -> MediaShelf
     if shelf in ("new", "released"):  # 027: with when it was added or released
         size = max(1, min(module.config.discovery_shelf_size, 50))
         hidden = await module.gate.hidden(principal)  # 032: not what a profile's age rating keeps from it
-        recents = [r for r in await module.discovery.recent(shelf, limit=size) if r[0].id not in hidden]
+        kinds = [kind] if kind else None
+        recents = [
+            r for r in await module.discovery.recent(shelf, limit=size, kinds=kinds) if r[0].id not in hidden
+        ]
         async with module.database.session() as session:
             images = await module.catalog._images(session, [r.id for r, _ in recents])
         items = [

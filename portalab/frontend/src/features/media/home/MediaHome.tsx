@@ -45,6 +45,8 @@ function useJournal() {
 }
 
 const KINDS = ["movie", "series", "book", "audiobook", "game", "album"];
+/** Issue 435: the kinds with a row of their own on the home (films and series fill the main rows). */
+const SHELF_KINDS = ["book", "audiobook", "game", "album"];
 
 function JournalRail({
   items,
@@ -160,10 +162,14 @@ function TasteRows() {
 }
 
 /** A discovery shelf: shown only when it has something (an empty shelf is not a section). */
-function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
+function Shelf({ name, icon, kind }: { name: ShelfName; icon: string; kind?: string }) {
   const t = useT();
   const format = useFormat();
-  const shelf = useShelf(name);
+  const shelf = useShelf(name, kind);
+  // issue 435: one kind's shelf says it (« Recently added · Books ») and opens that kind's catalog
+  const title = kind
+    ? t(`media:shelf.${name}Of`, { kind: t(`media:kindPlural.${kind}`) })
+    : t(`media:shelf.${name}`);
   // issue 110: the day it goes, as a badge on the poster (like « Available »)
   const leaving = (item: MediaCard) => (
     <LeavingBadge
@@ -185,8 +191,8 @@ function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
   if (shelf.isError) return null;
   if (shelf.isPending) {
     return (
-      <Row icon={icon} title={t(`media:shelf.${name}`)}>
-        <Skeleton shape="tile" count={5} label={t(`media:shelf.${name}`)} />
+      <Row icon={icon} title={title}>
+        <Skeleton shape="tile" count={5} label={title} />
       </Row>
     );
   }
@@ -194,12 +200,16 @@ function Shelf({ name, icon }: { name: ShelfName; icon: string }) {
   return (
     <Row
       icon={icon}
-      title={t(`media:shelf.${name}`)}
-      more={name === "leaving" ? undefined : { to: "/media/browse", label: t("media:home.seeAll") }}
+      title={title}
+      more={
+        name === "leaving"
+          ? undefined
+          : { to: kind ? `/media/browse?kind=${kind}` : "/media/browse", label: t("media:home.seeAll") }
+      }
     >
       <MediaGrid
         items={shelf.data.items}
-        label={t(`media:shelf.${name}`)}
+        label={title}
         rail
         note={note}
         badge={name === "leaving" ? leaving : undefined}
@@ -321,6 +331,10 @@ export function MediaHome() {
       ) : null}
       <Shelf name="trending" icon="trending" />
       <TasteRows />
+      {/* issue 435: each kind the library holds its own row of what arrived last */}
+      {SHELF_KINDS.map((kind) => (
+        <Shelf key={kind} name="new" icon={KIND_ICONS[kind] ?? "sparkles"} kind={kind} />
+      ))}
       {/* #4: what one can ask for, like Seerr's home */}
       <DiscoverShelves />
       <Row icon="list" title={t("media:home.byKind")}>

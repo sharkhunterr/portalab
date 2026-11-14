@@ -14,8 +14,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.modules.media.models import MediaObject, SourceItem
 
-WORKS = ("movie", "series", "book", "audiobook", "game", "album")
-UNITS = ("movie", "episode", "season", "series", "book", "audiobook", "game", "album", "track")
+WORKS = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "game", "album")
+UNITS = (*WORKS, "episode", "season", "track")
+PARTS = {"series": ("episode", "season"), "album": ("track",)}  # what brings a work up
+
+
+def units_of(kinds: Sequence[str] | None) -> tuple[str, ...]:
+    """Issue 435: the source items standing for these kinds of work (a series' episodes, its tracks)."""
+    if not kinds:
+        return UNITS
+    return tuple(unit for kind in kinds if kind in WORKS for unit in (kind, *PARTS.get(kind, ())))
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,7 +91,7 @@ async def recently_added(
             .where(
                 SourceItem.object_id.is_not(None),
                 SourceItem.availability == "available",
-                SourceItem.kind.in_(UNITS),
+                SourceItem.kind.in_(units_of(kinds)),
             )
             .order_by(SourceItem.observed_at.desc())
             .limit(limit * 25)
@@ -104,6 +112,7 @@ async def recent_releases(
                 SourceItem.availability == "available",
                 released.is_not(None),
                 released <= today.isoformat(),
+                SourceItem.kind.in_(units_of(kinds)),
             )
             .order_by(released.desc())
             .limit(limit * 25)

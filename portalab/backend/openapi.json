@@ -54694,6 +54694,7 @@
     },
     "/api/v1/media/discovery/{shelf}": {
       "get": {
+        "description": "A discovery shelf \u2014 issue 435: \u00ab new \u00bb and \u00ab released \u00bb of one kind of media (``kind``) too.",
         "operationId": "discovery_api_v1_media_discovery__shelf__get",
         "parameters": [
           {
@@ -54703,6 +54704,23 @@
             "schema": {
               "title": "Shelf",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z]{2,12}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
             }
           }
         ],
