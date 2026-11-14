@@ -37,6 +37,7 @@ from portalab.modules.notifications.settings import DIGEST, SMTP_PASSWORD, Notif
 EMAIL_JOB = "notifications.send_email"
 BASE_BACKOFF = 30
 MAX_BACKOFF = 3600
+EXTENSIONS = {"jpeg": "jpg"}
 
 
 async def _unnamed() -> str:
@@ -73,16 +74,29 @@ class SmtpTransport:
         mime["From"] = sender(await self.name(), config.email_from)
         mime["To"] = message.to
         mime["Subject"] = message.subject.replace("\n", " ")[:200]
-        mime.set_content(message.text)
+        versions = MIMEPart() if message.html and message.inline else mime
+        versions.set_content(message.text)
         if message.html:
-            mime.add_alternative(message.html, subtype="html")
-            page = mime.get_body(("html",))
-            if message.inline and isinstance(page, MIMEPart):
-                for image in message.inline:  # issue 411: the pictures, with the HTML (multipart/related)
-                    maintype, subtype = image.mime.split("/", 1)
-                    page.add_related(
-                        image.data, maintype, subtype, cid=f"<{image.cid}>", disposition="inline"
-                    )
+            versions.add_alternative(message.html, subtype="html")
+        if versions is not mime:
+            # issues 411/414: the pictures beside both versions (multipart/related > alternative), each named,
+            # inline — laid out as mail clients send them, so none lists them as "noname" attachments
+            mime.set_type("multipart/related")
+            mime.set_param("type", "multipart/alternative")
+            mime.set_payload([versions])
+            for number, image in enumerate(message.inline, 1):
+                maintype, subtype = image.mime.split("/", 1)
+                name = f"image{number}.{EXTENSIONS.get(subtype, subtype)}"
+                mime.add_related(
+                    image.data,
+                    maintype,
+                    subtype,
+                    cid=f"<{image.cid}>",
+                    disposition="inline",
+                    filename=name,
+                    params={"name": name},
+                    headers=[f"X-Attachment-Id: {image.cid}"],
+                )
         password = await self.password()
         await aiosmtplib.send(
             mime,

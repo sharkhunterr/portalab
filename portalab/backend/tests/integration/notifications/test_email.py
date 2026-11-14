@@ -194,8 +194,8 @@ async def test_members_email_switched_off_but_the_administrators(
 
 
 async def test_smtp_carries_the_pictures_inline() -> None:
-    """Issue 411: the pictures travel with the HTML — multipart/alternative > multipart/related, each one
-    inline with the Content-ID the HTML shows."""
+    """Issues 411/414: the pictures travel with the HTML — multipart/related > (multipart/alternative) +
+    pictures, each one inline, named (never a "noname" attachment), with the Content-ID the HTML shows."""
     from portalab.capabilities.notifications import InlineImage
 
     sink = Sink()
@@ -223,15 +223,16 @@ async def test_smtp_carries_the_pictures_inline() -> None:
     finally:
         controller.stop()
     parsed = message_from_bytes(sink.messages[0].content, policy=default)
-    assert parsed.get_content_type() == "multipart/alternative"
-    text_part, related = parsed.get_payload()
+    assert parsed.get_content_type() == "multipart/related"
+    versions, picture = parsed.get_payload()
+    assert versions.get_content_type() == "multipart/alternative"
+    text_part, page = versions.get_payload()
     assert text_part.get_content_type() == "text/plain"
-    assert related.get_content_type() == "multipart/related"
-    page, picture = related.get_payload()
     assert page.get_content_type() == "text/html" and "cid:img1.abc@portalab" in page.get_content()
     assert picture.get_content_type() == "image/jpeg"
     assert picture["Content-ID"] == "<img1.abc@portalab>"
-    assert picture.get_content_disposition() == "inline"
+    assert picture["X-Attachment-Id"] == "img1.abc@portalab"
+    assert picture.get_content_disposition() == "inline" and picture.get_filename() == "image1.jpg"
     assert picture.get_payload(decode=True) == jpeg
 
 
