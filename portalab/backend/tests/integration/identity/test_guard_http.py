@@ -75,3 +75,33 @@ async def test_a_member_probing_the_administration_is_kept_out(
     assert await store.lift(by="console:test", subject="mallory") >= 1
     guard.load(await store.active())
     assert (await client.get("/api/v1/me")).status_code == 200
+
+
+async def test_a_household_profile_refused_by_its_masters_rules_is_no_probe(
+    app: FastAPI, client: httpx.AsyncClient, database: Database
+) -> None:
+    """032: a child profile opening locked titles and withheld features over and over is its master's rules
+    at work — never a block of the master's account; the administration still counts."""
+    from portalab.core.authz_port import Principal
+
+    audit = Audit()
+    _armed(app, database, audit)
+    module = module_of(app)
+    owner = await create_user(module, "parent")
+    created = await module.household.create(
+        Principal(user_id=owner), display_name="Arthur", kind="child", color=None, pin=None
+    )
+    assert (await login(client, "parent")).status_code == 200
+    await client.post("/api/v1/household/switch", json={"user_id": str(created["id"])})
+    refused = [
+        (await client.post("/api/v1/household/profiles", json={"display_name": "X"})).status_code
+        for _ in range(30)
+    ]
+    await _settle()
+    assert set(refused) == {403}
+    assert (await client.get("/api/v1/me")).status_code == 200  # nothing blocked
+    assert not any(e.action == "security.blocked" for e in audit.entries)
+    for _ in range(12):  # probing the administration still counts double
+        await client.get("/api/v1/admin/visuals")
+    await _settle()
+    assert any(e.action == "security.blocked" for e in audit.entries)

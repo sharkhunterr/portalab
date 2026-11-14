@@ -32,6 +32,7 @@ from portalab.core.authorization import (
     require,
     route_access,
 )
+from portalab.core.authz_port import Principal
 from portalab.core.errors import PROBLEM_CONTENT_TYPE, Forbidden, Unauthorized
 from portalab.core.logging import get_logger
 from portalab.modules.identity.guard import IntrusionGuard, weigh
@@ -350,6 +351,12 @@ class SlidingWindowLimiter:
             return None
 
 
+def _household_profile(scope: Scope) -> bool:
+    """032: whether the request was a household profile's (the principal the routes resolved, kept on it)."""
+    principal = (scope.get("state") or {}).get("principal")
+    return isinstance(principal, Principal) and principal.profile_of is not None
+
+
 def _json(headers: Iterable[tuple[bytes, bytes]]) -> bool:
     return any(
         name.lower() == b"content-type"
@@ -576,6 +583,8 @@ class SecurityMiddleware:
         verdict = weigh(raw.decode("latin-1"), query, status)
         if verdict is None:
             return
+        if verdict[1] == "refused" and _household_profile(scope):
+            return  # 032: a profile refused a locked title or a withheld feature: its master's rules
         for block in self.guard.strike(keys, verdict[0], verdict[1], raw.decode("latin-1")):
             app_state = getattr(scope.get("app"), "state", None)
             alert = app_state._state.get("security_alert") if app_state is not None else None
