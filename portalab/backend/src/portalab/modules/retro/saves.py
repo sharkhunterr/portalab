@@ -141,11 +141,14 @@ class SaveService:
             raise SaveNotFound("No picture for this slot.")
         return found.screenshot, kind
 
-    async def picture_of_game(self, viewer: Principal, object_id: UUID, slot: int) -> tuple[bytes, str]:
-        """A state's picture for the game's page (the viewer's own; a profile's restrictions hold)."""
+    async def picture_of_game(
+        self, viewer: Principal, object_id: UUID, slot: int, rom: str | None = None
+    ) -> tuple[bytes, str]:
+        """A state's picture for the game's page (the viewer's own; a profile's restrictions hold) — of one
+        copy of the game (``rom``), else the latest of any."""
         libraries = self.retro._libraries()
         sources = await _call_sources(self.retro, viewer, object_id, list(libraries))
-        keys = [(s.service_id, s.external_id) for s in sources]
+        keys = [(s.service_id, s.external_id) for s in sources if rom is None or s.external_id == rom]
         if not keys:
             raise SaveNotFound("No picture for this slot.")
         async with self.database.session() as session:

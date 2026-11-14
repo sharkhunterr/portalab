@@ -8,6 +8,7 @@ export type Sitting = components["schemas"]["SittingOut"];
 export type Beat = components["schemas"]["BeatOut"];
 export type Progress = components["schemas"]["RetroProgressOut"];
 export type SavedState = components["schemas"]["RetroStateOut"];
+export type RetroRom = components["schemas"]["RetroRomOut"];
 
 /** Whether the title plays here (its platform has an emulator, the library has its file) — quiet otherwise. */
 export function useRetroGame(objectId: string, enabled = true) {
@@ -27,10 +28,14 @@ export function useRetroGame(objectId: string, enabled = true) {
 }
 
 /** 420: ``resume`` — the save state the game starts from (« Continue »); none: a new game. */
-export async function startSitting(objectId: string, resume: number | null = null): Promise<Sitting> {
+export async function startSitting(
+  objectId: string,
+  resume: number | null = null,
+  rom: string | null = null,
+): Promise<Sitting> {
   const { data } = await api.POST("/api/v1/retro/games/{object_id}/sittings", {
     params: { path: { object_id: objectId } },
-    body: { resume },
+    body: { resume, rom },
   });
   if (!data) throw new Error("empty sitting");
   return data;
@@ -141,12 +146,21 @@ export function keepPreferences(core: string, data: EmulatorPreferences): Promis
   });
 }
 
-/** A save state's picture on the game's page (the viewer's own), outside any sitting. */
-export function gamePictureUrl(objectId: string, slot: number, version: string): string {
-  return `/api/v1/retro/games/${objectId}/states/${slot}/picture?v=${encodeURIComponent(version)}`;
+/** A save state's picture on the game's page (the viewer's own, of one copy), outside any sitting. */
+export function gamePictureUrl(objectId: string, slot: number, version: string, rom?: string | null): string {
+  const of = rom ? `&rom=${encodeURIComponent(rom)}` : "";
+  return `/api/v1/retro/games/${objectId}/states/${slot}/picture?v=${encodeURIComponent(version)}${of}`;
 }
 
-/** The play page of a game: a new game, or resuming from one of its save states. */
-export function playUrl(objectId: string, resume: number | null): string {
-  return resume === null ? `/media/${objectId}/play?new=1` : `/media/${objectId}/play?resume=${resume}`;
+/** The play page of a game: choosing where to resume (the default), a new game, or one save at once. */
+export function playUrl(
+  objectId: string,
+  how: { fresh?: boolean; resume?: number; rom?: string | null } = {},
+): string {
+  const query = new URLSearchParams();
+  if (how.fresh) query.set("new", "1");
+  if (how.resume !== undefined) query.set("resume", String(how.resume));
+  if (how.rom) query.set("rom", how.rom);
+  const text = query.toString();
+  return `/media/${objectId}/play${text ? `?${text}` : ""}`;
 }

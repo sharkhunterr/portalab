@@ -19917,12 +19917,18 @@ export interface components {
             /** Platform */
             platform: string;
             progress?: components["schemas"]["RetroProgressOut"] | null;
+            /** Rom */
+            rom?: string | null;
+            /** Roms */
+            roms?: components["schemas"]["RetroRomOut"][];
             /** Service Name */
             service_name?: string | null;
             /** Threads */
             threads: boolean;
             /** Title */
             title: string;
+            /** Variant */
+            variant?: string | null;
         };
         /** RetroPreferencesIn */
         RetroPreferencesIn: {
@@ -19951,6 +19957,29 @@ export interface components {
             sram_at: string | null;
             /** States */
             states: components["schemas"]["RetroStateOut"][];
+        };
+        /**
+         * RetroRomOut
+         * @description 420: one copy of the game played here (several ROMs of one game: regions, revisions, platforms).
+         */
+        RetroRomOut: {
+            /** Core */
+            core: string;
+            /**
+             * Engine
+             * @default emulatorjs
+             * @enum {string}
+             */
+            engine: "emulatorjs" | "ruffle";
+            /** Id */
+            id: string;
+            /** Platform */
+            platform: string;
+            progress: components["schemas"]["RetroProgressOut"];
+            /** Size */
+            size?: number | null;
+            /** Variant */
+            variant?: string | null;
         };
         /** RetroStateOut */
         RetroStateOut: {
@@ -20461,6 +20490,8 @@ export interface components {
         SittingIn: {
             /** Resume */
             resume?: number | null;
+            /** Rom */
+            rom?: string | null;
         };
         /** SittingOut */
         SittingOut: {

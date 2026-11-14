@@ -20,7 +20,7 @@ Your progress follows **you** (your profile, in a household), on every device:
 
 - **The game's own save** (what the game saves itself, as on the console) is kept every minute while you play and when you leave, and loaded when you play again.
 - **Save states**: open **Saves** (the floppy disk at the top right while playing) and use **« Save here »** on one of the 5 slots — the slot keeps a picture of the screen — then **« Load »** whenever you want. The emulator's own *Save State* / *Load State* buttons use the slot you last chose.
-- **Resume**: leaving the game keeps where you are (« Where you left off », with a picture of the screen). The game's page then offers **« Resume »** — choose the save, each shown with its picture and date — or **« New game »** (your game's own save is still there).
+- **Resume**: leaving the game keeps where you are (« Where you left off », with a picture of the screen). The game's page always shows **your saves** (picture, slot, date — one of them opens the game on it at once), with **« Resume »** (the game then asks which save) and **« New game »** (your game's own save is still there). When the library holds several versions of the game (regions, languages, revisions), a new game asks which one to start, and each version keeps its own saves.
 - Each save and state is also **copied to RomM**, labelled « Portalab » and with your name, so you find them in RomM too. A member's or a profile's saves are never another's.
 - A save state is the emulator's whole memory: for the largest consoles it may exceed what the portal accepts (10 MB unless your administrator raised it).
 

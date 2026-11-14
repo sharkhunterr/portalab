@@ -5,9 +5,9 @@
   display: grid;
   gap: var(--space-2);
 }
-.retro-resume p {
+.retro-resume h3 {
   margin: 0;
-  color: var(--color-text-muted);
+  font-size: var(--font-size-md, 1rem);
 }
 .retro-chooser {
   display: grid;
@@ -77,4 +77,19 @@
 }
 .retro-start .retro-chooser__text small {
   color: var(--player-ink-muted);
+}
+
+.retro-roms {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: min(100%, 30rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.retro-roms__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
 }

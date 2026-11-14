@@ -22,7 +22,7 @@ import {
 } from "./api";
 import { LoadingSteps } from "./LoadingSteps";
 import { type StepKey, useEmulatorLoading } from "./loading";
-import { SaveChooser, statesOf } from "./Resume";
+import { entriesOf, keyOf, RomChooser, romsOf, SaveChooser } from "./Resume";
 import { emulator, picture, SaveKeeper } from "./saves";
 import "../media/player/player.css";
 import "./retro.css";
@@ -169,7 +169,9 @@ export function RetroPage() {
   const [slot, setSlot] = useState(1);
   const [notice, setNotice] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
-  const [choice, setChoice] = useState<number | null | undefined>(undefined); // 420: the save to resume
+  const [choice, setChoice] = useState<string | null | undefined>(undefined); // 420: the save to resume
+  const [romChoice, setRomChoice] = useState<string | null>(null); // the copy to start a new game with
+  const [fresh, setFresh] = useState<boolean | null>(null); // a new game asked here
   const [resumed, setResumed] = useState<number | null>(null);
   const current = useRef<string | null>(null);
   const keeper = useRef<SaveKeeper | null>(null);
@@ -249,11 +251,11 @@ export function RetroPage() {
     refresh();
   };
 
-  const start = async (resume: number | null) => {
+  const start = async (resume: number | null, rom: string | null = null) => {
     setResumed(resume);
     setStage("starting");
     try {
-      const started = await startSitting(objectId, resume);
+      const started = await startSitting(objectId, resume, rom);
       current.current = started.id;
       const saves = new SaveKeeper(started);
       keeper.current = saves;
@@ -364,11 +366,16 @@ export function RetroPage() {
     );
   }
   const info = game.data;
-  const states = statesOf(info);
-  const asked = params.get("resume");
-  const wanted = asked !== null && states.some((s) => String(s.slot) === asked) ? Number(asked) : null;
-  const chosen =
-    choice !== undefined ? choice : params.get("new") ? null : (wanted ?? states[0]?.slot ?? null);
+  const entries = entriesOf(info);
+  const roms = romsOf(info);
+  const askedRom = params.get("rom");
+  const asked =
+    params.get("resume") !== null ? `${askedRom ?? entries[0]?.rom}:${params.get("resume")}` : null;
+  const wanted = entries.find((e) => keyOf(e) === asked) ?? entries[0] ?? null;
+  const chosenKey = choice !== undefined ? choice : wanted ? keyOf(wanted) : null;
+  const chosen = entries.find((e) => keyOf(e) === chosenKey) ?? null;
+  const fresher = fresh ?? (Boolean(params.get("new")) || !entries.length);
+  const rom = romChoice ?? (roms.some((r) => r.id === askedRom) ? askedRom : (roms[0]?.id ?? null));
   const ruffle = info.engine === "ruffle";
   const steps: StepKey[] = ruffle
     ? ["sitting", "emulator", "start"]
@@ -449,35 +456,61 @@ export function RetroPage() {
           <div className="retro-start">
             <Icon name="joystick" size={40} />
             <p>{t("retro:intro", { title: info.title })}</p>
-            {states.length ? (
+            {!fresher ? (
               <>
                 <small className="retro-hint">{t("retro:resume.choose")}</small>
                 <SaveChooser
                   objectId={objectId}
-                  states={states}
-                  selected={chosen}
-                  onSelect={setChoice}
+                  entries={entries}
+                  selected={chosen ? keyOf(chosen) : null}
+                  onSelect={(entry) => setChoice(keyOf(entry))}
                   label={t("retro:resume.choose")}
+                  copies={roms.length > 1}
                 />
                 <div className="retro-start__actions">
                   <button
                     type="button"
                     className="player-pill"
                     data-primary
-                    disabled={chosen === null}
-                    onClick={() => void start(chosen)}
+                    disabled={!chosen}
+                    onClick={() => chosen && void start(chosen.slot, chosen.rom)}
                   >
                     {t("retro:continue")}
                   </button>
-                  <button type="button" className="player-pill" onClick={() => void start(null)}>
+                  <button type="button" className="player-pill" onClick={() => setFresh(true)}>
                     {t("retro:newGame")}
                   </button>
                 </div>
               </>
             ) : (
-              <button type="button" className="player-pill" data-primary onClick={() => void start(null)}>
-                {t("retro:play")}
-              </button>
+              <>
+                {roms.length > 1 ? (
+                  <>
+                    <small className="retro-hint">{t("retro:roms.choose")}</small>
+                    <RomChooser
+                      roms={roms}
+                      selected={rom}
+                      onSelect={setRomChoice}
+                      label={t("retro:roms.choose")}
+                    />
+                  </>
+                ) : null}
+                <div className="retro-start__actions">
+                  <button
+                    type="button"
+                    className="player-pill"
+                    data-primary
+                    onClick={() => void start(null, rom)}
+                  >
+                    {t(entries.length ? "retro:newGame" : "retro:play")}
+                  </button>
+                  {entries.length ? (
+                    <button type="button" className="player-pill" onClick={() => setFresh(false)}>
+                      {t("retro:resume.back")}
+                    </button>
+                  ) : null}
+                </div>
+              </>
             )}
             {info.threads && !window.crossOriginIsolated ? (
               <small className="retro-hint">{t("retro:threads")}</small>

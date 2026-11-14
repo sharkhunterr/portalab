@@ -187,14 +187,16 @@ class RetroService:
         locator: GameSourceLocator = providers[0].provider
         return locator
 
-    async def game(self, viewer: Principal, object_id: UUID) -> Playable:
-        """The first of the title's games a library holds that the portal plays (its core, its file there)."""
+    async def games(self, viewer: Principal, object_id: UUID) -> list[Playable]:
+        """Every copy of the title the portal plays (its core, its file in the library) — several ROMs of one
+        game (regions, revisions, platforms) for the member to choose from; the most recently seen first."""
         libraries = self._libraries()
         if not libraries:
             raise NotPlayable("No library plays its games in the portal.")
         sources: Sequence[GameSource] = await _call(
             self._locator().sources(object_id, viewer, list(libraries))
         )
+        found: list[Playable] = []
         for source in sources:
             library, name = libraries[str(source.service_id)]
             game: RetroGame | None = await _call(library.game(source.external_id))
@@ -202,12 +204,24 @@ class RetroService:
                 continue
             core = core_for(game.platform)
             if core is not None:
-                return Playable(source=source, game=game, core=core, service_name=name)
-        raise NotPlayable("No emulator here plays this game.")
+                found.append(Playable(source=source, game=game, core=core, service_name=name))
+        if not found:
+            raise NotPlayable("No emulator here plays this game.")
+        return found
+
+    async def game(self, viewer: Principal, object_id: UUID, rom: str | None = None) -> Playable:
+        """One copy of the title: the one asked (``rom``: its id in the library), else the first."""
+        found = await self.games(viewer, object_id)
+        if rom is None:
+            return found[0]
+        chosen = next((p for p in found if p.game.external_id == rom), None)
+        if chosen is None:
+            raise NotPlayable("This copy of the game is not played here.")
+        return chosen
 
     # --- a sitting ------------------------------------------------------------------------------------------
-    async def start(self, viewer: Principal, object_id: UUID) -> Started:
-        playable = await self.game(viewer, object_id)
+    async def start(self, viewer: Principal, object_id: UUID, rom: str | None = None) -> Started:
+        playable = await self.game(viewer, object_id, rom)
         library = self._library(playable.source.service_id)
         try:
             firmware: Sequence[RetroFirmware] = await _call(library.firmware(playable.game.platform_id))

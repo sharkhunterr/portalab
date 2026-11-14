@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 from urllib.parse import quote
 from uuid import UUID
 
-from fastapi import APIRouter, Header, Path, Request, status
+from fastapi import APIRouter, Header, Path, Query, Request, status
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -51,6 +51,18 @@ class RetroProgressOut(BaseModel):
     slots: int
 
 
+class RetroRomOut(BaseModel):
+    """420: one copy of the game played here (several ROMs of one game: regions, revisions, platforms)."""
+
+    id: str
+    variant: str | None = None
+    platform: str
+    core: str
+    engine: Literal["emulatorjs", "ruffle"] = "emulatorjs"
+    size: int | None = None
+    progress: RetroProgressOut
+
+
 class RetroGameOut(BaseModel):
     title: str
     platform: str
@@ -60,10 +72,16 @@ class RetroGameOut(BaseModel):
     progress: RetroProgressOut | None = None
     engine: Literal["emulatorjs", "ruffle"] = "emulatorjs"  # 421
     control_scheme: str | None = None  # 421: the virtual gamepad of a Sega console
+    rom: str | None = None  # 420: which copy this is (its id in the library)
+    variant: str | None = None
+    roms: list[RetroRomOut] = Field(default_factory=list)  # every copy played here, with its progress
 
 
 class SittingIn(BaseModel):
     resume: int | None = Field(default=None, ge=0, le=SLOTS)  # 420: the save state to start from
+    rom: str | None = Field(
+        default=None, max_length=200
+    )  # 420: the copy of the game to play (else the first)
 
 
 class FirmwareOut(BaseModel):
@@ -116,6 +134,20 @@ def _game(playable: Playable, progress: Progress | None = None) -> RetroGameOut:
         progress=_progress(progress) if progress is not None else None,
         engine="ruffle" if playable.engine == "ruffle" else "emulatorjs",
         control_scheme=playable.control_scheme,
+        rom=playable.game.external_id,
+        variant=playable.game.variant,
+    )
+
+
+def _rom(playable: Playable, progress: Progress) -> RetroRomOut:
+    return RetroRomOut(
+        id=playable.game.external_id,
+        variant=playable.game.variant,
+        platform=playable.game.platform,
+        core=playable.core,
+        engine="ruffle" if playable.engine == "ruffle" else "emulatorjs",
+        size=playable.game.size,
+        progress=_progress(progress),
     )
 
 
@@ -149,18 +181,19 @@ def _file_name(name: str, multi: bool) -> str:
 async def retro_game(principal: Player, module: Module, object_id: UUID) -> RetroGameOut:
     """Whether the title plays in the portal — its platform and emulator (404 ``retro.not_playable``) — and
     the player's progress in it."""
-    playable = await module.service.game(principal, object_id)
-    progress = await module.saves.progress(
-        player_of(principal), playable.source.service_id, playable.game.external_id
-    )
-    return _game(playable, progress)
+    found = await module.service.games(principal, object_id)
+    player = player_of(principal)
+    progress = [await module.saves.progress(player, p.source.service_id, p.game.external_id) for p in found]
+    out = _game(found[0], progress[0])
+    out.roms = [_rom(p, made) for p, made in zip(found, progress, strict=True)]
+    return out
 
 
 @router.post("/games/{object_id}/sittings", response_model=SittingOut, status_code=status.HTTP_201_CREATED)
 async def start_sitting(
     principal: Player, module: Module, object_id: UUID, body: SittingIn | None = None
 ) -> SittingOut:
-    started = await module.service.start(principal, object_id)
+    started = await module.service.start(principal, object_id, body.rom if body is not None else None)
     playable, sitting = started.playable, started.sitting
     progress = await module.saves.progress(
         player_of(principal), playable.source.service_id, playable.game.external_id
@@ -329,9 +362,16 @@ async def state_picture(principal: Player, module: Module, sitting_id: UUID, slo
 
 
 @router.get("/games/{object_id}/states/{slot}/picture", include_in_schema=False)
-async def game_state_picture(principal: Player, module: Module, object_id: UUID, slot: SLOT) -> Response:
-    """A save state's picture, for choosing where to resume from the game's page."""
-    data, kind = await module.saves.picture_of_game(principal, object_id, slot)
+async def game_state_picture(
+    principal: Player,
+    module: Module,
+    object_id: UUID,
+    slot: SLOT,
+    rom: Annotated[str | None, Query(max_length=200)] = None,
+) -> Response:
+    """A save state's picture (of one copy of the game, ``rom``), for choosing where to resume from the
+    game's page."""
+    data, kind = await module.saves.picture_of_game(principal, object_id, slot, rom)
     return _bytes(data, kind)
 
 

@@ -19,7 +19,13 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { chooseFirmware, emulatorLanguage, type Sitting } from "../../../src/features/retro/api";
+import {
+  chooseFirmware,
+  emulatorLanguage,
+  type Progress,
+  type RetroRom,
+  type Sitting,
+} from "../../../src/features/retro/api";
 import { RetroPlayButtons } from "../../../src/features/retro/Resume";
 import RetroPage from "../../../src/features/retro/RetroPage";
 import { json } from "../../support/fake-api";
@@ -32,7 +38,20 @@ const GAME = {
   threads: false,
   service_name: "RomM",
   engine: "emulatorjs" as const,
+  rom: "r1",
+  roms: [] as RetroRom[],
 };
+const EMPTY: Progress = { sram_at: null, states: [], latest_slot: null, slots: 5 };
+const rom = (id: string, variant: string | null, progress: Progress = EMPTY): RetroRom => ({
+  id,
+  variant,
+  platform: "snes",
+  core: "snes9x",
+  engine: "emulatorjs" as const,
+  size: 9,
+  progress,
+});
+GAME.roms = [rom("r1", null)];
 const BASE = "/api/v1/retro/sittings/0190f0a0-0000-7000-8000-0000000000dd";
 const SITTING: Sitting = {
   id: "0190f0a0-0000-7000-8000-0000000000dd",
@@ -174,7 +193,8 @@ describe("saves and states (issue 420)", () => {
     let started: unknown = null;
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
-      if (path === `/api/v1/retro/games/${OBJECT}`) return json(200, { ...GAME, progress: PROGRESS });
+      if (path === `/api/v1/retro/games/${OBJECT}`)
+        return json(200, { ...GAME, progress: PROGRESS, roms: [rom("r1", null, PROGRESS)] });
       if (path === `/api/v1/retro/games/${OBJECT}/sittings`) {
         started = await request.json();
         return json(201, { ...SITTING, state_url: `${BASE}/states/0` });
@@ -206,7 +226,7 @@ describe("saves and states (issue 420)", () => {
     expect(latest.getAttribute("aria-pressed")).toBe("true"); // the latest, chosen
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     await waitFor(() => expect(w.EJS_loadStateURL).toBe(`${BASE}/states/0`));
-    expect(started).toEqual({ resume: 0 });
+    expect(started).toEqual({ resume: 0, rom: "r1" });
     act(() => (w.EJS_onGameStart as () => void)());
 
     fireEvent.click(await screen.findByRole("button", { name: "Saves" }));
@@ -335,33 +355,55 @@ describe("loading, step by step (issue 420)", () => {
 });
 
 describe("the game's page (issue 420)", () => {
-  it("offers to resume, choosing the save, or a new game", async () => {
-    const saved = {
-      ...GAME,
-      progress: {
-        sram_at: null,
+  const saved = {
+    ...GAME,
+    roms: [
+      rom("r1", "Europe", {
+        ...EMPTY,
         latest_slot: 2,
-        slots: 5,
         states: [
           { slot: 0, size: 8, updated_at: "2026-11-14T20:00:00Z", has_picture: true },
           { slot: 2, size: 8, updated_at: "2026-11-14T21:00:00Z", has_picture: false },
         ],
-      },
-    };
+      }),
+      rom("r2", "Europe, Netherlands"),
+    ],
+  };
+
+  it("always shows the saves; « Resume » asks which on the play page, a save opens the game on it", () => {
     show(<RetroPlayButtons objectId={OBJECT} game={saved} />);
+    expect(screen.getByRole("link", { name: /Resume/ }).getAttribute("href")).toBe(`/media/${OBJECT}/play`);
     expect(screen.getByRole("link", { name: /New game/ }).getAttribute("href")).toBe(
       `/media/${OBJECT}/play?new=1`,
     );
-    fireEvent.click(screen.getByRole("button", { name: /Resume/ }));
-    const choices = screen.getAllByRole("button", { name: /Slot 2|Where you left off/ });
-    expect(choices.map((c) => c.textContent)).toEqual([
-      expect.stringMatching(/^Slot 2/),
+    const list = screen.getByRole("list", { name: "Your saves" });
+    const items = Array.from(list.querySelectorAll("button")).map((b) => b.textContent);
+    expect(items).toEqual([
+      expect.stringMatching(/^Slot 2.*Europe$/),
       expect.stringMatching(/^Where you left off/),
     ]);
-    expect(document.querySelector(".retro-chooser img")?.getAttribute("src")).toContain(
-      `/api/v1/retro/games/${OBJECT}/states/0/picture`,
-    );
-    fireEvent.click(choices[0] as HTMLElement);
-    expect(assign).toHaveBeenCalledWith(`/media/${OBJECT}/play?resume=2`);
+    expect(list.querySelector("img")?.getAttribute("src")).toContain(`/states/0/picture`);
+    expect(list.querySelector("img")?.getAttribute("src")).toContain("rom=r1");
+    fireEvent.click(screen.getAllByRole("button", { name: /Slot 2/ })[0] as HTMLElement);
+    expect(assign).toHaveBeenCalledWith(`/media/${OBJECT}/play?resume=2&rom=r1`);
+  });
+
+  it("asks which version to start for a new game when there are several", async () => {
+    let body: unknown = null;
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === `/api/v1/retro/games/${OBJECT}`) return json(200, saved);
+      if (path === `/api/v1/retro/games/${OBJECT}/sittings`) {
+        body = await request.json();
+        return json(201, SITTING);
+      }
+      return json(404, {});
+    };
+    show(<RetroPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "New game" }));
+    expect(await screen.findByText("Which version of the game do you start?")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Europe, Netherlands/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: "New game" })[0] as HTMLElement);
+    await waitFor(() => expect(body).toEqual({ resume: null, rom: "r2" }));
   });
 });

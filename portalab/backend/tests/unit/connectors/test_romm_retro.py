@@ -15,7 +15,7 @@ from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import ACTIVITY_HISTORY
 from portalab.capabilities.results import ProviderAuthError, ProviderNotFound
 from portalab.capabilities.retro import RETRO_SOURCE, MemberAccount, RetroSource
-from portalab.connectors.romm import RommConnector, game_rating
+from portalab.connectors.romm import RommConnector, game_rating, rom_variant
 
 ROM = {
     "id": 12,
@@ -285,3 +285,12 @@ async def test_a_members_authorisation_and_token(server: _Server) -> None:
     assert made.headers["authorization"] == "Bearer tok-m"
     await retro.end_link(member)
     assert server.requests[-1].url.path == "/api/devices/d-7"
+
+
+def test_a_roms_copy_is_told_by_its_regions_revision_and_languages() -> None:
+    """Issue 420: several copies of one game, told apart."""
+    assert rom_variant(
+        {"regions": ["Europe", "Netherlands"], "revision": "Rev 1", "languages": ["En", "Nl"]}
+    ) == ("Europe, Netherlands · Rev 1 · En, Nl")
+    assert rom_variant({"regions": [], "fs_name_no_ext": "Tintin (Proto)"}) == "Tintin (Proto)"
+    assert rom_variant({}) is None

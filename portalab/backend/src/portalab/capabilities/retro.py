@@ -34,6 +34,7 @@ class RetroGame:
     size: int | None = None
     multi: bool = False  # several files: the library sends them as one archive
     present: bool = True  # its file is on the library's disk
+    variant: str | None = None  # which copy this is: its regions, revision, languages (several of one game)
 
 
 @dataclass(frozen=True, slots=True)

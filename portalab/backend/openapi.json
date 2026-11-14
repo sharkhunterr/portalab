@@ -19789,6 +19789,24 @@
               }
             ]
           },
+          "rom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rom"
+          },
+          "roms": {
+            "items": {
+              "$ref": "#/components/schemas/RetroRomOut"
+            },
+            "title": "Roms",
+            "type": "array"
+          },
           "service_name": {
             "anyOf": [
               {
@@ -19807,6 +19825,17 @@
           "title": {
             "title": "Title",
             "type": "string"
+          },
+          "variant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant"
           }
         },
         "required": [
@@ -19895,6 +19924,65 @@
           "slots"
         ],
         "title": "RetroProgressOut",
+        "type": "object"
+      },
+      "RetroRomOut": {
+        "description": "420: one copy of the game played here (several ROMs of one game: regions, revisions, platforms).",
+        "properties": {
+          "core": {
+            "title": "Core",
+            "type": "string"
+          },
+          "engine": {
+            "default": "emulatorjs",
+            "enum": [
+              "emulatorjs",
+              "ruffle"
+            ],
+            "title": "Engine",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "platform": {
+            "title": "Platform",
+            "type": "string"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/RetroProgressOut"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "variant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant"
+          }
+        },
+        "required": [
+          "id",
+          "platform",
+          "core",
+          "progress"
+        ],
+        "title": "RetroRomOut",
         "type": "object"
       },
       "RetroStateOut": {
@@ -21429,6 +21517,18 @@
               }
             ],
             "title": "Resume"
+          },
+          "rom": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rom"
           }
         },
         "title": "SittingIn",

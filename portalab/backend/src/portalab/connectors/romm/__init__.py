@@ -121,6 +121,18 @@ def play_times(game: Mapping[str, Any]) -> dict[str, dict[str, float | int | Non
     return out
 
 
+def rom_variant(rom: Mapping[str, Any]) -> str | None:
+    """Issue 420: which copy of a game a ROM is — its regions, revision and languages (« Europe, Netherlands ·
+    Rev 1 »), else its file's name — to tell several copies of one game apart."""
+    parts = [
+        ", ".join(_names(rom.get("regions"))),
+        str(rom.get("revision") or "").strip(),
+        ", ".join(_names(rom.get("languages"))),
+    ]
+    found = " · ".join(p for p in parts if p)
+    return (found or str(rom.get("fs_name_no_ext") or rom.get("fs_name") or ""))[:200] or None
+
+
 def game_rating(game: Mapping[str, Any]) -> str | None:
     """Issue 421: a game's strictest age rating among IGDB's (PEGI, ESRB, USK, CERO…, as RomM keeps them:
     ``{"category": "PEGI", "rating": "Twelve"}``), as its label (« PEGI 12 », « ESRB T »); ``None``: unrated
@@ -455,6 +467,7 @@ class _Retro:
             size=int(size) if isinstance(size, int) else None,
             multi=bool(rom.get("has_multiple_files")),
             present=not rom.get("missing_from_fs") and rom.get("has_file_on_disk") is not False,
+            variant=rom_variant(rom),
         )
 
     async def firmware(self, platform_id: str) -> Sequence[RetroFirmware]:
