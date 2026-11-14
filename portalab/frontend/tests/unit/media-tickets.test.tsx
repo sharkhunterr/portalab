@@ -35,10 +35,14 @@ const ticket = (id: string, title: string, open: boolean, mine: boolean) => ({
   updated_at: AT,
 });
 
+// 032: a member who may open tickets (a household profile kept out of the support asks nothing)
+const PERMISSIONS = { permissions: ["tickets.create"], roles: ["user"] };
+
 function show() {
   const asked: string[] = [];
   fake.handler = (request) => {
     const url = new URL(request.url);
+    if (url.pathname === "/api/v1/me/permissions") return json(200, PERMISSIONS);
     if (url.pathname !== "/api/v1/tickets/media/m-1") return json(200, []);
     const closed = url.searchParams.get("closed") === "true";
     asked.push(String(closed));
@@ -79,10 +83,11 @@ describe("a media's reports", () => {
   });
 
   it("flags a poster with its open reports, how many when more than one", async () => {
-    fake.handler = (request) =>
-      new URL(request.url).pathname === "/api/v1/media-tickets/open"
-        ? json(200, { "m-1": 2, "m-2": 1 })
-        : json(200, {});
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/me/permissions") return json(200, PERMISSIONS);
+      return path === "/api/v1/media-tickets/open" ? json(200, { "m-1": 2, "m-2": 1 }) : json(200, {});
+    };
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
       <QueryClientProvider client={client}>

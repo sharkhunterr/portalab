@@ -13,6 +13,27 @@ import { PosterTickets } from "../../support/tickets/MediaTickets";
 /** A title one can ask for, as a poster card: its state on the poster, a click to its page. */
 export function RequestableCard({ item }: { item: Requestable }) {
   const t = useT();
+  if (item.locked) {
+    // 032: kept from this household profile — shown locked, opened nowhere
+    return (
+      <li className="media-card discover-card" data-locked>
+        <span className="media-card__link" aria-disabled="true">
+          <span className="media-card__frame">
+            <Poster src={metadataImage(item.poster, "w342")} kind={item.kind} />
+            <span className="media-card__lock" title={t("household:lockedBadge")}>
+              <Icon name="lock" size={22} />
+              <span className="visually-hidden">{t("household:lockedBadge")}</span>
+            </span>
+          </span>
+          <span className="media-card__title">{item.title}</span>
+        </span>
+        <span className="media-card__meta">
+          {t(`media:kind.${item.kind}`)}
+          {item.year ? ` · ${item.year}` : ""}
+        </span>
+      </li>
+    );
+  }
   return (
     <li className="media-card discover-card" data-status={item.status}>
       <Link to={item.route} className="media-card__link">

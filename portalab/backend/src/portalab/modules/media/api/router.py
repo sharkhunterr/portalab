@@ -472,6 +472,7 @@ async def discover_search(
     """#4: films and series one can ask for (the request service's search, over TMDB), each with its
     page in the catalog when it is there and the open request for it (mine, or a member's)."""
     items = await module.requestable.search(q, _me(principal), await module.member_language(principal), page)
+    items = await module.gate.requestable(principal, items)  # 032: a household profile's restrictions
     return {"items": items, "configured": module.requestable.configured()}
 
 
@@ -484,6 +485,7 @@ async def discover_shelf(
     """#4: a shelf like the request service's own — ``trending``, ``popular_movies``,
     ``popular_series``, ``upcoming_movies``, ``upcoming_series``."""
     items = await module.requestable.shelf(name, _me(principal), await module.member_language(principal))
+    items = await module.gate.requestable(principal, items)  # 032: a household profile's restrictions
     return {"items": items, "configured": module.requestable.configured()}
 
 

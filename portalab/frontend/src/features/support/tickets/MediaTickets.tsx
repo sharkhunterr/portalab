@@ -5,6 +5,7 @@ import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useHasPermission } from "../../authz/useMyPermissions";
 import { StateBadge } from "./TicketBadges";
 import "../support.css";
 
@@ -15,9 +16,13 @@ import "../support.css";
  */
 export const MEDIA_TICKETS_ID = "media-tickets";
 
+const TICKETS = "tickets.create"; // the support's tickets — withheld from a profile its master keeps out of it
+
 export function useMediaTickets(mediaId: string, closed = false) {
+  const allowed = useHasPermission(TICKETS); // 032: a household profile kept out of the support asks nothing
   return useQuery({
     queryKey: ["support", "media", mediaId, closed],
+    enabled: allowed,
     retry: false,
     queryFn: async () =>
       (
@@ -30,8 +35,10 @@ export function useMediaTickets(mediaId: string, closed = false) {
 
 /** Issue 354: per media, how many open reports I may see — one ask for every poster on the page. */
 export function useOpenMediaTickets() {
+  const allowed = useHasPermission(TICKETS);
   return useQuery({
     queryKey: ["support", "media-open"],
+    enabled: allowed,
     retry: false,
     staleTime: 60_000,
     queryFn: async () => ((await api.GET("/api/v1/media-tickets/open")).data ?? {}) as Record<string, number>,

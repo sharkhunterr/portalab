@@ -232,6 +232,32 @@ class TitleGate:
         now = datetime.now(zone)
         return now.replace(hour=0, minute=0, second=0, microsecond=0)
 
+    async def requestable(
+        self, viewer: Principal | UUID | None, items: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """032: the request service's titles (TMDB's shelves and search) for a restricted profile — one in the
+        library follows its lock; one outside it has no known rating: unrated (left out when the profile opens
+        rated titles only, or films and series are kept from it). Locked ones carry ``locked`` (lock mode)."""
+        restrictions = await self.restrictions(viewer)
+        if restrictions is None:
+            return items
+        blocked = await self.blocked(viewer)
+        kept_kinds = restrictions.kinds
+        out: list[dict[str, Any]] = []
+        for item in items:
+            object_id = _id_of(item, "object_id")
+            kind = "movie" if item.get("kind") == "movie" else "series"
+            kept = (
+                object_id in blocked
+                if object_id is not None
+                else kind in kept_kinds or not restrictions.allow_unrated
+            )
+            if not kept:
+                out.append(item)
+            elif restrictions.mode == "lock":
+                out.append({**item, "locked": True})
+        return out
+
     def forget(self) -> None:
         self._cache.clear()
 

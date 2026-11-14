@@ -4,6 +4,7 @@ import type { Metadata } from "../detail/Enrichment";
 
 /** #4: what one can ask for (the request service's search, shelves and details) and #3 my quota. */
 export interface Requestable {
+  locked?: boolean; // 032: kept from this household profile, shown locked by its master's choice
   tmdb_id: string;
   kind: "movie" | "series";
   title: string;

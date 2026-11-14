@@ -297,3 +297,30 @@ async def test_kinds_titles_and_screen_time(
     seen = await client.get("/api/v1/me/media/screen-time", params={"profile": str(lea)})
     assert seen.json() == {"used": 20, "allowed": 15}  # its master sees it
     assert (await client.get("/api/v1/me/media/screen-time")).json() is None  # the master has none
+
+
+async def test_the_request_services_titles_follow_the_profile(app: FastAPI, media: MediaHarness) -> None:
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    identity = module_of(app)
+    owner = Principal(user_id=people["zoe"])
+    created = await identity.household.create(owner, display_name="Léa", kind="child", color=None, pin=None)
+    lea = UUID(str(created["id"]))
+    viewer = Principal(user_id=lea, profile_of=people["zoe"])
+    items = [
+        {"tmdb_id": "1", "kind": "movie", "title": "Alien", "object_id": str(ids["Alien"])},
+        {"tmdb_id": "2", "kind": "movie", "title": "Toy Story", "object_id": str(ids["Toy Story"])},
+        {"tmdb_id": "3", "kind": "movie", "title": "Outside", "object_id": None},  # no known rating
+    ]
+    assert [i["title"] for i in await media.module.gate.requestable(viewer, items)] == ["Toy Story"]
+    await identity.household.change(
+        owner, lea, restrictions=RestrictionSettings(max_age=12, allow_unrated=True, mode="lock")
+    )
+    media.module.gate.forget()
+    shown = await media.module.gate.requestable(viewer, items)
+    assert [(i["title"], i.get("locked", False)) for i in shown] == [
+        ("Alien", True),
+        ("Toy Story", False),
+        ("Outside", False),  # unrated titles allowed: kept
+    ]
+    assert await media.module.gate.requestable(owner, items) == items  # the master sees them all
