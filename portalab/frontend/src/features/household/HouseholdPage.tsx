@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
@@ -10,6 +10,7 @@ import { FunctionalState } from "../../design-system/state/FunctionalState";
 import { useFormat } from "../../i18n/format/useFormat";
 import { useT } from "../../i18n/hooks/useT";
 import { ApiError } from "../../state/regions";
+import { openWelcome } from "../onboarding/api";
 import {
   type AccessRequest,
   chooseProfile,
@@ -18,9 +19,11 @@ import {
   useAccessRequests,
   useDecideAccess,
   useHousehold,
+  useHouseholdSession,
   useProfileActivity,
   useScreenTime,
   useSetPin,
+  useUnmakeHousehold,
 } from "./api";
 import { FamilyDashboard } from "./FamilyDashboard";
 import { HouseholdEconomyChoice } from "./HouseholdEconomy";
@@ -40,6 +43,10 @@ export type HouseholdView = "overview" | "profiles" | "schedule" | "requests";
 export default function HouseholdPage({ view = "overview" }: { view?: HouseholdView }) {
   const t = useT();
   const household = useHousehold();
+  const session = useHouseholdSession();
+  const unmake = useUnmakeHousehold();
+  const notify = useNotify();
+  const navigate = useNavigate();
   const requests = useAccessRequests();
   const [editing, setEditing] = useState<HouseholdMember | "new" | null>(null);
   const [watching, setWatching] = useState<HouseholdMember | null>(null);
@@ -52,6 +59,17 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
     return <FunctionalState state="unavailable" onRetry={() => household.refetch()} />;
   const data = household.data;
   const profiles = data.members.filter((m) => m.kind !== "owner");
+  // issue 445: a master without a household — make one (the household part of the welcome)
+  if (data.can_manage && session.data?.made === false)
+    return (
+      <div className="household-page">
+        <p className="household-note">{t("household:made.none")}</p>
+        <Button onClick={() => openWelcome("household")}>
+          <Icon name="users" size={16} />
+          {t("household:made.make")}
+        </Button>
+      </div>
+    );
   const pending = (requests.data ?? []).filter((r) => r.status === "pending").length;
   // issue 436: a profile reads its own schedule
   const heading = view === "schedule" && !data.can_manage ? "scheduleMine" : view;
@@ -118,7 +136,24 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
             {t("household:page.count", { count: profiles.length, max: data.max_profiles })}
           </p>
           {profiles.length === 0 && data.can_manage ? (
-            <p className="household-note">{t("household:page.empty")}</p>
+            <p className="household-note">
+              {t("household:page.empty")}{" "}
+              <Button
+                variant="ghost"
+                disabled={unmake.isPending}
+                onClick={() =>
+                  unmake.mutate(undefined, {
+                    onSuccess: () => {
+                      notify({ severity: "success", title: t("household:made.undone") });
+                      navigate("/");
+                    },
+                    onError: () => notify({ severity: "critical", title: t("household:error") }),
+                  })
+                }
+              >
+                {t("household:made.undo")}
+              </Button>
+            </p>
           ) : null}
           <ul className="household-members">
             {data.members.map((member) => (

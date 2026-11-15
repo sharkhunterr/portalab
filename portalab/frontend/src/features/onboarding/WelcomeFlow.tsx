@@ -16,7 +16,15 @@ import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
 import { PRESENCE_CHOICES, type PresenceLevel, setPresence, usePresence } from "../auth/CommunityPresence";
 import { ME_KEY, type Me, useMe } from "../auth/useAuth";
-import { useCreateProfile, useHousehold, useHouseholdSession } from "../household/api";
+import {
+  type HouseholdMember,
+  useCreateProfile,
+  useHousehold,
+  useHouseholdSession,
+  useMakeHousehold,
+} from "../household/api";
+import { HouseholdEconomyChoice } from "../household/HouseholdEconomy";
+import { ProfileEditor } from "../household/ProfileEditor";
 import { ProfileFace } from "../household/ProfilePicker";
 import { useLinks } from "../media/api";
 import { RetroAccountList, useRetroAccounts } from "../retro/RetroAccounts";
@@ -41,7 +49,10 @@ const STEPS = [
   "profile",
   "accounts",
   "retro",
+  "household",
+  "policy",
   "family",
+  "rules",
   "play",
   "presence",
   "home",
@@ -51,12 +62,18 @@ const STEPS = [
 ] as const;
 type Step = (typeof STEPS)[number];
 
+// issue 445: the household part — asked of a master (never of a profile), and replayed on its own later
+const HOUSEHOLD_STEPS: readonly Step[] = ["household", "policy", "family", "rules"];
+
 const ART: Record<Step, string> = {
   hello: "sparkles",
   profile: "user",
   accounts: "link",
   retro: "joystick",
+  household: "home",
+  policy: "coins",
   family: "users",
+  rules: "shield",
   home: "heart",
   play: "gamepad",
   presence: "eye",
@@ -92,6 +109,8 @@ export function WelcomeFlow() {
   const [step, setStep] = useState<Step>("hello");
   // issue 347: the play gauge moved in this welcome — the home is then made again with it, by default
   const [replayed, setReplayed] = useState(false);
+  // issue 445: only the household part (« Make a household » later), or the whole welcome
+  const [only, setOnly] = useState<"household" | null>(null);
   const decided = useRef(false);
   const titleId = useId();
 
@@ -104,8 +123,10 @@ export function WelcomeFlow() {
 
   // the personal menu brings it back
   useEffect(() => {
-    const reopen = () => {
-      setStep("hello");
+    const reopen = (event: Event) => {
+      const part = (event as CustomEvent<"household" | null>).detail ?? null;
+      setOnly(part);
+      setStep(part === "household" ? "household" : "hello");
       setReplayed(false);
       setOpen(true);
     };
@@ -115,6 +136,7 @@ export function WelcomeFlow() {
 
   const close = () => {
     setOpen(false);
+    setOnly(null);
     if (!welcomedAt) setWelcomedAt(new Date().toISOString());
   };
   // issue 347: no presence screen when the privacy centre is off
@@ -131,15 +153,28 @@ export function WelcomeFlow() {
   // issue 428: the account's holder makes its household's profiles here (not a profile itself)
   const session = useHouseholdSession(open && !profile);
   const family = Boolean(session.data?.enabled) && !profile;
+  const made = Boolean(session.data?.made);
   const steps = STEPS.filter(
     (s) =>
-      (s !== "family" || family) &&
+      (only !== "household" || HOUSEHOLD_STEPS.includes(s)) &&
+      (!HOUSEHOLD_STEPS.includes(s) || family) &&
+      // issue 445: asked while there is no household; its policy, profiles and rules once it is made
+      (s !== "household" || !made || step === "household") &&
+      (!["policy", "family", "rules"].includes(s) || made) &&
       (s !== "presence" || presence.available) &&
       (s !== "retro" || (!profile && mapped.length > 0 && (toAuthorise || step === "retro"))) &&
       !(profile && (s === "accounts" || s === "presence")),
   );
   const index = Math.max(steps.indexOf(step), 0);
-  const next = () => setStep(steps[Math.min(index + 1, steps.length - 1)] as Step);
+  const last = index >= steps.length - 1;
+  const next = () =>
+    only === "household" && last ? close() : setStep(steps[Math.min(index + 1, steps.length - 1)] as Step);
+  // issue 445: no household — its policy, profiles and rules are skipped, the welcome goes on
+  const afterHousehold = () => {
+    const rest = steps.filter((s) => STEPS.indexOf(s) > STEPS.indexOf("rules"));
+    if (only === "household" || !rest.length) close();
+    else setStep(rest[0] as Step);
+  };
   const back = () => setStep(steps[Math.max(index - 1, 0)] as Step);
   const name = me.data?.display_name ?? me.data?.login ?? "";
 
@@ -196,8 +231,17 @@ export function WelcomeFlow() {
               {step === "retro" ? (
                 <RetroStep titleId={titleId} only={mapped} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
+              {step === "household" ? (
+                <HouseholdAsk titleId={titleId} onMade={() => setStep("policy")} onNone={afterHousehold} />
+              ) : null}
+              {step === "policy" ? (
+                <PolicyStep titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
               {step === "family" ? (
                 <FamilyStep titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
+              {step === "rules" ? (
+                <RulesStep titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
               {step === "play" ? (
                 <PlayChoice
@@ -779,6 +823,104 @@ function RetroStep({ titleId, only, nav }: { titleId: string; only: readonly str
       <DialogPrimitive.Title id={titleId}>{t("onboarding:retro.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:retro.lead")}</p>
       <RetroAccountList only={only} />
+      {nav}
+    </>
+  );
+}
+
+/** Issue 445: a household or not — made with a common pot (changed on the next screen), or none: its screens
+ * are skipped and « My household » stays out of the menu (made later from the account page). */
+function HouseholdAsk({
+  titleId,
+  onMade,
+  onNone,
+}: {
+  titleId: string;
+  onMade: () => void;
+  onNone: () => void;
+}) {
+  const t = useT();
+  const make = useMakeHousehold();
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:household.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:household.lead")}</p>
+      <div className="onboarding-household">
+        <button
+          type="button"
+          className="onboarding-household__choice"
+          disabled={make.isPending}
+          onClick={() => make.mutate("pot", { onSuccess: onMade })}
+        >
+          <Icon name="users" size={22} />
+          <span>
+            <strong>{t("onboarding:household.yes")}</strong>
+            <small>{t("onboarding:household.yesHint")}</small>
+          </span>
+        </button>
+        <button type="button" className="onboarding-household__choice" onClick={onNone}>
+          <Icon name="user" size={22} />
+          <span>
+            <strong>{t("onboarding:household.no")}</strong>
+            <small>{t("onboarding:household.noHint")}</small>
+          </span>
+        </button>
+      </div>
+      {make.isError ? <p role="alert">{t("household:error")}</p> : null}
+    </>
+  );
+}
+
+/** Issue 445: the household's policy — a common pot on the master's account, or separate profiles. */
+function PolicyStep({ titleId, nav }: { titleId: string; nav: ReactNode }) {
+  const t = useT();
+  const household = useHousehold();
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:policy.title")}</DialogPrimitive.Title>
+      {household.data ? <HouseholdEconomyChoice household={household.data} /> : null}
+      {nav}
+    </>
+  );
+}
+
+/** Issue 445: each profile's rules — its kind's presets, set in place (ages, genres, screen time…). */
+function RulesStep({ titleId, nav }: { titleId: string; nav: ReactNode }) {
+  const t = useT();
+  const household = useHousehold();
+  const [editing, setEditing] = useState<HouseholdMember | null>(null);
+  const data = household.data;
+  const profiles = (data?.members ?? []).filter((m) => m.kind !== "owner");
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:rules.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">
+        {profiles.length ? t("onboarding:rules.lead") : t("onboarding:rules.none")}
+      </p>
+      {profiles.length ? (
+        <ul className="onboarding-family" aria-label={t("onboarding:family.made")}>
+          {profiles.map((member) => (
+            <li key={member.id}>
+              <ProfileFace member={member} size="sm" />
+              <span>{member.display_name}</span>
+              <small>{t(`household:kind.${member.kind}`)}</small>
+              <Button variant="secondary" onClick={() => setEditing(member)}>
+                <Icon name="settings" size={14} />
+                {t("onboarding:rules.set", { name: member.display_name })}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {editing && data ? (
+        <ProfileEditor
+          member={editing}
+          position={profiles.indexOf(editing) + 1}
+          palette={data.palette}
+          economy={data.economy ?? "pot"}
+          onClose={() => setEditing(null)}
+        />
+      ) : null}
       {nav}
     </>
   );

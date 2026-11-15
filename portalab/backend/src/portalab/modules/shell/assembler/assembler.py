@@ -18,6 +18,7 @@ from typing import Any
 
 from portalab.capabilities.administration import EXTENSION_STATE_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
 from portalab.capabilities.navigation import (
     LEGACY_GROUP,
     NavigationContribution,
@@ -43,6 +44,7 @@ GAMES_ENTRIES = frozenset({"games.page", "games.party"})
 QUESTS_ENTRY = "community.quests"
 # issue 347: « just the media » has no community either — its section, and the achievements kept among mine
 COMMUNITY_GROUP = "community"
+HOUSEHOLD_GROUP = "household"  # issue 445: « My household », for a household only
 ACHIEVEMENTS_ENTRY = "community.achievements"
 
 
@@ -88,6 +90,17 @@ class NavigationAssembler:
         except Exception:
             return fallback
 
+    async def _in_household(self, principal: Principal) -> bool:
+        """Issue 445: a profile, or a master who made its household (shown when unknown)."""
+        household = self._provider(HOUSEHOLD)
+        user = principal.acting_for or principal.user_id
+        if household is None or user is None or not hasattr(household, "exists"):
+            return True
+        try:
+            return bool(await household.exists(user))
+        except Exception:
+            return True
+
     async def _enabled(self, contribution: NavigationContribution, memo: dict[tuple[str, str], bool]) -> bool:
         state = self._provider(EXTENSION_STATE_CAPABILITY)
         checks: list[tuple[str, str]] = []
@@ -119,6 +132,10 @@ class NavigationAssembler:
         cardless, gameless, sectionless = hidden_by_play(
             await self._setting("shell.onboarding.play", principal, None)
         )
+        if not await self._in_household(principal):
+            sectionless = sectionless | {
+                HOUSEHOLD_GROUP
+            }  # issue 445: no household made — no « My household »
         # issue 246: a feature switched on or off (``visible_when.setting``) shows or hides its entries now
         switches = {
             key: await self._setting(key, principal, True)

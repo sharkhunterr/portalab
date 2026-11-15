@@ -309,6 +309,11 @@ class Household(Protocol):
         """Issue 443: the dispatched profiles their master shows anonymously in the community."""
         ...
 
+    async def exists(self, user: UUID) -> bool:
+        """Issue 445: whether ``user`` is in a household — a profile, or a master who made one (« My
+        household » is shown to them only)."""
+        ...
+
 
 @dataclass(frozen=True, slots=True)
 class AccountCard:

@@ -9918,6 +9918,11 @@
             "title": "Enabled",
             "type": "boolean"
           },
+          "made": {
+            "default": false,
+            "title": "Made",
+            "type": "boolean"
+          },
           "members": {
             "items": {
               "$ref": "#/components/schemas/HouseholdMemberTile"
@@ -47975,6 +47980,54 @@
           }
         },
         "summary": "Set Economy",
+        "tags": [
+          "household"
+        ]
+      }
+    },
+    "/api/v1/household/made": {
+      "delete": {
+        "description": "Issue 445: a household without profiles undone \u2014 \u00ab My household \u00bb disappears.",
+        "operationId": "unmake_household_api_v1_household_made_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Unmake Household",
+        "tags": [
+          "household"
+        ]
+      },
+      "post": {
+        "description": "Issue 445: the master makes its household with its economy (once) \u2014 \u00ab My household \u00bb appears.",
+        "operationId": "make_household_api_v1_household_made_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdEconomyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Make Household",
         "tags": [
           "household"
         ]

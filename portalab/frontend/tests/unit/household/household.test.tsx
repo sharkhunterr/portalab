@@ -262,6 +262,24 @@ describe("my household", () => {
     await waitFor(() => expect(decisions).toEqual([{ approve: true, days: 1 }]));
   });
 
+  it("asks a master without a household to make one (issue 445)", async () => {
+    const opened: unknown[] = [];
+    const listen = (event: Event) => opened.push((event as CustomEvent).detail);
+    window.addEventListener("portalab:welcome", listen);
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household")
+        return json(200, { ...HOUSEHOLD, members: HOUSEHOLD.members.slice(0, 1) });
+      if (path === "/api/v1/household/session") return json(200, { ...SESSION, made: false });
+      if (path === "/api/v1/household/requests") return json(200, []);
+      return json(404, {});
+    };
+    show(<HouseholdPage view="overview" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Make a household" }));
+    expect(opened).toEqual(["household"]); // the welcome's household part
+    window.removeEventListener("portalab:welcome", listen);
+  });
+
   it("lets the master choose a common pot or separate profiles (issue 443)", async () => {
     const sent: unknown[] = [];
     let economy = "pot";

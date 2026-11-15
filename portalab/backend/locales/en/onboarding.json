@@ -448,5 +448,16 @@
   "tours.ticket.send.title": "Send",
   "tours.ticket.service.text": "Pick the service concerned: we check its health for you.",
   "tours.ticket.service.title": "Which service?",
-  "tours.ticket.title": "Ask the support"
+  "tours.ticket.title": "Ask the support",
+  "household.title": "A household?",
+  "household.lead": "Do other people share your account — children, a partner? A household gives each of them a profile: their own dashboard, progress and rules.",
+  "household.yes": "Make my household",
+  "household.yesHint": "Then choose how it earns, create the profiles and set their rules.",
+  "household.no": "No profiles",
+  "household.noHint": "Just me. You can make a household later from your account page.",
+  "policy.title": "How your household earns",
+  "rules.title": "Each profile's rules",
+  "rules.lead": "Each profile starts with its kind's rules. Adjust ages, genres and screen time now, or later in « My household ».",
+  "rules.none": "No profile yet: add them later in « My household ».",
+  "rules.set": "Set {name}'s rules"
 }

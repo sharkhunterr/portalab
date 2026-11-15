@@ -315,5 +315,11 @@
   "editor.communityPublicHint": "Affiché avec son nom dans l'annuaire des membres et les classements.",
   "editor.communityAnonymousHint": "Affiché anonymement dans les classements : sans nom ni avatar.",
   "page.private": "Privé (pot commun)",
-  "page.anonymous": "Anonyme dans la communauté"
+  "page.anonymous": "Anonyme dans la communauté",
+  "made.none": "Vous n'avez pas encore de foyer. Créez-en un pour donner un profil à chaque personne qui partage votre compte.",
+  "made.make": "Créer un foyer",
+  "made.undo": "Je ne veux pas de foyer",
+  "made.undone": "Votre foyer est supprimé",
+  "account.make": "Créer un foyer",
+  "account.makeHint": "Des profils pour les personnes qui partagent votre compte, chacun avec son tableau de bord et ses règles."
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import type { components } from "../../api/generated/schema";
+import { NAVIGATION_KEY } from "../../shell/nav/NavigationProvider";
 
 /**
  * Households (spec 032): the « Who's there? » picker and the switch, the household page (every member sees
@@ -65,6 +66,7 @@ function useRefresh() {
   return () => {
     void client.invalidateQueries({ queryKey: ["household"] });
     void client.invalidateQueries({ queryKey: ["identity", "me"] });
+    void client.invalidateQueries({ queryKey: NAVIGATION_KEY }); // issue 445: « My household » in the menu
   };
 }
 
@@ -86,6 +88,30 @@ export interface ProfileChanges {
 }
 
 export type HouseholdEconomy = "pot" | "dispatch";
+
+/** Issue 445: the master makes its household (with its economy) — « My household » appears in the menu. */
+export function useMakeHousehold() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (economy: HouseholdEconomy) => {
+      const { error } = await api.POST("/api/v1/household/made", { body: { economy } });
+      if (error) throw new Error("household.made");
+    },
+    onSuccess: refresh,
+  });
+}
+
+/** Issue 445: a household without profiles undone — « My household » leaves the menu. */
+export function useUnmakeHousehold() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async () => {
+      const { error } = await api.DELETE("/api/v1/household/made");
+      if (error) throw new Error("household.unmade");
+    },
+    onSuccess: refresh,
+  });
+}
 
 /** Issue 443: the master chooses its household's economy (switching rebuilds or gives back the pot). */
 export function useHouseholdEconomy() {

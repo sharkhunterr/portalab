@@ -116,3 +116,51 @@ async def test_degraded_view_has_empty_sections(sh: ShellHarness) -> None:
     sh.module.assembler.authorizer = Broken()  # type: ignore[assignment]
     view = await sh.module.assembler.build(user(await insert_user(sh.full.database)))
     assert view["degraded"] is True and view["sections"] == [] and view["personal"] == []
+
+
+async def test_my_household_only_for_a_household(sh: ShellHarness) -> None:
+    """Issue 445: « My household » shows to a member in a household only (a profile, or a master who made
+    one); without a household service it shows as before."""
+    from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
+
+    plain = user(await insert_user(sh.full.database))
+    assert "household" in keys(await sh.module.assembler.build(plain))
+
+    class Household:
+        made = False
+
+        async def exists(self, member: Any) -> bool:
+            return self.made
+
+        async def owner_of(self, member: Any) -> None:
+            return None
+
+        async def restrictions_of(self, member: Any) -> None:
+            return None
+
+        async def granted(self, member: Any, kind: str, ref: str) -> bool:
+            return False
+
+        async def grants(self, member: Any, kind: str) -> frozenset[str]:
+            return frozenset()
+
+        async def hidden(self) -> frozenset[Any]:
+            return frozenset()
+
+        async def anonymous(self) -> frozenset[Any]:
+            return frozenset()
+
+        async def profiles(self) -> frozenset[Any]:
+            return frozenset()
+
+        async def profiles_of(self, owner: Any) -> frozenset[Any]:
+            return frozenset()
+
+        async def economy_of(self, member: Any) -> str:
+            return "pot"
+
+    household = Household()
+    sh.full.identity.capabilities.provide(HOUSEHOLD, household, instance_ref="test", owner="module:household")
+    assert "household" not in keys(await sh.module.assembler.build(plain))
+    household.made = True
+    assert "household" in keys(await sh.module.assembler.build(plain))

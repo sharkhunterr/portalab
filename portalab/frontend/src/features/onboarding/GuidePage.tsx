@@ -51,7 +51,7 @@ export default function GuidePage() {
           total: tours.length,
         })}
         secondary={
-          <Button variant="secondary" onClick={openWelcome}>
+          <Button variant="secondary" onClick={() => openWelcome()}>
             <Icon name="sparkles" size={18} />
             {t("onboarding:guide.welcome")}
           </Button>

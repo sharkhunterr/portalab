@@ -19,7 +19,7 @@ vi.mock("../../src/api/client", async (importOriginal) => {
   return importOriginal();
 });
 
-import { startTour } from "../../src/features/onboarding/api";
+import { openWelcome, startTour } from "../../src/features/onboarding/api";
 import { FirstSteps } from "../../src/features/onboarding/FirstSteps";
 import GuidePage from "../../src/features/onboarding/GuidePage";
 import { TOUR_TIMING, Tour } from "../../src/features/onboarding/Tour";
@@ -59,6 +59,7 @@ function backend({
   household = false,
 }: Backend) {
   const made: unknown[] = [];
+  const householdMade: unknown[] = [];
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
   const visibility: Array<[string, unknown]> = [];
@@ -73,6 +74,10 @@ function backend({
       const { level } = (await request.json()) as { level: string };
       visibility.push([path.split("/").pop() ?? "", level]);
       return json(200, { effective: true });
+    }
+    if (request.method === "POST" && path === "/api/v1/household/made") {
+      householdMade.push(await request.json()); // issue 445
+      return new Response(null, { status: 204 });
     }
     if (request.method === "POST" && path === "/api/v1/household/profiles") {
       made.push(await request.json());
@@ -102,7 +107,14 @@ function backend({
     if (path === "/api/v1/retro/accounts") return json(200, retro);
     if (path === "/api/v1/household/session")
       return household
-        ? json(200, { enabled: true, owner_id: ME.id, active_id: ME.id, must_choose: false, members: [] })
+        ? json(200, {
+            enabled: true,
+            made: householdMade.length > 0,
+            owner_id: ME.id,
+            active_id: ME.id,
+            must_choose: false,
+            members: [],
+          })
         : json(404, {});
     if (path === "/api/v1/household")
       return json(200, {
@@ -132,7 +144,7 @@ function backend({
       });
     return json(404, {});
   };
-  return { puts, posts, visibility, resets, made };
+  return { puts, posts, visibility, resets, made, householdMade };
 }
 
 const mission = (key: string, done = false) => ({
@@ -195,6 +207,30 @@ describe("welcome", () => {
 
   it("lets the account's holder make the household's profiles (issue 428)", async () => {
     window.localStorage.clear();
+    const { made, householdMade } = backend({ household: true });
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByRole("heading", { name: "Your media accounts" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // issue 445: a household or not first — made with a common pot, then its policy
+    expect(await screen.findByRole("heading", { name: "A household?" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Make my household/ }));
+    await waitFor(() => expect(householdMade).toEqual([{ economy: "pot" }]));
+    expect(await screen.findByRole("heading", { name: "How your household earns" })).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Your family" })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Léa" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add this profile" }));
+    await waitFor(() => expect(made).toEqual([{ display_name: "Léa", kind: "child" }]));
+    expect(await screen.findByText("Léa")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Each profile's rules" })).toBeInTheDocument();
+  });
+
+  it("skips the household when the member wants no profiles, and replays just that part later", async () => {
+    window.localStorage.clear();
     const { made } = backend({ household: true });
     show(<WelcomeFlow />);
     fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
@@ -202,11 +238,18 @@ describe("welcome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "Your media accounts" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(await screen.findByRole("heading", { name: "Your family" })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Léa" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add this profile" }));
-    await waitFor(() => expect(made).toEqual([{ display_name: "Léa", kind: "child" }]));
-    expect(await screen.findByText("Léa")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: /No profiles/ }));
+    // issue 445: no household — its policy, profiles and rules are skipped, the welcome goes on
+    expect(await screen.findByRole("heading", { name: "How far do you want to play?" })).toBeInTheDocument();
+    expect(made).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("heading", { name: "How far do you want to play?" })).toBeNull(),
+    );
+
+    act(() => openWelcome("household")); // « Make a household » from the account page
+    expect(await screen.findByRole("heading", { name: "A household?" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Let's go" })).toBeNull();
   });
 
   it("stays closed once seen elsewhere, or when the administrator turned it off", async () => {

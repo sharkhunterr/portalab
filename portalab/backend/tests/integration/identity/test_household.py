@@ -297,3 +297,28 @@ async def test_the_master_gives_time_in_a_few_taps(app: FastAPI, client: httpx.A
     await _switch(client, tom)
     refused = await client.post(minutes, json={"minutes": 30})
     assert refused.status_code == 403  # a profile gives no time
+
+
+async def test_a_master_makes_its_household_or_undoes_an_empty_one(
+    app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 445: a member is in no household until it makes one (with its economy) or a profile; a household
+    without profiles may be undone, one with profiles not."""
+    module = module_of(app)
+    await create_user(module, "dora")
+    await login(client, "dora")
+
+    async def made() -> bool:
+        return bool((await client.get("/api/v1/household/session")).json()["made"])
+
+    assert await made() is False
+    response = await client.post("/api/v1/household/made", json={"economy": "dispatch"})
+    assert response.status_code == 204, response.text
+    assert await made() is True
+    assert (await client.get("/api/v1/household")).json()["economy"] == "dispatch"
+    assert (await client.delete("/api/v1/household/made")).status_code == 204
+    assert await made() is False
+    await _profile(client, "Zoé")  # a profile makes the household too
+    assert await made() is True
+    refused = await client.delete("/api/v1/household/made")
+    assert refused.status_code == 409 and refused.json()["code"] == "household.not_empty"

@@ -197,6 +197,39 @@ class HouseholdService:
         async with self.database.session() as session:
             return frozenset(await session.scalars(query))
 
+    async def exists(self, user: UUID) -> bool:
+        """Issue 445: a profile, or a master who made its household (its own row)."""
+        async with self.database.session() as session:
+            return await session.get(HouseholdMember, user) is not None
+
+    async def make(self, principal: Principal, economy: str) -> None:
+        """Issue 445: the master makes its household (once), with its economy — « My household » appears."""
+        owner = self._manager(principal)
+        if economy not in ECONOMIES:
+            raise Conflict("Choose a common pot or dispatched profiles.", code="household.invalid_economy")
+        async with self.database.unit_of_work() as uow:
+            existing = await uow.session.get(HouseholdMember, owner)
+            row = await self._owner_row(uow.session, owner, self.now())
+            if existing is None:
+                row.economy = economy
+                await self._audit(uow.session, "household.made", principal, owner, {"economy": economy})
+        self.forget(owner)
+        if existing is not None and existing.economy != economy:
+            await self.set_economy(principal, economy)
+
+    async def unmake(self, principal: Principal) -> None:
+        """Issue 445: a household without profiles undone — « My household » disappears until made again."""
+        owner = self._manager(principal)
+        if await self.profiles_of(owner):
+            raise Conflict("Remove the profiles first.", code="household.not_empty")
+        async with self.database.unit_of_work() as uow:
+            row = await uow.session.get(HouseholdMember, owner, with_for_update=True)
+            if row is None:
+                return
+            await uow.session.delete(row)
+            await self._audit(uow.session, "household.unmade", principal, owner, {})
+        self.forget(owner)
+
     async def economy_of(self, user: UUID) -> str:
         """Issue 443: its household's economy — its master's choice (``pot`` until the master chooses)."""
         cached = self._economies.get(user)
@@ -304,6 +337,7 @@ class HouseholdService:
             tiles.append(tile)
         return {
             "enabled": True,
+            "made": await self.exists(principal.user_id) if principal.user_id else False,  # issue 445
             "owner_id": owner,
             "active_id": principal.user_id,
             "must_choose": len(tiles) > 1 and not chosen,

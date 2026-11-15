@@ -315,5 +315,11 @@
   "editor.communityPublicHint": "Shown with its name in the members directory and the leaderboards.",
   "editor.communityAnonymousHint": "Shown anonymously in the leaderboards: no name, no avatar.",
   "page.private": "Private (common pot)",
-  "page.anonymous": "Anonymous in the community"
+  "page.anonymous": "Anonymous in the community",
+  "made.none": "You have no household yet. Make one to give a profile to each person sharing your account.",
+  "made.make": "Make a household",
+  "made.undo": "I don't want a household",
+  "made.undone": "Your household is undone",
+  "account.make": "Make a household",
+  "account.makeHint": "Profiles for the people sharing your account, each with their own dashboard and rules."
 }

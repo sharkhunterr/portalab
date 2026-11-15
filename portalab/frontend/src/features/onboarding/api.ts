@@ -30,8 +30,9 @@ export function startTour(tour = "portal"): void {
   window.dispatchEvent(new CustomEvent(TOUR_EVENT, { detail: tour }));
 }
 
-export function openWelcome(): void {
-  window.dispatchEvent(new CustomEvent(WELCOME_EVENT));
+/** Reopens the welcome — ``only: "household"`` (issue 445): just its household part, to make one later. */
+export function openWelcome(only?: "household"): void {
+  window.dispatchEvent(new CustomEvent(WELCOME_EVENT, { detail: only ?? null }));
 }
 
 export function useWelcome() {

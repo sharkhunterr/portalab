@@ -15,6 +15,8 @@ import { CommunityPresence } from "./CommunityPresence";
 import { FormMessage } from "./FormMessage";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
+import { useHouseholdSession } from "../household/api";
+import { openWelcome } from "../onboarding/api";
 import { passwordRuleMessage } from "./passwordRules";
 import { TwoFactorSection } from "./TwoFactorSection";
 
@@ -54,7 +56,10 @@ function AccountView({ me }: { me: Me }) {
           </p>
         </SettingsCard>
       ) : (
-        <CommunityPresence />
+        <>
+          <CommunityPresence />
+          <HouseholdCard />
+        </>
       )}
       <SettingsCard icon="compass" title={t("account:links.title")} hint={t("account:links.hint")}>
         <ul className="account-links">
@@ -292,5 +297,29 @@ export function AccountPage() {
         me ? <AccountView me={me} /> : <FunctionalState state="unauthorized" detail={t("account:title")} />
       }
     </DataRegion>
+  );
+}
+
+/** Issue 445: a master's household — « My household » once made, else the welcome's household part. */
+function HouseholdCard() {
+  const t = useT();
+  const session = useHouseholdSession();
+  if (!session.data?.enabled) return null;
+  return (
+    <SettingsCard icon="users" title={t("household:page.title")} hint={t("household:account.makeHint")}>
+      <p className="account-links">
+        {session.data.made ? (
+          <Link to="/household">
+            <Icon name="users" size={18} />
+            {t("household:page.title")}
+          </Link>
+        ) : (
+          <Button variant="secondary" onClick={() => openWelcome("household")}>
+            <Icon name="plus" size={16} />
+            {t("household:account.make")}
+          </Button>
+        )}
+      </p>
+    </SettingsCard>
   );
 }

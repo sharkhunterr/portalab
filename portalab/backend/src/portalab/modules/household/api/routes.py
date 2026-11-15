@@ -36,6 +36,7 @@ class HouseholdMemberTile(BaseModel):
 
 class HouseholdSession(BaseModel):
     enabled: bool
+    made: bool = False  # issue 445: a household made (a profile's, or its master's own)
     owner_id: UUID
     active_id: UUID | None
     must_choose: bool
@@ -232,6 +233,22 @@ class HouseholdFreeIn(_Strict):
 
 class HouseholdEconomyIn(_Strict):
     economy: Literal["pot", "dispatch"]
+
+
+@router.post("/made", status_code=status.HTTP_204_NO_CONTENT)
+async def make_household(
+    body: HouseholdEconomyIn, module: Module, principal: Principal = require(SELF)
+) -> Response:
+    """Issue 445: the master makes its household with its economy (once) — « My household » appears."""
+    await module.service.make(principal, body.economy)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.delete("/made", status_code=status.HTTP_204_NO_CONTENT)
+async def unmake_household(module: Module, principal: Principal = require(SELF)) -> Response:
+    """Issue 445: a household without profiles undone — « My household » disappears."""
+    await module.service.unmake(principal)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/economy", status_code=status.HTTP_204_NO_CONTENT)

@@ -448,5 +448,16 @@
   "tours.ticket.send.title": "Envoyer",
   "tours.ticket.service.text": "Choisis le service concerné : on vérifie son état pour toi.",
   "tours.ticket.service.title": "Quel service ?",
-  "tours.ticket.title": "Demander au support"
+  "tours.ticket.title": "Demander au support",
+  "household.title": "Un foyer ?",
+  "household.lead": "D'autres personnes partagent-elles votre compte, des enfants ou un conjoint ? Un foyer donne à chacun un profil : son propre tableau de bord, sa progression et ses règles.",
+  "household.yes": "Créer mon foyer",
+  "household.yesHint": "Ensuite, choisissez comment il gagne, créez les profils et réglez leurs règles.",
+  "household.no": "Pas de profil",
+  "household.noHint": "Juste moi. Vous pourrez créer un foyer plus tard depuis votre page compte.",
+  "policy.title": "Comment votre foyer gagne",
+  "rules.title": "Les règles de chaque profil",
+  "rules.lead": "Chaque profil démarre avec les règles de son type. Ajustez les âges, les genres et le temps d'écran maintenant, ou plus tard dans « Mon foyer ».",
+  "rules.none": "Pas encore de profil : ajoutez-les plus tard dans « Mon foyer ».",
+  "rules.set": "Régler les règles de {name}"
 }

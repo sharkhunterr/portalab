@@ -7261,6 +7261,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/household/made": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make Household
+         * @description Issue 445: the master makes its household with its economy (once) — « My household » appears.
+         */
+        post: operations["make_household_api_v1_household_made_post"];
+        /**
+         * Unmake Household
+         * @description Issue 445: a household without profiles undone — « My household » disappears.
+         */
+        delete: operations["unmake_household_api_v1_household_made_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/household/members/{member_id}/pin": {
         parameters: {
             query?: never;
@@ -16626,6 +16650,11 @@ export interface components {
             active_id: string | null;
             /** Enabled */
             enabled: boolean;
+            /**
+             * Made
+             * @default false
+             */
+            made: boolean;
             /** Members */
             members: components["schemas"]["HouseholdMemberTile"][];
             /** Must Choose */
@@ -36828,6 +36857,55 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    make_household_api_v1_household_made_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdEconomyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unmake_household_api_v1_household_made_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
