@@ -15,3 +15,9 @@ c3cd508bb5c2ea02adca88d3fc5dafca3a24559e:portalab/backend/src/portalab/app/demo_
 # issue 408: the RFC 6238 appendix B test secret (base32 of "12345678901234567890"), public by definition
 85bd7ae7b204acee1f2f40083e2509e150ce3691:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:53
 85bd7ae7b204acee1f2f40083e2509e150ce3691:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:62
+# the same findings after the history was rewritten (2026-11-15: private names taken out of every commit)
+b809a2fdf05a22564f8ff56e063bb4eb78f1fce6:portalab/backend/src/portalab/app/game_presets/lan.json:generic-api-key:3249
+b809a2fdf05a22564f8ff56e063bb4eb78f1fce6:portalab/backend/src/portalab/app/game_presets/lan.json:generic-api-key:3421
+c18e8521df2bc20dc7bd996ce8f74b9a5edd88ca:portalab/backend/src/portalab/app/demo_catalog.json:generic-api-key:2362
+70ce799b0f2fc53cf19f03c796fad419cac6822d:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:53
+70ce799b0f2fc53cf19f03c796fad419cac6822d:portalab/backend/tests/integration/identity/test_mfa.py:generic-api-key:62
