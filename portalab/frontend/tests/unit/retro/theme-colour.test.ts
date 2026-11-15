@@ -19,8 +19,8 @@ describe("the theme's colour for the emulator", () => {
     expect(themeHex("--player-panel")).toBe("#ffcc00");
   });
 
-  it("falls back when the theme gives nothing readable", () => {
+  it("gives nothing when the theme gives nothing readable: the emulator keeps its own", () => {
     vi.spyOn(window, "getComputedStyle").mockReturnValue({ color: "" } as CSSStyleDeclaration);
-    expect(themeHex("--player-stage", "#000000")).toBe("#000000");
+    expect(themeHex("--player-stage")).toBeUndefined();
   });
 });

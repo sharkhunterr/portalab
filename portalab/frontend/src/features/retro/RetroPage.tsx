@@ -47,14 +47,14 @@ type Hooks = {
 const LOADER = "script[data-retro-loader]"; // EmulatorJS's settings are the page's globals: one game a load
 
 /** Issue 463: a theme's colour (a token, a ``color-mix``…) as the ``#rrggbb`` EmulatorJS reads. */
-export function themeHex(token: string, fallback = "#1f4fd1"): string {
+export function themeHex(token: string): string | undefined {
   const probe = document.createElement("span");
   probe.style.color = `var(${token})`;
   probe.hidden = true;
   document.body.append(probe);
   const [r, g, b] = (getComputedStyle(probe).color.match(/\d+(\.\d+)?/g) ?? []).map(Number);
   probe.remove();
-  if (r === undefined || g === undefined || b === undefined) return fallback;
+  if (r === undefined || g === undefined || b === undefined) return undefined; // the emulator keeps its own
   return `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
 }
 
@@ -70,8 +70,10 @@ function launch(sitting: Sitting, language: string, hooks: Hooks, preferences: E
   }
   const w = window as unknown as Record<string, unknown>;
   w.EJS_player = "#retro-game";
-  w.EJS_color = themeHex("--player-accent"); // issue 463: its buttons and menus in the theme's accent
-  w.EJS_backgroundColor = themeHex("--player-stage", "#000000");
+  const accent = themeHex("--player-accent"); // issue 463: its buttons and menus in the theme's accent
+  const stage = themeHex("--player-stage");
+  if (accent) w.EJS_color = accent;
+  if (stage) w.EJS_backgroundColor = stage;
   w.EJS_core = sitting.game.core;
   w.EJS_gameUrl = sitting.game_url;
   w.EJS_gameName = sitting.game.title;
