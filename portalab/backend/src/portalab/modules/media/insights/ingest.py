@@ -112,6 +112,9 @@ LONG_KINDS = ("movie", "episode")
 # #119: a richer source (Tautulli) that recorded plays this close to a dated-only entry was running then —
 # had the entry been a play, it would have recorded it too
 RICHER_RUNNING = timedelta(hours=12)
+# issue 440: a play of the portal's player told back to a service (a game's time to RomM, a film streamed from
+# Plex) comes back in that account's history — the portal's own row of it is the play, of whoever played it
+PORTAL_ECHO = timedelta(minutes=10)
 
 
 class _Resolver:
@@ -583,7 +586,8 @@ class ActivityIngestor:
         three hours after it ended — Plex dates a play when it is marked watched). A play the richer source
         missed (Tautulli down, not running yet) keeps counting. #119: a title marked watched is no play —
         a date and no length, minutes from another one (marked in bulk), or while the richer source was
-        recording other plays around it but not this one: set aside too."""
+        recording other plays around it but not this one: set aside too. Issue 440: so is a play the portal's
+        player recorded already (its echo in the account's history)."""
         richer = aliased(Activity)
         same_play = (
             select(literal(1))
@@ -636,7 +640,21 @@ class ActivityIngestor:
             )
             .exists(),
         )
-        set_aside = or_(same_play, bulk_mark, richer_missed_it)
+        # issue 440: the portal's player recorded that play already — and its player: a household profile
+        # playing with its master's account (or anyone told back to the service's own) is not that account's
+        portal = aliased(Activity)
+        portal_echo = (
+            select(literal(1))
+            .where(
+                portal.ref.like("portal:%"),
+                portal.object_id.is_not(None),
+                portal.object_id == Activity.object_id,
+                portal.started_at <= func.coalesce(Activity.stopped_at, Activity.started_at) + PORTAL_ECHO,
+                Activity.started_at <= func.coalesce(portal.stopped_at, portal.started_at) + PORTAL_ECHO,
+            )
+            .exists()
+        )
+        set_aside = or_(same_play, bulk_mark, richer_missed_it, portal_echo)
         async with self.database.unit_of_work() as uow:
             session = uow.session
             changed = (

@@ -749,3 +749,91 @@ async def test_a_card_tells_what_its_title_is(media: MediaHarness) -> None:
         2013,
         2600,
     )
+
+
+async def test_a_play_the_portal_recorded_is_not_its_accounts_too(
+    app: FastAPI, media: MediaHarness, clock: FixedClock
+) -> None:
+    """Issue 440: a profile plays a game in the portal; its time told back to RomM returns in the shared
+    account's history as its master's play. The portal's row is the play — of the profile: the echo is set
+    aside, and leaves its master's « continue » and « recent ». The master's own plays keep counting."""
+    from uuid import uuid4
+
+    from portalab.modules.media.insights.continuing import in_progress, recently
+
+    people = await users(app, media, "master", "arthur")
+    romm = media.service(1, "romm")
+    media.library(romm)
+    await media.module.library.upsert(
+        [
+            library_record("g1", kind="game", title="Flight of the Falcon", year=2003),
+            library_record("g2", kind="game", title="Golden Sun", year=2001),
+        ],
+        romm,
+    )
+    async with media.database.session() as session:
+        ids = dict((await session.execute(select(MediaObject.title, MediaObject.id))).tuples().all())
+    now = clock.now()
+
+    def row(user: str, title: str, ref: str, start: datetime, stop: datetime, **extra: Any) -> Activity:
+        return Activity(
+            service_id=romm.service_id,
+            ref=ref,
+            priority=10,
+            counted=True,
+            external_user_id="1",
+            user_id=people[user],
+            kind="game",
+            title=title,
+            object_id=ids[title],
+            ids={},
+            started_at=start,
+            stopped_at=stop,
+            watched_s=(stop - start).total_seconds(),
+            received_at=now,
+            **extra,
+        )
+
+    sitting = now - timedelta(hours=2)
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                # Arthur's sitting in the portal, then its echo in the master's RomM account
+                row(
+                    "arthur",
+                    "Flight of the Falcon",
+                    f"portal:{uuid4()}",
+                    sitting,
+                    sitting + timedelta(minutes=3),
+                ),
+                row(
+                    "master",
+                    "Flight of the Falcon",
+                    "played:1976:today",
+                    sitting + timedelta(minutes=1),
+                    sitting + timedelta(minutes=3),
+                    family="romm",
+                ),
+                # the master's own game, on RomM itself, the same evening
+                row(
+                    "master",
+                    "Golden Sun",
+                    "session:7",
+                    sitting - timedelta(minutes=50),
+                    sitting - timedelta(minutes=10),
+                    family="romm",
+                ),
+            ]
+        )
+    await media.module.ingestor.dedup("romm")
+    async with media.database.session() as session:
+        counted = {a.ref: a.counted for a in (await session.execute(select(Activity))).scalars()}
+    assert counted["played:1976:today"] is False
+    assert counted["session:7"] is True
+    assert all(v for k, v in counted.items() if k.startswith("portal:"))
+
+    going = [item["title"] for item in await in_progress(media.database, people["master"], now)]
+    lately = [item["title"] for item in await recently(media.database, people["master"], now)]
+    assert going == ["Golden Sun"] and lately == ["Golden Sun"]
+    theirs = [item["title"] for item in await in_progress(media.database, people["arthur"], now)]
+    assert theirs == ["Flight of the Falcon"]

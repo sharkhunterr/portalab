@@ -36,6 +36,9 @@ async def _latest(database: Database, user: UUID, now: datetime) -> list[Activit
                         Activity.user_id == user,
                         Activity.started_at >= now - timedelta(days=DAYS),
                         Activity.kind != "live",
+                        # issue 440: not a play another source reports better — the portal's own, of the
+                        # household profile that played with its master's account
+                        Activity.counted.is_(True),
                     )
                     .order_by(Activity.started_at.desc())
                     .limit(500)
