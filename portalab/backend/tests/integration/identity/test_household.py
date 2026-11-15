@@ -322,3 +322,7 @@ async def test_a_master_makes_its_household_or_undoes_an_empty_one(
     assert await made() is True
     refused = await client.delete("/api/v1/household/made")
     assert refused.status_code == 409 and refused.json()["code"] == "household.not_empty"
+    (zoe,) = await households(app).profiles_of(UUID(str((await client.get("/api/v1/me")).json()["id"])))
+    assert (await client.delete(f"/api/v1/household/profiles/{zoe}")).status_code == 204
+    assert (await client.delete("/api/v1/household/made")).status_code == 204  # its removed profile gone too
+    assert await made() is False

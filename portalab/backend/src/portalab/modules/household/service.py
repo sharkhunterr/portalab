@@ -599,6 +599,10 @@ class HouseholdService:
         async with self.database.session() as session:
             await self._profile(session, owner, profile)
         await self.accounts().remove(profile, principal)
+        async with self.database.unit_of_work() as uow:  # issue 445: no longer one of its household's
+            row = await uow.session.get(HouseholdMember, profile, with_for_update=True)
+            if row is not None:
+                await uow.session.delete(row)
         self.forget(profile)
 
     # --- supervision ---------------------------------------------------------------------------------
