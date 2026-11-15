@@ -610,3 +610,19 @@ async def test_all_of_portalab_counts_when_its_master_says_so(
     assert await media.module.gate._used(lea, since, "portal") == 1 + 20 + 5  # the 5 minutes together once
     with pytest.raises(Exception):  # noqa: B017 — the choices are « media » and « portal »
         RestrictionSettings(screen_scope="everything")  # type: ignore[arg-type]
+
+
+async def test_a_portal_set_up_in_french_rates_as_france(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 438: without a system language, the interface language its administrator chose counts before
+    the formatting locale's factory value (« en »)."""
+    from portalab.modules.media.region import system_language
+
+    assert await system_language(media.module.capabilities) == "en"
+    await media.configure("i18n.defaultLanguage", "fr")
+    assert await system_language(media.module.capabilities) == "fr"
+    await media.configure("i18n.defaultLocale", "fr-BE")
+    assert await system_language(media.module.capabilities) == "fr-BE"
+    await media.configure("i18n.systemLanguage", "fr-CA")
+    assert await system_language(media.module.capabilities) == "fr-CA"

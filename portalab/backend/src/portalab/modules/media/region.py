@@ -13,21 +13,26 @@ FALLBACKS = (SYSTEM_LANGUAGE, "i18n.defaultLocale", "i18n.defaultLanguage")
 
 
 async def system_language(capabilities: Any) -> str:
-    """The system language (« fr-FR »), else the portal's formatting locale or its interface language."""
+    """The system language (« fr-FR »), else the portal's formatting locale or its interface language —
+    the ones its administrator chose first (a portal set up in French before 438 rates as France does)."""
     try:
         providers = capabilities.system_providers(CONFIG)
     except Exception:
         return "en"
     if not providers:
         return "en"
+    fallback = "en"
     for key in FALLBACKS:
         try:
-            value = (await providers[0].provider.get(key)).value
+            found = await providers[0].provider.get(key)
         except Exception:  # noqa: S112 — undeclared (tests, an older portal): the next one
             continue
-        if value:
-            return str(value)
-    return "en"
+        if not found.value:
+            continue
+        if found.source != "default":  # one its administrator chose, before a factory value
+            return str(found.value)
+        fallback = fallback if fallback != "en" else str(found.value)
+    return fallback
 
 
 def country_of(tag: str | None) -> str | None:
