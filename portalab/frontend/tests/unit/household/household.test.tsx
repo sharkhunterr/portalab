@@ -186,6 +186,20 @@ describe("who's there", () => {
 });
 
 describe("my household", () => {
+  it("shows no common wallet to separate profiles (issue 456)", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, { ...HOUSEHOLD, economy: "dispatch" });
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (path === "/api/v1/me/media/household") return json(200, { days: 7, members: [] });
+      return json(404, {});
+    };
+    show(<HouseholdPage />);
+    expect(await screen.findByRole("heading", { name: "Family dashboard" })).toBeTruthy();
+    expect(screen.getByText("What each member of the family watched, read and played lately.")).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Household wallet" })).toBeNull();
+  });
+
   it("shows the family's dashboard: the wallet, each member's watching, the requests waiting", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;

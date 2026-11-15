@@ -78,7 +78,12 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
     <div className="household-page">
       <PageHeader
         title={t(`household:page.${heading}Title`)}
-        context={t(`household:page.${heading}Subtitle`)}
+        context={t(
+          // issue 456: separate profiles have no common wallet — the overview is only the family's activity
+          heading === "overview" && data.economy === "dispatch"
+            ? "household:page.overviewSubtitleOwn"
+            : `household:page.${heading}Subtitle`,
+        )}
         icon={icons[view]}
         primary={
           data.can_manage && profiles.length < data.max_profiles ? (
@@ -109,7 +114,7 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
       ) : null}
       {view === "overview" ? (
         <>
-          <Wallet household={data} />
+          {data.economy === "dispatch" ? null : <Wallet household={data} />}
           {data.can_manage && pending ? (
             <p className="household-advice" role="note">
               <Icon name="key" size={16} />

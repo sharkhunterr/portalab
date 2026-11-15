@@ -322,5 +322,6 @@
   "made.undone": "Ton foyer est supprimé",
   "account.make": "Créer un foyer",
   "account.makeHint": "Des profils pour les personnes qui partagent ton compte, chacun avec son tableau de bord et ses règles.",
-  "myPin.refused": "Ce code a été refusé : vérifiez l'actuel, et utilisez 4 à 6 chiffres."
+  "myPin.refused": "Ce code a été refusé : vérifiez l'actuel, et utilisez 4 à 6 chiffres.",
+  "page.overviewSubtitleOwn": "Ce que chacun a regardé, lu et joué ces derniers jours."
 }
