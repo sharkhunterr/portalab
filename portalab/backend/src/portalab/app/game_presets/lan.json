@@ -2739,39 +2739,6 @@
     {
       "definition": {
         "complete_on": "all",
-        "description": "Lisez une de vos notifications.",
-        "icon": "bell",
-        "kind": "daily",
-        "label": "Boîte aux lettres",
-        "period": "day",
-        "requires": [],
-        "rewards": [
-          {
-            "amount": 5,
-            "value": "xp"
-          },
-          {
-            "amount": 5,
-            "value": "coins"
-          }
-        ],
-        "steps": [
-          {
-            "count": 1,
-            "event_type": "notification.read",
-            "filter": [],
-            "kind": "event_count"
-          }
-        ],
-        "translations": {},
-        "unlocks": [],
-        "window": null
-      },
-      "key": "daily_inbox"
-    },
-    {
-      "definition": {
-        "complete_on": "all",
         "description": "Écoutez la radio au moins un quart d'heure d'affilée.",
         "icon": "radio",
         "kind": "daily",
