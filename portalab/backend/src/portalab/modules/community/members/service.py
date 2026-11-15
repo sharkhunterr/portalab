@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
 from portalab.capabilities.identity_directory import (
     CAPABILITY as DIRECTORY,
 )
@@ -32,6 +33,17 @@ class Member:
     id: UUID
     display_name: str
     joined_at: datetime
+
+
+async def household_hidden(capabilities: CapabilityRegistry) -> frozenset[UUID]:
+    """Issue 443: the profiles of a common pot, kept out of the community."""
+    providers = capabilities.system_providers(HOUSEHOLD)
+    if not providers:
+        return frozenset()
+    try:
+        return frozenset(await providers[0].provider.hidden())
+    except Exception:
+        return frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,6 +131,10 @@ class Members:
         summary = await directory.get_user_summary(member)
         if summary is None or not summary.is_active or summary.anonymized or not summary.display_name:
             return None
+        if member != (viewer.acting_for or viewer.user_id) and member in await household_hidden(
+            self.capabilities
+        ):
+            return None  # issue 443: a common pot's profile — its master stands for the household
         if not await self.named(viewer, member):
             return None
         return summary.display_name, await self.listed(viewer, member)

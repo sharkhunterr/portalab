@@ -7,6 +7,7 @@ import { Dialog, DialogActions } from "../../../design-system/components/Overlay
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { useCreateProposal, useProposals } from "./api";
 import { HelpWantedBadge } from "./HelpWantedBadge";
@@ -17,7 +18,8 @@ export function ProposalList() {
   const open = useProposals();
   const mine = useProposals(true);
   const create = useCreateProposal();
-  const canPropose = useHasPermission("community.propose");
+  // issue 443: a household profile does not propose community projects (its master does)
+  const canPropose = useHasPermission("community.propose") && !useMe().data?.profile_of;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [kind, setKind] = useState<"project" | "feature">("project");

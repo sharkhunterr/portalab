@@ -10,6 +10,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from portalab.capabilities.household import refuse_profile
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Conflict
@@ -58,6 +59,7 @@ class Votes:
 
     async def _voter(self, actor: Principal) -> UUID:
         user = user_of(actor)
+        await refuse_profile(self.proposals.capabilities, actor, user)  # issue 443
         if user is None or not await self.proposals.active(user):
             raise NotActiveAccount("Only active accounts can vote.")
         return user

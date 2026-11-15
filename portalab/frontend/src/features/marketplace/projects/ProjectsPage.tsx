@@ -6,6 +6,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { type Project, useMyFundings, useProjects, useProjectsSeen } from "../api";
 import { MyFundings } from "./MyFundings";
 import { Gathered, STAGES, STATE_ICON, Stepper } from "./parts";
@@ -66,6 +67,7 @@ export default function ProjectsPage() {
   const format = useFormat();
   const projects = useProjects();
   const fundings = useMyFundings();
+  const profile = Boolean(useMe().data?.profile_of); // issue 443: profiles launch no project
   const seen = useProjectsSeen();
   const [stage, setStage] = useState<string>("all");
   // issue 303: when I had last looked (null: never) — what changed after is marked, for this visit
@@ -138,17 +140,19 @@ export default function ProjectsPage() {
           ))}
         </ul>
       )}
-      <section className="project-launch-cta">
-        <Icon name="lightbulb" size={24} />
-        <div>
-          <h2>{t("marketplace:projects.launchTitle")}</h2>
-          <p>{t("marketplace:projects.launchHint")}</p>
-        </div>
-        <Link className="ds-button ds-button--primary" to="/marketplace?type=project_launch">
-          <Icon name="shop" size={16} />
-          {t("marketplace:projects.launch")}
-        </Link>
-      </section>
+      {profile ? null : (
+        <section className="project-launch-cta">
+          <Icon name="lightbulb" size={24} />
+          <div>
+            <h2>{t("marketplace:projects.launchTitle")}</h2>
+            <p>{t("marketplace:projects.launchHint")}</p>
+          </div>
+          <Link className="ds-button ds-button--primary" to="/marketplace?type=project_launch">
+            <Icon name="shop" size={16} />
+            {t("marketplace:projects.launch")}
+          </Link>
+        </section>
+      )}
       <MyFundings />
     </div>
   );

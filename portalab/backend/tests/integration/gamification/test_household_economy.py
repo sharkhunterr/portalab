@@ -143,3 +143,37 @@ async def test_a_master_keeps_features_out_of_a_profile(gm: GamHarness, app: Fas
         Principal(user_id=lea, profile_of=owner), ["ai.use", "news.read"]
     )
     assert "news.read" in await engine.effective_permissions(Principal(user_id=lea, profile_of=owner))
+
+
+async def test_the_community_follows_the_households_economy(gm: GamHarness, app: FastAPI) -> None:
+    """Issue 443: a common pot's profile is on no leaderboard (its master stands for the household); a
+    dispatched one is, by name or (its master's choice) anonymously. A profile never takes part in a
+    community project, whatever its household's economy."""
+    from portalab.capabilities.household import ProfileNoProjects, refuse_profile
+
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner, kind="standard")
+    boss = gm.p("boss")
+    await gm.module.rewards.grant_manual(boss, lea, "xp", 500, reason="quest", idempotency_key="lb")
+
+    async def ranked() -> dict[UUID, bool]:
+        await gm.module.leaderboards.compute("xp", "all")
+        view = await gm.module.leaderboards.board(gm.p("ulrich"), "xp")
+        return {e.user_id: bool(getattr(e, "anonymous", False)) for e in view.entries}
+
+    board = await ranked()
+    assert lea not in board and owner in board  # a common pot: the master (with Léa's 500 XP) only
+    await households(app).set_economy(Principal(user_id=owner), "dispatch")
+    board = await ranked()
+    assert lea in board and board[lea] is False  # dispatched, public (a standard profile)
+    await households(app).change(Principal(user_id=owner), lea, community_visible=False)
+    view = await gm.module.leaderboards.board(gm.p("ulrich"), "xp")
+    assert lea not in {e.user_id for e in view.entries}  # anonymous: no longer named on the board
+    assert any(getattr(e, "anonymous", False) for e in view.entries)
+
+    capabilities = gm.ev.full.identity.capabilities
+    with pytest.raises(ProfileNoProjects):
+        await refuse_profile(capabilities, None, lea)
+    with pytest.raises(ProfileNoProjects):
+        await refuse_profile(capabilities, Principal(user_id=lea, profile_of=owner), lea)
+    await refuse_profile(capabilities, Principal(user_id=owner), owner)  # its master takes part

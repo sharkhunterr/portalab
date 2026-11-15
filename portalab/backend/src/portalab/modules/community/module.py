@@ -68,7 +68,7 @@ from portalab.modules.community.integrations import (
     ProjectsWidget,
 )
 from portalab.modules.community.leaderboards.view import LeaderboardsView
-from portalab.modules.community.members.service import Members
+from portalab.modules.community.members.service import Members, household_hidden
 from portalab.modules.community.models import FeedEntry
 from portalab.modules.community.observability import log, metrics
 from portalab.modules.community.participation.service import Participations
@@ -126,7 +126,13 @@ class CommunityModule:
         self.observables = observables
         self.config = CommunityConfig()
         self.members = Members(capabilities, self.visibility)
-        self.feed = FeedService(database, self.visibility, self.display_name, clock=clock)
+        self.feed = FeedService(
+            database,
+            self.visibility,
+            self.display_name,
+            clock=clock,
+            hidden=lambda: household_hidden(capabilities),  # issue 443
+        )
         self.projector = FeedProjector(
             database, event_types, self.visibility, lambda: self.config, clock=clock
         )

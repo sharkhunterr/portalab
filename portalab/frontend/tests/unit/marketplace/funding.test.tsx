@@ -54,6 +54,7 @@ describe("funding panel", () => {
       if (path === "/api/v1/me/permissions") {
         return json(200, { permissions: ["marketplace.purchase"], roles: ["user"] });
       }
+      if (path === "/api/v1/me") return json(200, { id: "u1", profile_of: null });
       requests.push(request.clone());
       return json(201, { id: "f1", project_id: "p1", amount: 20, status: "reserved" });
     };
@@ -72,6 +73,23 @@ describe("funding panel", () => {
     await waitFor(() => expect(requests).toHaveLength(1));
     expect(requests[0]?.headers.get("Idempotency-Key")).toBeTruthy();
     expect(await requests[0]?.json()).toEqual({ amount: 20, acknowledged: true });
+  });
+});
+
+describe("a household profile", () => {
+  it("is not offered to fund a community project (issue 443)", async () => {
+    fake.handler = (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/me/permissions") {
+        return json(200, { permissions: ["marketplace.purchase"], roles: ["user"] });
+      }
+      if (path === "/api/v1/me") return json(200, { id: "u2", profile_of: "u1" });
+      return json(404, {});
+    };
+    show(<FundingPanel project={PROJECT as never} mine={0} />);
+    await waitFor(() => expect(screen.queryByLabelText("Coins to reserve")).toBeNull());
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.queryByRole("button", { name: "Reserve Coins" })).toBeNull();
   });
 });
 

@@ -9,6 +9,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 
+from portalab.capabilities.household import refuse_profile
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
@@ -54,6 +55,7 @@ class Fundings:
         self, actor: Principal, project_id: UUID, amount: int, *, acknowledged: bool, request_key: str
     ) -> ProjectFunding:
         user = actor.acting_for or actor.user_id
+        await refuse_profile(self.capabilities, actor, user)  # issue 443
         if user is None or not await self._active(user):
             raise Forbidden("Only active accounts can fund projects.", code="project.not_active_account")
         if not acknowledged:

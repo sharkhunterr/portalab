@@ -247,7 +247,7 @@ class GamificationModule:
         ):
             self.capabilities.provide(
                 PREFERENCE_CAPABILITY,
-                ProgressionPreferences(self.database, clock=self.clock),
+                ProgressionPreferences(self.database, clock=self.clock, household=self._household),
                 instance_ref=INSTANCE,
                 owner=OWNER,
                 metadata={"datum_classes": [PROGRESSION_DATUM]},

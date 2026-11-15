@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.content.render import RENDERER_VERSION, render_markdown_async
+from portalab.capabilities.household import refuse_profile
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.marketplace import LIFECYCLE
 from portalab.capabilities.registry import CapabilityRegistry
@@ -90,6 +91,7 @@ class Proposals:
         return await self.authorizer.is_allowed(viewer, MODERATE)
 
     async def _may_propose(self, user: UUID) -> None:
+        await refuse_profile(self.capabilities, None, user)  # issue 443
         if not await self.active(user):
             raise NotActiveAccount("Only active accounts can propose.")
         allowed = self.config().proposals_allowed_roles

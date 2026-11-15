@@ -12,7 +12,7 @@ import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Literal, Protocol, get_args, runtime_checkable
+from typing import Any, Literal, Protocol, get_args, runtime_checkable
 from uuid import UUID
 
 from portalab.capabilities.registry import CapabilitySpec
@@ -376,3 +376,28 @@ SPEC = CapabilitySpec(
     multi_provider=False,
     description="Households: profiles' masters, restrictions and access grants (owned by household).",
 )
+
+
+class ProfileNoProjects(Forbidden):
+    """Issue 443: a household profile never takes part in the community's projects (fund, vote, join,
+    propose, launch) — its master does, for the household."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Household profiles do not take part in community projects.", code="household.no_projects"
+        )
+
+
+async def refuse_profile(capabilities: Any, actor: Principal | None, user: UUID | None) -> None:
+    """Issue 443: refuses a household profile (acting as one, or a profile's account) a community project."""
+    if actor is not None and actor.profile_of is not None:
+        raise ProfileNoProjects()
+    if user is None:
+        return
+    try:
+        providers = capabilities.system_providers(CAPABILITY)
+        owner = await providers[0].provider.owner_of(user) if providers else None
+    except Exception:
+        owner = None
+    if owner is not None:
+        raise ProfileNoProjects()

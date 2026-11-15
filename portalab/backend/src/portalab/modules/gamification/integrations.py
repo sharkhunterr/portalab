@@ -2,7 +2,7 @@
 (021), the dashboard widget ``gamification.progress`` (009), the AI tool ``progression.get`` (018) and the
 automation actions ``award.xp|coins|contribution`` / ``reward.unlock`` (019)."""
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any, cast
 from uuid import UUID
 
@@ -43,13 +43,23 @@ register_datum_class(
 
 
 class ProgressionPreferences:
-    def __init__(self, database: Database, *, clock: Clock | None = None) -> None:
+    def __init__(
+        self,
+        database: Database,
+        *,
+        clock: Clock | None = None,
+        household: Callable[[], Any] | None = None,
+    ) -> None:
         self.database = database
         self.clock = clock
+        self.household = household  # issue 443: the dispatched profiles shown anonymously
 
     async def get_preference(self, subject: UUID, datum_class: str, datum_ref: str | None) -> Level | None:
         if datum_class != PROGRESSION:
             return None
+        found = self.household() if self.household is not None else None
+        if found is not None and hasattr(found, "anonymous") and subject in await found.anonymous():
+            return "private"  # issue 443: its master shows this dispatched profile anonymously
         async with self.database.session() as session:
             row = await session.get(ProgressionPreference, subject)
         return cast(Level, row.level) if row else None

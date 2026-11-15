@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from portalab.capabilities.economy import InsufficientCoins
+from portalab.capabilities.household import refuse_profile
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
@@ -99,6 +100,8 @@ class Purchases:
             raise NotAvailable("This product cannot be acquired now.")
         if not offered(self.activation.types, product.type, version.payload or {}):
             raise NotAvailable("This product cannot be acquired now.")  # issue 173: not offered now
+        if product.type == "project_launch":
+            await refuse_profile(self.capabilities, actor, user)  # issue 443: no community project
         # 027: the price now — less the best reduction of an active campaign
         discounts = await active_discounts(self.capabilities, utc_now(self.clock))
         reduced, _ = price_now(

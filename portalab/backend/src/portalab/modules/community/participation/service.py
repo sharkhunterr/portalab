@@ -11,6 +11,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 
+from portalab.capabilities.household import refuse_profile
 from portalab.core.audit_port import AuditRecord, AuditSink
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.db import Database
@@ -59,6 +60,7 @@ class Participations:
 
     async def join(self, actor: Principal, proposal_id: UUID, role: Role, note: str | None) -> Participation:
         user = user_of(actor)
+        await refuse_profile(self.proposals.capabilities, actor, user)  # issue 443
         if user is None or not await self.proposals.active(user):
             raise NotActiveAccount("Only active accounts can take part.")
         now = utc_now(self.clock)

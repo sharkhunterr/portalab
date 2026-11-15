@@ -5,6 +5,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { CurrencyShort } from "../../../design-system/site/SiteLook";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { useHasPermission } from "../../authz/useMyPermissions";
 import { type Project, useFund } from "../api";
 
@@ -81,7 +82,9 @@ export function FundingProgress({ project, mine }: { project: Project; mine: num
 export function FundingPanel({ project, mine }: { project: Project; mine: number }) {
   const t = useT();
   const format = useFormat();
-  const canFund = useHasPermission("marketplace.purchase");
+  // issue 443: a household profile never funds a community project (its master does)
+  const profile = Boolean(useMe().data?.profile_of);
+  const canFund = useHasPermission("marketplace.purchase") && !profile;
   const fund = useFund(project.id);
   const [amount, setAmount] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);

@@ -3,6 +3,7 @@ import { Button } from "../../../design-system/components/Button";
 import { SelectField } from "../../../design-system/components/Field";
 import { useT } from "../../../i18n/hooks/useT";
 import { ApiError } from "../../../state/regions";
+import { useMe } from "../../auth/useAuth";
 import { type Proposal, useParticipations, useProposalActions } from "./api";
 
 const ROLES = ["contributor", "tester", "helper"] as const;
@@ -23,6 +24,7 @@ export function ParticipationPanel({
   const actions = useProposalActions(proposal.id);
   const [role, setRole] = useState<(typeof ROLES)[number]>("contributor");
   const mine = (participations.data ?? []).some((p) => p.mine);
+  const profile = Boolean(useMe().data?.profile_of); // issue 443: profiles do not take part in projects
   const error = actions.recognize.error instanceof ApiError ? actions.recognize.error.code : null;
   return (
     <section aria-labelledby="proposal-participation" className="ds-card ds-stack">
@@ -46,7 +48,7 @@ export function ParticipationPanel({
       {error ? (
         <p role="alert">{t(`community:participation.error.${error.split(".")[1] ?? "generic"}`)}</p>
       ) : null}
-      {proposal.status === "open" ? (
+      {proposal.status === "open" && !profile ? (
         mine ? (
           <Button variant="secondary" onClick={() => actions.leave.mutate()}>
             {t("community:participation.leave")}

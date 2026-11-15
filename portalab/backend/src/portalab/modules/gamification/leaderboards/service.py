@@ -26,6 +26,7 @@ from portalab.capabilities.economy import (
     LeaderboardPeriod,
     LeaderboardView,
 )
+from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.identity_directory import MEMBERS
 from portalab.capabilities.registry import CapabilityRegistry
@@ -101,6 +102,16 @@ class LeaderboardService:
         directory = providers[0].provider
         return {u for u in users if await directory.is_active_account(u)}
 
+    async def _hidden(self) -> frozenset[UUID]:
+        """Issue 443: the profiles of a common pot — their master's account stands for the household."""
+        providers = self.capabilities.system_providers(HOUSEHOLD)
+        if not providers:
+            return frozenset()
+        try:
+            return frozenset(await providers[0].provider.hidden())
+        except Exception:
+            return frozenset()
+
     async def _members(self) -> list[UUID]:
         """Issue 120: every active member, by name — those who earned nothing yet are ranked too."""
         providers = self.capabilities.system_providers(MEMBERS)
@@ -165,6 +176,8 @@ class LeaderboardService:
         active = await self._active([user for user in scored if user not in named])
         users = [user for user in scored if user in named or user in active]
         users += [user for user in members if user not in scores]
+        hidden = await self._hidden()
+        users = [user for user in users if user not in hidden]  # issue 443: a common pot's profiles
 
         def values(user: UUID) -> tuple[int, ...]:
             return (scores.get(user, beginner), *(tie.get(user, 0) for tie in ties))

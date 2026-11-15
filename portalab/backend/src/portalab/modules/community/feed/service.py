@@ -66,7 +66,9 @@ class FeedService:
         names: Any,
         *,
         clock: Clock | None = None,
+        hidden: Any = None,
     ) -> None:
+        self.hidden = hidden  # issue 443: async () -> the profiles of a common pot (kept out)
         self.database = database
         self.visibility = visibility
         self.names = names  # async (UUID) -> str | None
@@ -88,6 +90,7 @@ class FeedService:
         named: dict[UUID, bool] = {}
         me = viewer.acting_for or viewer.user_id
         items: list[FeedItem] = []
+        kept_out = frozenset(await self.hidden()) if self.hidden is not None else frozenset()
         for _ in range(MAX_SCANS):
             statement = select(FeedEntry).order_by(FeedEntry.occurred_at.desc(), FeedEntry.id.desc())
             if position is not None:
@@ -108,6 +111,8 @@ class FeedService:
                 rows = list((await session.execute(statement.limit(limit * 2))).scalars())
             for row in rows:
                 position = (row.occurred_at, row.id)
+                if row.actor_user_id in kept_out and row.actor_user_id != me:
+                    continue  # issue 443: a common pot's profile — its master stands for the household
                 if row.actor_user_id not in allowed:
                     allowed[row.actor_user_id] = await shown(
                         self.visibility, viewer, row.actor_user_id, ACTIVITY, True
