@@ -55,6 +55,122 @@
 
 ---
 
+# v1.5.0
+
+## Portalab v1.5.0 — households and profiles, retro games in the portal, age ratings that follow your country
+
+**One account, a whole household**: each person gets a profile of their own — their home, their progress,
+their rules — and the account's holder decides how the household earns and what each child may watch, and
+when. **The library's retro games now play right in the portal**, with each member's saves. And **age
+ratings follow the country your portal lives in**, with the strictest one when that country has none.
+
+![The family dashboard: what each member watched, read and played lately](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.5.0/assets/screenshots/household.jpg)
+
+### Highlights
+
+- **Households and profiles** — a member makes a household (in the welcome, or later from their account
+  page) and creates a profile for each person sharing the account: a child profile comes with age limits
+  and screen time, every profile can have its own PIN. *My household* gathers the family's dashboard, the
+  profiles, a weekly schedule with the time left right now, and the access requests a profile sends when a
+  title is kept from it.
+- **The household's rules** — any genre kept out, titles above an age hidden or locked, a week of
+  screen-time spans like a calendar, minutes more today or no limits for a while in a few taps. The master
+  chooses whether screen time counts the media only or every minute on Portalab, and a guard covers the
+  screen once the time is over.
+- **The household's economy** — a common pot (each profile keeps its own figures, privately, and everything
+  it earns — XP, Coins, Contribution, boosters and rewards — is duplicated on the master's account, which
+  stands for the household in the community) or separate profiles (each its own wallet, in the community
+  publicly or anonymously). Switching rebuilds the pot or gives it back. Profiles never take part in
+  community projects.
+- **Retro games in the portal** — the RomM library's games start in the browser, with RomM's cores,
+  gamepads, Flash in Ruffle and each game's age rating; saves and save states belong to each member and
+  profile, copied to RomM; a member can authorise Portalab on their own RomM account.
+- **Age ratings that follow your country** — *Administration › Site identity* now sets the portal's system
+  language and country: the language metadata is fetched in, the country whose ratings count (a film rated
+  « Tous publics » in France is no longer shown as 8+), the default dates and numbers. Without a rating for
+  that country, the strictest of the others counts. Ratings show on every kind of media, and the catalog
+  filters by « what this member may watch ».
+- **A welcome for everyone** — members and profiles are welcomed: languages by their flags, the text size,
+  a profile's own PIN, the household part for the account's holder (replayable later), and a last screen
+  that explains how the portal works. Profiles are never asked about e-mails: their master's account holds
+  them.
+- **The pages between pages** — « not allowed », a page that is not there, an error, a service away, the
+  portal loading or unreachable: one look, the sign-in's, always with a way back home.
+- **Ten colour palettes offered** — Tangerine, Wisteria, Ruby, Amber, Seafoam, Sky, Petal, Coral, Stone and
+  Opal join Ocean and Forest for every member, readable in light and dark.
+
+### Closed issues
+
+#### Fixed
+
+- `bug` E-mail pictures were listed as « noname » attachments in Gmail; they no longer are
+- `bug` Live TV never kept a play streak, and a sitting counted only its pieces' minutes; a long enough
+  sitting keeps the streak and counts its whole length
+- `bug` Wide screens left their right side empty and the bingo was far too big; pages use the width, the
+  bingo fits
+- `bug` *My household* had no tabs like the other pages; it has them, and a family dashboard
+- `bug` « Switch profile » was misplaced on the desktop profile card
+- `bug` The IGDB service card showed no sync; it says IGDB is read on demand
+- `bug` The household's access-request e-mail did not use the detailed layout
+- `bug` A profile's game showed in its master's « Continue »; whatever a profile watches, reads or plays in
+  the portal stays its own (a play on the TV's own Plex app still counts for the account)
+- `bug` Household profiles got no welcome (they inherited their master's « seen »); they get their own,
+  with their PIN
+- `bug` The language chosen in the welcome did not apply until a restart; it applies at once, and a
+  member's dates follow their language
+- `bug` On a phone, some pages slid sideways and the welcome's fields ran past the edges; nothing is wider
+  than the screen any more
+- `bug` A deleted profile still showed in the administration's charts and its requests waited, unnamed; an
+  erased account leaves no trace on the administration's screens
+- `bug` The system language could only be set in the arrival wizard; it has its own card in
+  *Site identity*
+- `bug` A household profile refused by its master's rules was counted as an intrusion attempt
+- `bug` Relative times were written in the region's language (« il y a 2 heures » on an English page); they
+  follow the interface's
+- `bug` A few breadcrumbs stayed in English on a French page (« My household », « A book »…)
+- `bug` With separate profiles, the family dashboard still showed a common « household wallet »; it shows in a
+  common pot only
+- `bug` The welcome's new French screens said « vous » where the rest says « tu »
+
+#### New
+
+- `feat` Household profiles: several profiles per account, PINs, child restrictions, a household economy
+- `feat` Retro play: RomM's games in the portal, saves and states per member and profile, controls and more
+  engines, each member's own RomM account
+- `feat` The household's policy: any genre kept out, a weekly screen-time plan, temporary access in a few
+  taps; screen time as a calendar with the live countdown
+- `feat` The master chooses what screen time counts: the media only, or every minute on Portalab
+- `feat` The household's economy, the master's choice: a common pot or separate profiles; each profile's
+  own play streak (and the pot's)
+- `feat` Make a household in the welcome (the account's holder only), replayable later
+- `feat` Age ratings shown prominently for every kind of media; the catalog filters by age rating
+- `feat` Age ratings follow the portal's system language and country, set by the administrator
+- `feat` The media home shows a row of what arrived last for each kind (books, audiobooks, games…)
+- `feat` Gamification tells the library's video games (RomM) from the portal's mini-games
+- `feat` The administrator chooses the plays that keep a streak and their minimum length
+- `feat` The administration's charts can show household profiles on their master's row; the members'
+  streaks list the profiles
+- `feat` One look for the pages between pages (not allowed, not here, error, loading, sign-in)
+- `feat` The setup assistant covers the system language and the households
+- `feat` Ten more colour palettes offered to everyone
+- `feat` The daily quest « Mailbox » (read a notification) is gone
+
+#### Documentation and tooling
+
+- `doc` Households, retro games, the system language and the palettes in the README, the guides and the
+  wiki, with new screenshots
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts).
+- Set **Administration › Site identity › System language and country**: until you do, the portal follows
+  the interface language you chose, and age ratings follow that language's country.
+- Households start as a **common pot**; each master can switch to separate profiles in *My household*. A
+  member who never created a profile no longer sees *My household* until they make a household (from their
+  account page). Households can be switched off in *Administration › Modules*.
+
+---
+
 # v1.4.1
 
 ## Portalab v1.4.1 — pictures in e-mails, new versions announced, a security check-up
