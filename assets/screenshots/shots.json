@@ -408,7 +408,7 @@
  {
   "name": "wiki",
   "page": "readme",
-  "route": "/wiki/getting-started",
+  "route": "/wiki/guide-premiers-pas",
   "clip": "body",
   "height": 900,
   "maxHeight": 900,

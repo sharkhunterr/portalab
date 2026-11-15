@@ -273,6 +273,13 @@ async function act(page, step) {
                 );
         if (text !== node.nodeValue) node.nodeValue = text;
       }
+      // what fields show too (a site's name typed in a form)
+      for (const field of document.querySelectorAll("input, textarea")) {
+        let text = field.value;
+        for (const [from, to] of Object.entries(pairs))
+          if (!from.startsWith("~") && !from.startsWith("=")) text = text.split(from).join(to);
+        if (text !== field.value) field.value = text;
+      }
       // a key starting with « ~ »: the element holding that word is blurred (a private name, a brand)
       const hidden = Object.keys(pairs)
         .filter((key) => key.startsWith("~"))
