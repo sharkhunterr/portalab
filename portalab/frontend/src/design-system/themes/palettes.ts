@@ -25,43 +25,43 @@ export const PALETTE_COLORS: Record<string, { dark: Palette; light: Palette }> =
   // issue 455: ten more offered to everyone (WCAG AA: their text on the accent, the accent on white)
   tangerine: {
     dark: { accent: "#ffa94d", accentAlt: "#f783ac", contrast: "#1c0a02" },
-    light: { accent: "#c2410c", accentAlt: "#be185d", contrast: "#ffffff" },
+    light: { accent: "#b8460c", accentAlt: "#a8245e", contrast: "#ffffff" },
   },
   wisteria: {
     dark: { accent: "#d0bfff", accentAlt: "#b197fc", contrast: "#140b2e" },
-    light: { accent: "#6d28d9", accentAlt: "#7c3aed", contrast: "#ffffff" },
+    light: { accent: "#6236c4", accentAlt: "#7a3fd1", contrast: "#ffffff" },
   },
   ruby: {
-    dark: { accent: "#ff6b6b", accentAlt: "#f06595", contrast: "#1f0509" },
-    light: { accent: "#be123c", accentAlt: "#9f1239", contrast: "#ffffff" },
+    dark: { accent: "#ff7a7a", accentAlt: "#f06595", contrast: "#1f0509" },
+    light: { accent: "#b3143c", accentAlt: "#8f1336", contrast: "#ffffff" },
   },
   amber: {
     dark: { accent: "#ffd43b", accentAlt: "#fcc419", contrast: "#1c1002" },
-    light: { accent: "#b45309", accentAlt: "#92400e", contrast: "#ffffff" },
+    light: { accent: "#a65a07", accentAlt: "#8a4a0b", contrast: "#ffffff" },
   },
   seafoam: {
     dark: { accent: "#63e6be", accentAlt: "#66d9e8", contrast: "#03140e" },
-    light: { accent: "#047857", accentAlt: "#0f766e", contrast: "#ffffff" },
+    light: { accent: "#0b7a5c", accentAlt: "#0e6f73", contrast: "#ffffff" },
   },
   sky: {
     dark: { accent: "#74c0fc", accentAlt: "#91a7ff", contrast: "#04121c" },
-    light: { accent: "#1d4ed8", accentAlt: "#4338ca", contrast: "#ffffff" },
+    light: { accent: "#1e54d1", accentAlt: "#4a3fc4", contrast: "#ffffff" },
   },
   petal: {
     dark: { accent: "#fcc2d7", accentAlt: "#e599f7", contrast: "#24071a" },
-    light: { accent: "#be185d", accentAlt: "#a21caf", contrast: "#ffffff" },
+    light: { accent: "#b0195a", accentAlt: "#9b1ea8", contrast: "#ffffff" },
   },
   coral: {
-    dark: { accent: "#fda4af", accentAlt: "#fdba74", contrast: "#240a0d" },
-    light: { accent: "#b91c1c", accentAlt: "#c2410c", contrast: "#ffffff" },
+    dark: { accent: "#ffa8a8", accentAlt: "#fdba74", contrast: "#240a0d" },
+    light: { accent: "#b42318", accentAlt: "#b9461a", contrast: "#ffffff" },
   },
   stone: {
-    dark: { accent: "#cbd5e1", accentAlt: "#94a3b8", contrast: "#0f172a" },
-    light: { accent: "#334155", accentAlt: "#475569", contrast: "#ffffff" },
+    dark: { accent: "#c9d2de", accentAlt: "#94a3b8", contrast: "#0f172a" },
+    light: { accent: "#3a4556", accentAlt: "#4e5a6a", contrast: "#ffffff" },
   },
   opal: {
     dark: { accent: "#38d9a9", accentAlt: "#da77f2", contrast: "#031a17" },
-    light: { accent: "#0f766e", accentAlt: "#7e22ce", contrast: "#ffffff" },
+    light: { accent: "#0d7268", accentAlt: "#7424b8", contrast: "#ffffff" },
   },
 };
 

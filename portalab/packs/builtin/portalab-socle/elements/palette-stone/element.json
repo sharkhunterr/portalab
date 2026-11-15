@@ -11,13 +11,13 @@
   "free": true,
   "palette": {
     "dark": {
-      "accent": "#cbd5e1",
+      "accent": "#c9d2de",
       "accentAlt": "#94a3b8",
       "contrast": "#0f172a"
     },
     "light": {
-      "accent": "#334155",
-      "accentAlt": "#475569",
+      "accent": "#3a4556",
+      "accentAlt": "#4e5a6a",
       "contrast": "#ffffff"
     }
   }

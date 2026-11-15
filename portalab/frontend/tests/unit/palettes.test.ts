@@ -50,3 +50,38 @@ describe("palettes", () => {
     }
   });
 });
+
+describe("the palettes offered to everyone", () => {
+  // issue 454: the socle's palettes are in the interface's code too (drawn before any pack is read), the same
+  // colours; none repeats an accent of another palette, the shop's included (light or dark)
+  const SOCLE = join(PACKS, "portalab-socle", "elements");
+  const offered = readdirSync(SOCLE)
+    .map((folder) => JSON.parse(readFileSync(join(SOCLE, folder, "element.json"), "utf8")))
+    .filter((element) => element.type === "palette" && element.palette);
+
+  it("are the interface's own, colour for colour", async () => {
+    const { PALETTE_COLORS: inCode } = await import("../../src/design-system/themes/palettes");
+    expect(offered.length).toBeGreaterThanOrEqual(12);
+    for (const element of offered) expect(inCode[element.look], element.look).toEqual(element.palette);
+  });
+
+  it("repeat no accent of another palette", () => {
+    const socle = new Set(offered.map((element) => element.look as string));
+    const others = Object.entries(PALETTE_COLORS).filter(([look]) => !socle.has(look));
+    const taken = new Set(
+      others.flatMap(([, schemes]) =>
+        (["dark", "light"] as const).flatMap((s) => [
+          schemes[s].accent.toLowerCase(),
+          schemes[s].accentAlt.toLowerCase(),
+        ]),
+      ),
+    );
+    // Ocean and Forest predate the shop (some of its palettes were drawn from them): the ten offered since
+    // issue 454 are each their own
+    for (const element of offered.filter((e) => !["ocean", "forest"].includes(e.look)))
+      for (const scheme of ["dark", "light"] as const)
+        expect(taken.has(element.palette[scheme].accent.toLowerCase()), `${element.look} ${scheme}`).toBe(
+          false,
+        );
+  });
+});

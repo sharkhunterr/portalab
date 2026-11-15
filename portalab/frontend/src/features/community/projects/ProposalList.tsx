@@ -19,7 +19,9 @@ export function ProposalList() {
   const mine = useProposals(true);
   const create = useCreateProposal();
   // issue 443: a household profile does not propose community projects (its master does)
-  const canPropose = useHasPermission("community.propose") && !useMe().data?.profile_of;
+  const allowed = useHasPermission("community.propose");
+  const profile = Boolean(useMe().data?.profile_of);
+  const canPropose = allowed && !profile;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [kind, setKind] = useState<"project" | "feature">("project");
