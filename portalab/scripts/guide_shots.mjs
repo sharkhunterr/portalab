@@ -203,7 +203,18 @@ async function act(page, step) {
       for (let node = walker.nextNode(); node; node = walker.nextNode()) {
         let text = node.nodeValue ?? "";
         for (const [from, to] of Object.entries(pairs))
-          text = from.startsWith("=") ? (text.trim() === from.slice(1) ? to : text) : text.split(from).join(to);
+          text = from.startsWith("=")
+            ? text.trim() === from.slice(1)
+              ? to
+              : text
+            : // a whole word only: « Alex » is not « Alexandre » (a key's edge that is a letter)
+              text.replace(
+                new RegExp(
+                  `${/^\p{L}/u.test(from) ? "(?<!\\p{L})" : ""}${from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${/\p{L}$/u.test(from) ? "(?!\\p{L})" : ""}`,
+                  "gu",
+                ),
+                to,
+              );
         if (text !== node.nodeValue) node.nodeValue = text;
       }
     }, names);
