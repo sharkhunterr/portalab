@@ -48,6 +48,7 @@ interface Backend {
   assistant?: boolean;
   household?: boolean; // issue 428: profiles turned on
   me?: Record<string, unknown>; // issue 446: a household profile signed in
+  permissions?: string[]; // issue 458: what the member may use
 }
 
 function backend({
@@ -59,6 +60,7 @@ function backend({
   retro = [],
   household = false,
   me = ME,
+  permissions = ["media.request", "retro.play"],
 }: Backend) {
   const made: unknown[] = [];
   const householdMade: unknown[] = [];
@@ -96,6 +98,7 @@ function backend({
       return json(200, []);
     }
     if (path === "/api/v1/me") return json(200, me);
+    if (path === "/api/v1/me/permissions") return json(200, { permissions, roles: [] });
     if (path === "/api/v1/i18n/languages")
       return json(200, {
         default: "en",
@@ -518,8 +521,8 @@ describe("guide", () => {
     expect(await screen.findByText("+25 XP · +10 Coins")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "See again : Service status" })).toBeInTheDocument();
     // issue 181: the assistant's tours only while it is switched on
-    expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(
-      TOURS.filter((tour) => !tour.requires).length - 1,
+    expect(screen.getAllByRole("heading", { level: 4 }).map((h) => h.textContent)).toHaveLength(
+      TOURS.filter((tour) => tour.requires !== "assistant").length - 1,
     );
     expect(screen.queryByRole("heading", { name: "The assistant" })).toBeNull();
   });
@@ -531,6 +534,18 @@ describe("guide", () => {
     expect(await screen.findByRole("heading", { name: "The assistant" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Power up the assistant" })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(TOURS.length - 1);
+  });
+
+  it("offers no tour of a feature the member cannot use (issue 458)", async () => {
+    window.localStorage.clear();
+    backend({ me: { ...ME, profile_of: "0190f0a0-0000-7000-8000-00000000000f" }, permissions: [] });
+    show(<GuidePage />);
+    expect(await screen.findByRole("heading", { name: "Watch and read" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Ask for a title" })).toBeNull());
+    expect(screen.queryByRole("heading", { name: "Follow a request" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Retro games" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "My household" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "My settings" })).toBeInTheDocument();
   });
 });
 

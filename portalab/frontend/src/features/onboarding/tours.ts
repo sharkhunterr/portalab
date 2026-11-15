@@ -25,8 +25,12 @@ export interface TourDef {
   steps: readonly TourStep[];
   /** The « first steps » mission it leads to, if any. */
   mission?: string;
-  /** issue 181: offered only while this feature is there (the assistant switched on) */
-  requires?: "assistant";
+  /** issue 181: offered only while this feature is there (the assistant switched on); issue 458: « master »,
+   * to the account's holder only (never to a household profile) */
+  requires?: "assistant" | "master";
+  /** issue 458: offered only to a member who may use the feature (a child profile without requests is not
+   * shown how to ask for a title) */
+  permission?: string;
 }
 
 const done: TourStep = { key: "done", icon: "rocket", targets: [] };
@@ -98,6 +102,47 @@ export const TOURS: readonly TourDef[] = [
     ],
   },
   {
+    // issue 458: My settings — one list and its search, then the looks, the language, what tells you, privacy
+    key: "settings",
+    icon: "settings",
+    group: "start",
+    route: "/settings",
+    steps: [
+      { key: "search", icon: "search", targets: [".settings-search"] },
+      { key: "pages", icon: "list", targets: [".settings-home__grid", ".settings-hub__pages"] },
+      { key: "palettes", icon: "palette", route: "/settings/appearance", targets: [".palettes"] },
+      { key: "text", icon: "type", targets: [".appearance-scale"] },
+      { key: "language", icon: "globe", route: "/settings/language", targets: [".settings-fields"] },
+      {
+        key: "notifications",
+        icon: "bell",
+        route: "/settings/notifications",
+        targets: [".notification-preferences"],
+      },
+      { key: "privacy", icon: "lock", route: "/privacy", targets: [".privacy-data"] },
+      done,
+    ],
+  },
+  {
+    // issue 458: My household, for the account's holder — the family, how it earns, the schedule, requests
+    key: "household",
+    icon: "users",
+    group: "start",
+    route: "/household",
+    requires: "master",
+    steps: [
+      { key: "family", icon: "users", targets: [".family__members", ".family"] },
+      { key: "pin", icon: "key", targets: [".household-advice"] },
+      { key: "economy", icon: "coins", route: "/household/profiles", targets: [".household-economy"] },
+      { key: "profiles", icon: "user", targets: [".household-member"] },
+      { key: "quick", icon: "clock", targets: [".household-quick"] },
+      { key: "schedule", icon: "calendar-week", route: "/household/schedule", targets: [".screen-cal"] },
+      { key: "left", icon: "clock", targets: [".schedule-count"] },
+      { key: "requests", icon: "key", route: "/household/requests", targets: [".household-requests"] },
+      done,
+    ],
+  },
+  {
     // issue 344: the news — the team's headlines, then my feed: what comes, the sources, what I follow
     key: "news",
     icon: "newspaper",
@@ -129,7 +174,27 @@ export const TOURS: readonly TourDef[] = [
         route: "/media/browse",
         targets: [".catalog__search", ".catalog__kinds"],
       },
-      { key: "card", icon: "play", targets: [".media-card"] },
+      // issue 458: the age ratings — the « what I may watch » filter, then a title's age and its sources
+      { key: "filters", icon: "sliders", targets: [".catalog__toggle"], click: true },
+      { key: "age", icon: "shield", targets: ["[data-tour='catalog-age']", ".catalog__filters"] },
+      { key: "card", icon: "play", targets: [".media-card .media-card__link", ".media-card"], click: true },
+      { key: "rating", icon: "shield", targets: [".age-badge"] },
+      done,
+    ],
+  },
+  {
+    // issue 458: the library's retro games, played in the portal — the shelf, a game's page, saves, RomM
+    key: "retro",
+    icon: "game",
+    group: "media",
+    route: "/media/browse?kind=game",
+    permission: "retro.play",
+    steps: [
+      { key: "games", icon: "game", targets: [".catalog__kinds", ".catalog__search"] },
+      { key: "game", icon: "film", targets: [".media-card .media-card__link", ".media-card"], click: true },
+      { key: "play", icon: "play", targets: [".retro-resume .media-watch-here", ".media-watch-here"] },
+      { key: "saves", icon: "clock", targets: [".retro-chooser", ".retro-resume"] },
+      { key: "account", icon: "link", route: "/settings/media-accounts", targets: [".retro-account"] },
       done,
     ],
   },
@@ -139,6 +204,7 @@ export const TOURS: readonly TourDef[] = [
     group: "media",
     route: "/media/browse",
     mission: "discover_request",
+    permission: "media.request",
     steps: [
       { key: "find", icon: "search", targets: [".catalog__search", ".catalog__kinds"] },
       { key: "search", icon: "search", targets: ["[data-tour='search']", ".header-search", ".shell-search"] },
@@ -152,6 +218,7 @@ export const TOURS: readonly TourDef[] = [
     group: "media",
     route: "/media/requests",
     mission: "discover_request_status",
+    permission: "media.request",
     steps: [
       // issue 344: the figures are « My requests » in the Statistics section; the list is the section's page
       {

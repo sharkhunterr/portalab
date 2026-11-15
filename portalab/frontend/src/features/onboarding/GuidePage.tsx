@@ -6,6 +6,8 @@ import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { useAiStatus } from "../ai/api";
+import { useMe } from "../auth/useAuth";
+import { useMyPermissions } from "../authz/useMyPermissions";
 import { openWelcome, rewardOf, startTour, useMissions } from "./api";
 import { TOURS, type TourDef, type TourGroup } from "./tours";
 import "./onboarding.css";
@@ -37,7 +39,16 @@ export default function GuidePage() {
   const missions = useMissions();
   const missionOf = (tour: TourDef) => missions.data?.find((m) => m.key === tour.mission);
   const assistant = useAiStatus().data?.available === true; // issue 181: its tours while it is on
-  const tours = TOURS.filter((tour) => reachable(tour) && (tour.requires !== "assistant" || assistant));
+  // issue 458: a tour of a feature the member cannot use is not offered (a household profile, a role)
+  const permissions = useMyPermissions().data?.permissions;
+  const profile = Boolean(useMe().data?.profile_of);
+  const tours = TOURS.filter(
+    (tour) =>
+      reachable(tour) &&
+      (tour.requires !== "assistant" || assistant) &&
+      (tour.requires !== "master" || !profile) &&
+      (!tour.permission || !permissions || permissions.includes(tour.permission)),
+  );
   const portal = tours.find((tour) => tour.key === "portal");
   return (
     <section aria-labelledby={headingId} className="guide-page">

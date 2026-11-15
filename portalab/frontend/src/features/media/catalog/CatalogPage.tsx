@@ -337,6 +337,7 @@ export function CatalogPage() {
           </SelectField>
           <SelectField
             label={t("media:catalog.age")}
+            data-tour="catalog-age"
             value={filters.age ?? ""}
             onChange={(event) => set({ age: event.target.value })}
           >
