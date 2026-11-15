@@ -13,14 +13,10 @@ import { ApiError } from "../../state/regions";
 import {
   type AccessRequest,
   chooseProfile,
-  EXTRA_MINUTES,
   type Household,
   type HouseholdMember,
-  minutesLeftToday,
   useAccessRequests,
   useDecideAccess,
-  useFreeProfile,
-  useGiveMinutes,
   useHousehold,
   useProfileActivity,
   useScreenTime,
@@ -29,6 +25,8 @@ import {
 import { FamilyDashboard } from "./FamilyDashboard";
 import { ProfileEditor } from "./ProfileEditor";
 import { ProfileFace } from "./ProfilePicker";
+import { QuickTime } from "./QuickTime";
+import { SchedulePanel } from "./SchedulePanel";
 import "./household.css";
 
 /**
@@ -36,7 +34,7 @@ import "./household.css";
  * balances hold every profile's earnings) and each member's figures; the master adds and sets profiles,
  * reads their activity and answers their access requests.
  */
-export type HouseholdView = "overview" | "profiles" | "requests";
+export type HouseholdView = "overview" | "profiles" | "schedule" | "requests";
 
 export default function HouseholdPage({ view = "overview" }: { view?: HouseholdView }) {
   const t = useT();
@@ -54,12 +52,15 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
   const data = household.data;
   const profiles = data.members.filter((m) => m.kind !== "owner");
   const pending = (requests.data ?? []).filter((r) => r.status === "pending").length;
+  // issue 436: a profile reads its own schedule
+  const heading = view === "schedule" && !data.can_manage ? "scheduleMine" : view;
+  const icons = { overview: "dashboard", profiles: "user", schedule: "calendar-week", requests: "key" };
   return (
     <div className="household-page">
       <PageHeader
-        title={t(`household:page.${view}Title`)}
-        context={t(`household:page.${view}Subtitle`)}
-        icon={view === "overview" ? "dashboard" : view === "profiles" ? "user" : "key"}
+        title={t(`household:page.${heading}Title`)}
+        context={t(`household:page.${heading}Subtitle`)}
+        icon={icons[view]}
         primary={
           data.can_manage && profiles.length < data.max_profiles ? (
             <Button onClick={() => setEditing("new")}>
@@ -131,6 +132,8 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
             ))}
           </ul>
         </>
+      ) : view === "schedule" ? (
+        <SchedulePanel household={data} onAdd={() => setEditing("new")} />
       ) : (
         <Requests items={requests.data ?? []} household={data} />
       )}
@@ -511,118 +514,5 @@ function ScreenLine({ member }: { member: HouseholdMember }) {
     <p className="household-screen">
       <Icon name="clock" size={14} /> {parts.join(" · ")}
     </p>
-  );
-}
-
-/** Issue 432: time given in a few taps — minutes more today, no limits for a while, the limits back. */
-function QuickTime({ member }: { member: HouseholdMember }) {
-  const t = useT();
-  const format = useFormat();
-  const notify = useNotify();
-  const give = useGiveMinutes();
-  const free = useFreeProfile();
-  const name = member.display_name;
-  const until = member.free_until ? new Date(member.free_until) : null;
-  const freed = until !== null && until.getTime() > Date.now();
-  const timed = Boolean(
-    member.restrictions?.daily_minutes ||
-      member.restrictions?.week_minutes ||
-      member.restrictions?.slots?.length,
-  );
-  const failed = () => notify({ severity: "critical", title: t("household:error") });
-  const freeFor = (minutes: number) =>
-    free.mutate(
-      { id: member.id, minutes },
-      {
-        onSuccess: () =>
-          notify({
-            severity: "success",
-            title: t("household:quick.freed", {
-              name,
-              until: format.time(new Date(Date.now() + minutes * 60_000)),
-            }),
-          }),
-        onError: failed,
-      },
-    );
-  return (
-    <section className="household-quick" aria-label={t("household:quick.title")}>
-      {freed ? (
-        <div className="household-quick__row">
-          <span className="household-badge household-badge--free">
-            <Icon name="infinity" size={12} />
-            {t("household:quick.freeUntil", { until: format.time(until) })}
-          </span>
-          <Button
-            variant="ghost"
-            disabled={free.isPending}
-            onClick={() =>
-              free.mutate(
-                { id: member.id, minutes: null },
-                {
-                  onSuccess: () =>
-                    notify({ severity: "success", title: t("household:quick.backDone", { name }) }),
-                  onError: failed,
-                },
-              )
-            }
-          >
-            <Icon name="lock" size={14} />
-            {t("household:quick.back")}
-          </Button>
-        </div>
-      ) : (
-        <>
-          {timed ? (
-            <div className="household-quick__row">
-              <span className="household-quick__label">
-                {t("household:quick.more")}
-                {member.bonus_minutes
-                  ? ` (${t("household:quick.bonus", { minutes: member.bonus_minutes })})`
-                  : ""}
-              </span>
-              {EXTRA_MINUTES.map((minutes) => (
-                <Button
-                  key={minutes}
-                  variant="secondary"
-                  disabled={give.isPending}
-                  onClick={() =>
-                    give.mutate(
-                      { id: member.id, minutes },
-                      {
-                        onSuccess: () =>
-                          notify({
-                            severity: "success",
-                            title: t("household:quick.given", { minutes, name }),
-                          }),
-                        onError: failed,
-                      },
-                    )
-                  }
-                >
-                  {t("household:quick.minutes", { minutes })}
-                </Button>
-              ))}
-            </div>
-          ) : null}
-          <div className="household-quick__row">
-            <span className="household-quick__label">{t("household:quick.free")}</span>
-            {[1, 2].map((hours) => (
-              <Button
-                key={hours}
-                variant="secondary"
-                disabled={free.isPending}
-                onClick={() => freeFor(hours * 60)}
-              >
-                {t("household:quick.freeFor", { hours })}
-              </Button>
-            ))}
-            <Button variant="secondary" disabled={free.isPending} onClick={() => freeFor(minutesLeftToday())}>
-              {t("household:quick.freeDay")}
-            </Button>
-          </div>
-        </>
-      )}
-    </section>
   );
 }

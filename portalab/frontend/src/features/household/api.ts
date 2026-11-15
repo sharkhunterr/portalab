@@ -167,10 +167,11 @@ export function useDecideAccess() {
 export type ScreenTime = components["schemas"]["ScreenTimeOut"];
 
 /** A profile's screen time today (``null``: none set). */
-export function useScreenTime(profile: string | null, enabled = true) {
+export function useScreenTime(profile: string | null, enabled = true, live = false) {
   return useQuery({
     queryKey: ["household", "screen", profile],
     enabled,
+    refetchInterval: live ? 60_000 : false, // issue 436: the countdown follows what is watched
     retry: false,
     queryFn: async () =>
       (

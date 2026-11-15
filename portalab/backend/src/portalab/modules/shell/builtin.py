@@ -156,6 +156,18 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "keywords": ("profiles", "screen time", "profils", "temps d'écran", "contrôle parental"),
     },
     {
+        "key": "shell.household.schedule",  # issue 436: screen time as a calendar, the time left
+        "owner": "module:shell",
+        "kind": "entry",
+        "label_key": "nav.household_schedule",
+        "icon": "calendar-week",
+        "route": "/household/schedule",
+        "group": "household",
+        "order_hint": 10,
+        "required_permission": "users.self.manage",
+        "keywords": ("schedule", "screen time", "calendar", "horaires", "temps d'écran", "agenda"),
+    },
+    {
         "key": "shell.household.requests",  # issue 428: the profiles' access requests
         "owner": "module:shell",
         "kind": "entry",
@@ -163,7 +175,7 @@ BUILTIN: tuple[dict[str, object], ...] = (
         "icon": "key",
         "route": "/household/requests",
         "group": "household",
-        "order_hint": 10,
+        "order_hint": 11,
         "required_permission": "users.self.manage",
         "keywords": ("requests", "access", "demandes", "accès"),
     },

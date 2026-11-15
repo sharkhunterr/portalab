@@ -458,6 +458,11 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
           handle: h({ crumb: "Profiles" }),
         },
         {
+          path: "household/schedule", // issue 436: the profiles' screen time as a calendar, the time left
+          element: <Household view="schedule" />,
+          handle: h({ crumb: "Schedule" }),
+        },
+        {
           path: "household/requests",
           element: <Household view="requests" />,
           handle: h({ crumb: "Requests" }),

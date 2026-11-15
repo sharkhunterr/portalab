@@ -279,7 +279,7 @@ describe("my household", () => {
     expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(false);
     fireEvent.click(within(editor).getByLabelText("Horror"));
     expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(true);
-    expect(within(editor).getByLabelText("Most screen time on Monday")).toBeTruthy(); // issue 432: the planner
+    expect(within(editor).getByRole("button", { name: /^Most screen time on Monday/ })).toBeTruthy(); // 436: calendar
     expect((within(editor).getByRole("radio", { name: /Child/ }) as HTMLInputElement).checked).toBe(true);
     // 032: a birth date sets the age (the fixed one is then disabled), hidden or locked titles, requests
     fireEvent.change(within(editor).getByLabelText("Birth date (optional)"), {
@@ -358,8 +358,9 @@ describe("my household", () => {
     fireEvent.click(within(editor).getByRole("button", { name: "Remove science fiction" }));
     expect(within(editor).queryByRole("button", { name: "Remove science fiction" })).toBeNull();
 
-    fireEvent.click(within(editor).getByRole("button", { name: "Add a span on Saturday" }));
-    expect(within(editor).getByRole("region", { name: "Span on Saturday" })).toBeTruthy();
+    fireEvent.click(within(editor).getByRole("button", { name: "Add a span" }));
+    expect(await screen.findByRole("dialog", { name: "Span on Monday" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
     fireEvent.click(within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }));
     expect(
       (within(editor).getByRole("radio", { name: /^Shown(?! locked)/ }) as HTMLInputElement).checked,
@@ -378,6 +379,90 @@ describe("my household", () => {
     expect(screen.queryByRole("button", { name: "Edit Léa" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Add a profile" })).toBeNull();
     expect(screen.getByRole("button", { name: "My PIN" })).toBeTruthy();
+  });
+});
+
+describe("the household's schedule (issue 436)", () => {
+  const planned = {
+    ...HOUSEHOLD,
+    members: HOUSEHOLD.members.map((m) =>
+      m.id === LEA
+        ? {
+            ...m,
+            restrictions: {
+              ...("restrictions" in m ? m.restrictions : {}),
+              daily_minutes: 120,
+              slots: [{ day: 0, start: "16:00", end: "18:00", minutes: 45 }],
+            },
+          }
+        : m,
+    ),
+  };
+  const now = {
+    used: 30,
+    allowed: 120,
+    open: true,
+    slot: { start: "16:00", end: "18:00", used: 10, allowed: 45 },
+    slots: [{ start: "16:00", end: "18:00", minutes: 45 }],
+    next: null,
+  };
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 10, 16, 16, 30)); // a Monday, in the span
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it("shows the master a profile's time left and its calendar, changed in place and saved", async () => {
+    const patched: unknown[] = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, planned);
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (path === "/api/v1/me/media/screen-time") return json(200, now);
+      if (request.method === "PATCH" && path === `/api/v1/household/profiles/${LEA}`) {
+        patched.push(await request.json());
+        return new Response(null, { status: 204 });
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage view="schedule" />);
+    expect(await screen.findByRole("heading", { name: "Schedule" })).toBeTruthy();
+    const left = await screen.findByRole("region", { name: "Time left now" });
+    await waitFor(() => expect(within(left).getByText("35 min")).toBeTruthy()); // the span's 45 min, 10 used
+    expect(within(left).getByText("30 min of 2 hr")).toBeTruthy();
+    expect(within(left).getByText("Today's spans: 16:00–18:00")).toBeTruthy();
+    const calendar = screen.getByRole("region", { name: "Léa's schedule" });
+    expect(within(calendar).getByRole("button", { name: "Monday, 16:00 to 18:00: 45 min" })).toBeTruthy();
+    fireEvent.click(within(calendar).getByRole("button", { name: "Add a span" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Done" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save the schedule" }));
+    await waitFor(() => expect(patched).toHaveLength(1));
+    expect(patched[0]).toMatchObject({
+      restrictions: {
+        max_age: 12,
+        daily_minutes: 120,
+        slots: [
+          { day: 0, start: "14:00", end: "16:00", minutes: null }, // the first free two hours
+          { day: 0, start: "16:00", end: "18:00", minutes: 45 },
+        ],
+      },
+    });
+  });
+
+  it("shows a profile its own schedule, without changing it", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, { ...planned, me: LEA, can_manage: false });
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (path === "/api/v1/me/media/screen-time") return json(200, { ...now, open: false, slot: null });
+      return json(404, {});
+    };
+    show(<HouseholdPage view="schedule" />);
+    expect(await screen.findByRole("heading", { name: "My schedule" })).toBeTruthy();
+    expect(await screen.findByText("Closed for now")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Monday, 16:00 to 18:00: 45 min" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Add a span" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save the schedule" })).toBeNull();
   });
 });
 
