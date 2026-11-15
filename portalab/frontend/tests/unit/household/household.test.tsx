@@ -454,6 +454,55 @@ describe("the household's schedule (issue 436)", () => {
     });
   });
 
+  it("shows the master the chosen profile's own time when there are several", async () => {
+    const twins = {
+      ...planned,
+      members: [
+        ...planned.members,
+        {
+          ...tile(TOM, "Tom", "child"),
+          progress: figures(5),
+          community_visible: false,
+          effective_age: 8,
+          restrictions: {
+            max_age: 8,
+            allow_unrated: false,
+            blocked: [],
+            mode: "hide",
+            requests: true,
+            daily_minutes: 90,
+          },
+        },
+      ],
+    };
+    const asked: (string | null)[] = [];
+    fake.handler = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/household") return json(200, twins);
+      if (url.pathname === "/api/v1/household/requests") return json(200, []);
+      if (url.pathname === "/api/v1/me/media/screen-time") {
+        const profile = url.searchParams.get("profile");
+        asked.push(profile);
+        return json(
+          200,
+          profile === TOM ? { ...now, used: 80, allowed: 90, slot: null, slots: [], scope: "portal" } : now,
+        );
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage view="schedule" />);
+    const lea = await screen.findByRole("region", { name: "Léa's time" });
+    await waitFor(() => expect(within(lea).getByText("30 min of 2 hr")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Tom" }));
+    const tom = await screen.findByRole("region", { name: "Tom's time" });
+    await waitFor(() => expect(within(tom).getByText("10 min")).toBeTruthy()); // 90 − 80
+    expect(within(tom).getByText("1 hr 20 min of 1 hr 30 min")).toBeTruthy();
+    expect(screen.queryByText("30 min of 2 hr")).toBeNull(); // nothing of Léa's left
+    expect(screen.getByRole("region", { name: "Tom's schedule" })).toBeTruthy();
+    expect(asked).toEqual(expect.arrayContaining([LEA, TOM]));
+    expect(asked).not.toContain(null); // never the master's own
+  });
+
   it("shows a profile its own schedule, without changing it", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;

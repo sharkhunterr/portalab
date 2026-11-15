@@ -626,3 +626,69 @@ async def test_a_portal_set_up_in_french_rates_as_france(
     assert await system_language(media.module.capabilities) == "fr-BE"
     await media.configure("i18n.systemLanguage", "fr-CA")
     assert await system_language(media.module.capabilities) == "fr-CA"
+
+
+async def test_each_profiles_screen_time_is_its_own(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 439: with several profiles, its master reads each one's own screen time — its minutes, its
+    allowance, its scope — and a profile never reads a sibling's."""
+    from portalab.modules.media.insights.portal import PortalActivity
+    from portalab.modules.media.models import ScreenBeat
+
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    owner = Principal(user_id=people["zoe"])
+    lea = UUID(
+        str(
+            (await households(app).create(owner, display_name="Léa", kind="standard", color=None, pin=None))[
+                "id"
+            ]
+        )
+    )
+    tom = UUID(
+        str(
+            (await households(app).create(owner, display_name="Tom", kind="standard", color=None, pin=None))[
+                "id"
+            ]
+        )
+    )
+    await households(app).change(owner, lea, restrictions=RestrictionSettings(daily_minutes=60))
+    await households(app).change(
+        owner, tom, restrictions=RestrictionSettings(daily_minutes=90, screen_scope="portal")
+    )
+    now = datetime.now(UTC).replace(second=0, microsecond=0)
+    await PortalActivity(media.database).store(  # Léa: a 20-minute film
+        ref="portal:lea",
+        user=lea,
+        service=media.service(1).service_id,
+        object_id=ids["Toy Story"],
+        kind="movie",
+        watched=20 * 60,
+        duration=None,
+        share=None,
+        ended=now - timedelta(minutes=1),
+    )
+    async with media.database.unit_of_work() as uow:  # Tom: 7 minutes on the portal
+        uow.session.add_all(ScreenBeat(user_id=tom, minute=now - timedelta(minutes=m)) for m in range(1, 8))
+
+    await login(client, "zoe")
+    read = {}
+    for name, who in (("lea", lea), ("tom", tom)):
+        seen = await client.get("/api/v1/me/media/screen-time", params={"profile": str(who)})
+        assert seen.status_code == 200, seen.text
+        read[name] = seen.json()
+    assert (read["lea"]["used"], read["lea"]["allowed"], read["lea"]["scope"]) == (20, 60, "media")
+    assert (read["tom"]["used"], read["tom"]["allowed"], read["tom"]["scope"]) == (7, 90, "portal")
+    mine = await client.get("/api/v1/me/media/screen-time")
+    assert mine.status_code == 200 and mine.json() is None  # the master has none of its own
+
+    family = (await client.get("/api/v1/me/media/household")).json()["members"]
+    screens = {member["user_id"]: member["screen"] for member in family}
+    assert screens[str(lea)]["used"] == 20 and screens[str(tom)]["used"] == 7
+
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    own = await client.get("/api/v1/me/media/screen-time")
+    assert own.json()["used"] == 20
+    sibling = await client.get("/api/v1/me/media/screen-time", params={"profile": str(tom)})
+    assert sibling.status_code == 404
