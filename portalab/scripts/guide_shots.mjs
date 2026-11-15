@@ -4,12 +4,15 @@
  * (``docs/member-guide/shots/<page>.json``, one per page): the page, the screen, what is done first, the part
  * kept and the marks. A shot may name the API paths a page reads by POST (``"reads": ["/api/v1/search"]``);
  * every other write is refused.
- * The interface is shown in the guide's language whatever the account's; nothing is changed on the portal.
+ * The interface is shown in the guide's language and the default palette whatever the account's; nothing is
+ * changed on the portal.
  * By default only the content is kept (``main``), never the header nor the member's own panel.
  *
  *     node scripts/guide_shots.mjs docs/member-guide/shots --base https://127.0.0.1:8443 --login admin \
  *         --password-file <file> --out <folder> [--language fr] [--only name,name] [--names <file>]
  *
+ * ``"picker": true`` keeps « Who's there? » on screen (the shot of the picker itself).
+ * A bubble's words or a selector naming a label may be given in each language: ``{"en": "…", "fr": "…"}``.
  * A step may replace names in the picture (``"replace": true``), after the page is drawn: the real names and
  * the ones shown are read from ``--names`` (a JSON map kept out of the repository, e.g.
  * ``deploy/secrets/shot_names.json``: ``{"Real": "Shown", "=R": "S"}`` — a key starting with ``=`` replaces
@@ -52,7 +55,17 @@ const files = statSync(source).isDirectory()
       .sort()
       .map((name) => join(source, name))
   : [source];
-const shots = files.flatMap((file) => JSON.parse(readFileSync(file, "utf8")));
+// issue 457: a text in each language (``{"en": "…", "fr": "…"}``) — a bubble's words, a selector naming a
+// label — is read in the shot's language
+const localize = (value) => {
+  if (Array.isArray(value)) return value.map(localize);
+  if (value === null || typeof value !== "object") return value;
+  const keys = Object.keys(value);
+  if (keys.length && keys.every((key) => /^[a-z]{2}$/.test(key)))
+    return value[values.language] ?? value.en ?? value[keys[0]];
+  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, localize(item)]));
+};
+const shots = files.flatMap((file) => JSON.parse(readFileSync(file, "utf8"))).map(localize);
 const PRIVATE_CSS =
   '.avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, ' +
   '.household-face img, img[src*="/avatar"] { filter: blur(8px); }';
@@ -233,17 +246,29 @@ async function take(shot, last) {
     const read = request.method() === "POST" && (path === "/api/v1/household/switch" || reads.includes(path));
     return request.method() === "GET" || read ? route.fallback() : route.fulfill({ status: 204, body: "" });
   });
+  // issue 457: the portal's default colours, whatever palette the account chose — only in this browser
+  await page.route("**/api/v1/me/preferences", async (route) => {
+    if (route.request().method() !== "GET") return route.fallback();
+    const response = await route.fetch();
+    const body = await response.json();
+    const preferences = (body.preferences ?? []).map((item) =>
+      item.key === "ui.palette" ? { ...item, value: "theme" } : item,
+    );
+    await route.fulfill({ response, json: { ...body, preferences } });
+  });
   // the guide's language, whatever the account's — only in this browser
   await page.route("**/api/v1/i18n/context", async (route) => {
     const response = await route.fetch();
     const body = await response.json();
-    await route.fulfill({ response, json: { ...body, language: values.language } });
+    // dates and numbers too, as a member reading in that language sees them (not the account's region)
+    const locale = body.language === values.language ? body.locale : values.language;
+    await route.fulfill({ response, json: { ...body, language: values.language, locale } });
   });
   try {
     await act(page, { goto: shot.route, wait: shot.settle ?? 4000 });
     // issue 457: an account with profiles is asked « Who's there? » first — its holder is chosen
     const picker = page.locator(".household-picker__grid li:first-child .household-tile");
-    if (await picker.count()) {
+    if (!shot.picker && (await picker.count())) {
       await picker.first().click();
       await page.waitForTimeout(3000);
       await act(page, { goto: shot.route, wait: shot.settle ?? 4000 });

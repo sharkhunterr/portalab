@@ -22,32 +22,47 @@
     "marks": [
       {
         "target": ".shell-health",
-        "label": "L'icône du centre de contrôle",
+        "label": {
+          "en": "The control center's icon",
+          "fr": "L'icône du centre de contrôle"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": ".shell-status__head",
-        "label": "Le résumé",
+        "label": {
+          "en": "The summary",
+          "fr": "Le résumé"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": ".shell-status__group",
-        "label": "Chaque incident ouvert",
+        "label": {
+          "en": "Each open incident",
+          "fr": "Chaque incident ouvert"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": ".shell-status__group",
         "pick": "last",
-        "label": "L'état des services",
+        "label": {
+          "en": "The services' state",
+          "fr": "L'état des services"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": ".shell-status__foot",
-        "label": "Les pages des services et des incidents",
+        "label": {
+          "en": "The services' and incidents' pages",
+          "fr": "Les pages des services et des incidents"
+        },
         "side": "left",
         "gap": 40
       }
@@ -73,7 +88,10 @@
       },
       {
         "target": ".incidents-page fieldset",
-        "label": "« En cours », « Résolus » ou « Tous »",
+        "label": {
+          "en": "« Ongoing », « Resolved » or « All »",
+          "fr": "« En cours », « Résolus » ou « Tous »"
+        },
         "side": "right",
         "gap": 40
       },

@@ -15,7 +15,8 @@
         "replace": true,
         "wait": 300
       }
-    ]
+    ],
+    "picker": true
   },
   {
     "name": "foyer-famille",

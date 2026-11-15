@@ -9,7 +9,10 @@
     "marks": [
       {
         "target": ".discover-page__search",
-        "label": "Un film ou une série, même absent de la médiathèque",
+        "label": {
+          "en": "A film or a series, even one not in the library",
+          "fr": "Un film ou une série, même absent de la médiathèque"
+        },
         "side": "bottom",
         "gap": 30,
         "shift": 200,
@@ -17,7 +20,10 @@
       },
       {
         "target": ".discover-page .media-row .discover-card__badge",
-        "label": "Son badge : à demander, demandé, disponible…",
+        "label": {
+          "en": "Its badge: ask for it, requested, available…",
+          "fr": "Son badge : à demander, demandé, disponible…"
+        },
         "side": "right",
         "gap": 60,
         "shift": 40,
@@ -61,19 +67,28 @@
     "marks": [
       {
         "target": ".request-dialog__seasons",
-        "label": "Les saisons qui manquent : toutes cochées",
+        "label": {
+          "en": "The missing seasons: all ticked",
+          "fr": "Les saisons qui manquent : toutes cochées"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".request-dialog .request-quota__line",
-        "label": "Ce que la demande prend sur votre quota",
+        "label": {
+          "en": "What the request takes from your quota",
+          "fr": "Ce que la demande prend sur votre quota"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": "[role='dialog'] .ds-dialog__footer button:last-of-type",
-        "label": "Envoyer la demande",
+        "label": {
+          "en": "Send the request",
+          "fr": "Envoyer la demande"
+        },
         "side": "right",
         "gap": 40
       }
@@ -119,7 +134,10 @@
         "wait": 2000
       },
       {
-        "follow": ".requests-row:not(:has-text(\"Disponible\")) a"
+        "follow": {
+          "en": ".requests-row:not(:has-text(\"Available\")) a",
+          "fr": ".requests-row:not(:has-text(\"Disponible\")) a"
+        }
       },
       {
         "waitFor": ".media-journey",
@@ -140,7 +158,10 @@
     "marks": [
       {
         "target": ".journey-steps",
-        "label": "Chaque étape et son état",
+        "label": {
+          "en": "Each step and its state",
+          "fr": "Chaque étape et son état"
+        },
         "side": "top",
         "gap": 16
       },
@@ -153,7 +174,10 @@
       },
       {
         "target": ".media-journey__head button:has([data-icon=\"sparkles\"])",
-        "label": "Demander à l'assistant",
+        "label": {
+          "en": "Ask the assistant",
+          "fr": "Demander à l'assistant"
+        },
         "side": "left",
         "gap": 40
       }

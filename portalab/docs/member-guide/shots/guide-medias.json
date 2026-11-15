@@ -9,20 +9,29 @@
     "marks": [
       {
         "target": ".media-hero .ds-page-header__actions a:last-of-type",
-        "label": "Chercher dans le catalogue",
+        "label": {
+          "en": "Search the catalogue",
+          "fr": "Chercher dans le catalogue"
+        },
         "side": "top",
         "gap": 26,
         "shift": 0
       },
       {
         "target": ".media-hero .ds-page-header__actions a:first-of-type",
-        "label": "Demander un titre qui manque",
+        "label": {
+          "en": "Ask for a missing title",
+          "fr": "Demander un titre qui manque"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".media-home > .media-row:nth-of-type(2) .media-rail",
-        "label": "Une rangée : faites-la défiler sur le côté",
+        "label": {
+          "en": "A row: swipe it sideways",
+          "fr": "Une rangée : faites-la défiler sur le côté"
+        },
         "side": "top",
         "gap": 26,
         "shift": 380
@@ -90,7 +99,10 @@
     "marks": [
       {
         "target": ".discover-title__state .media-badges",
-        "label": "Où en est le titre : disponible, en cours, déjà vu…",
+        "label": {
+          "en": "Where the title stands: available, in progress, already seen…",
+          "fr": "Où en est le titre : disponible, en cours, déjà vu…"
+        },
         "side": "bottom",
         "gap": 30,
         "shift": 160,
@@ -98,7 +110,10 @@
       },
       {
         "target": ".discover-title__hero .ds-page-header__actions",
-        "label": "Regarder, reprendre, recommencer, ou l'ouvrir dans son application",
+        "label": {
+          "en": "Watch, resume, start over, or open it in its app",
+          "fr": "Regarder, reprendre, recommencer, ou l'ouvrir dans son application"
+        },
         "side": "top",
         "gap": 40,
         "pad": 4

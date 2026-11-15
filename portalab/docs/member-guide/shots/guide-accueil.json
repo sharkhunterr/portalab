@@ -8,7 +8,10 @@
     "before": [
       {
         "click": "[data-tour='customize']",
-        "waitFor": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__body img",
+        "waitFor": {
+          "en": ".widget-frame:has(.dash-grip[aria-label$='Continue']) .widget-frame__body img",
+          "fr": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__body img"
+        },
         "wait": 2500
       },
       {
@@ -40,15 +43,24 @@
         "pad": 3
       },
       {
-        "target": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__controls",
+        "target": {
+          "en": ".widget-frame:has(.dash-grip[aria-label$='Continue']) .widget-frame__controls",
+          "fr": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .widget-frame__controls"
+        },
         "pad": 3
       },
       {
-        "target": ".dash-grip[aria-label$='Reprendre']",
+        "target": {
+          "en": ".dash-grip[aria-label$='Continue']",
+          "fr": ".dash-grip[aria-label$='Reprendre']"
+        },
         "pad": 3
       },
       {
-        "target": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-resize--corner",
+        "target": {
+          "en": ".widget-frame:has(.dash-grip[aria-label$='Continue']) .dash-resize--corner",
+          "fr": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-resize--corner"
+        },
         "pad": 6
       }
     ]
@@ -76,31 +88,46 @@
     "marks": [
       {
         "target": ".widget-catalog__search",
-        "label": "Chercher un widget",
+        "label": {
+          "en": "Search for a widget",
+          "fr": "Chercher un widget"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".widget-catalog .in-shop",
-        "label": "D'autres widgets dans la boutique",
+        "label": {
+          "en": "More widgets in the shop",
+          "fr": "D'autres widgets dans la boutique"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".widget-gallery__item:nth-child(3) .widget-gallery__preview",
-        "label": "Son aperçu",
+        "label": {
+          "en": "Its preview",
+          "fr": "Son aperçu"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".widget-gallery__item:nth-child(3) .widget-gallery__text",
-        "label": "Ce qu'il fait, et ses tailles possibles",
+        "label": {
+          "en": "What it does, and its possible sizes",
+          "fr": "Ce qu'il fait, et ses tailles possibles"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".widget-gallery__item:nth-child(3) button",
-        "label": "L'ajouter au tableau de bord",
+        "label": {
+          "en": "Add it to the dashboard",
+          "fr": "L'ajouter au tableau de bord"
+        },
         "side": "right",
         "gap": 40
       }
@@ -125,7 +152,10 @@
         "wait": 2000
       },
       {
-        "click": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-tool",
+        "click": {
+          "en": ".widget-frame:has(.dash-grip[aria-label$='Continue']) .dash-tool",
+          "fr": ".widget-frame:has(.dash-grip[aria-label$='Reprendre']) .dash-tool"
+        },
         "waitFor": "[role='dialog']",
         "wait": 2500
       }
@@ -134,20 +164,29 @@
     "marks": [
       {
         "target": "[role='dialog'] select",
-        "label": "Une option propre à ce widget",
+        "label": {
+          "en": "An option of this widget's own",
+          "fr": "Une option propre à ce widget"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": "[role='dialog'] select",
         "pick": "last",
-        "label": "Le « Visuel » du widget",
+        "label": {
+          "en": "The widget's « Look »",
+          "fr": "Le « Visuel » du widget"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": "[role='dialog'] fieldset",
-        "label": "L'« Affichage », pour tous les widgets",
+        "label": {
+          "en": "« Display », for every widget",
+          "fr": "L'« Affichage », pour tous les widgets"
+        },
         "side": "left",
         "gap": 40
       }

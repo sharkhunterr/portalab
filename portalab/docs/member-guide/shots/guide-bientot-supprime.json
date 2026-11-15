@@ -21,7 +21,10 @@
     "marks": [
       {
         "target": "[data-status='leaving']",
-        "label": "« bientôt supprimé », et quand il part si c'est connu",
+        "label": {
+          "en": "« Leaving soon », and when it goes if known",
+          "fr": "« bientôt supprimé », et quand il part si c'est connu"
+        },
         "side": "right",
         "gap": 70,
         "shift": -6,
@@ -49,20 +52,29 @@
     "marks": [
       {
         "target": ".media-leaving__text",
-        "label": "Quand le titre part, et la règle qui l'a choisi",
+        "label": {
+          "en": "When the title goes, and the rule that chose it",
+          "fr": "Quand le titre part, et la règle qui l'a choisi"
+        },
         "side": "top",
         "gap": 40,
         "shift": 300
       },
       {
         "target": ".media-leaving__rescue",
-        "label": "Vos sauvetages, ou en acheter un",
+        "label": {
+          "en": "Your rescues, or buy one",
+          "fr": "Vos sauvetages, ou en acheter un"
+        },
         "side": "bottom",
         "gap": 30
       },
       {
         "target": ".media-leaving__actions > button",
-        "label": "Demander à l'assistant",
+        "label": {
+          "en": "Ask the assistant",
+          "fr": "Demander à l'assistant"
+        },
         "side": "bottom",
         "gap": 30,
         "shift": 60

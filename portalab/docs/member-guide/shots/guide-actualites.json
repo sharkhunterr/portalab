@@ -54,7 +54,10 @@
       {
         "target": ".feed-entry .feed-item__new",
         "pad": 3,
-        "label": "Arrivé depuis votre dernière visite",
+        "label": {
+          "en": "Arrived since your last visit",
+          "fr": "Arrivé depuis votre dernière visite"
+        },
         "side": "right",
         "gap": 40
       }
@@ -98,7 +101,10 @@
       },
       {
         "target": ".month-grid__day[data-today]",
-        "label": "Touchez un jour pour son détail",
+        "label": {
+          "en": "Tap a day for its details",
+          "fr": "Touchez un jour pour son détail"
+        },
         "side": "top",
         "pad": 3,
         "gap": 34

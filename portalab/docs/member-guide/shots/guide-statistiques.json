@@ -57,7 +57,10 @@
     "marks": [
       {
         "target": ".insights-locked .ds-button",
-        "label": "Une statistique verrouillée : la débloquer dans la boutique",
+        "label": {
+          "en": "A locked statistic: unlock it in the shop",
+          "fr": "Une statistique verrouillée : la débloquer dans la boutique"
+        },
         "side": "right",
         "gap": 50,
         "pad": 4

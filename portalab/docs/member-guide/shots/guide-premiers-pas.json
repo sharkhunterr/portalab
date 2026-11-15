@@ -68,20 +68,29 @@
     "marks": [
       {
         "target": ".shell-sections",
-        "label": "Le menu et ses rubriques",
+        "label": {
+          "en": "The menu and its sections",
+          "fr": "Le menu et ses rubriques"
+        },
         "side": "right",
         "gap": 50,
         "shift": 90
       },
       {
         "target": ".shell-breadcrumbs",
-        "label": "Le fil d'Ariane : où vous êtes",
+        "label": {
+          "en": "The breadcrumbs: where you are",
+          "fr": "Le fil d'Ariane : où vous êtes"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".hub-tabs ul",
-        "label": "Les onglets de la rubrique",
+        "label": {
+          "en": "The section's tabs",
+          "fr": "Les onglets de la rubrique"
+        },
         "side": "right",
         "gap": 40
       }
@@ -98,20 +107,29 @@
     "marks": [
       {
         "target": ".guide-page .ds-page-header button",
-        "label": "Revoir les écrans de bienvenue",
+        "label": {
+          "en": "See the welcome screens again",
+          "fr": "Revoir les écrans de bienvenue"
+        },
         "side": "left",
         "gap": 40
       },
       {
         "target": ".guide-hero .ds-button",
-        "label": "La première visite : le portail en une minute",
+        "label": {
+          "en": "The first tour: the portal in one minute",
+          "fr": "La première visite : le portail en une minute"
+        },
         "side": "bottom",
         "gap": 26,
         "shift": -260
       },
       {
         "target": ".guide-group .guide-card:nth-child(2)",
-        "label": "Une visite : ses étapes, « Vue » quand vous l'avez faite, puis « Lancer » ou « Revoir »",
+        "label": {
+          "en": "A tour: its steps, « Seen » once you took it, then « Start » or « See again »",
+          "fr": "Une visite : ses étapes, « Vue » quand vous l'avez faite, puis « Lancer » ou « Revoir »"
+        },
         "side": "right",
         "gap": 44,
         "width": 300

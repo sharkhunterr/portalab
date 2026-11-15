@@ -31,14 +31,20 @@
       },
       {
         "target": ".notif-panel__tabs",
-        "label": "Les onglets",
+        "label": {
+          "en": "The tabs",
+          "fr": "Les onglets"
+        },
         "side": "left",
         "gap": 40,
         "shift": 10
       },
       {
         "target": ".notif-row",
-        "label": "Une notification : touchez-la pour l'ouvrir",
+        "label": {
+          "en": "A notification: tap it to open it",
+          "fr": "Une notification : touchez-la pour l'ouvrir"
+        },
         "side": "left",
         "gap": 40
       },
@@ -99,7 +105,10 @@
     "marks": [
       {
         "target": ".settings-card:has(select) select",
-        "label": "Chaque e-mail, un résumé par jour ou par semaine",
+        "label": {
+          "en": "Each e-mail, a daily or weekly digest",
+          "fr": "Chaque e-mail, un résumé par jour ou par semaine"
+        },
         "side": "bottom",
         "gap": 30
       }

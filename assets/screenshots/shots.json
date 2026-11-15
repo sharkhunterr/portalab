@@ -919,7 +919,8 @@
     "replace": true,
     "wait": 300
    }
-  ]
+  ],
+  "picker": true
  },
  {
   "name": "household",

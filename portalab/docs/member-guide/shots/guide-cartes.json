@@ -24,7 +24,10 @@
       },
       {
         "target": ".cards-sets li[data-started]",
-        "label": "Une extension : son code et votre avancée",
+        "label": {
+          "en": "A set: its code and how far you are",
+          "fr": "Une extension : son code et votre avancée"
+        },
         "side": "right",
         "gap": 60
       }
@@ -65,37 +68,55 @@
     "marks": [
       {
         "target": ".cards-sheet figure:first-of-type .mcard__name",
-        "label": "Son nom",
+        "label": {
+          "en": "Its name",
+          "fr": "Son nom"
+        },
         "side": "left",
         "pad": 3
       },
       {
         "target": ".cards-sheet figure:first-of-type .mcard__genre",
-        "label": "Le genre du titre, qui donne sa couleur",
+        "label": {
+          "en": "The title's genre, which gives its colour",
+          "fr": "Le genre du titre, qui donne sa couleur"
+        },
         "side": "right",
         "pad": 3
       },
       {
         "target": ".cards-sheet figure:first-of-type .mcard__art",
-        "label": "L'illustration : le personnage sur une scène du titre",
+        "label": {
+          "en": "The artwork: the character in a scene of the title",
+          "fr": "L'illustration : le personnage sur une scène du titre"
+        },
         "side": "left",
         "pad": 2
       },
       {
         "target": ".cards-sheet figure:first-of-type .mcard__strip",
-        "label": "Ce qu'est la carte, et le symbole de son édition",
+        "label": {
+          "en": "What the card is, and its edition's symbol",
+          "fr": "Ce qu'est la carte, et le symbole de son édition"
+        },
         "side": "right",
         "pad": 2
       },
       {
         "target": ".cards-sheet figure:first-of-type .mcard__lower",
-        "label": "Le titre : son affiche, qui joue le rôle, ses chiffres",
+        "label": {
+          "en": "The title: its poster, who plays the part, its figures",
+          "fr": "Le titre : son affiche, qui joue le rôle, ses chiffres"
+        },
         "side": "left",
         "pad": 2
       },
       {
         "target": ".cards-sheet figure:first-of-type .mcard__foot",
-        "label": "Son numéro et sa rareté",
+        "label": {
+          "en": "Its number and its rarity",
+          "fr": "Son numéro et sa rareté"
+        },
         "side": "right",
         "pad": 2
       }
@@ -120,14 +141,20 @@
       },
       {
         "target": ".cards-binder li:has(.mcard:not([data-missing]))",
-        "label": "À vous : en couleur",
+        "label": {
+          "en": "Yours: in colour",
+          "fr": "À vous : en couleur"
+        },
         "side": "bottom",
         "gap": 30
       },
       {
         "target": ".cards-binder li:has(.mcard[data-missing])",
         "pick": "last",
-        "label": "Pas encore à vous : grisée",
+        "label": {
+          "en": "Not yours yet: dimmed",
+          "fr": "Pas encore à vous : grisée"
+        },
         "side": "bottom",
         "gap": 30
       }
@@ -153,13 +180,19 @@
     "marks": [
       {
         "target": ".cards-sheet figure[data-owned]",
-        "label": "Une version que vous avez, et combien",
+        "label": {
+          "en": "A version you have, and how many",
+          "fr": "Une version que vous avez, et combien"
+        },
         "side": "bottom",
         "gap": 24
       },
       {
         "target": ".cards-sheet figure:not([data-owned])",
-        "label": "Une version à trouver",
+        "label": {
+          "en": "A version to find",
+          "fr": "Une version à trouver"
+        },
         "side": "bottom",
         "gap": 24
       }
@@ -225,7 +258,10 @@
     "marks": [
       {
         "target": ".vitrine-grid .vitrine-tile",
-        "label": "Un booster de cartes : son genre, son nombre de cartes (×3), son prix",
+        "label": {
+          "en": "A card booster: its genre, its number of cards (×3), its price",
+          "fr": "Un booster de cartes : son genre, son nombre de cartes (×3), son prix"
+        },
         "side": "top",
         "shift": 220,
         "gap": 50
@@ -248,13 +284,19 @@
     "marks": [
       {
         "target": ".cards-boosters__pack",
-        "label": "Un booster : touchez-le pour l'ouvrir",
+        "label": {
+          "en": "A booster: tap it to open it",
+          "fr": "Un booster : touchez-le pour l'ouvrir"
+        },
         "side": "right",
         "gap": 40
       },
       {
         "target": ".cards-boosters__pile",
-        "label": "Des boosters identiques : combien dans la pile",
+        "label": {
+          "en": "Identical boosters: how many in the stack",
+          "fr": "Des boosters identiques : combien dans la pile"
+        },
         "side": "bottom",
         "gap": 30,
         "pad": 3
