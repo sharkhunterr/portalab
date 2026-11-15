@@ -8,10 +8,12 @@
  * By default only the content is kept (``main``), never the header nor the member's own panel.
  *
  *     node scripts/guide_shots.mjs docs/member-guide/shots --base https://127.0.0.1:8443 --login admin \
- *         --password-file <file> --out <folder> [--language fr] [--only name,name]
+ *         --password-file <file> --out <folder> [--language fr] [--only name,name] [--names <file>]
  *
- * A step may replace names in the picture (``"replace": {"Real": "Shown"}``), after the page is drawn; a key
- * starting with ``=`` replaces only a whole text (an initial: ``"=R": "S"``).
+ * A step may replace names in the picture (``"replace": true``), after the page is drawn: the real names and
+ * the ones shown are read from ``--names`` (a JSON map kept out of the repository, e.g.
+ * ``deploy/secrets/shot_names.json``: ``{"Real": "Shown", "=R": "S"}`` — a key starting with ``=`` replaces
+ * only a whole text, an initial). Without the file, a shot asking for it is refused: real names never show.
  * The password is read from a file, never from the command line. Then ``wiki_import.py --shots <folder>``.
  */
 
@@ -33,6 +35,7 @@ const { values, positionals } = parseArgs({
     out: { type: "string" },
     language: { type: "string", default: "fr" },
     only: { type: "string" },
+    names: { type: "string" },
   },
 });
 if (!positionals[0] || !values.base || !values.login || !values["password-file"] || !values.out) {
@@ -50,6 +53,8 @@ const files = statSync(source).isDirectory()
       .map((name) => join(source, name))
   : [source];
 const shots = files.flatMap((file) => JSON.parse(readFileSync(file, "utf8")));
+// issue 456: the real names to hide, never written in the repository
+const names = values.names ? JSON.parse(readFileSync(values.names, "utf8")) : null;
 const only = values.only ? new Set(values.only.split(",")) : null;
 const out = resolve(values.out);
 mkdirSync(out, { recursive: true });
@@ -176,6 +181,7 @@ async function act(page, step) {
   if (step.click) await page.locator(step.click).first().click();
   // issue 456: names replaced in the picture (a real family's children never shown in public screenshots)
   if (step.replace) {
+    if (!names) throw new Error("this shot replaces names: pass --names <file>");
     await page.evaluate((pairs) => {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -184,7 +190,7 @@ async function act(page, step) {
           text = from.startsWith("=") ? (text.trim() === from.slice(1) ? to : text) : text.split(from).join(to);
         if (text !== node.nodeValue) node.nodeValue = text;
       }
-    }, step.replace);
+    }, names);
   }
   if (step.follow) {
     // a link's address, rewritten (a set's page → its work's page)

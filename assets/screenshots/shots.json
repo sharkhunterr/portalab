@@ -529,7 +529,7 @@
   "settle": 12000,
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
@@ -924,12 +924,7 @@
     "wait": 300
    },
    {
-    "replace": {
-     "Maya": "Léa",
-     "Camille": "Tom",
-     "=M": "L",
-     "=C": "T"
-    },
+    "replace": true,
     "wait": 300
    }
   ]
@@ -946,7 +941,7 @@
   ],
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
@@ -958,12 +953,7 @@
     "wait": 300
    },
    {
-    "replace": {
-     "Maya": "Léa",
-     "Camille": "Tom",
-     "=M": "L",
-     "=C": "T"
-    },
+    "replace": true,
     "wait": 300
    }
   ]
@@ -980,7 +970,7 @@
   ],
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
@@ -992,12 +982,7 @@
     "wait": 300
    },
    {
-    "replace": {
-     "Maya": "Léa",
-     "Camille": "Tom",
-     "=M": "L",
-     "=C": "T"
-    },
+    "replace": true,
     "wait": 300
    }
   ]
@@ -1014,7 +999,7 @@
   ],
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
@@ -1026,12 +1011,7 @@
     "wait": 300
    },
    {
-    "replace": {
-     "Maya": "Léa",
-     "Camille": "Tom",
-     "=M": "L",
-     "=C": "T"
-    },
+    "replace": true,
     "wait": 300
    }
   ]
@@ -1048,7 +1028,7 @@
   ],
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
@@ -1073,7 +1053,7 @@
   ],
   "before": [
    {
-    "click": "button:has-text(\"Jérémie\")",
+    "click": ".household-picker__grid li:first-child .household-tile",
     "wait": 3500
    },
    {
