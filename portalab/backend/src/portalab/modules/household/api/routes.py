@@ -77,6 +77,7 @@ class HouseholdOut(BaseModel):
     palette: list[str]  # the colours a profile may take
     totals: HouseholdFigures | None
     members: list[HouseholdMemberOut]
+    economy: Literal["pot", "dispatch"] = "pot"  # issue 443: a common pot on the master, or dispatched
 
 
 class HouseholdProfileIn(_Strict):
@@ -227,6 +228,20 @@ class HouseholdMinutesIn(_Strict):
 
 class HouseholdFreeIn(_Strict):
     minutes: int | None = Field(default=None, ge=15, le=1440)  # issue 432: none — the limits back now
+
+
+class HouseholdEconomyIn(_Strict):
+    economy: Literal["pot", "dispatch"]
+
+
+@router.put("/economy", status_code=status.HTTP_204_NO_CONTENT)
+async def set_economy(
+    body: HouseholdEconomyIn, module: Module, principal: Principal = require(SELF)
+) -> Response:
+    """Issue 443: the master chooses its household's economy — a common pot on its account (its profiles kept
+    out of the community) or dispatched profiles (each its own wallet, in the community)."""
+    await module.service.set_economy(principal, body.economy)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/profiles/{profile_id}/minutes", status_code=status.HTTP_204_NO_CONTENT)

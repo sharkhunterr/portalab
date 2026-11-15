@@ -34,6 +34,7 @@ class HouseholdMember(HouseholdBase):
     __table_args__ = (
         CheckConstraint(_in("kind", KINDS), name="kind"),
         CheckConstraint("(kind = 'owner') = (owner_id = user_id)", name="owner"),
+        CheckConstraint("economy IN ('pot', 'dispatch')", name="economy"),
         Index("ix_members_owner_id", "owner_id", "position"),
     )
 
@@ -55,6 +56,8 @@ class HouseholdMember(HouseholdBase):
     bonus_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     bonus_day: Mapped[date | None] = mapped_column(Date)
     free_until: Mapped[datetime | None] = mapped_column(TZDateTime)
+    # issue 443 (the master's row): its household's economy — a common pot on the master, or dispatched
+    economy: Mapped[str] = mapped_column(String(10), nullable=False, default="pot")
 
 
 class AccessRequest(HouseholdBase):

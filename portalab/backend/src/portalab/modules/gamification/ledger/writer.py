@@ -8,8 +8,8 @@
 5. for XP and Coins, queue a ``progression.changed`` live notification to the owner only (spec 027 R6), so
    the header updates without polling — and never on rollback, since it shares the transaction;
 6. 032: for a household profile, record the same XP, Contribution or Coins once more for its master, in the
-   same transaction (the master's balances are the household's; issue 441: its Coins only when its
-   administrator dispatches the profiles): a debit the household cannot cover refuses
+   same transaction (the master's balances are the household's; issue 443: in a common pot only — dispatched
+   profiles keep their own, boosters included): a debit the household cannot cover refuses
    a spend or a reservation, and an administrator's correction is mirrored up to what the master holds; the
    copy publishes no reward event (it rewards nothing twice).
 Rows are never updated or deleted (database triggers); corrections are new rows."""
@@ -41,7 +41,7 @@ EVENTS = {
     "refund": "economy.coins_refunded",
     "destruction": "economy.coins_destroyed",
 }
-MIRRORED = ("xp", "contribution", "coins")
+MIRRORED = ("xp", "contribution", "coins", "booster")  # issue 443: boosters too, in a common pot
 REFUSED_SHORT = ("spend", "reserve")  # a household that cannot cover them refuses them
 
 
@@ -108,8 +108,6 @@ class LedgerWriter:
         self.levels = levels
         self.clock = clock
         self.household: Callable[[], Household | None] = lambda: None  # 032: wired by the module
-        # issue 441: a profile's XP and contribution on its master too (« group »), else its Coins only
-        self.grouped: Callable[[], bool] = lambda: True
 
     async def record(self, session: AsyncSession, entry: Entry) -> Recorded:
         if entry.value not in ("xp", "contribution", "coins", "booster"):
@@ -164,7 +162,7 @@ class LedgerWriter:
             await self._publish(session, row, level_up)
         if row.value in ("xp", "coins"):
             await self._live(session, row, level_up)
-        if entry.profile_id is None and row.value in MIRRORED and (row.value == "coins" or self.grouped()):
+        if entry.profile_id is None and row.value in MIRRORED:
             await self._mirror(session, entry)
         return Recorded(to_transaction(row), level_up=level_up)
 
@@ -173,8 +171,11 @@ class LedgerWriter:
         profile row's)."""
         household = self.household()
         owner = await household.owner_of(entry.user_id) if household is not None else None
-        if owner is None:
+        if owner is None or household is None:
             return
+        economy = getattr(household, "economy_of", None)
+        if economy is not None and await economy(entry.user_id) != "pot":
+            return  # issue 443: dispatched profiles — each its own wallet
         await lock_user(session, owner)
         delta = entry.delta
         if delta < 0 and entry.kind not in REFUSED_SHORT:

@@ -286,7 +286,8 @@ class Household(Protocol):
         ...
 
     async def hidden(self) -> frozenset[UUID]:
-        """The profiles their master keeps out of the community."""
+        """The profiles kept out of the community — issue 443: every profile of a common pot (its master
+        stands for the household)."""
         ...
 
     async def profiles(self) -> frozenset[UUID]:
@@ -295,6 +296,16 @@ class Household(Protocol):
 
     async def profiles_of(self, owner: UUID) -> frozenset[UUID]:
         """A master's profiles (they follow its account's deletion)."""
+        ...
+
+    async def economy_of(self, user: UUID) -> str:
+        """Issue 443: how a master's household earns — ``pot`` (its profiles' gains, items too, also the
+        master's: the household's pot; the profiles kept out of the community) or ``dispatch`` (each profile
+        its own wallet, in the community as itself or anonymous). A profile's is its master's."""
+        ...
+
+    async def anonymous(self) -> frozenset[UUID]:
+        """Issue 443: the dispatched profiles their master shows anonymously in the community."""
         ...
 
 

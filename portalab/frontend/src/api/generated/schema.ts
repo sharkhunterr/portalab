@@ -7240,6 +7240,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/household/economy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Economy
+         * @description Issue 443: the master chooses its household's economy — a common pot on its account (its profiles kept
+         *     out of the community) or dispatched profiles (each its own wallet, in the community).
+         */
+        put: operations["set_economy_api_v1_household_economy_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/household/members/{member_id}/pin": {
         parameters: {
             query?: never;
@@ -16404,6 +16425,14 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HouseholdEconomyIn */
+        HouseholdEconomyIn: {
+            /**
+             * Economy
+             * @enum {string}
+             */
+            economy: "pot" | "dispatch";
+        };
         /** HouseholdEconomyLine */
         HouseholdEconomyLine: {
             /**
@@ -16524,6 +16553,12 @@ export interface components {
         HouseholdOut: {
             /** Can Manage */
             can_manage: boolean;
+            /**
+             * Economy
+             * @default pot
+             * @enum {string}
+             */
+            economy: "pot" | "dispatch";
             /** Enabled */
             enabled: boolean;
             /** Max Profiles */
@@ -36761,6 +36796,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HouseholdOut"];
+                };
+            };
+        };
+    };
+    set_economy_api_v1_household_economy_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdEconomyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

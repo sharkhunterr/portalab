@@ -236,8 +236,13 @@ async def test_hidden_profiles_are_no_members_and_follow_their_master(
     module, alice, lea, tom = await _family(app, client)
     listing = module.ctx.capabilities.system_providers(MEMBERS)[0].provider
     listed = {entry.id for entry in (await listing.active_members(limit=50)).items}
-    assert alice in listed and tom in listed and lea not in listed  # a child starts out of the community
-    assert await households(app).hidden() == frozenset({lea})
+    # issue 443: a common pot (the default) — the master stands for the household, its profiles stay out
+    assert alice in listed and tom not in listed and lea not in listed
+    assert await households(app).hidden() == frozenset({lea, tom})
+    await households(app).set_economy(Principal(user_id=alice), "dispatch")
+    listed = {entry.id for entry in (await listing.active_members(limit=50)).items}
+    assert {alice, tom, lea} <= listed  # dispatched: each profile in the community
+    assert await households(app).anonymous() == frozenset({lea})  # a child, anonymously
 
     await module.deletion.request(self_actor(Principal(user_id=alice)), alice, reason="test")
     async with module.ctx.database.session() as session:

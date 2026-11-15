@@ -252,7 +252,7 @@ describe("my household", () => {
     };
     show(<HouseholdPage view="profiles" />);
     expect(await screen.findByText("Up to 12+")).toBeTruthy();
-    expect(screen.getByText("Hidden from the community")).toBeTruthy();
+    expect(screen.getByText("Private (common pot)")).toBeTruthy(); // issue 443: a common pot by default
     expect(screen.getByRole("button", { name: "Edit Léa" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Add a profile" })).toBeTruthy();
     cleanup();
@@ -260,6 +260,31 @@ describe("my household", () => {
     expect(await screen.findByText("Léa asks for “Alien”")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Allow for 1 day" }));
     await waitFor(() => expect(decisions).toEqual([{ approve: true, days: 1 }]));
+  });
+
+  it("lets the master choose a common pot or separate profiles (issue 443)", async () => {
+    const sent: unknown[] = [];
+    let economy = "pot";
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, { ...HOUSEHOLD, economy });
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (request.method === "PUT" && path === "/api/v1/household/economy") {
+        const body = (await request.json()) as { economy: string };
+        sent.push(body);
+        economy = body.economy;
+        return new Response(null, { status: 204 });
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage view="profiles" />);
+    const pot = await screen.findByRole("radio", { name: /Common pot/ });
+    expect((pot as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(screen.getByRole("radio", { name: /Separate profiles/ }));
+    await waitFor(() => expect(sent).toEqual([{ economy: "dispatch" }]));
+    expect(await screen.findByText("Anonymous in the community")).toBeTruthy(); // Léa: not public
+    fireEvent.click(screen.getByRole("button", { name: "Edit Léa" }));
+    expect(await screen.findByRole("checkbox", { name: "Public in the community" })).toBeTruthy();
   });
 
   it("opens the editor with the profile's restrictions", async () => {

@@ -93,11 +93,13 @@ export function ProfileEditor({
   member,
   position,
   palette,
+  economy = "pot",
   onClose,
 }: {
   member: HouseholdMember | null;
   position: number;
   palette: readonly string[];
+  economy?: string;
   onClose: () => void;
 }) {
   const t = useT();
@@ -385,12 +387,25 @@ export function ProfileEditor({
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.community")}</legend>
-          <Switch
-            label={t("household:editor.community")}
-            checked={community}
-            onChange={(event) => setCommunity(event.target.checked)}
-          />
-          <p className="household-editor__hint">{t("household:editor.communityHint")}</p>
+          {economy === "pot" ? (
+            // issue 443: a common pot — the master stands for the household, its profiles stay private
+            <p className="household-editor__hint">{t("household:editor.communityPot")}</p>
+          ) : (
+            <>
+              <Switch
+                label={t("household:editor.communityPublic")}
+                checked={community}
+                onChange={(event) => setCommunity(event.target.checked)}
+              />
+              <p className="household-editor__hint">
+                {t(
+                  community
+                    ? "household:editor.communityPublicHint"
+                    : "household:editor.communityAnonymousHint",
+                )}
+              </p>
+            </>
+          )}
         </fieldset>
 
         <fieldset className="household-editor__section">

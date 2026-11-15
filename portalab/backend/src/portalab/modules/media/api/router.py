@@ -14,7 +14,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
-from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
 from portalab.capabilities.themes import COSMETICS
@@ -56,8 +55,6 @@ from portalab.modules.media.permissions import (
 from portalab.modules.media.providers.insight_widgets import posters, with_posters
 from portalab.modules.media.requests.insights import kind_of, lookup_of, told
 from portalab.modules.media.sections.service import SECTIONS
-
-HOUSEHOLD_GROUPED = "economy.household.grouped"  # issue 441: the economy's setting
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
 
@@ -655,29 +652,28 @@ async def _guard_filters(module: Any, principal: Principal, period: str, scope: 
 
 async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | frozenset[UUID] | None:
     """Whose statistics: mine, the server's (``None``), or (032) my household's — its master and (issue 441)
-    each of its profiles (what they watched with the portal's player is theirs). A master's own include its
-    profiles' when its administrator groups the profiles on their master."""
+    each of its profiles (what they watched with the portal's player is theirs). Issue 443: a master's own
+    include its profiles' in a common pot (its account is the household's)."""
     if scope == "all":
         return None
     me = _me(principal)
     owner = await link_holder(module.capabilities, me)
     if scope == "household":
         return frozenset({owner, *await profiles_of(module.capabilities, owner)})
-    if owner == me and await _grouped(module):
+    if owner == me and await _pot(module, me):
         profiles = await profiles_of(module.capabilities, me)
         return frozenset({me, *profiles}) if profiles else me
     return me
 
 
-async def _grouped(module: Any) -> bool:
-    """Issue 441: household profiles grouped on their master (the economy's setting; grouped by default)."""
+async def _pot(module: Any, owner: UUID) -> bool:
+    """Issue 443: the master's household economy is a common pot (the default)."""
+    household = module.gate._household()
+    economy = getattr(household, "economy_of", None) if household is not None else None
     try:
-        providers = module.capabilities.system_providers(CONFIG)
-        if providers:
-            return bool((await providers[0].provider.get(HOUSEHOLD_GROUPED)).value)
-    except Exception:  # noqa: S110 — undeclared (an older portal, tests): grouped, as before
-        pass
-    return True
+        return economy is None or await economy(owner) == "pot"
+    except Exception:
+        return True
 
 
 class SpanUseOut(BaseModel):

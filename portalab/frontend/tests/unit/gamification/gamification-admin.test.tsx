@@ -292,15 +292,15 @@ describe("gamification administration", () => {
     });
   });
 
-  it("groups the household profiles on their master, or dispatches them (issue 441)", async () => {
+  it("groups the household profiles on their master in the charts, or not (issue 443)", async () => {
     const sent: Array<{ method: string; path: string; body: unknown }> = [];
     serve(sent);
     show("/admin/gamification");
-    const toggle = await screen.findByRole("checkbox", { name: "Group profiles on their master" });
+    const toggle = await screen.findByRole("checkbox", {
+      name: "Group profiles on their master in the charts",
+    });
     expect((toggle as HTMLInputElement).checked).toBe(true);
-    expect(
-      screen.getByText("A profile's XP, contribution and statistics count on its master too."),
-    ).toBeTruthy();
+    expect(screen.getByText("A profile's figures are shown on its master's row.")).toBeTruthy();
     fireEvent.click(toggle);
     await waitFor(() =>
       expect(sent).toContainEqual({
@@ -309,11 +309,7 @@ describe("gamification administration", () => {
         body: { grouped: false },
       }),
     );
-    expect(
-      await screen.findByText(
-        "Each profile keeps its own XP, contribution and statistics; the master keeps only its own.",
-      ),
-    ).toBeTruthy();
+    expect(await screen.findByText("Each profile has its own row in the charts.")).toBeTruthy();
     expect((toggle as HTMLInputElement).checked).toBe(false);
   });
 

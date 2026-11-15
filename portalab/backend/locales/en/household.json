@@ -299,5 +299,21 @@
   "type.games": "Video games",
   "type.movies": "Films",
   "type.music": "Music",
-  "type.series": "Series"
+  "type.series": "Series",
+  "economy.title": "The household's economy",
+  "economy.hint": "How your profiles' XP, Coins, contribution and rewards count. Switching moves what they already earned.",
+  "economy.pot": "Common pot",
+  "economy.potHint": "Each profile keeps its own figures, privately. Everything they earn (XP, Coins, contribution, boosters and rewards) is also added to your account, which stands for the household in the community.",
+  "economy.dispatch": "Separate profiles",
+  "economy.dispatchHint": "Each profile has its own wallet and appears in the community, publicly or anonymously. Nothing is added to your account.",
+  "economy.saved_pot": "Common pot: your profiles' earnings are on your account",
+  "economy.saved_dispatch": "Separate profiles: each keeps its own",
+  "economy.mine_pot": "Your household shares a common pot: what you earn is also added to your master's account.",
+  "economy.mine_dispatch": "You have your own wallet in this household.",
+  "editor.communityPot": "In a common pot, profiles stay out of the community: the master's account stands for the household.",
+  "editor.communityPublic": "Public in the community",
+  "editor.communityPublicHint": "Shown with its name in the members directory and the leaderboards.",
+  "editor.communityAnonymousHint": "Shown anonymously in the leaderboards: no name, no avatar.",
+  "page.private": "Private (common pot)",
+  "page.anonymous": "Anonymous in the community"
 }

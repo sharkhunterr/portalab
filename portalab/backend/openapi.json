@@ -9333,6 +9333,24 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HouseholdEconomyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "economy": {
+            "enum": [
+              "pot",
+              "dispatch"
+            ],
+            "title": "Economy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "economy"
+        ],
+        "title": "HouseholdEconomyIn",
+        "type": "object"
+      },
       "HouseholdEconomyLine": {
         "properties": {
           "at": {
@@ -9632,6 +9650,15 @@
           "can_manage": {
             "title": "Can Manage",
             "type": "boolean"
+          },
+          "economy": {
+            "default": "pot",
+            "enum": [
+              "pot",
+              "dispatch"
+            ],
+            "title": "Economy",
+            "type": "string"
           },
           "enabled": {
             "title": "Enabled",
@@ -47913,6 +47940,41 @@
           }
         },
         "summary": "Household",
+        "tags": [
+          "household"
+        ]
+      }
+    },
+    "/api/v1/household/economy": {
+      "put": {
+        "description": "Issue 443: the master chooses its household's economy \u2014 a common pot on its account (its profiles kept\nout of the community) or dispatched profiles (each its own wallet, in the community).",
+        "operationId": "set_economy_api_v1_household_economy_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdEconomyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Economy",
         "tags": [
           "household"
         ]

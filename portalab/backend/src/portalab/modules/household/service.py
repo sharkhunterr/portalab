@@ -14,9 +14,10 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
-from portalab.capabilities.economy import ECONOMY
+from portalab.capabilities.economy import ECONOMY, HOUSEHOLD_POT
 from portalab.capabilities.household import PROFILE_ACCOUNTS, AccountCard, ProfileAccounts, Restrictions
 from portalab.capabilities.notifications import NOTIFY, CommunicationRequest, Users
 from portalab.capabilities.registry import CapabilityRegistry
@@ -43,6 +44,7 @@ from portalab.modules.household.rules import (
 from portalab.modules.household.settings import MAX_KEY
 
 CACHE_S = 15.0
+ECONOMIES = ("pot", "dispatch")  # issue 443
 ATTENTION_ENTRY = "shell.household.requests"  # issue 428: « My household »'s requests tab
 CATEGORY = "household.requests"
 EXTRA_MINUTES = (15, 30, 60, 120)  # issue 432: screen time given for today
@@ -77,7 +79,9 @@ class HouseholdService:
         self._owners: dict[UUID, UUID | None] = {}
         self._restrictions: dict[UUID, tuple[float, Restrictions | None]] = {}
         self._hidden: tuple[float, frozenset[UUID]] | None = None
+        self._anonymous: tuple[float, frozenset[UUID]] | None = None
         self._profiles: tuple[float, frozenset[UUID]] | None = None
+        self._economies: dict[UUID, tuple[float, str]] = {}
 
     def now(self) -> datetime:
         return utc_now(self.clock)
@@ -105,7 +109,9 @@ class HouseholdService:
         for user in users:
             self._restrictions.pop(user, None)
         self._hidden = None
+        self._anonymous = None
         self._profiles = None
+        self._economies.clear()
 
     async def _audit(
         self, session: AsyncSession, action: str, actor: Principal, user: UUID, context: dict[str, Any]
@@ -163,18 +169,70 @@ class HouseholdService:
         return ref in await self.grants(user, kind)
 
     async def hidden(self) -> frozenset[UUID]:
+        """Issue 443: every profile of a common pot — its master stands for the household in the community."""
         if self._hidden is not None and time.monotonic() - self._hidden[0] < CACHE_S:
             return self._hidden[1]
-        async with self.database.session() as session:
-            found = frozenset(
-                await session.scalars(
-                    select(HouseholdMember.user_id).where(
-                        HouseholdMember.kind != "owner", HouseholdMember.community_visible.is_(False)
-                    )
-                )
-            )
+        found = await self._profiles_where(pot=True)
         self._hidden = (time.monotonic(), found)
         return found
+
+    async def anonymous(self) -> frozenset[UUID]:
+        """Issue 443: the dispatched profiles their master shows anonymously in the community."""
+        if self._anonymous is not None and time.monotonic() - self._anonymous[0] < CACHE_S:
+            return self._anonymous[1]
+        found = await self._profiles_where(pot=False, visible=False)
+        self._anonymous = (time.monotonic(), found)
+        return found
+
+    async def _profiles_where(self, *, pot: bool, visible: bool | None = None) -> frozenset[UUID]:
+        master = aliased(HouseholdMember)
+        economy = func.coalesce(master.economy, "pot")
+        query = (
+            select(HouseholdMember.user_id)
+            .outerjoin(master, master.user_id == HouseholdMember.owner_id)
+            .where(HouseholdMember.kind != "owner", (economy == "pot") if pot else (economy == "dispatch"))
+        )
+        if visible is not None:
+            query = query.where(HouseholdMember.community_visible.is_(visible))
+        async with self.database.session() as session:
+            return frozenset(await session.scalars(query))
+
+    async def economy_of(self, user: UUID) -> str:
+        """Issue 443: its household's economy — its master's choice (``pot`` until the master chooses)."""
+        cached = self._economies.get(user)
+        if cached is not None and time.monotonic() - cached[0] < CACHE_S:
+            return cached[1]
+        async with self.database.session() as session:
+            row = await session.get(HouseholdMember, user)
+            master = await session.get(HouseholdMember, row.owner_id) if row is not None else None
+        found = master.economy if master is not None and master.economy in ECONOMIES else "pot"
+        self._economies[user] = (time.monotonic(), found)
+        return found
+
+    async def set_economy(self, principal: Principal, economy: str) -> None:
+        """Issue 443: the master chooses its household's economy; switching rebuilds the pot (its profiles'
+        amounts and items duplicated on the master) or gives it back (each profile keeps its own)."""
+        owner = self._manager(principal)
+        if economy not in ECONOMIES:
+            raise Conflict("Choose a common pot or dispatched profiles.", code="household.invalid_economy")
+        async with self.database.unit_of_work() as uow:
+            row = await self._owner_row(uow.session, owner, self.now())
+            if row.economy == economy:
+                return
+            row.economy = economy
+            row.updated_at = self.now()
+            await self._audit(
+                uow.session, "household.economy_changed", principal, owner, {"economy": economy}
+            )
+        self.forget(owner)
+        profiles = sorted(await self.profiles_of(owner))
+        if not profiles:
+            return
+        for registration in self.capabilities.system_providers(HOUSEHOLD_POT):
+            try:
+                await registration.provider.regroup(owner, profiles, economy == "pot")
+            except Exception:
+                log.exception("household economy not regrouped", extra={"economy": economy})
 
     async def profiles(self) -> frozenset[UUID]:
         if self._profiles is not None and time.monotonic() - self._profiles[0] < CACHE_S:
@@ -340,6 +398,7 @@ class HouseholdService:
             "max_profiles": limit,
             "palette": list(COLORS),
             "totals": tiles[0]["progress"] if tiles else None,
+            "economy": await self.economy_of(owner),  # issue 443
             "members": tiles,
         }
 

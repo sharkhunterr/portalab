@@ -1097,9 +1097,9 @@
   "admin.streak.minimum": "Minimum length of a sitting (minutes)",
   "admin.streak.minimumHint": "Applies to interrupted plays, live TV, the radio and music. 0: any length.",
   "admin.household.title": "Household profiles",
-  "admin.household.hint": "Whether what a household profile earns and watches also counts on its master's account. Coins are always the household's, and « My household » statistics always show everyone.",
-  "admin.household.grouped": "Group profiles on their master",
-  "admin.household.groupedHint": "A profile's XP, contribution and statistics count on its master too.",
-  "admin.household.dispatchedHint": "Each profile keeps its own XP, contribution and statistics; the master keeps only its own.",
+  "admin.household.hint": "How the administration's charts show household profiles. Each master chooses their household's economy (a common pot or dispatched profiles) in My household.",
+  "admin.household.grouped": "Group profiles on their master in the charts",
+  "admin.household.groupedHint": "A profile's figures are shown on its master's row.",
+  "admin.household.dispatchedHint": "Each profile has its own row in the charts.",
   "admin.household.saved": "Saved"
 }

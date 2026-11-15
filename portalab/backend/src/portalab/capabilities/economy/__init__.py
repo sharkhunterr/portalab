@@ -28,6 +28,9 @@ from portalab.core.authz_port import Principal
 from portalab.core.errors import Conflict
 
 ECONOMY = "economy.service"
+# issue 443: what follows a master's household economy (a common pot or dispatched profiles) — the ledger's
+# amounts (gamification), the items (marketplace); every provider is told when a master switches
+HOUSEHOLD_POT = "economy.household_pot"
 REWARDS = "economy.rewards"
 MODIFIERS = "economy.modifiers"
 DEFINITION_SOURCES = "economy.definition_sources"
@@ -300,6 +303,15 @@ class GamificationCatalog(Protocol):
         ...
 
 
+@runtime_checkable
+class HouseholdPot(Protocol):
+    async def regroup(self, owner: UUID, profiles: Sequence[UUID], pot: bool) -> None:
+        """Issue 443: a master switched its household economy. ``pot``: what its profiles hold is duplicated
+        on the master once (the pot rebuilt); not: the master gives back what came from its profiles (each
+        keeps its own). Idempotent."""
+        ...
+
+
 def _spec(name: str, protocol: type[Any], multi: bool, description: str) -> CapabilitySpec:
     return CapabilitySpec(
         name=name, version="1.0", protocol=protocol, multi_provider=multi, description=description
@@ -314,4 +326,5 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(LEADERBOARDS, LeaderboardReader, False, "Visibility-bound leaderboards (Gamification 013)"),
     _spec(CATALOG, GamificationCatalog, False, "Achievements and quests for presentation (Gamification 013)"),
     _spec(PERKS, Perks, False, "Streak freezes and XP boosts bought in the shop (Gamification)"),
+    _spec(HOUSEHOLD_POT, HouseholdPot, True, "A household's common pot rebuilt or given back (issue 443)"),
 )

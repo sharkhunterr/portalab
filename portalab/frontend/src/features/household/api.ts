@@ -85,6 +85,20 @@ export interface ProfileChanges {
   community_visible?: boolean;
 }
 
+export type HouseholdEconomy = "pot" | "dispatch";
+
+/** Issue 443: the master chooses its household's economy (switching rebuilds or gives back the pot). */
+export function useHouseholdEconomy() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (economy: HouseholdEconomy) => {
+      const { error } = await api.PUT("/api/v1/household/economy", { body: { economy } });
+      if (error) throw new Error("household.economy");
+    },
+    onSuccess: refresh,
+  });
+}
+
 export function useUpdateProfile() {
   const refresh = useRefresh();
   return useMutation({

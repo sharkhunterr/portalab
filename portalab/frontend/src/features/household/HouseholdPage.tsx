@@ -23,6 +23,7 @@ import {
   useSetPin,
 } from "./api";
 import { FamilyDashboard } from "./FamilyDashboard";
+import { HouseholdEconomyChoice } from "./HouseholdEconomy";
 import { ProfileEditor } from "./ProfileEditor";
 import { ProfileFace } from "./ProfilePicker";
 import { QuickTime } from "./QuickTime";
@@ -112,6 +113,7 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
         </>
       ) : view === "profiles" ? (
         <>
+          <HouseholdEconomyChoice household={data} />
           <p className="household-count">
             {t("household:page.count", { count: profiles.length, max: data.max_profiles })}
           </p>
@@ -125,6 +127,7 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
                 member={member}
                 me={member.id === data.me}
                 manage={data.can_manage && member.kind !== "owner"}
+                economy={data.economy ?? "pot"}
                 onEdit={() => setEditing(member)}
                 onActivity={() => setWatching(member)}
                 onPin={() => setPinOf(member)}
@@ -142,6 +145,7 @@ export default function HouseholdPage({ view = "overview" }: { view?: HouseholdV
           member={editing === "new" ? null : editing}
           position={profiles.length + 1}
           palette={data.palette}
+          economy={data.economy ?? "pot"}
           onClose={() => setEditing(null)}
         />
       ) : null}
@@ -190,6 +194,7 @@ function MemberCard({
   member,
   me,
   manage,
+  economy,
   onEdit,
   onActivity,
   onPin,
@@ -197,6 +202,7 @@ function MemberCard({
   member: HouseholdMember;
   me: boolean;
   manage: boolean;
+  economy: string;
   onEdit: () => void;
   onActivity: () => void;
   onPin: () => void;
@@ -251,10 +257,10 @@ function MemberCard({
             {t("household:page.restricted", { age: age ?? "none" })}
           </span>
         ) : null}
-        {member.kind !== "owner" && !member.community_visible ? (
+        {member.kind !== "owner" && (economy === "pot" || !member.community_visible) ? (
           <span className="household-badge">
             <Icon name="hide" size={12} />
-            {t("household:page.hidden")}
+            {t(economy === "pot" ? "household:page.private" : "household:page.anonymous")}
           </span>
         ) : null}
         {member.has_pin ? (

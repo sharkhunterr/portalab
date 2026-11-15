@@ -823,8 +823,8 @@ async def test_a_profiles_media_is_not_in_its_masters_continue(
 async def test_my_households_statistics_count_every_profile(
     app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: Any
 ) -> None:
-    """Issue 441: « My household » counts the master's plays and each profile's (in the portal: theirs); the
-    master's own count its profiles' too while its administrator groups them, its own only once dispatched."""
+    """Issue 441: « My household » counts the master's plays and each profile's (in the portal: theirs); issue
+    443: the master's own count its profiles' too in a common pot, its own only once dispatched."""
     from portalab.modules.media.insights.portal import PortalActivity
 
     people = await users(app, media, "zoe")
@@ -863,8 +863,8 @@ async def test_my_households_statistics_count_every_profile(
 
     await login(client, "zoe")
     assert await plays("household") == 2
-    assert await plays("me") == 2  # grouped (the default): the master's own count Arthur's
-    await media.configure("economy.household.grouped", False)
+    assert await plays("me") == 2  # a common pot (the default): the master's own count Arthur's
+    await households(app).set_economy(owner, "dispatch")
     assert await plays("me") == 1  # dispatched: its own only
     assert await plays("household") == 2
     assert (await client.post("/api/v1/household/switch", json={"user_id": str(arthur)})).status_code == 200

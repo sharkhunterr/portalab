@@ -12,7 +12,15 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.automation_actions import ActionRegistry, default_actions
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
-from portalab.capabilities.economy import CATALOG, ECONOMY, LEADERBOARDS, MODIFIERS, PERKS, REWARDS
+from portalab.capabilities.economy import (
+    CATALOG,
+    ECONOMY,
+    HOUSEHOLD_POT,
+    LEADERBOARDS,
+    MODIFIERS,
+    PERKS,
+    REWARDS,
+)
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -67,6 +75,7 @@ from portalab.modules.gamification.integrations import (
     PROGRESSION as PROGRESSION_DATUM,
 )
 from portalab.modules.gamification.leaderboards.service import LeaderboardService
+from portalab.modules.gamification.ledger.household_pot import LedgerPot
 from portalab.modules.gamification.ledger.writer import LedgerWriter
 from portalab.modules.gamification.levels.service import LevelService
 from portalab.modules.gamification.manual.service import RewardServiceImpl
@@ -138,7 +147,6 @@ class GamificationModule:
         self.levels = LevelService(database, lambda: self.config.level_curve_active, clock=clock)
         self.writer = LedgerWriter(events, self.levels, clock=clock)
         self.writer.household = self._household  # 032: a profile's amounts are its household's too
-        self.writer.grouped = lambda: self.config.household_grouped  # issue 441
         self.economy = EconomyServiceImpl(database, self.writer, clock=clock)
         self.rules = RuleStore(database, audit, events, event_types, clock=clock)
         self.combiner = ModifierCombiner(capabilities)
@@ -220,6 +228,14 @@ class GamificationModule:
         ):
             if not self.capabilities.system_providers(name):
                 self.capabilities.provide(name, provider, instance_ref=INSTANCE, owner=OWNER)
+        if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(HOUSEHOLD_POT)):
+            # issue 443: a master's switch of its household economy, the ledger's side
+            self.capabilities.provide(
+                HOUSEHOLD_POT,
+                LedgerPot(self.database, self.writer, clock=self.clock),
+                instance_ref=INSTANCE,
+                owner=OWNER,
+            )
         participant = GamificationParticipant(
             self.database, self.writer, clock=self.clock, leaderboards=self.leaderboards
         )

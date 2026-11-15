@@ -58,32 +58,54 @@ async def test_a_profile_earns_for_its_household(gm: GamHarness, app: FastAPI) -
     assert await gm.balance(lea, "coins") == 15 and await gm.balance(owner, "coins") == 115
 
 
-async def test_profiles_dispatched_keep_their_xp_and_contribution(
+async def test_a_master_chooses_a_common_pot_or_dispatched_profiles(
     gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
 ) -> None:
-    """Issue 441: its administrator dispatches the household profiles — a profile's XP and contribution stay
-    its own, its Coins still the household's; grouped again, they count on its master too."""
+    """Issue 443: dispatched, a profile keeps its own XP, Coins, contribution and boosters (its own wallet);
+    back to a common pot, what it holds is duplicated on its master once (a replay changes nothing);
+    dispatched again, the master gives it back. Profiles stay out of the community in a pot only."""
     owner = gm.people["ursula"]
     lea = await _child(gm, app, owner)
-    await login(client, "boss")
-    assert (await client.get("/api/v1/admin/gamification/household")).json() == {"grouped": True}
-    saved = await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
-    assert saved.status_code == 200 and saved.json() == {"grouped": False}
     boss = gm.p("boss")
+    service = households(app)
+    assert await service.economy_of(lea) == "pot" and lea in await service.hidden()
+
+    await login(client, "ursula")
+    assert (await client.put("/api/v1/household/economy", json={"economy": "dispatch"})).status_code == 204
+    assert (await client.get("/api/v1/household")).json()["economy"] == "dispatch"
+    assert lea not in await service.hidden() and lea in await service.anonymous()  # a child: anonymous
+    await service.change(Principal(user_id=owner), lea, community_visible=True)
+    assert lea not in await service.anonymous()  # public in the community
     for value, amount in (("xp", 40), ("coins", 15), ("contribution", 3)):
         await gm.module.rewards.grant_manual(
             boss, lea, value, amount, reason="quest", idempotency_key=f"d-{value}"
         )
     assert [await gm.balance(lea, v) for v in ("xp", "coins", "contribution")] == [40, 15, 3]
-    assert [await gm.balance(owner, v) for v in ("xp", "coins", "contribution")] == [0, 15, 0]
+    assert [await gm.balance(owner, v) for v in ("xp", "coins", "contribution")] == [0, 0, 0]
+    economy = gm.ev.full.identity.capabilities.system_providers(ECONOMY)[0].provider
+    await economy.spend(
+        lea, 5, reason="badge", source_kind="marketplace", source_ref="i:1", idempotency_key="sp"
+    )
+    assert await gm.balance(lea, "coins") == 10 and await gm.balance(owner, "coins") == 0  # its own wallet
 
-    await client.put("/api/v1/admin/gamification/household", json={"grouped": True})
-    await gm.module.rewards.grant_manual(boss, lea, "xp", 10, reason="quest", idempotency_key="g-xp")
-    assert await gm.balance(lea, "xp") == 50 and await gm.balance(owner, "xp") == 10
-    await login(client, "ursula")
-    assert (
-        await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
-    ).status_code == 403
+    assert (await client.put("/api/v1/household/economy", json={"economy": "pot"})).status_code == 204
+    assert [await gm.balance(owner, v) for v in ("xp", "coins", "contribution")] == [
+        40,
+        10,
+        3,
+    ]  # the pot rebuilt
+    await service.set_economy(Principal(user_id=owner), "pot")  # the same again: nothing moves
+    assert await gm.balance(owner, "xp") == 40 and lea in await service.hidden()
+    await gm.module.rewards.grant_manual(boss, lea, "xp", 10, reason="quest", idempotency_key="p-xp")
+    assert await gm.balance(owner, "xp") == 50  # copied as it comes
+
+    await client.put("/api/v1/household/economy", json={"economy": "dispatch"})
+    assert [await gm.balance(owner, v) for v in ("xp", "coins", "contribution")] == [0, 0, 0]  # given back
+    assert [await gm.balance(lea, v) for v in ("xp", "coins", "contribution")] == [50, 10, 3]
+
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    refused = await client.put("/api/v1/household/economy", json={"economy": "pot"})
+    assert refused.status_code == 403  # its master only
 
 
 async def test_a_profile_spends_the_household_wallet(gm: GamHarness, app: FastAPI) -> None:

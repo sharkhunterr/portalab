@@ -1097,9 +1097,9 @@
   "admin.streak.minimum": "Durée minimale d'une séance (minutes)",
   "admin.streak.minimumHint": "S'applique aux lectures interrompues, à la TV en direct, à la radio et à la musique. 0 : toute durée.",
   "admin.household.title": "Profils du foyer",
-  "admin.household.hint": "Ce qu'un profil du foyer gagne et regarde compte-t-il aussi sur le compte maître ? Les pièces restent toujours celles du foyer, et les statistiques « Mon foyer » montrent toujours tout le monde.",
-  "admin.household.grouped": "Regrouper les profils sur le compte maître",
-  "admin.household.groupedHint": "L'XP, la contribution et les statistiques d'un profil comptent aussi pour son maître.",
-  "admin.household.dispatchedHint": "Chaque profil garde son XP, sa contribution et ses statistiques ; le maître ne garde que les siens.",
+  "admin.household.hint": "Comment les graphiques d'administration montrent les profils du foyer. Chaque maître choisit l'économie de son foyer (pot commun ou profils séparés) dans Mon foyer.",
+  "admin.household.grouped": "Regrouper les profils sur le maître dans les graphiques",
+  "admin.household.groupedHint": "Les chiffres d'un profil apparaissent sur la ligne de son maître.",
+  "admin.household.dispatchedHint": "Chaque profil a sa propre ligne dans les graphiques.",
   "admin.household.saved": "Enregistré"
 }
