@@ -245,5 +245,9 @@
   "status.unavailable.title": "This service is away for a moment",
   "status.unavailable.text": "It may be restarting. Try again in a moment.",
   "status.error.title": "This page could not be loaded",
-  "status.error.text": "Something went wrong on the way. Try again, or come back later."
+  "status.error.text": "Something went wrong on the way. Try again, or come back later.",
+  "crumb.aBook": "A book",
+  "crumb.askTheTeam": "Ask the team",
+  "crumb.collection": "Collection",
+  "crumb.myHousehold": "My household"
 }

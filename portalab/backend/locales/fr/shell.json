@@ -245,5 +245,9 @@
   "status.unavailable.title": "Ce service est momentanément absent",
   "status.unavailable.text": "Il redémarre peut-être. Réessayez dans un instant.",
   "status.error.title": "Cette page n'a pas pu être chargée",
-  "status.error.text": "Quelque chose s'est mal passé en route. Réessayez, ou revenez plus tard."
+  "status.error.text": "Quelque chose s'est mal passé en route. Réessayez, ou revenez plus tard.",
+  "crumb.aBook": "Un livre",
+  "crumb.askTheTeam": "Demander à l'équipe",
+  "crumb.collection": "Collection",
+  "crumb.myHousehold": "Mon foyer"
 }
