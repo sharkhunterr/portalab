@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "seafoam",
+  "names": {
+    "en": "Seafoam",
+    "fr": "Écume"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#63e6be",
+      "accentAlt": "#66d9e8",
+      "contrast": "#03140e"
+    },
+    "light": {
+      "accent": "#047857",
+      "accentAlt": "#0f766e",
+      "contrast": "#ffffff"
+    }
+  }
+}

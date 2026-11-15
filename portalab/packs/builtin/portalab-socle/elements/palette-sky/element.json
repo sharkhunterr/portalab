@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "sky",
+  "names": {
+    "en": "Sky",
+    "fr": "Ciel"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#74c0fc",
+      "accentAlt": "#91a7ff",
+      "contrast": "#04121c"
+    },
+    "light": {
+      "accent": "#1d4ed8",
+      "accentAlt": "#4338ca",
+      "contrast": "#ffffff"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "opal",
+  "names": {
+    "en": "Opal",
+    "fr": "Opale"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#38d9a9",
+      "accentAlt": "#da77f2",
+      "contrast": "#031a17"
+    },
+    "light": {
+      "accent": "#0f766e",
+      "accentAlt": "#7e22ce",
+      "contrast": "#ffffff"
+    }
+  }
+}

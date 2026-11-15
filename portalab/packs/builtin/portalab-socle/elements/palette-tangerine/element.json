@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "tangerine",
+  "names": {
+    "en": "Tangerine",
+    "fr": "Mandarine"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#ffa94d",
+      "accentAlt": "#f783ac",
+      "contrast": "#1c0a02"
+    },
+    "light": {
+      "accent": "#c2410c",
+      "accentAlt": "#be185d",
+      "contrast": "#ffffff"
+    }
+  }
+}

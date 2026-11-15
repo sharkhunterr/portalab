@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "wisteria",
+  "names": {
+    "en": "Wisteria",
+    "fr": "Glycine"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#d0bfff",
+      "accentAlt": "#b197fc",
+      "contrast": "#140b2e"
+    },
+    "light": {
+      "accent": "#6d28d9",
+      "accentAlt": "#7c3aed",
+      "contrast": "#ffffff"
+    }
+  }
+}

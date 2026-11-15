@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "coral",
+  "names": {
+    "en": "Coral",
+    "fr": "Corail"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#fda4af",
+      "accentAlt": "#fdba74",
+      "contrast": "#240a0d"
+    },
+    "light": {
+      "accent": "#b91c1c",
+      "accentAlt": "#c2410c",
+      "contrast": "#ffffff"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "amber",
+  "names": {
+    "en": "Amber",
+    "fr": "Ambre"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#ffd43b",
+      "accentAlt": "#fcc419",
+      "contrast": "#1c1002"
+    },
+    "light": {
+      "accent": "#b45309",
+      "accentAlt": "#92400e",
+      "contrast": "#ffffff"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "palette",
+  "look": "petal",
+  "names": {
+    "en": "Petal",
+    "fr": "Pétale"
+  },
+  "render": {
+    "kind": "data"
+  },
+  "free": true,
+  "palette": {
+    "dark": {
+      "accent": "#fcc2d7",
+      "accentAlt": "#e599f7",
+      "contrast": "#24071a"
+    },
+    "light": {
+      "accent": "#be185d",
+      "accentAlt": "#a21caf",
+      "contrast": "#ffffff"
+    }
+  }
+}
