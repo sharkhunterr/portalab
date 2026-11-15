@@ -12,11 +12,11 @@ import { NewsletterSubscriptions } from "../news/NewsletterSubscriptions";
 import { type Preferences, usePreferences, useSavePreferences } from "../notifications/api";
 import {
   type Category,
-  CHANNELS,
   COMPANIONS,
   GROUPS,
   groupOf,
   SHOWN_WITH,
+  useChannels,
 } from "../notifications/preferences/NotificationPreferences";
 import { connectorIcon } from "../services/connectorIcons";
 
@@ -172,6 +172,8 @@ export function Notify({
   const t = useT();
   const query = usePreferences();
   const save = useSavePreferences();
+  const channels = useChannels(); // issue 449: a household profile, the portal only
+  const profile = channels.length === 1;
   // the recommended choice offered on a first visit, applied on « Next » unless the member set something
   const [preset, setPreset] = useState<Preset | null>(first ? RECOMMENDED : null);
   const [touched, setTouched] = useState(false);
@@ -180,7 +182,7 @@ export function Notify({
   const groups = GROUPS.map((group) => ({
     ...group,
     lines: lines.filter((c) => groupOf(c) === group.key),
-  })).filter((group) => group.lines.some((c) => CHANNELS.some((channel) => c.channels[channel])));
+  })).filter((group) => group.lines.some((c) => channels.some((channel) => c.channels[channel])));
   const set = (targets: Category[], channel: string, on: boolean) => {
     const changes = targets.filter((c) => free(c, channel));
     if (!changes.length) return;
@@ -198,14 +200,14 @@ export function Notify({
     const preferences: Record<string, Record<string, boolean>> = {};
     for (const category of lines) {
       const group = groupOf(category);
-      for (const channel of CHANNELS) {
+      for (const channel of channels) {
         if (!free(category, channel)) continue;
         for (const key of keysOf(category)) {
           preferences[key] = { ...(preferences[key] ?? {}), [channel]: wants(keep[channel], group) };
         }
       }
     }
-    save.mutate({ preferences, digest: keep.digest });
+    save.mutate(profile ? { preferences } : { preferences, digest: keep.digest });
   };
   return (
     <>
@@ -225,7 +227,7 @@ export function Notify({
             {choice === RECOMMENDED ? (
               <span className="onboarding-tile__badge">{t("onboarding:recommended")}</span>
             ) : null}
-            <span>{t(`onboarding:notify.preset.${choice}Hint`)}</span>
+            <span>{t(`onboarding:notify.preset.${choice}${profile ? "HintPortal" : "Hint"}`)}</span>
           </label>
         ))}
       </fieldset>
@@ -236,7 +238,7 @@ export function Notify({
               <th scope="col">
                 <span className="visually-hidden">{t("onboarding:notify.theme")}</span>
               </th>
-              {CHANNELS.map((channel) => (
+              {channels.map((channel) => (
                 <th key={channel} scope="col">
                   {t(`notifications:preferences.${channel}`)}
                 </th>
@@ -254,7 +256,7 @@ export function Notify({
                     </span>
                     {label}
                   </th>
-                  {CHANNELS.map((channel) => {
+                  {channels.map((channel) => {
                     const own = group.lines.filter((c) => c.channels[channel]);
                     if (!own.length) return <td key={channel} />;
                     const turnable = own.some((c) => free(c, channel));
@@ -282,7 +284,7 @@ export function Notify({
           </tbody>
         </table>
       ) : null}
-      {data ? (
+      {data && !profile ? (
         <SelectField
           label={t("notifications:preferences.digest")}
           value={data.digest}
@@ -295,9 +297,11 @@ export function Notify({
           ))}
         </SelectField>
       ) : null}
-      <div className="onboarding-newsletters">
-        <NewsletterSubscriptions />
-      </div>
+      {profile ? null : (
+        <div className="onboarding-newsletters">
+          <NewsletterSubscriptions />
+        </div>
+      )}
       {save.isError ? (
         <p className="onboarding-welcome__problem" role="alert">
           {t("onboarding:notify.error")}

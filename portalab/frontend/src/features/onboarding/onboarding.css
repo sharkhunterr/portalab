@@ -161,14 +161,28 @@
 
 .onboarding-welcome__nav {
   position: sticky; /* a long screen scrolls under its buttons, which stay in reach */
+  z-index: 1;
   inset-block-end: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  /* issue 449: a clean footer — the screen's whole width (its focus room included), what scrolls under
+     it fading out rather than cut by a box */
   margin-block-start: auto;
-  padding-block-start: var(--space-3);
+  margin-inline: calc(-1 * var(--onboarding-ring, 0px));
+  padding: var(--space-3) var(--onboarding-ring, 0px) var(--onboarding-ring, 0px);
   background: var(--color-surface-raised);
+}
+
+.onboarding-welcome__nav::before {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  block-size: var(--space-6);
+  background: linear-gradient(to bottom, transparent, var(--color-surface-raised));
+  content: "";
+  pointer-events: none;
 }
 
 .onboarding-highlights {
@@ -1547,4 +1561,46 @@ button.first-steps__start:focus-visible {
   min-inline-size: 3.5ch;
   text-align: end;
   font-variant-numeric: tabular-nums;
+}
+
+/* issue 449: the languages by their flags */
+.onboarding-languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.onboarding-languages legend {
+  margin-block-end: var(--space-1);
+  padding: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.onboarding-languages label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.onboarding-languages label[data-checked] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+.onboarding-languages label:focus-within {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+.onboarding-languages input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.onboarding-languages__flag {
+  font-size: 1.3em;
+  line-height: 1;
 }

@@ -51,3 +51,29 @@ async def test_recipient_and_response_language() -> None:
         await ResponseLanguage(resolver).for_user(recipient, supported=["en", "fr"]) == "fr"
     )  # model lacks de
     assert await ResponseLanguage(resolver).for_user(recipient) == "de"
+
+
+async def test_a_new_language_counts_without_an_event(monkeypatch: object) -> None:
+    """Issue 449: the epoch's events reach the worker only — the web process sees a member's new language
+    within seconds anyway (no restart)."""
+    import pytest
+
+    from portalab.modules.i18n.resolver import resolver as module
+
+    member = uuid4()
+    prefs = Prefs({member: UserLocalePreference(language="en")})
+    capabilities = new_registry()
+    capabilities.provide(LOCALE_READER, prefs, instance_ref="t", owner="t")
+    capabilities.provide(I18N_POLICY_READER, Policy(), instance_ref="t", owner="t")
+    resolver = LocaleResolver(capabilities)
+    clock = [1000.0]
+    patch = pytest.MonkeyPatch()
+    patch.setattr(module.time, "monotonic", lambda: clock[0])
+    try:
+        assert (await resolver.for_user(member)).language == "en"
+        prefs.table[member] = UserLocalePreference(language="fr")  # saved by the welcome
+        assert (await resolver.for_user(member)).language == "en"  # a burst shares one reading
+        clock[0] += module.CACHE_S + 0.1
+        assert (await resolver.for_user(member)).language == "fr"
+    finally:
+        patch.undo()

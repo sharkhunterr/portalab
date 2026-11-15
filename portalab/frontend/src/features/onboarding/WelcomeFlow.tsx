@@ -7,7 +7,7 @@ import { usePreferences } from "../../design-system/a11y/PreferencesProvider";
 import type { UiPreferences } from "../../design-system/a11y/preferences";
 import { Avatar } from "../../design-system/components/Avatar";
 import { Button } from "../../design-system/components/Button";
-import { SelectField, TextField } from "../../design-system/components/Field";
+import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
@@ -459,17 +459,27 @@ function Profile({
             onChange={(event) => setDisplayName(event.target.value)}
           />
           {(languages.data?.items.length ?? 0) > 1 ? (
-            <SelectField
-              label={t("onboarding:profile.language")}
-              value={language}
-              onChange={(event) => setLanguage(event.target.value)}
-            >
+            // issue 449: each language by its flag and its own name, chosen in a tap
+            <fieldset className="onboarding-languages">
+              <legend>{t("onboarding:profile.language")}</legend>
               {(languages.data?.items ?? []).map((item) => (
-                <option key={item.code} value={item.code} lang={item.code} dir={item.direction}>
-                  {item.name_native}
-                </option>
+                <label key={item.code} data-checked={language === item.code || undefined}>
+                  <input
+                    type="radio"
+                    name={`${fileId}-language`}
+                    value={item.code}
+                    checked={language === item.code}
+                    onChange={() => setLanguage(item.code)}
+                  />
+                  <span className="onboarding-languages__flag" aria-hidden="true">
+                    {flagOf(item.code)}
+                  </span>
+                  <span lang={item.code} dir={item.direction}>
+                    {item.name_native}
+                  </span>
+                </label>
               ))}
-            </SelectField>
+            </fieldset>
           ) : null}
         </div>
       </div>
@@ -490,6 +500,42 @@ function Profile({
       </div>
     </>
   );
+}
+
+// issue 449: a language's flag — its likeliest country (English: the United Kingdom); none when unknown
+const FLAG_COUNTRY: Record<string, string> = {
+  en: "GB",
+  fr: "FR",
+  de: "DE",
+  es: "ES",
+  it: "IT",
+  pt: "PT",
+  nl: "NL",
+  pl: "PL",
+  sv: "SE",
+  da: "DK",
+  nb: "NO",
+  no: "NO",
+  fi: "FI",
+  cs: "CZ",
+  ja: "JP",
+  ko: "KR",
+  zh: "CN",
+  ru: "RU",
+  uk: "UA",
+  tr: "TR",
+  ar: "SA",
+  he: "IL",
+  el: "GR",
+  hu: "HU",
+  ro: "RO",
+};
+
+function flagOf(code: string): string {
+  const parts = code.split(/[-_]/);
+  const region = parts[1]?.length === 2 ? parts[1].toUpperCase() : FLAG_COUNTRY[parts[0]?.toLowerCase() ?? ""];
+  if (!region) return "🌐";
+  return String.fromCodePoint(...[...region].map((letter) => 0x1f1e6 + letter.charCodeAt(0) - 65));
 }
 
 const MODES: Array<{ key: UiPreferences["colorMode"]; icon: string }> = [

@@ -8,6 +8,7 @@ import { SavedNote, SettingsCard, SettingsGrid, SettingsPage, Switch } from "../
 import { NewsletterSubscriptions } from "../../news/NewsletterSubscriptions";
 import { type Preferences, usePreferences, useSavePreferences } from "../api";
 import "../notifications.css";
+import { useMe } from "../../auth/useAuth";
 
 /**
  * Notification preferences (spec 010 T016; #46 redrawn like the other « My account » tabs): one card per
@@ -18,6 +19,13 @@ import "../notifications.css";
  * line — its switches set both.
  */
 export const CHANNELS = ["portal", "email"] as const;
+const PORTAL_ONLY = ["portal"] as const;
+
+/** Issue 449: a household profile has no e-mail — its master's account holds it (and its e-mails): the
+ * portal's channel only. */
+export function useChannels(): readonly (typeof CHANNELS)[number][] {
+  return useMe().data?.profile_of ? PORTAL_ONLY : CHANNELS;
+}
 export type Category = Preferences["categories"][number];
 
 /** Which card a category goes in, from its key's prefix (« media.available » → media). */
@@ -61,6 +69,7 @@ function Line({
   onToggle: (channel: string, on: boolean) => void;
 }) {
   const t = useT();
+  const channels = useChannels();
   const label = t(category.label_key);
   return (
     <li>
@@ -73,7 +82,7 @@ function Line({
         ) : null}
       </span>
       <span className="settings-list__controls">
-        {CHANNELS.map((channel) => {
+        {channels.map((channel) => {
           const state = category.channels[channel];
           if (!state) return <span key={channel} className="notif-matrix__cell" />;
           const policy = state.mandatory ? "mandatory" : state.locked ? "locked" : "free";
@@ -105,6 +114,8 @@ export function NotificationPreferences() {
   const t = useT();
   const query = usePreferences();
   const save = useSavePreferences();
+  const channels = useChannels();
+  const profile = channels.length === 1;
   const [saved, setSaved] = useState(false);
   if (query.isPending) return <FunctionalState state="loading" />;
   if (query.isError || !query.data)
@@ -120,7 +131,7 @@ export function NotificationPreferences() {
     .filter((group) => group.items.length);
   const heads = (
     <span className="notif-matrix__head" aria-hidden="true">
-      {CHANNELS.map((channel) => (
+      {channels.map((channel) => (
         <span key={channel}>{t(`notifications:preferences.${channel}`)}</span>
       ))}
     </span>
@@ -160,25 +171,27 @@ export function NotificationPreferences() {
             </ul>
           </SettingsCard>
         ))}
-        <SettingsCard
-          icon="mail"
-          title={t("notifications:preferences.digest")}
-          hint={t("account:notifications.digestHint")}
-        >
-          <SelectField
-            label={t("notifications:preferences.digest")}
-            value={data.digest}
-            onChange={(event) => submit({ digest: event.currentTarget.value as Preferences["digest"] })}
+        {profile ? null : (
+          <SettingsCard
+            icon="mail"
+            title={t("notifications:preferences.digest")}
+            hint={t("account:notifications.digestHint")}
           >
-            {(["off", "daily", "weekly"] as const).map((mode) => (
-              <option key={mode} value={mode}>
-                {t(`notifications:preferences.digest.${mode}`)}
-              </option>
-            ))}
-          </SelectField>
-        </SettingsCard>
+            <SelectField
+              label={t("notifications:preferences.digest")}
+              value={data.digest}
+              onChange={(event) => submit({ digest: event.currentTarget.value as Preferences["digest"] })}
+            >
+              {(["off", "daily", "weekly"] as const).map((mode) => (
+                <option key={mode} value={mode}>
+                  {t(`notifications:preferences.digest.${mode}`)}
+                </option>
+              ))}
+            </SelectField>
+          </SettingsCard>
+        )}
       </SettingsGrid>
-      <NewsletterSubscriptions />
+      {profile ? null : <NewsletterSubscriptions />}
     </SettingsPage>
   );
 }

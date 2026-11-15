@@ -169,6 +169,35 @@ describe("notification preferences", () => {
     expect(await screen.findByText("Preferences saved.")).toBeTruthy();
   });
 
+  it("offers a household profile the portal only — its master's account holds the e-mails (issue 449)", async () => {
+    const prefs = {
+      digest: "off",
+      categories: [
+        {
+          key: "system.maintenance",
+          label_key: "notifications:category.maintenance",
+          user_mutable: true,
+          channels: {
+            portal: { enabled: true, mandatory: false, locked: false },
+            email: { enabled: false, mandatory: false, locked: false },
+          },
+        },
+      ],
+    };
+    fake.handler = async (request) =>
+      new URL(request.url).pathname === "/api/v1/me"
+        ? json(200, { id: "p1", login: "lea", display_name: "Léa", state: "active", profile_of: "m1" })
+        : json(200, prefs);
+    wrap(<NotificationPreferences />);
+    expect(
+      await screen.findByRole("checkbox", { name: "Scheduled maintenance: In the portal" }),
+    ).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.queryByRole("checkbox", { name: "Scheduled maintenance: By e-mail" })).toBeNull(),
+    );
+    expect(screen.queryByRole("combobox")).toBeNull(); // no e-mail digest
+  });
+
   it("shows an outage once and sets both its categories (issue 124)", async () => {
     const bodies: unknown[] = [];
     const channel = (enabled: boolean) => ({ enabled, mandatory: false, locked: false });

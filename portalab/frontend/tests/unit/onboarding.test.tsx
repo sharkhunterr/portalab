@@ -96,6 +96,14 @@ function backend({
       return json(200, []);
     }
     if (path === "/api/v1/me") return json(200, me);
+    if (path === "/api/v1/i18n/languages")
+      return json(200, {
+        default: "en",
+        items: [
+          { code: "en", name_native: "English", name_en: "English", direction: "ltr" },
+          { code: "fr", name_native: "Français", name_en: "French", direction: "ltr" },
+        ],
+      });
     if (path === "/api/v1/me/preferences") return json(200, { preferences });
     if (path === "/api/v1/me/onboarding/welcome") return json(200, welcome);
     if (path === "/api/v1/me/privacy")
@@ -265,6 +273,17 @@ describe("welcome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     // no media accounts, no household: its master's
     expect(await screen.findByRole("heading", { name: "How far do you want to play?" })).toBeInTheDocument();
+  });
+
+  it("chooses the language by its flag (issue 449)", async () => {
+    window.localStorage.clear();
+    const { puts } = backend({});
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(await screen.findByRole("radio", { name: /Français/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await waitFor(() => expect(puts).toContainEqual({ "i18n.language": "fr" }));
   });
 
   it("skips the household when the member wants no profiles, and replays just that part later", async () => {

@@ -468,5 +468,8 @@
   "pin.mismatch": "The two PINs differ.",
   "pin.save": "Save my PIN",
   "pin.saved": "Your PIN is saved. You'll be asked for it when entering your profile.",
-  "style.textScale": "Text size"
+  "style.textScale": "Text size",
+  "notify.preset.allHintPortal": "Every piece of news, in the portal.",
+  "notify.preset.essentialHintPortal": "Everything that matters to you, in the portal.",
+  "notify.preset.minimumHintPortal": "Your account, your media and your tickets only, in the portal."
 }

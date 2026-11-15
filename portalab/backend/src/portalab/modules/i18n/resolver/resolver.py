@@ -7,6 +7,7 @@ is kept (``retained_language``) and applies again as soon as its language is re-
 per ``(user, locale_epoch)``; the epoch is bumped when i18n settings change.
 """
 
+import time
 from collections import OrderedDict
 from typing import Any
 from uuid import UUID
@@ -55,11 +56,16 @@ def resolve(preference: UserLocalePreference, policy: I18nPolicy) -> LocaleConte
     )
 
 
+CACHE_S = 2.0  # issue 449: a burst of requests shares one reading
+
+
 class LocaleResolver:
     def __init__(self, capabilities: CapabilityRegistry) -> None:
         self.capabilities = capabilities
         self.epoch = 0
-        self._cache: OrderedDict[tuple[Any, int], LocaleContext] = OrderedDict()
+        # issue 449: (when, context) — the events that bump the epoch reach the worker only, never the web
+        # process: a member's new language (or the administrator's policy) counts within seconds anyway
+        self._cache: OrderedDict[tuple[Any, int], tuple[float, LocaleContext]] = OrderedDict()
 
     def _port(self, name: str) -> Any:
         providers = self.capabilities.system_providers(name)
@@ -80,8 +86,8 @@ class LocaleResolver:
     async def for_user(self, user_id: UUID | None) -> LocaleContext:
         key = (user_id, self.epoch)
         cached = self._cache.get(key)
-        if cached is not None:
-            return cached
+        if cached is not None and time.monotonic() - cached[0] < CACHE_S:
+            return cached[1]
         reader = self._port(LOCALE_READER)
         preference = UserLocalePreference()
         if user_id is not None and reader is not None:
@@ -90,7 +96,8 @@ class LocaleResolver:
             except Exception:
                 preference = UserLocalePreference()
         context = resolve(preference, await self.policy())
-        self._cache[key] = context
+        self._cache[key] = (time.monotonic(), context)
+        self._cache.move_to_end(key)
         if len(self._cache) > 2048:
             self._cache.popitem(last=False)
         return context

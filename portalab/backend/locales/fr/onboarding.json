@@ -468,5 +468,8 @@
   "pin.mismatch": "Les deux codes sont différents.",
   "pin.save": "Enregistrer mon code",
   "pin.saved": "Votre code PIN est enregistré. Il vous sera demandé pour entrer dans votre profil.",
-  "style.textScale": "Taille du texte"
+  "style.textScale": "Taille du texte",
+  "notify.preset.allHintPortal": "Toutes les nouvelles, dans le portail.",
+  "notify.preset.essentialHintPortal": "Tout ce qui compte pour vous, dans le portail.",
+  "notify.preset.minimumHintPortal": "Votre compte, vos médias et vos tickets seulement, dans le portail."
 }
