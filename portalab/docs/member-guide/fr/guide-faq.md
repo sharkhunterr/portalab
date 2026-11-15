@@ -24,7 +24,7 @@ L'administrateur l'a imposé ou verrouillé : le widget l'indique (« Épinglé 
 ## Centre de contrôle et notifications
 
 **Que signifie l'icône (cœur, clé à molette, panneau danger) dans l'en-tête ?**
-C'est le centre de contrôle. Le cœur veut dire que tout va bien ; les autres icônes signalent un incident, une maintenance, des services en difficulté ou une annonce. Cliquez dessus pour le détail. Voir [Le centre de contrôle](portalab://wiki/guide-centre-de-controle).
+C'est le centre de contrôle. Le cœur veut dire que tout va bien ; les autres icônes signalent un incident, une maintenance, des services en difficulté ou une annonce. Cliquez dessus pour le détail. Voir [Centre de contrôle](portalab://wiki/guide-centre-de-controle).
 
 **J'ai fermé une annonce, comment la relire ?**
 Ouvrez le centre de contrôle : les annonces en cours y restent, même fermées. Certaines annonces ne peuvent pas être fermées, par choix de l'administrateur.
@@ -56,13 +56,13 @@ Sur sa fiche, l'encadré « Où en est ce titre » montre chaque étape, de « D
 Oui. Sur sa fiche, cliquez sur « Sauver ce titre » dans l'encadré « Bientôt supprimé ». Il vous faut un sauvetage, acheté dans la boutique (produits « Sauvetage ») ou gagné dans un booster. Le titre est sauvé pour tout le monde, pour de bon. Voir [Titres bientôt supprimés](portalab://wiki/guide-bientot-supprime).
 
 **Pourquoi le lecteur me demande de lier mon compte ?**
-Selon votre portail, le lecteur a besoin de votre compte du serveur multimédia. Liez-le dans « Comptes médias » : votre progression et votre historique restent les vôtres. Voir [Compte et réglages](portalab://wiki/guide-compte).
+Selon votre portail, le lecteur a besoin de votre compte du serveur multimédia. Liez-le dans « Comptes médias » : votre progression et votre historique restent les vôtres. Voir [Mon compte et mes réglages](portalab://wiki/guide-compte).
 
 **Pourquoi mes statistiques sont vides ?**
 Elles apparaissent quand un service de la médiathèque remonte vos lectures et que vos comptes médias sont liés et vérifiés. Voir [Mes statistiques et mon récap](portalab://wiki/guide-statistiques).
 
 **Où trouver mon récap ?**
-Une notification « Votre bilan … est prêt » vous prévient à la fin de la période. Elle ouvre le récap, que vous parcourez avec « Précédent » et « Suivant ».
+Une notification « Votre récap … est prêt » vous prévient à la fin de la période. Elle ouvre le récap, que vous parcourez avec « Précédent » et « Suivant ».
 
 ## Boutique et progression
 

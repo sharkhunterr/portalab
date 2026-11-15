@@ -22,10 +22,13 @@ export interface DiffSegment {
 
 const KEY = ["wiki"] as const;
 
-export function useTree() {
+/** Issue 457: the titles in the member's language where a page is translated. */
+export function useTree(lang?: string) {
   return useQuery({
-    queryKey: [...KEY, "tree"],
-    queryFn: async () => ((await api.GET("/api/v1/wiki/tree")).data ?? []) as unknown as TreeNode[],
+    queryKey: [...KEY, "tree", lang],
+    queryFn: async () =>
+      ((await api.GET("/api/v1/wiki/tree", { params: { query: lang ? { lang } : {} } })).data ??
+        []) as unknown as TreeNode[],
   });
 }
 

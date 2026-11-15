@@ -31,7 +31,7 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 - **Bienvenue** : ce que vous ferez sur le portail (regarder et lire, jouer si vous le voulez, tout régler à votre goût). « C'est parti » ouvre la suite.
 - **Une photo et un nom** : c'est comme ça que les autres membres vous verront ; vous y choisissez aussi votre « Langue », chacune avec son drapeau. Elle s'applique tout de suite, au reste de l'accueil compris.
 - **Ton code PIN** (pour un profil d'un foyer seulement) : 4 à 6 chiffres, deux fois, pour que personne d'autre du foyer n'ouvre votre profil. Vous pouvez passer cet écran et le choisir plus tard depuis le menu de votre avatar.
-- **Tes comptes médias** : reliez votre compte Plex, Jellyfin… ; ce que vous y regardez compte alors dans vos statistiques et votre progression. Choisissez le « Service », saisissez votre « Compte sur ce service » et touchez « Lier le compte ». Si le service vous a donné un « Code de vérification », saisissez-le et touchez « Vérifier ». Vous lierez d'autres comptes plus tard, dans « Comptes médias » (voir [Compte, apparence et confidentialité](portalab://wiki/guide-compte)). Un profil d'un foyer n'a pas cet écran : il utilise les comptes du titulaire.
+- **Tes comptes médias** : reliez votre compte Plex, Jellyfin… ; ce que vous y regardez compte alors dans vos statistiques et votre progression. Choisissez le « Service », saisissez votre « Compte sur ce service » et touchez « Lier le compte ». Si le service vous a donné un « Code de vérification », saisissez-le et touchez « Vérifier ». Vous lierez d'autres comptes plus tard, dans « Comptes médias » (voir [Mon compte et mes réglages](portalab://wiki/guide-compte)). Un profil d'un foyer n'a pas cet écran : il utilise les comptes du titulaire.
 - **Un foyer ?** (pour le titulaire d'un compte, jamais pour un profil) : d'autres personnes partagent votre compte ? « Créer mon foyer » enchaîne « Comment ton foyer gagne », « Ta famille » et « Les règles de chaque profil » ; « Pas de profil » passe la suite. Voir [Mon foyer et ses profils](portalab://wiki/guide-foyer).
 - **Jusqu'où veux-tu jouer ?** : une jauge à quatre crans. Faites glisser le curseur : chaque cran ajoute au précédent.
 
@@ -97,7 +97,7 @@ Cliquez sur votre photo pour ouvrir le « Menu personnel ». C'est la rubrique *
 - « Mes paramètres » : tous vos réglages (compte, apparence, langue et région, notifications, comptes liés, confidentialité, jeu) ;
 - « Se déconnecter ».
 
-Le détail de ces réglages est dans [Compte, apparence et confidentialité](portalab://wiki/guide-compte).
+Le détail de ces réglages est dans [Mon compte et mes réglages](portalab://wiki/guide-compte).
 
 ## Le menu et ses rubriques
 

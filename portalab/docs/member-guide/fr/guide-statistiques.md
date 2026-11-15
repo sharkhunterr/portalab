@@ -25,8 +25,8 @@ Ouvrez [Mes médias](/media/insights) dans la rubrique « Statistiques ». Vous 
 ![Mes médias : la période (1), Moi ou Tout le serveur (2), la catégorie (3), les onglets (4) et les quatre chiffres (5)](shot:statistiques-medias)
 
 1. **« Période »** : « 7 derniers jours », « 30 derniers jours », « 3 derniers mois », « Cette année », « 12 derniers mois », « Depuis toujours », ou une année précise.
-2. **« Moi »** ou **« Tout le serveur »** : vos chiffres, ou l'activité de toute la communauté. La vue du serveur est anonyme : aucun membre n'y est nommé.
-3. **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio », « Radio », « Jeux » ou « Demandes ». « Tout » compte aussi le temps passé à jouer.
+2. **« Moi »** ou **« Tout le serveur »** : vos chiffres, ou l'activité de toute la communauté. La vue du serveur est anonyme : aucun membre n'y est nommé. Dans un foyer, **« Mon foyer »** montre les chiffres de tout le foyer, ceux de chaque profil compris (voir [Mon foyer et ses profils](portalab://wiki/guide-foyer)).
+3. **La catégorie** : « Tout », « Films », « Séries », « TV en direct », « Musique », « Livres », « Livres audio », « Radio », « Jeux vidéo » ou « Demandes ». « Tout » compte aussi le temps passé à jouer.
 4. **Les onglets** : « Aperçu », puis ceux de la catégorie (voir ci-dessous).
 5. **Les quatre chiffres** de l'aperçu.
 
@@ -86,8 +86,8 @@ Une carte peut être **verrouillée**. Elle vous dit alors comment la débloquer
 
 Le récap résume une période terminée (un mois, un trimestre ou une année, selon votre portail), statistique par statistique.
 
-1. Quand votre récap est prêt, une notification vous prévient : « Votre bilan … est prêt ».
-2. Cliquez dessus : le récap s'ouvre sur la page « Votre bilan : du… au… ».
+1. Quand votre récap est prêt, une notification vous prévient : « Votre récap … est prêt ».
+2. Cliquez dessus : le récap s'ouvre sur la page « Votre bilan : … – … ».
 3. Passez d'une statistique à l'autre avec **« Précédent »** et **« Suivant »**. Rien ne défile tout seul : vous avancez à votre rythme.
 
 Votre récap est personnel : vous seul le voyez. Si aucun récap n'est encore prêt, la page affiche « Pas encore de bilan. ». Les notifications de récap se règlent dans la catégorie « Bilans » de vos préférences (voir [Notifications](portalab://wiki/guide-notifications)).

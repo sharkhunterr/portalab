@@ -11,12 +11,18 @@ OWNER = "module:wiki"
 class WikiConfig:
     max_page_bytes: int = 200_000
     history_visibility: str = "editors"  # editors | readers (readers: every wiki reader sees history)
+    guide_enabled: bool = True  # issue 457: Portalab's own member guide installed and kept up to date
 
 
-SETTINGS = {"max_page_bytes": "wiki.maxPageBytes", "history_visibility": "wiki.history.visibility"}
+SETTINGS = {
+    "max_page_bytes": "wiki.maxPageBytes",
+    "history_visibility": "wiki.history.visibility",
+    "guide_enabled": "wiki.guide.enabled",
+}
 _DESCRIPTIONS = {
     "max_page_bytes": "Largest wiki page source accepted (bytes).",
     "history_visibility": "Who sees page history: 'editors' (wiki.history.read) or 'readers'.",
+    "guide_enabled": "Portalab's member guide in the wiki (English and French), kept up to date.",
 }
 
 

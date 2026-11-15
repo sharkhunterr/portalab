@@ -75,7 +75,7 @@ Selon votre portail, l'équipe peut utiliser d'autres états.
 ## La page d'un ticket
 
 - **En haut** : le numéro, l'état, la priorité et, le cas échéant, l'incident rattaché.
-- **Votre demande** : votre description et vos réponses aux questions.
+- **Détails** : votre description et vos réponses aux questions.
 - **« Échanges »** : les messages entre vous (« Vous ») et l'« Équipe support ». Écrivez dans « Votre message », puis touchez « Envoyer ».
 - **« Pièces jointes »** : touchez « Joindre un fichier » pour ajouter une capture ou un document. La taille et les types de fichiers acceptés dépendent de votre portail. Un fichier refusé affiche « Ce fichier a été refusé (type, taille ou vérification). ».
 - **« Historique »** : tout ce qui s'est passé sur le ticket (création, changements d'état, réponses…).
@@ -121,7 +121,7 @@ Votre portail peut en proposer d'autres. Remplissez le petit formulaire, puis to
 La section « Mes avis » liste ce que vous avez envoyé. Pour chaque avis, un suivi montre où il en est :
 
 1. « Envoyé » : l'avis est parti.
-2. « Lu » : l'équipe l'a lu. À cette étape, vous pouvez voir « Pris en compte » (l'équipe en a fait quelque chose, par exemple un ticket ou une proposition) ou « Classé ».
+2. « Lu » : l'équipe l'a lu. À cette étape, vous pouvez voir « Pris en compte » (l'équipe en a fait quelque chose, par exemple un ticket ou une proposition) ou « Clos ».
 3. « Réponse » : l'équipe vous a répondu. Sa « Réponse de l'équipe » s'affiche sous votre message.
 
 Filtrez avec « Tout », « En attente » ou « Avec réponse ». Une notification vous prévient : « L'équipe a répondu à votre avis ».

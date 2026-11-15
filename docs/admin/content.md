@@ -144,7 +144,15 @@ The member guide and your own pages live in the wiki. Editors write pages from t
 
 **Wiki** in Administration lists "every page, its place and state": **Publish**, **Archive** or **Back to draft**, and a **Broken links** view to fix links that lead nowhere. On a page, **The assistant may use this page** lets the assistant quote it (it only ever uses pages the asking member may read).
 
-Settings: *Who sees page history* (editors only, or every reader), *Largest wiki page*.
+### Portalab's member guide
+
+Portalab ships its own **member guide** (about twenty pages: first steps, the home page, watching and reading, requests, the shop, progression, Mediacards, the community, statistics, the assistant, notifications, support, the household, retro games, an FAQ…), written in **English and French** with screenshots. While the wiki module is on, each start installs it and brings it up to date with the release: one wiki page per guide page, in English with its French translation, so **each member reads it in their language**. Your currency's name replaces « Coins ».
+
+- **Your changes win.** Edit a guide page and it becomes yours: no release writes over it again. Translate or correct its French text and that translation stays as you saved it. Delete a guide page and it does not come back.
+- **Switch it off** with *Portalab's member guide in the wiki* (Configuration): the pages the guide still owns are removed; the ones you changed stay. Switching it on again brings every page back, the ones you deleted included.
+- Your own pages under the same name are never touched; a guide page needs nothing from you.
+
+Settings: *Who sees page history* (editors only, or every reader), *Largest wiki page*, *Portalab's member guide in the wiki*.
 
 ## Terms of use
 

@@ -33,6 +33,9 @@ from mdit_py_plugins.tasklists import tasklists_plugin
 
 RENDERER_VERSION = "1"
 ASSET_SCHEME = "portalab-asset:"
+# issue 457: a screenshot of Portalab's member guide, shipped with the release (« portalab-guide:fr/name »)
+GUIDE_SCHEME = "portalab-guide:"
+_GUIDE_SHOT = re.compile(r"^([a-z]{2})/([a-z0-9][a-z0-9-]{0,80})$")
 REF_SCHEME = "portalab://"
 CALLOUTS = {
     "NOTE": "Note",
@@ -176,6 +179,11 @@ class MarkdownRenderer:
             if asset:
                 state.assets.append(asset)
                 return f'<img src="/api/v1/content/assets/{asset}" alt="{alt}" data-asset="{asset}">'
+        if src.lower().startswith(GUIDE_SCHEME):
+            shot = _GUIDE_SHOT.match(src[len(GUIDE_SCHEME) :])
+            if shot:
+                language, name = shot.groups()
+                return f'<img src="/api/v1/wiki/guide/shots/{language}/{name}.jpg" alt="{alt}">'
         if _is_external(src) and state.allow_external_images:
             state.external.append(src)
             return f'<img src="{html.escape(src, quote=True)}" alt="{alt}">'

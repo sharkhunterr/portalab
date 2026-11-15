@@ -1,5 +1,6 @@
 """Wiki module facade (spec 011)."""
 
+import asyncio
 from dataclasses import replace
 from typing import Any
 
@@ -29,6 +30,7 @@ from portalab.modules.wiki import settings as _settings  # noqa: F401 — declar
 from portalab.modules.wiki.ai_tools import WikiAiTools
 from portalab.modules.wiki.attention import DraftsAttention
 from portalab.modules.wiki.events import register_event_types
+from portalab.modules.wiki.guide import GuideSync, guide_root
 from portalab.modules.wiki.knowledge import WikiKnowledge, WikiLinkResolver, WikiSearchProvider
 from portalab.modules.wiki.pages import PageService
 from portalab.modules.wiki.participant import WikiParticipant
@@ -66,6 +68,27 @@ class WikiModule:
         self.observables = observables
         self.pages = PageService(database, events, authorizer, capabilities, lambda: self.config, clock=clock)
         self.knowledge = WikiKnowledge(self.pages)
+        self.guide = GuideSync(self.pages, capabilities, guide_root(), clock=clock)  # issue 457
+        self._guide_task: asyncio.Task[None] | None = None
+        self._started = False
+
+    async def _sync_guide(self) -> None:
+        try:
+            report = await self.guide.run(enabled=self.config.guide_enabled)
+            if report.changed or report.kept:
+                log.info("member guide: %s", "; ".join(report.lines()))
+        except Exception:
+            log.warning("member guide: synchronisation failed", exc_info=True)
+
+    def sync_guide(self) -> None:
+        """Brings Portalab's member guide in line with the release and the switch (in the background)."""
+        if self._guide_task is None or self._guide_task.done():
+            self._guide_task = asyncio.create_task(self._sync_guide())
+
+    async def start(self) -> None:
+        """Issue 457: the member guide at each start — a start never waits for it."""
+        self._started = True
+        self.sync_guide()
 
     def register(self) -> None:
         if not any(p.instance_ref == "wiki" for p in self.capabilities.system_providers(ATTENTION)):
@@ -112,6 +135,9 @@ class WikiModule:
                 values = {
                     name: (await providers[0].provider.get(key)).value for name, key in SETTINGS.items()
                 }
+                switched = values.get("guide_enabled", self.config.guide_enabled) != self.config.guide_enabled
                 self.config = replace(self.config, **values)
+                if switched and self._started:
+                    self.sync_guide()  # issue 457: the guide switched on or off
         except Exception:
             log.warning("wiki configuration not refreshed")

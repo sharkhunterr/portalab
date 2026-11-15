@@ -172,7 +172,8 @@ mini-games, challenges and parties), and each member's home starts from the dash
 
 - **News** with an editorial workflow, and **newsletters by e-mail** (what arrived, what is coming) at
   the rhythm each member chooses.
-- **An internal wiki**, versioned, for the server's guides and rules.
+- **An internal wiki**, versioned, for the server's guides and rules — with **Portalab's member guide** built
+  in, in English and French, each member reading it in their language, kept up to date by every release.
 - **A calendar** of releases, events, campaigns and maintenance; **events and proposals** the community
   votes on; member profiles and an activity feed.
 - **Terms of use** published in versions, accepted by every member.

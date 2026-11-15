@@ -61,7 +61,7 @@ Quand une notification arrive pendant que vous êtes sur le portail, un petit me
 
 Même si vous ne l'avez pas vu, le message reste toujours dans la cloche.
 
-Dans [Apparence](/settings/appearance), vous pouvez choisir la place de ces messages à l'écran, activer ou couper leur son, et choisir leur style et leur animation. Certains styles s'obtiennent dans la [boutique](/marketplace). Voir [Compte, apparence et confidentialité](portalab://wiki/guide-compte).
+Dans [Apparence](/settings/appearance), vous pouvez choisir la place de ces messages à l'écran, activer ou couper leur son, et choisir leur style et leur animation. Certains styles s'obtiennent dans la [boutique](/marketplace). Voir [Mon compte et mes réglages](portalab://wiki/guide-compte).
 
 ## Choisir ce que vous recevez
 

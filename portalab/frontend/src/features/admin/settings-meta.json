@@ -1467,6 +1467,10 @@
     "advanced": false,
     "group": "general"
   },
+  "wiki.guide.enabled": {
+    "advanced": false,
+    "group": "media"
+  },
   "wiki.history.visibility": {
     "advanced": false,
     "group": "media"

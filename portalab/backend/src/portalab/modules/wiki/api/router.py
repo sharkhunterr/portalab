@@ -6,6 +6,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
@@ -14,6 +15,7 @@ from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, Unavailable
+from portalab.modules.wiki.guide import shot_path
 from portalab.modules.wiki.module import WikiModule
 from portalab.modules.wiki.pages import PageInput, PageNotFound, PageView
 from portalab.modules.wiki.permissions import SELF, WIKI_DELETE, WIKI_EDIT, WIKI_PUBLISH, WIKI_READ
@@ -191,9 +193,20 @@ async def _audit(
         )
 
 
+@router.get("/wiki/guide/shots/{language}/{name}.jpg", response_class=FileResponse)
+async def guide_shot(language: str, name: str, module: Module, _: Reader) -> FileResponse:
+    """Issue 457: a screenshot of Portalab's member guide — a file of the release, read-only."""
+    path = shot_path(module.guide.root, language, name)
+    if path is None:
+        raise PageNotFound("This picture does not exist.")
+    return FileResponse(path, media_type="image/jpeg", headers={"Cache-Control": "private, max-age=86400"})
+
+
 @router.get("/wiki/tree")
-async def tree(principal: Reader, module: Module) -> list[dict[str, Any]]:
-    return await module.pages.tree(principal)
+async def tree(
+    principal: Reader, module: Module, lang: Annotated[str | None, Query(max_length=16)] = None
+) -> list[dict[str, Any]]:
+    return await module.pages.tree(principal, lang)
 
 
 @router.get("/wiki/pages/{key}", response_model=WikiPageOut)

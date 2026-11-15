@@ -53,6 +53,26 @@ default; `wiki.history.visibility = readers` widens it). Pages carry `readable_b
 `support.knowledge` and AI tools only see pages the asking user may read (and, for AI, marked readable);
 `GET /help?key=` feeds the header help entry (route `/services/<id>` → key `services.detail`).
 
+### Portalab's member guide (issue 457)
+
+`docs/member-guide/<language>/*.md` (a header — `slug`, `title`, `position`, `parent`, `help_keys`, `tags` —
+then Markdown) and its screenshots `docs/member-guide/images/<language>/<name>.jpg` are copied into the image
+(`/app/guide`, else `PORTALAB_GUIDE_DIR`, else the repository's folder). `modules/wiki/guide.py`
+(`GuideSync`) runs at each start and when `wiki.guide.enabled` changes, in the background, under an advisory
+lock: each page becomes one wiki page whose source is English, the other languages its translations
+(`updated_by` NULL); `![alt](shot:<name>)` becomes `![alt](portalab-guide:<language>/<name>)`, rendered as
+`/api/v1/wiki/guide/shots/<language>/<name>.jpg` (wiki readers, names validated, never outside the folder);
+« Coins » becomes the site's currency. A page is the guide's while every revision carries the change note
+`Portalab member guide` (or `Guide du membre`, the hand import of `scripts/wiki_import.py`, adopted);
+otherwise it is its administrator's and never written again. `wiki.guide_pages` remembers what the guide
+installed, what it removed (switched off) and what an administrator deleted (`dismissed`, not brought back
+until the guide is switched off and on). Pages and the tree take `?lang=` — the interface sends the member's
+language.
+
+Screenshots: `node scripts/guide_shots.mjs docs/member-guide/shots --language <en|fr> --names
+deploy/secrets/shot_names.json --out docs/member-guide/images/<language> …` — with `--names`, every shot
+blurs members' faces and replaces the real names listed in that file (kept out of the repository).
+
 ## Calendar source contract
 
 The calendar owns no item. A domain registers a `CalendarSource`:

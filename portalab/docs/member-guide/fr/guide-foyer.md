@@ -71,7 +71,7 @@ C'est vous, le titulaire, qui fixez la politique de chaque profil : **« Mon foy
 
 ### Les classifications d'âge
 
-Chaque titre affiche sa **classification** (films, séries, livres, jeux), et la médiathèque filtre selon « ce que ce membre peut regarder ». L'âge d'un titre est **sa classification dans le pays du portail**, réglé par l'administrateur avec la langue système : en France, un film « Tous publics » est ouvert à tous. **Sans classification pour ce pays, c'est la plus stricte des autres qui compte** : celles des États-Unis, du Royaume-Uni, de l'Allemagne (via TMDB) et celle de votre serveur Plex ou Jellyfin. La fiche de chaque titre affiche cet âge et ses sources.
+Chaque titre affiche sa **classification** (films, séries, livres, jeux), et la médiathèque filtre selon « Ce que je peux regarder ». L'âge d'un titre est **sa classification dans le pays du portail**, réglé par l'administrateur avec la langue système : en France, un film « Tous publics » est ouvert à tous. **Sans classification pour ce pays, c'est la plus stricte des autres qui compte** : celles des États-Unis, du Royaume-Uni, de l'Allemagne (via TMDB) et celle de votre serveur Plex ou Jellyfin. La fiche de chaque titre affiche cet âge et ses sources.
 
 Un jeu suit sa classification (PEGI, ESRB… venue d'IGDB par RomM) quand il en a une ; un jeu non classé reste ouvert, la plupart des jeux rétro étant antérieurs aux classifications. Les livres et la musique n'ont pas de classification.
 

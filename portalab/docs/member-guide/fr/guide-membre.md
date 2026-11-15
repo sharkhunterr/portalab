@@ -15,7 +15,7 @@ Le guide de Portalab, le portail de vos services : regarder et demander des titr
 
 - [Premiers pas](portalab://wiki/guide-premiers-pas) — l'en-tête, le menu, la recherche et les visites guidées.
 - [L'accueil et ses widgets](portalab://wiki/guide-accueil) — composer votre page d'accueil.
-- [Le centre de contrôle](portalab://wiki/guide-centre-de-controle) — incidents, maintenances, annonces et état des services.
+- [Centre de contrôle](portalab://wiki/guide-centre-de-controle) — incidents, maintenances, annonces et état des services.
 
 ## Films, séries, livres et musique
 
@@ -36,6 +36,6 @@ Le guide de Portalab, le portail de vos services : regarder et demander des titr
 - [L'assistant](portalab://wiki/guide-assistant) — poser une question, se faire aider.
 - [Notifications](portalab://wiki/guide-notifications) — la cloche, les e-mails, les newsletters et vos préférences.
 - [Support](portalab://wiki/guide-support) — ouvrir un ticket, donner votre avis.
-- [Compte et réglages](portalab://wiki/guide-compte) — profil, apparence, langue et confidentialité.
+- [Mon compte et mes réglages](portalab://wiki/guide-compte) — profil, apparence, langue et confidentialité.
 - [Actualités, calendrier et wiki](portalab://wiki/guide-actualites) — À la une, Mon fil, les newsletters, le calendrier et le wiki.
 - [Questions fréquentes](portalab://wiki/guide-faq) — les réponses rapides.

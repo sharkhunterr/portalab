@@ -29,14 +29,6 @@
     ],
     "before": [
       {
-        "click": ".household-picker__grid li:first-child .household-tile",
-        "wait": 3500
-      },
-      {
-        "goto": "/household",
-        "wait": 2500
-      },
-      {
         "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
         "wait": 300
       },
@@ -58,14 +50,6 @@
     ],
     "before": [
       {
-        "click": ".household-picker__grid li:first-child .household-tile",
-        "wait": 3500
-      },
-      {
-        "goto": "/household/profiles",
-        "wait": 2500
-      },
-      {
         "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
         "wait": 300
       },
@@ -86,14 +70,6 @@
       "/api/v1/household/switch"
     ],
     "before": [
-      {
-        "click": ".household-picker__grid li:first-child .household-tile",
-        "wait": 3500
-      },
-      {
-        "goto": "/household/schedule",
-        "wait": 2500
-      },
       {
         "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
         "wait": 300

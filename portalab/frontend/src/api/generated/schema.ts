@@ -12879,6 +12879,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/wiki/guide/shots/{language}/{name}.jpg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Guide Shot
+         * @description Issue 457: a screenshot of Portalab's member guide — a file of the release, read-only.
+         */
+        get: operations["guide_shot_api_v1_wiki_guide_shots__language___name__jpg_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/wiki/pages": {
         parameters: {
             query?: never;
@@ -47031,6 +47051,36 @@ export interface operations {
             };
         };
     };
+    guide_shot_api_v1_wiki_guide_shots__language___name__jpg_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                language: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_page_api_v1_wiki_pages_post: {
         parameters: {
             query?: never;
@@ -47404,7 +47454,9 @@ export interface operations {
     };
     tree_api_v1_wiki_tree_get: {
         parameters: {
-            query?: never;
+            query?: {
+                lang?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -47420,6 +47472,15 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

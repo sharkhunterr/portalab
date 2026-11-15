@@ -63232,6 +63232,51 @@
         ]
       }
     },
+    "/api/v1/wiki/guide/shots/{language}/{name}.jpg": {
+      "get": {
+        "description": "Issue 457: a screenshot of Portalab's member guide \u2014 a file of the release, read-only.",
+        "operationId": "guide_shot_api_v1_wiki_guide_shots__language___name__jpg_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "language",
+            "required": true,
+            "schema": {
+              "title": "Language",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Guide Shot",
+        "tags": [
+          "wiki"
+        ]
+      }
+    },
     "/api/v1/wiki/pages": {
       "post": {
         "operationId": "create_page_api_v1_wiki_pages_post",
@@ -63823,6 +63868,25 @@
     "/api/v1/wiki/tree": {
       "get": {
         "operationId": "tree_api_v1_wiki_tree_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 16,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lang"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -63838,6 +63902,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Tree",

@@ -11,7 +11,7 @@ Un film ou une série manque à la médiathèque ? Le demander, savoir ce que ce
 
 Ouvrez [Demander un titre](/media/discover) dans la rubrique « Médias » du menu, ou cliquez sur **« Demander un média »** depuis la page Médias.
 
-- Tapez dans **« Chercher un film ou une série »** : vous trouvez aussi les titres absents de la médiathèque.
+- Tapez dans **« Un film, une série, un livre, un jeu… »** : vous trouvez aussi les titres absents de la médiathèque.
 - Ou parcourez les rangées : **« Tendances »**, **« Films populaires »**, **« Séries populaires »**, **« Films à venir »**, **« Séries à venir »**.
 
 Chaque affiche porte un badge : **« À demander »**, **« Demandé »**, **« Vous l'avez demandé »**, **« Déjà demandé »**, **« En cours »**, **« En partie disponible »** ou **« Disponible »**.
@@ -86,7 +86,7 @@ Sur la fiche d'un titre demandé, l'encadré **« Où en est ce titre »** montr
 6. **« Importé »** : le fichier entre dans la médiathèque.
 7. **« Disponible »** : le titre est prêt.
 
-Chaque étape est « fait », « en cours », « en attente », « bloqué » (quelqu'un doit intervenir), « en échec » ou « à venir ». L'étape en cours est expliquée juste sous la frise. Dépliez **« Toutes les étapes »** pour lire le détail de chacune.
+Chaque étape est « fait », « en cours », « en attente », « bloqué » (quelqu'un doit intervenir), « échec » ou « à venir ». L'étape en cours est expliquée juste sous la frise. Dépliez **« Toutes les étapes »** pour lire le détail de chacune.
 
 ![L'encadré « Où en est ce titre » d'un titre demandé, pas encore arrivé](shot:demandes-parcours)
 

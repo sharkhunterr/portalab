@@ -414,6 +414,8 @@ def create_app(
             await app.state.platform.start_services()
             if app.state.platform.visuals is not None:
                 await app.state.platform.visuals.start()
+            if getattr(app.state.platform, "wiki", None) is not None:
+                await app.state.platform.wiki.start()  # issue 457: Portalab's member guide, in the background
             # 030: this process serves the plugins' pages, routes and slots: the enabled ones load at start
             # (only the worker did; a restart left them all out until each was enabled again)
             await app.state.platform.plugins.start()

@@ -500,7 +500,8 @@ class PageService:
             can_edit=await self.allowed(viewer, WIKI_EDIT),
         )
 
-    async def tree(self, viewer: Principal) -> list[dict[str, Any]]:
+    async def tree(self, viewer: Principal, language: str | None = None) -> list[dict[str, Any]]:
+        """The pages a viewer may read; issue 457: titles and summaries in their language when translated."""
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -512,19 +513,34 @@ class PageService:
                     .order_by(Page.position, Page.title)
                 )
             ).all()
+            translated = (
+                {
+                    row.page_id: row
+                    for row in (
+                        await session.scalars(
+                            select(PageTranslation).where(
+                                PageTranslation.language == language, PageTranslation.state == "translated"
+                            )
+                        )
+                    ).all()
+                }
+                if language
+                else {}
+            )
         bodies = {page.id: body or "" for page, body in rows}
         visible = [p for p, _ in rows if await self.readable(p, viewer)]
         ids = {p.id for p in visible}
         nodes: dict[UUID | None, list[dict[str, Any]]] = {}
         for page in visible:
             parent = page.parent_id if page.parent_id in ids else None
+            other = translated.get(page.id) if page.language != language else None
             nodes.setdefault(parent, []).append(
                 {
                     "id": str(page.id),
                     "slug": page.slug,
-                    "title": page.title,
+                    "title": other.title if other else page.title,
                     "status": page.status,
-                    "summary": summary_of(bodies[page.id]),
+                    "summary": summary_of(other.body_md if other else bodies[page.id]),
                     "children": [],
                 }
             )

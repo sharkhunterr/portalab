@@ -2239,5 +2239,7 @@
   "setup.step.household.title": "Foyers et profils",
   "setup.step.household.lead": "Un membre peut créer un foyer : des profils pour les personnes qui partagent son compte, chacun avec ses règles (âges, temps d'écran) et sa propre progression. Réglez combien de profils un compte peut avoir, et si les graphiques d'administration montrent les profils sur la ligne de leur maître. Chaque maître choisit l'économie de son foyer (pot commun ou profils séparés) dans « Mon foyer ».",
   "setup.step.household.todo": "Choisir combien de profils un compte peut avoir",
-  "setup.link.household": "Mon foyer"
+  "setup.link.household": "Mon foyer",
+  "setting.wiki.guide.enabled.label": "Le guide du membre de Portalab dans le wiki",
+  "setting.wiki.guide.enabled.hint": "Les pages du guide en anglais et en français, chaque membre les lit dans sa langue, mises à jour à chaque version. Une page que vous modifiez ou supprimez reste telle que vous l'avez laissée. Coupé : les pages que le guide possède encore sont retirées."
 }

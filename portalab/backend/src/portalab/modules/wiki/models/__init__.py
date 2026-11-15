@@ -101,3 +101,16 @@ class PageTranslation(WikiBase):
     state: Mapped[str] = mapped_column(String(14), nullable=False)
     updated_by: Mapped[UUID | None] = mapped_column()
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class GuidePage(WikiBase):
+    """Issue 457: a page of Portalab's own member guide in this wiki — installed, removed with the guide, or
+    dismissed (its administrator deleted it: never brought back, until the guide is switched off and on)."""
+
+    __tablename__ = "guide_pages"
+    __table_args__ = (CheckConstraint("state IN ('installed', 'removed', 'dismissed')", name="state"),)
+
+    slug: Mapped[str] = mapped_column(String(160), primary_key=True)
+    page_id: Mapped[UUID | None] = mapped_column(ForeignKey("wiki.pages.id", ondelete="SET NULL"))
+    state: Mapped[str] = mapped_column(String(10), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)

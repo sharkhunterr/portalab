@@ -10,6 +10,7 @@ import { SafeHtml } from "../content/SafeHtml";
 import { type TreeNode, usePage, useTree, useWikiActions } from "./api";
 import { groupOf, WikiTree } from "./WikiTree";
 import "./wiki.css";
+import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 
 /**
  * Wiki page (spec 011 T012, 027 T095): a documentation layout — the page tree on the side (desktop),
@@ -68,8 +69,10 @@ export function PageView() {
   const t = useT();
   const { slug = "" } = useParams();
   const headingId = useId();
-  const page = usePage(slug);
-  const tree = useTree();
+  // issue 457: a translated page (Portalab's guide, in English and French) read in the member's language
+  const { language } = useLocaleContext();
+  const page = usePage(slug, language);
+  const tree = useTree(language);
   const { publish } = useWikiActions();
   if (page.isPending) return <FunctionalState state="loading" />;
   if (page.isError || !page.data) return <FunctionalState state="unavailable" label={t("wiki:notFound")} />;

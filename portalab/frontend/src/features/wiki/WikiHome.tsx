@@ -9,6 +9,7 @@ import { useHasPermission } from "../authz/useMyPermissions";
 import { type TreeNode, useTree } from "./api";
 import { flatten, groupsOf, type WikiGroup } from "./WikiTree";
 import "./wiki.css";
+import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 
 /**
  * Wiki home (spec 011 T016, 027 T095): "New page" for those who may write, a title filter, and the wiki as
@@ -128,7 +129,7 @@ function Group({
 export function WikiHome() {
   const t = useT();
   const headingId = useId();
-  const tree = useTree();
+  const tree = useTree(useLocaleContext().language); // issue 457: titles in the member's language
   const canWrite = useHasPermission("wiki.edit");
   const [query, setQuery] = useState("");
   const [opened, setOpened] = useState<string[]>(readOpened);

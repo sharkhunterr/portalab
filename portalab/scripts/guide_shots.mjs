@@ -53,6 +53,9 @@ const files = statSync(source).isDirectory()
       .map((name) => join(source, name))
   : [source];
 const shots = files.flatMap((file) => JSON.parse(readFileSync(file, "utf8")));
+const PRIVATE_CSS =
+  '.avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, ' +
+  '.household-face img, img[src*="/avatar"] { filter: blur(8px); }';
 // issue 456: the real names to hide, never written in the repository
 const names = values.names ? JSON.parse(readFileSync(values.names, "utf8")) : null;
 const only = values.only ? new Set(values.only.split(",")) : null;
@@ -225,7 +228,9 @@ async function take(shot, last) {
   const reads = shot.reads ?? [];
   await page.route("**/api/v1/**", (route) => {
     const request = route.request();
-    const read = request.method() === "POST" && reads.some((path) => new URL(request.url()).pathname === path);
+    const path = new URL(request.url()).pathname;
+    // issue 457: choosing the account's own profile on « Who's there? » only switches this browser's session
+    const read = request.method() === "POST" && (path === "/api/v1/household/switch" || reads.includes(path));
     return request.method() === "GET" || read ? route.fallback() : route.fulfill({ status: 204, body: "" });
   });
   // the guide's language, whatever the account's — only in this browser
@@ -236,7 +241,19 @@ async function take(shot, last) {
   });
   try {
     await act(page, { goto: shot.route, wait: shot.settle ?? 4000 });
+    // issue 457: an account with profiles is asked « Who's there? » first — its holder is chosen
+    const picker = page.locator(".household-picker__grid li:first-child .household-tile");
+    if (await picker.count()) {
+      await picker.first().click();
+      await page.waitForTimeout(3000);
+      await act(page, { goto: shot.route, wait: shot.settle ?? 4000 });
+    }
     for (const step of shot.before ?? []) await act(page, step);
+    if (names) {
+      // issue 457: public screenshots — members' faces blurred, real names replaced, whatever the shot
+      await act(page, { css: PRIVATE_CSS });
+      await act(page, { replace: true });
+    }
     const clip = await page.locator(shot.clip ?? "main").first().evaluate((element, [extra, most]) => {
       const r = element.getBoundingClientRect();
       const [top, right, bottom, left] = extra;

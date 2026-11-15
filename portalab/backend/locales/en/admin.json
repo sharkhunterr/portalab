@@ -2239,5 +2239,7 @@
   "setup.step.household.title": "Households and profiles",
   "setup.step.household.lead": "A member may make a household: profiles for the people sharing their account, each with its own rules (ages, screen time) and its own progress. Set how many profiles an account may hold, and whether the administration's charts show the profiles on their master's row. Each master chooses their household's economy (a common pot or separate profiles) in « My household ».",
   "setup.step.household.todo": "Choose how many profiles an account may hold",
-  "setup.link.household": "My household"
+  "setup.link.household": "My household",
+  "setting.wiki.guide.enabled.label": "Portalab's member guide in the wiki",
+  "setting.wiki.guide.enabled.hint": "The guide's pages in English and French, each member reading their language, kept up to date by each release. A page you change or delete stays as you left it. Off: the pages the guide still owns are removed."
 }
