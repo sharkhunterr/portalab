@@ -681,6 +681,17 @@ class ScreenTimeOut(BaseModel):
     slot: SpanUseOut | None = None
     slots: list[SpanOut] = []
     next: SpanOut | None = None
+    scope: Literal["media", "portal"] = "media"  # issue 439: its media only, or all of its time on the portal
+
+
+@router.post("/me/media/screen-time/beat", response_model=ScreenTimeOut | None)
+async def screen_beat(principal: Reader, module: Module) -> ScreenTimeOut | None:
+    """Issue 439: a profile whose master counts all of Portalab is on the portal (its tab in view) — one
+    minute more (one a minute at most), and its screen time now."""
+    me = _me(principal)
+    await module.gate.beat(me)
+    now = await module.gate.screen_now(me)
+    return ScreenTimeOut.model_validate(now) if now is not None else None
 
 
 @router.get("/me/media/screen-time", response_model=ScreenTimeOut | None)

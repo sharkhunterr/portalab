@@ -3,7 +3,7 @@
 import re
 from datetime import UTC, date, datetime
 from itertools import pairwise
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -83,6 +83,8 @@ class RestrictionSettings(BaseModel):
     hours_from: str | None = None
     hours_to: str | None = None
     slots: list[SlotIn] = Field(default_factory=list, max_length=MAX_SLOTS)
+    # issue 439: its screen time counts its media only, or all of its time on the portal
+    screen_scope: Literal["media", "portal"] = "media"
 
     @field_validator("slots")
     @classmethod
@@ -194,6 +196,7 @@ class RestrictionSettings(BaseModel):
             bonus_minutes,
             bonus_day,
             tuple(Slot(s.day, s.start, s.end, s.minutes) for s in self.slots),
+            self.screen_scope,
         )
 
 

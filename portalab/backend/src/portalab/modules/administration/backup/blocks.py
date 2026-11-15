@@ -137,6 +137,7 @@ MEMBER_COLUMNS: dict[tuple[str, str], Policy] = {
     ("media.radio_sittings", "user_id"): "drop",
     ("media.portal_streams", "user_id"): "drop",  # 032: who started a portal-player stream
     ("media.playback_sessions", "played_by"): "drop",  # 032: the household profile that watched it
+    ("media.screen_beats", "user_id"): "drop",  # 439: a profile's minutes on the portal
     ("news.article_revisions", "author_id"): "reassign",
     ("news.newsletter_editions", "created_by"): "reassign",
     ("notify.announcements", "created_by"): "reassign",

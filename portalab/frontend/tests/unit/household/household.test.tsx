@@ -23,6 +23,7 @@ import { chooseProfile } from "../../../src/features/household/api";
 import HouseholdPage from "../../../src/features/household/HouseholdPage";
 import { KeptNotice, LockedTitle } from "../../../src/features/household/LockedTitle";
 import { ProfileGate } from "../../../src/features/household/ProfilePicker";
+import { ScreenGuard, spent } from "../../../src/features/household/ScreenGuard";
 import { ApiError } from "../../../src/state/regions";
 import { json } from "../../support/fake-api";
 
@@ -427,7 +428,9 @@ describe("the household's schedule (issue 436)", () => {
     };
     show(<HouseholdPage view="schedule" />);
     expect(await screen.findByRole("heading", { name: "Schedule" })).toBeTruthy();
-    const left = await screen.findByRole("region", { name: "Time left now" });
+    // issue 439: whose time it is, its profile's chip too (a single profile)
+    expect(screen.getByRole("button", { name: "Léa", pressed: true })).toBeTruthy();
+    const left = await screen.findByRole("region", { name: "Léa's time" });
     await waitFor(() => expect(within(left).getByText("35 min")).toBeTruthy()); // the span's 45 min, 10 used
     expect(within(left).getByText("30 min of 2 hr")).toBeTruthy();
     expect(within(left).getByText("Today's spans: 16:00–18:00")).toBeTruthy();
@@ -435,10 +438,12 @@ describe("the household's schedule (issue 436)", () => {
     expect(within(calendar).getByRole("button", { name: "Monday, 16:00 to 18:00: 45 min" })).toBeTruthy();
     fireEvent.click(within(calendar).getByRole("button", { name: "Add a span" }));
     fireEvent.click(await screen.findByRole("button", { name: "Done" }));
+    fireEvent.click(screen.getByRole("radio", { name: /All of Portalab/ })); // issue 439: what counts
     fireEvent.click(screen.getByRole("button", { name: "Save the schedule" }));
     await waitFor(() => expect(patched).toHaveLength(1));
     expect(patched[0]).toMatchObject({
       restrictions: {
+        screen_scope: "portal",
         max_age: 12,
         daily_minutes: 120,
         slots: [
@@ -460,6 +465,7 @@ describe("the household's schedule (issue 436)", () => {
     show(<HouseholdPage view="schedule" />);
     expect(await screen.findByRole("heading", { name: "My schedule" })).toBeTruthy();
     expect(await screen.findByText("Closed for now")).toBeTruthy();
+    expect(screen.getByText("Your time counts what you watch, read, listen to and play.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Monday, 16:00 to 18:00: 45 min" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Add a span" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Save the schedule" })).toBeNull();
@@ -545,5 +551,73 @@ describe("a title shown to a profile, never played (issue 432)", () => {
     await waitFor(() =>
       expect(asked).toMatchObject([{ ref: REQUEST.subject_ref, title: "Alien", rating: "16+" }]),
     );
+  });
+});
+
+describe("all of Portalab as screen time (issue 439)", () => {
+  it("tells each minute on the portal, and covers it once the time is over", async () => {
+    const beats: string[] = [];
+    let used = 59;
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      const state = () => ({
+        used,
+        allowed: 60,
+        open: true,
+        slot: null,
+        slots: [],
+        next: null,
+        scope: "portal",
+      });
+      if (path === "/api/v1/me/media/screen-time") return json(200, state());
+      if (request.method === "POST" && path === "/api/v1/me/media/screen-time/beat") {
+        beats.push(path);
+        used += 1;
+        return json(200, state());
+      }
+      return json(404, {});
+    };
+    show(<ScreenGuard profile />);
+    expect(await screen.findByRole("alertdialog", { name: "Screen time is over" })).toBeTruthy();
+    expect(beats).toHaveLength(1); // the first minute, told at once
+    expect(screen.getByText("You can come back tomorrow.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Switch profile" }));
+  });
+
+  it("neither tells nor covers anything when only media counts, or for anyone but a profile", async () => {
+    const posts: string[] = [];
+    fake.handler = async (request) => {
+      if (request.method === "POST") posts.push(new URL(request.url).pathname);
+      return json(200, {
+        used: 90,
+        allowed: 60,
+        open: true,
+        slot: null,
+        slots: [],
+        next: null,
+        scope: "media",
+      });
+    };
+    show(<ScreenGuard profile />);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(screen.queryByRole("alertdialog")).toBeNull(); // its media are refused one by one instead
+    expect(posts).toEqual([]);
+    expect(
+      spent({ used: 10, allowed: 60, open: false, slot: null, slots: [], next: null, scope: "portal" }),
+    ).toBe(true);
+    expect(
+      spent({
+        used: 10,
+        allowed: 60,
+        open: true,
+        slot: { start: "16:00", end: "18:00", used: 30, allowed: 30 },
+        slots: [],
+        next: null,
+        scope: "portal",
+      }),
+    ).toBe(true);
+    expect(spent(null)).toBe(false);
   });
 });

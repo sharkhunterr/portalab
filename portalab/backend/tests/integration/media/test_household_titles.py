@@ -561,3 +561,52 @@ async def test_the_catalog_filters_by_age_rating(
     assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
     assert await titles() == {"Toy Story", "Alien", "Coco", "Nameless"}  # shown, the kept ones locked
     assert await titles(age="mine") == {"Toy Story", "Coco"}
+
+
+async def test_all_of_portalab_counts_when_its_master_says_so(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 439: a profile's screen time counts its media only, or (its master's choice) every minute on the
+    portal — one a minute however often it comes, a film in the portal's player counted once."""
+    from portalab.modules.media.insights.portal import PortalActivity
+    from portalab.modules.media.models import ScreenBeat
+
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    owner = Principal(user_id=people["zoe"])
+    created = await households(app).create(owner, display_name="Léa", kind="standard", color=None, pin=None)
+    lea = UUID(str(created["id"]))
+    await households(app).change(owner, lea, restrictions=RestrictionSettings(daily_minutes=60))
+    viewer = Principal(user_id=lea, profile_of=people["zoe"])
+    assert await media.module.gate.beat(viewer) is False  # its media only: nothing kept
+    assert await media.module.gate.beat(owner) is False  # the master has no screen time
+
+    await households(app).change(
+        owner, lea, restrictions=RestrictionSettings(daily_minutes=60, screen_scope="portal")
+    )
+    await login(client, "zoe")
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    for _ in range(3):  # one minute, however often the portal tells it
+        seen = await client.post("/api/v1/me/media/screen-time/beat")
+        assert seen.status_code == 200, seen.text
+    assert seen.json()["used"] == 1 and seen.json()["scope"] == "portal"
+
+    now = datetime.now(UTC).replace(second=0, microsecond=0)
+    async with media.database.unit_of_work() as uow:  # ten minutes on the portal, from 30 minutes ago
+        uow.session.add_all(ScreenBeat(user_id=lea, minute=now - timedelta(minutes=m)) for m in range(21, 31))
+    await PortalActivity(media.database).store(  # a film from 45 to 25 minutes ago, the portal's tab open
+        ref="portal:t1",
+        user=lea,
+        service=media.service(1).service_id,
+        object_id=ids["Toy Story"],
+        kind="movie",
+        watched=20 * 60,
+        duration=None,
+        share=None,
+        ended=now - timedelta(minutes=25),
+    )
+    since = now - timedelta(hours=1)
+    assert await media.module.gate._used(lea, since, "media") == 20
+    assert await media.module.gate._used(lea, since, "portal") == 1 + 20 + 5  # the 5 minutes together once
+    with pytest.raises(Exception):  # noqa: B017 — the choices are « media » and « portal »
+        RestrictionSettings(screen_scope="everything")  # type: ignore[arg-type]

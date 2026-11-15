@@ -27,6 +27,7 @@ from portalab.modules.media.models import (
     RadioSitting,
     RescueLedger,
     Review,
+    ScreenBeat,
     TasteVerdict,
     UserLink,
     UserProgress,
@@ -225,6 +226,7 @@ class MediaParticipant:
                 Follow,  # #299
                 FeedSeen,
                 FeedNotified,
+                ScreenBeat,  # 439
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
             await session.execute(

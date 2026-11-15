@@ -11,13 +11,14 @@ restriction cost one cached lookup: nothing is computed for them."""
 import time
 from collections.abc import Iterable, Mapping
 from dataclasses import replace
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Uuid, all_, and_, any_, func, literal, select
+from sqlalchemy import Uuid, all_, and_, any_, delete, func, literal, select
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
@@ -27,7 +28,14 @@ from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Forbidden
-from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag, PlaybackSession
+from portalab.modules.media.models import (
+    Activity,
+    MediaObject,
+    ObjectMetadata,
+    ObjectTag,
+    PlaybackSession,
+    ScreenBeat,
+)
 from portalab.modules.media.region import country_of, system_language
 
 # issue 432: every kind a rating may hold to — the unrated rule too (books, games: « unrated titles » off
@@ -36,6 +44,8 @@ RATED = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "
 CACHE_S = 30.0
 AGES_CACHE_S = 300.0  # issue 437: every title's age, for the catalog's filter
 COUNTRY_CACHE_S = 60.0  # issue 438: the system language's country
+BEATS_KEPT = timedelta(days=8)  # issue 439: a profile's minutes on the portal, kept a week
+MINUTE = timedelta(minutes=1)
 AGE_FILTERS = ("mine", "0", "6", "10", "12", "14", "16", "18")
 ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
@@ -319,7 +329,7 @@ class TitleGate:
         allowed = restrictions.minutes_on(start.date())  # 432: the weekly plan's, and today's extra minutes
         if allowed is None:
             return None
-        return await self._used(user, start), allowed
+        return await self._used(user, start, restrictions.screen_scope), allowed
 
     async def screen_now(self, viewer: Principal | UUID | None) -> dict[str, Any] | None:
         """Issue 432: the profile's screen time now — the day's (``used``/``allowed``), whether it may watch
@@ -335,14 +345,15 @@ class TitleGate:
         if allowed is None and not spans and restrictions.hours is None:
             return None
         is_open, slot = restrictions.window(now)
-        used = await self._used(user, start)
+        scope = restrictions.screen_scope
+        used = await self._used(user, start, scope)
         current = None
         if slot is not None:
             since = start.replace(hour=int(slot.start[:2]), minute=int(slot.start[3:]))
             current = {
                 "start": slot.start,
                 "end": slot.end,
-                "used": await self._used(user, since),
+                "used": await self._used(user, since, scope),
                 "allowed": restrictions.slot_minutes(slot, start.date()),
             }
         clock = now.strftime("%H:%M")
@@ -355,10 +366,31 @@ class TitleGate:
             "slots": [{"start": s.start, "end": s.end, "minutes": s.minutes} for s in spans],
             "next": {"start": upcoming.start, "end": upcoming.end} if upcoming else None,
             "hours": list(restrictions.hours) if restrictions.hours and not spans else None,
+            "scope": scope,
         }
 
-    async def _used(self, user: UUID, since: datetime) -> int:
-        """Minutes watched, read or played in the portal since then (ended and running sittings)."""
+    async def beat(self, viewer: Principal | UUID | None) -> bool:
+        """Issue 439: one more minute on the portal for a profile whose master counts all of Portalab — one
+        a minute however often it comes; ``False`` for anyone else (nothing kept)."""
+        restrictions = await self.restrictions_any(viewer)
+        user = viewer_of(viewer)
+        if restrictions is None or user is None or restrictions.screen_scope != "portal":
+            return False
+        minute = datetime.now(UTC).replace(second=0, microsecond=0)
+        async with self.database.unit_of_work() as uow:
+            await uow.session.execute(
+                pg_insert(ScreenBeat).values(user_id=user, minute=minute).on_conflict_do_nothing()
+            )
+            await uow.session.execute(
+                delete(ScreenBeat).where(ScreenBeat.user_id == user, ScreenBeat.minute < minute - BEATS_KEPT)
+            )
+        return True
+
+    async def _used(self, user: UUID, since: datetime, scope: str = "media") -> int:
+        """Minutes watched, read or played in the portal since then (ended and running sittings) — issue
+        439: or, all of Portalab counting, every minute on the portal or in a sitting (each minute once)."""
+        if scope == "portal":
+            return await self._on_portal(user, since)
         async with self.database.session() as session:
             ended = await session.scalar(
                 select(func.coalesce(func.sum(Activity.watched_s), 0.0)).where(
@@ -381,6 +413,40 @@ class TitleGate:
                 )
             )
         return int((float(ended or 0) + max(0.0, float(running or 0))) // 60)
+
+    async def _on_portal(self, user: UUID, since: datetime) -> int:
+        """Issue 439: the minutes since then on the portal (its tab in view) or in a sitting elsewhere (a
+        film on the TV's Plex) — a film in the portal's player counts once, not on both counts."""
+        async with self.database.session() as session:
+            beats = await session.scalars(
+                select(ScreenBeat.minute).where(ScreenBeat.user_id == user, ScreenBeat.minute >= since)
+            )
+            minutes = {beat.astimezone(UTC).replace(second=0, microsecond=0) for beat in beats}
+            ended = await session.execute(
+                select(Activity.started_at, Activity.stopped_at).where(
+                    Activity.user_id == user, Activity.stopped_at >= since
+                )
+            )
+            running = await session.execute(
+                select(PlaybackSession.started_at, PlaybackSession.updated_at).where(
+                    PlaybackSession.played_by == user,
+                    PlaybackSession.ended.is_(False),
+                    PlaybackSession.started_at >= since,
+                )
+            )
+            sittings: list[tuple[datetime, datetime | None]] = [
+                (start, stop) for start, stop in ended.tuples().all()
+            ] + [(start, stop) for start, stop in running.tuples().all()]
+        floor = since.astimezone(UTC)
+        for start, stop in sittings:
+            if stop is None:
+                continue
+            moment = max(start, floor).astimezone(UTC).replace(second=0, microsecond=0)
+            last = min(stop.astimezone(UTC), moment + timedelta(days=1))
+            while moment < last:
+                minutes.add(moment)
+                moment += MINUTE
+        return len(minutes)
 
     async def check_screen(self, viewer: Principal | UUID | None) -> None:
         """Refuse to open a title once the profile's screen time of the day is spent — 432: or outside the

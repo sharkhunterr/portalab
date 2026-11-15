@@ -257,6 +257,16 @@ class PlaybackSession(MediaBase):
     played_by: Mapped[UUID | None] = mapped_column()
 
 
+class ScreenBeat(MediaBase):
+    """Issue 439: a minute a household profile spent on the portal (its tab in view) — its screen time when
+    its master counts all of Portalab, not its media only. Kept a week."""
+
+    __tablename__ = "screen_beats"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    minute: Mapped[datetime] = mapped_column(TZDateTime, primary_key=True)
+
+
 class PortalStream(MediaBase):
     """032: who started a stream with the portal's player — the media server only knows the account, which a
     household profile shares with its master; the live session it reports is told the profile's by this."""

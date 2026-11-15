@@ -3,6 +3,7 @@ import { AiPanel } from "../features/ai/panel/AiPanel";
 import { AssistantFab } from "../features/ai/panel/AssistantFab";
 import { useAiAssistant } from "../features/ai/panel/useAiAssistant";
 import { useLogout, useMe } from "../features/auth/useAuth";
+import { ScreenGuard } from "../features/household/ScreenGuard";
 import { NotificationPanel } from "../features/notifications/bell/NotificationPanel";
 import { useNotificationSummary } from "../features/notifications/bell/NotificationSlot";
 import { ToastRegion } from "../features/notifications/toasts/ToastRegion";
@@ -35,6 +36,7 @@ export function ShellLayout() {
       <TermsViewer />
       <WelcomeFlow />
       <Tour />
+      <ScreenGuard profile={Boolean(me.data?.profile_of)} />
     </ShellSlotsProvider>
   );
 }

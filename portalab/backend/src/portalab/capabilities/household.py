@@ -117,6 +117,9 @@ class Restrictions:
     bonus_minutes: int = 0
     bonus_day: date | None = None
     slots: tuple[Slot, ...] = ()  # issue 432: the spans it may watch, each its own screen time
+    # issue 439: what its screen time counts — its media (« media »: watched, read, listened to, played) or
+    # every minute it spends on the portal (« portal »)
+    screen_scope: str = "media"
 
     def slots_on(self, weekday: int) -> tuple[Slot, ...]:
         return tuple(sorted((s for s in self.slots if s.day == weekday), key=lambda s: s.start))

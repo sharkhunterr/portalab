@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
@@ -17,7 +17,8 @@ import {
 } from "./api";
 import { ProfileFace } from "./ProfilePicker";
 import { QuickTime } from "./QuickTime";
-import { type Plan, ScreenPlanner, toMinutes } from "./ScreenPlanner";
+import { ScreenPlanner, toMinutes } from "./ScreenPlanner";
+import { ScreenScope } from "./ScreenScope";
 
 /**
  * Issue 436: « Schedule » in My household — a profile's screen time as a calendar and the time it has left
@@ -33,7 +34,13 @@ export function SchedulePanel({ household, onAdd }: { household: Household; onAd
     return (
       <div className="schedule">
         <div className="schedule__layout">
-          <Countdown member={me} profile={null} />
+          <div className="schedule__side">
+            <Countdown member={me} profile={null} />
+            <p className="household-note">
+              <Icon name={me.restrictions.screen_scope === "portal" ? "dashboard" : "play"} size={14} />{" "}
+              {t(`household:scope.mine_${me.restrictions.screen_scope ?? "media"}`)}
+            </p>
+          </div>
           <ScreenPlanner plan={me.restrictions} label={t("household:page.scheduleMineTitle")} />
         </div>
       </div>
@@ -53,7 +60,7 @@ export function SchedulePanel({ household, onAdd }: { household: Household; onAd
   const chosen = profiles.find((p) => p.id === params.get("profile")) ?? (profiles[0] as HouseholdMember);
   return (
     <div className="schedule">
-      {profiles.length > 1 ? (
+      {profiles.length ? (
         <fieldset className="schedule__who">
           <legend className="visually-hidden">{t("household:schedule.choose")}</legend>
           {profiles.map((profile) => (
@@ -89,7 +96,9 @@ function ScheduleEditor({ member }: { member: HouseholdMember }) {
   const client = useQueryClient();
   const update = useUpdateProfile();
   const restrictions = member.restrictions as RestrictionSettings;
-  const [draft, setDraft] = useState<Plan | null>(null);
+  const scopeName = useId();
+  const [draft, setDraft] = useState<Partial<RestrictionSettings> | null>(null);
+  const shown = { ...restrictions, ...draft };
   const save = () => {
     if (!draft) return;
     update.mutate(
@@ -109,9 +118,14 @@ function ScheduleEditor({ member }: { member: HouseholdMember }) {
   };
   return (
     <div className="schedule__calendar">
+      <ScreenScope
+        name={scopeName}
+        value={shown.screen_scope}
+        onChange={(screen_scope) => setDraft((d) => ({ ...d, screen_scope }))}
+      />
       <ScreenPlanner
-        plan={draft ?? restrictions}
-        onChange={setDraft}
+        plan={shown}
+        onChange={(plan) => setDraft((d) => ({ ...d, ...plan }))}
         label={t("household:schedule.calendarOf", { name: member.display_name })}
       />
       {draft ? (
@@ -188,9 +202,17 @@ function Countdown({ member, profile }: { member: HouseholdMember; profile: stri
     <section
       className="schedule-count"
       data-tone={tone}
-      aria-label={t("household:schedule.left")}
+      aria-label={
+        profile ? t("household:schedule.leftOf", { name: member.display_name }) : t("household:schedule.left")
+      }
       aria-busy={screen.isPending || undefined}
     >
+      {profile ? (
+        <p className="schedule-count__who">
+          <ProfileFace member={member} size="sm" />
+          {t("household:schedule.leftOf", { name: member.display_name })}
+        </p>
+      ) : null}
       <div className="schedule-count__main" aria-live="polite">
         <strong>{screen.isPending ? "…" : big}</strong>
         <span>{caption}</span>

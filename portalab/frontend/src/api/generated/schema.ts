@@ -8697,6 +8697,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/screen-time/beat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Screen Beat
+         * @description Issue 439: a profile whose master counts all of Portalab is on the portal (its tab in view) — one
+         *     minute more (one a minute at most), and its screen time now.
+         */
+        post: operations["screen_beat_api_v1_me_media_screen_time_beat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/taste": {
         parameters: {
             query?: never;
@@ -20051,6 +20072,12 @@ export interface components {
              */
             requests: boolean;
             /**
+             * Screen Scope
+             * @default media
+             * @enum {string}
+             */
+            screen_scope: "media" | "portal";
+            /**
              * Services
              * @default true
              */
@@ -20348,6 +20375,12 @@ export interface components {
              * @default true
              */
             open: boolean;
+            /**
+             * Scope
+             * @default media
+             * @enum {string}
+             */
+            scope: "media" | "portal";
             slot?: components["schemas"]["SpanUseOut"] | null;
             /**
              * Slots
@@ -39176,6 +39209,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    screen_beat_api_v1_me_media_screen_time_beat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenTimeOut"] | null;
                 };
             };
         };

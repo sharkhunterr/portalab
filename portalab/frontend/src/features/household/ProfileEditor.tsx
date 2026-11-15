@@ -23,6 +23,7 @@ import {
 } from "./api";
 import { ProfileFace } from "./ProfilePicker";
 import { ScreenPlanner } from "./ScreenPlanner";
+import { ScreenScope } from "./ScreenScope";
 
 const KINDS: ProfileKind[] = ["standard", "child", "custom"];
 const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; community: boolean }> = {
@@ -34,6 +35,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       mode: "hide",
       requests: true,
       services: true,
+      screen_scope: "media",
     },
     community: true,
   },
@@ -46,6 +48,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       requests: true,
       genres: ["crime", "horror", "thriller", "war"], // issue 432: at least these for a child
       services: false,
+      screen_scope: "media",
     },
     community: false,
   },
@@ -57,6 +60,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       mode: "hide",
       requests: true,
       services: true,
+      screen_scope: "media",
     },
     community: true,
   },
@@ -367,6 +371,11 @@ export function ProfileEditor({
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.screen")}</legend>
+          <ScreenScope
+            name={`${formId}-scope`}
+            value={restrictions.screen_scope}
+            onChange={(screen_scope) => setRestrictions((r) => ({ ...r, screen_scope }))}
+          />
           <ScreenPlanner
             plan={restrictions}
             onChange={(plan) => setRestrictions((r) => ({ ...r, ...plan }))}

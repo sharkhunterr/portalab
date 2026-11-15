@@ -19920,6 +19920,15 @@
             "title": "Requests",
             "type": "boolean"
           },
+          "screen_scope": {
+            "default": "media",
+            "enum": [
+              "media",
+              "portal"
+            ],
+            "title": "Screen Scope",
+            "type": "string"
+          },
           "services": {
             "default": true,
             "title": "Services",
@@ -20811,6 +20820,15 @@
             "default": true,
             "title": "Open",
             "type": "boolean"
+          },
+          "scope": {
+            "default": "media",
+            "enum": [
+              "media",
+              "portal"
+            ],
+            "title": "Scope",
+            "type": "string"
           },
           "slot": {
             "anyOf": [
@@ -51422,6 +51440,36 @@
           }
         },
         "summary": "Screen Time",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/me/media/screen-time/beat": {
+      "post": {
+        "description": "Issue 439: a profile whose master counts all of Portalab is on the portal (its tab in view) \u2014 one\nminute more (one a minute at most), and its screen time now.",
+        "operationId": "screen_beat_api_v1_me_media_screen_time_beat_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ScreenTimeOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Screen Beat Api V1 Me Media Screen Time Beat Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Screen Beat",
         "tags": [
           "media"
         ]

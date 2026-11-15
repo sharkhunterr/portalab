@@ -1606,6 +1606,13 @@ button.screen-cal__max:focus-visible {
 .schedule-count[data-tone="free"] {
   --tone: var(--color-accent);
 }
+.schedule-count__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+}
 .schedule-count__main {
   display: grid;
   gap: 2px;
@@ -1676,4 +1683,35 @@ button.screen-cal__max:focus-visible {
   .schedule__save > button {
     flex: 1;
   }
+}
+
+/* issue 439: the portal covered once a profile's screen time is over (all of Portalab counting) */
+.screen-guard {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-celebration) + 10);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+.screen-guard__card {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-inline-size: 26rem;
+  padding: var(--space-6);
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.screen-guard__card h2 {
+  margin: 0;
+}
+.screen-guard__card p {
+  margin: 0;
+  color: var(--color-text-muted);
 }
