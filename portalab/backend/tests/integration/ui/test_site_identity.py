@@ -95,9 +95,7 @@ async def test_the_site_is_named_and_its_currency_too(
         catalogs.t("buy.confirmText", french, {"price": 1}, namespace="marketplace")
         == "Dépenser 1 Xénocoin ?"
     )
-    assert (
-        catalogs.t("buy.confirmText", english, {"price": 3}, namespace="marketplace") == "Spend 3 Coins?"
-    )
+    assert catalogs.t("buy.confirmText", english, {"price": 3}, namespace="marketplace") == "Spend 3 Coins?"
     assert (
         catalogs.t("verification.subject", english, namespace="notifications")
         == "Confirm your Starport account"

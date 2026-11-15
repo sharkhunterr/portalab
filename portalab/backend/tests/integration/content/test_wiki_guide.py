@@ -65,11 +65,7 @@ class Terms:
     version = 1
 
     def terms(self, language: str) -> SiteTerms:
-        return (
-            SiteTerms(currency_one="Coin", currency_other="Coins")
-            if language == "en"
-            else SiteTerms()
-        )
+        return SiteTerms(currency_one="Coin", currency_other="Coins") if language == "en" else SiteTerms()
 
     async def refresh(self) -> None:
         return None
