@@ -469,3 +469,37 @@ async def test_the_household_dashboard_shows_each_members_watching(
     again = (await client.get("/api/v1/me/media/household")).json()  # a profile sees its household too
     assert {m["user_id"] for m in again["members"]} == {str(people["zoe"]), str(lea)}
     assert (await client.get("/api/v1/me/media/household", params={"days": 99})).status_code == 422
+
+
+async def test_the_catalog_filters_by_age_rating(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 437: the catalog up to an age (unrated titles kept or not), or only what I may open."""
+    people = await users(app, media, "zoe")
+    await _library(app, media)
+    await login(client, "zoe")
+
+    async def titles(**params: str) -> set[str]:
+        response = await client.get("/api/v1/media", params={"kind": "movie", **params})
+        assert response.status_code == 200, response.text
+        return {item["title"] for item in response.json()["items"]}
+
+    assert await titles(age="12") == {"Toy Story", "Coco", "Nameless"}
+    assert await titles(age="12", unrated="exclude") == {"Toy Story", "Coco"}
+    assert await titles(age="0", unrated="exclude") == {"Toy Story"}
+    assert await titles(unrated="exclude") == {"Toy Story", "Alien", "Coco"}
+    assert await titles(age="18") == {"Toy Story", "Alien", "Coco", "Nameless"}
+    assert await titles(age="mine") == {"Toy Story", "Alien", "Coco", "Nameless"}  # nothing kept from me
+    assert (await client.get("/api/v1/media", params={"age": "11"})).status_code == 422
+
+    # a child profile shown its kept titles locked: « what I may open » leaves them out
+    created = await households(app).create(
+        Principal(user_id=people["zoe"]), display_name="Léa", kind="child", color=None, pin=None
+    )
+    lea = UUID(str(created["id"]))
+    child = RestrictionSettings(max_age=12, allow_unrated=False, mode="lock").model_dump(mode="json")
+    patched = await client.patch(f"/api/v1/household/profiles/{lea}", json={"restrictions": child})
+    assert patched.status_code in (200, 204), patched.text
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(lea)})).status_code == 200
+    assert await titles() == {"Toy Story", "Alien", "Coco", "Nameless"}  # shown, the kept ones locked
+    assert await titles(age="mine") == {"Toy Story", "Coco"}

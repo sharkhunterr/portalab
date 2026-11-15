@@ -348,10 +348,13 @@ async def browse(
     language: Annotated[str | None, Query(max_length=40)] = None,
     seen: Literal["unseen", "started", "finished"] | None = None,
     sort: Literal["title", "added", "year"] = "title",
+    age: Literal["mine", "0", "6", "10", "12", "14", "16", "18"] | None = None,
+    unrated: Literal["include", "exclude"] = "include",
 ) -> MediaPage:
     """The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields
     (author, narrator, director, platform, publisher, series, language), what I have already watched, read
-    or played — and the order; with how many titles match in all."""
+    or played — issue 437: up to an age rating, or what I may open — and the order; with how many titles
+    match in all."""
     named = {
         "author": author,
         "narrator": narrator,
@@ -367,6 +370,8 @@ async def browse(
         fields={k: v for k, v in named.items() if v},
         seen=seen,
         sort=sort,
+        age=age,
+        unrated=unrated == "include",
     )
     rows, next_cursor, total = await module.catalog.search(
         principal,

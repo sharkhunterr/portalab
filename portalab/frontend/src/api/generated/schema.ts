@@ -9729,7 +9729,8 @@ export interface paths {
          * Browse
          * @description The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields
          *     (author, narrator, director, platform, publisher, series, language), what I have already watched, read
-         *     or played — and the order; with how many titles match in all.
+         *     or played — issue 437: up to an age rating, or what I may open — and the order; with how many titles
+         *     match in all.
          */
         get: operations["browse_api_v1_media_get"];
         put?: never;
@@ -41017,6 +41018,8 @@ export interface operations {
                 language?: string | null;
                 seen?: ("unseen" | "started" | "finished") | null;
                 sort?: "title" | "added" | "year";
+                age?: ("mine" | "0" | "6" | "10" | "12" | "14" | "16" | "18") | null;
+                unrated?: "include" | "exclude";
             };
             header?: never;
             path?: never;

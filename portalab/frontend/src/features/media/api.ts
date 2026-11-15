@@ -26,6 +26,9 @@ export interface CatalogFilters {
   language?: string;
   seen?: "unseen" | "started" | "finished";
   sort?: "title" | "added" | "year";
+  /** issue 437: up to an age rating, or what I may open (« mine »); unrated titles kept or left out */
+  age?: "mine" | "0" | "6" | "10" | "12" | "14" | "16";
+  unrated?: "include" | "exclude";
 }
 export type CatalogFacets = components["schemas"]["MediaFacets"];
 

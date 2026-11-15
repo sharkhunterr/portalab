@@ -15,7 +15,7 @@ from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Uuid, all_, func, literal, select
+from sqlalchemy import Uuid, all_, and_, any_, func, literal, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import aliased
 
@@ -32,6 +32,8 @@ from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata,
 # keeps their unrated ones out as well); music has no rating system
 RATED = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "game")
 CACHE_S = 30.0
+AGES_CACHE_S = 300.0  # issue 437: every title's age, for the catalog's filter
+AGE_FILTERS = ("mine", "0", "6", "10", "12", "14", "16", "18")
 ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
 
@@ -82,6 +84,7 @@ class TitleGate:
         self.database = database
         self.capabilities = capabilities
         self._cache: dict[UUID, tuple[float, frozenset[UUID]]] = {}
+        self._ages: tuple[float, dict[UUID, int | None]] | None = None
 
     def _household(self) -> Household | None:
         providers = self.capabilities.system_providers(HOUSEHOLD)
@@ -190,6 +193,52 @@ class TitleGate:
                 update["age"] = ages[card.id]
             out.append(card.model_copy(update=update) if update else card)
         return out
+
+    async def rated_ages(self) -> dict[UUID, int | None]:
+        """Issue 437: the strictest age of every title of a rated kind (``None``: unrated) — shared by every
+        member, kept for a while."""
+        if self._ages is not None and time.monotonic() - self._ages[0] < AGES_CACHE_S:
+            return self._ages[1]
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(
+                        MediaObject.id, ObjectMetadata.data, MediaObject.effective["content_rating"].astext
+                    )
+                    .outerjoin(
+                        ObjectMetadata,
+                        (ObjectMetadata.object_id == MediaObject.id) & (ObjectMetadata.status == "found"),
+                    )
+                    .where(MediaObject.kind.in_(RATED))
+                )
+            ).all()
+        out: dict[UUID, int | None] = {}
+        for object_id, data, server in rows:
+            age = strictest_age(ratings(data, server))
+            known = out.get(object_id)
+            out[object_id] = age if known is None else known if age is None else max(age, known)
+        self._ages = (time.monotonic(), out)
+        return out
+
+    async def age_clause(self, viewer: Principal | UUID | None, age: str, *, unrated: bool = True) -> Any:
+        """Issue 437: the catalog's age filter as a clause — the titles up to an age (``"12"``), or those
+        this viewer may open (``"mine"``: none kept from it); unrated titles kept or left out. ``None``: no
+        title to leave out."""
+        if age not in AGE_FILTERS:
+            return None
+        ages = await self.rated_ages()
+        clauses = []
+        if age == "mine":
+            if blocked := await self.blocked(viewer):
+                clauses.append(excluded(MediaObject.id, blocked))
+        else:
+            limit = int(age)  # 18: every age
+            if limit < 18 and (over := frozenset(i for i, a in ages.items() if a is not None and a > limit)):
+                clauses.append(excluded(MediaObject.id, over))
+        if not unrated:
+            rated = [i for i, a in ages.items() if a is not None]
+            clauses.append(MediaObject.id == any_(literal(rated, ARRAY(Uuid()))))
+        return and_(*clauses) if clauses else None
 
     async def ages(self, ids: Iterable[UUID], *, unrated: int | None = None) -> dict[UUID, int]:
         """Issue 434: the strictest age each title's ratings stand for — an unrated one left out, or given

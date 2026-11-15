@@ -7,6 +7,7 @@ import { PageHeader } from "../../../design-system/components/PageHeader";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
+import { useMe } from "../../auth/useAuth";
 import { type CatalogFacets, type CatalogFilters, useCatalogFacets, useCatalogPage } from "../api";
 import { KIND_ICONS, MediaGrid } from "../MediaGrid";
 import "../media.css";
@@ -48,6 +49,7 @@ const KIND_FIELDS: Record<string, KindField[]> = {
   ],
 };
 const NUMBERS: Field[] = ["year", "year_from", "year_to"];
+const AGE_LIMITS = ["0", "6", "10", "12", "14", "16"] as const; // issue 437
 const ALL: Field[] = [
   "q",
   "kind",
@@ -56,6 +58,8 @@ const ALL: Field[] = [
   "year_to",
   "availability",
   "seen",
+  "age",
+  "unrated",
   "author",
   "narrator",
   "director",
@@ -165,6 +169,13 @@ export function CatalogPage() {
   const [q, setQ] = useSettled(filters.q ?? "", (value) => set({ q: value }));
   const fields = KIND_FIELDS[filters.kind ?? ""] ?? [];
   const label = (key: Field) => t(`media:catalog.field.${key}`);
+  const profile = Boolean(useMe().data?.profile_of); // 437: « what I may watch » means something to a profile
+  const ageLabel = (age: string) =>
+    age === "mine"
+      ? t("media:catalog.ageMine")
+      : age === "0"
+        ? t("media:catalog.ageAll")
+        : t("media:catalog.ageUpTo", { age });
 
   // the active filters, each one a chip to remove (the kind has its own chips)
   const active: Array<{ key: Field; text: string }> = [];
@@ -179,6 +190,8 @@ export function CatalogPage() {
   if (filters.availability)
     active.push({ key: "availability", text: t(`media:catalog.${filters.availability}`) });
   if (filters.seen) active.push({ key: "seen", text: t(`media:catalog.seenAs.${filters.seen}`) });
+  if (filters.age) active.push({ key: "age", text: ageLabel(filters.age) });
+  if (filters.unrated === "exclude") active.push({ key: "unrated", text: t("media:catalog.unratedOut") });
   for (const field of fields) {
     const value = filters[field.key];
     if (value) {
@@ -322,6 +335,31 @@ export function CatalogPage() {
             <option value="available">{t("media:catalog.available")}</option>
             <option value="unavailable">{t("media:catalog.unavailable")}</option>
           </SelectField>
+          <SelectField
+            label={t("media:catalog.age")}
+            value={filters.age ?? ""}
+            onChange={(event) => set({ age: event.target.value })}
+          >
+            <option value="">{t("media:catalog.all")}</option>
+            {profile || filters.age === "mine" ? <option value="mine">{ageLabel("mine")}</option> : null}
+            {AGE_LIMITS.map((age) => (
+              <option key={age} value={age}>
+                {ageLabel(age)}
+              </option>
+            ))}
+          </SelectField>
+          {filters.age || filters.unrated ? (
+            <SelectField
+              label={t("media:catalog.unrated")}
+              value={filters.unrated ?? "include"}
+              onChange={(event) =>
+                set({ unrated: event.target.value === "exclude" ? "exclude" : undefined })
+              }
+            >
+              <option value="include">{t("media:catalog.unratedInclude")}</option>
+              <option value="exclude">{t("media:catalog.unratedExclude")}</option>
+            </SelectField>
+          ) : null}
           <SelectField
             label={t("media:catalog.seen")}
             value={filters.seen ?? ""}

@@ -335,6 +335,14 @@ describe("catalog and requests", () => {
     fireEvent.click(screen.getByRole("button", { name: "Remove the filter Author : Ted Chiang" }));
     await waitFor(() => expect(queries.at(-1)).not.toContain("author="));
     expect(queries.at(-1)).toContain("seen=unseen");
+    // issue 437: up to an age rating, unrated titles left out — each a chip
+    expect(screen.queryByLabelText("Unrated titles")).toBeNull();
+    fireEvent.change(screen.getByLabelText("Age rating"), { target: { value: "12" } });
+    await waitFor(() => expect(queries.some((q) => q.includes("age=12"))).toBe(true));
+    fireEvent.change(screen.getByLabelText("Unrated titles"), { target: { value: "exclude" } });
+    await waitFor(() => expect(queries.at(-1)).toContain("unrated=exclude"));
+    expect(screen.getByRole("button", { name: "Remove the filter Up to 12+" })).toBeTruthy();
+    expect(screen.queryByRole("option", { name: "What I may watch" })).toBeNull(); // not a profile
     // the overview's card: the count, where they stand, the quota and the bought requests (#3) — #298: among
     // the statistics
     renderAt("/media/requests/stats", [{ path: "/media/requests/stats", element: <RequestsPage stats /> }]);

@@ -53876,7 +53876,7 @@
     },
     "/api/v1/media": {
       "get": {
-        "description": "The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields\n(author, narrator, director, platform, publisher, series, language), what I have already watched, read\nor played \u2014 and the order; with how many titles match in all.",
+        "description": "The catalog (T014; #111): text, kind, genre, years, availability, and for each kind its own fields\n(author, narrator, director, platform, publisher, series, language), what I have already watched, read\nor played \u2014 issue 437: up to an age rating, or what I may open \u2014 and the order; with how many titles\nmatch in all.",
         "operationId": "browse_api_v1_media_get",
         "parameters": [
           {
@@ -54173,6 +54173,46 @@
                 "year"
               ],
               "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "age",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "mine",
+                    "0",
+                    "6",
+                    "10",
+                    "12",
+                    "14",
+                    "16",
+                    "18"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Age"
+            }
+          },
+          {
+            "in": "query",
+            "name": "unrated",
+            "required": false,
+            "schema": {
+              "default": "include",
+              "enum": [
+                "include",
+                "exclude"
+              ],
+              "title": "Unrated",
               "type": "string"
             }
           }

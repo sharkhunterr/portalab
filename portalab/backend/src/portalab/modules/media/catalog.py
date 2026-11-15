@@ -105,6 +105,8 @@ class Refine:
     fields: dict[str, str] = field(default_factory=dict)  # author, narrator, director, platform…
     seen: str | None = None  # unseen, started, finished — the member's own progress
     sort: str = "title"
+    age: str | None = None  # issue 437: up to an age (« 12 »), or what the member may open (« mine »)
+    unrated: bool = True  # titles without a rating kept
 
     def apply(self, stmt: Any, user: UUID | None) -> Any:
         if self.year_from is not None:
@@ -260,6 +262,10 @@ class CatalogQuery:
         if self.gate is not None and (hidden := await self.gate.hidden(principal)):
             stmt = stmt.where(excluded(MediaObject.id, hidden))
         refine = refine or Refine()
+        if self.gate is not None and (refine.age or not refine.unrated):
+            clause = await self.gate.age_clause(principal, refine.age or "18", unrated=refine.unrated)
+            if clause is not None:
+                stmt = stmt.where(clause)
         stmt = refine.apply(stmt, principal.acting_for or principal.user_id)
         offset = decode_cursor(cursor)
         limit = max(1, min(limit, 100))
