@@ -199,3 +199,19 @@ def test_spans_each_with_its_own_time() -> None:
         except ValidationError:
             continue
         raise AssertionError(wrong)
+
+
+def test_the_system_countrys_rating_counts_first() -> None:
+    """Issue 438: the portal's country's rating (TMDB's, the media server's « fr/… »), else the strictest."""
+    from portalab.modules.media.region import country_of
+    from portalab.modules.media.restrictions import local_age, own_first
+
+    jam = [("DE", "0"), ("FR", "TP"), ("GB", "U"), ("US", "PG")]
+    assert local_age(jam, "FR") == 0 and local_age(jam, "US") == 8 and local_age(jam, None) == 8
+    assert local_age([("US", "PG-13"), ("server", "fr/TP")], "FR") == 0
+    assert local_age([("US", "R"), ("FR", "NR")], "FR") == 17  # unrated there: the strictest of the others
+    assert local_age([], "FR") is None
+    assert own_first([("US", "R"), ("server", "fr/12"), ("FR", "12")], "FR")[0] == ("server", "fr/12")
+    assert country_of("fr-FR") == "FR" and country_of("fr-CA") == "CA" and country_of("en_GB") == "GB"
+    assert country_of("fr") == "FR" and country_of("en") == "US" and country_of("de") == "DE"
+    assert country_of(None) is None and country_of("x1") is None

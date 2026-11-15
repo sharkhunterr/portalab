@@ -79,6 +79,7 @@ class I18nValidators:
             "i18n.defaultTimeZone": self.time_zone,
             "i18n.timeZone": self.time_zone,
             "i18n.defaultLocale": self.locale,
+            "i18n.systemLanguage": self.locale,
             "i18n.locale": self.locale,
             "i18n.language": self.user_language,
         }

@@ -621,7 +621,7 @@
         "type": "object"
       },
       "AgeRating": {
-        "description": "032: a title's age ratings and the strictest age they stand for (a household profile's limit).",
+        "description": "032: a title's age ratings and the age they stand for (a household profile's limit) \u2014 issue 438: its\nrating in the portal's country (``country``, listed first), else the strictest of the others.",
         "properties": {
           "age": {
             "anyOf": [
@@ -633,6 +633,17 @@
               }
             ],
             "title": "Age"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
           },
           "ratings": {
             "default": [],

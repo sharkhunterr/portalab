@@ -68,6 +68,7 @@ interface Identity {
   one: string;
   other: string;
   timeZone: string;
+  system: string; // issue 438: the system language (« fr-FR »)
 }
 
 interface Languages {
@@ -80,6 +81,54 @@ function initialLanguage(languages: Languages | undefined): string {
   const browser = (globalThis.navigator?.language ?? "").slice(0, 2).toLowerCase();
   if (offered.includes(browser)) return browser;
   return languages?.default ?? "en";
+}
+
+// issue 438: the system languages offered — a language and its country (the age ratings' one)
+export const SYSTEM_LANGUAGES = [
+  "fr-FR",
+  "fr-BE",
+  "fr-CA",
+  "fr-CH",
+  "en-US",
+  "en-GB",
+  "en-CA",
+  "en-AU",
+  "de-DE",
+  "de-AT",
+  "de-CH",
+  "es-ES",
+  "es-MX",
+  "it-IT",
+  "pt-PT",
+  "pt-BR",
+  "nl-NL",
+  "nl-BE",
+  "pl-PL",
+  "sv-SE",
+  "da-DK",
+  "nb-NO",
+  "fi-FI",
+  "ja-JP",
+  "ko-KR",
+] as const;
+const REGIONAL = /^[a-z]{2,3}-[A-Z]{2}$/;
+
+/** Issue 438: the browser's language when it names a country, else the first offered for this language. */
+export function initialSystem(language: string, browser = globalThis.navigator?.language ?? ""): string {
+  const [code = "", country = ""] = browser.split("-");
+  const tag = `${code.toLowerCase()}-${country.toUpperCase()}`;
+  if (REGIONAL.test(tag) && code.toLowerCase() === language) return tag;
+  return SYSTEM_LANGUAGES.find((s) => s.startsWith(`${language}-`)) ?? "en-US";
+}
+
+/** « Français (France) », in the language the wizard is read in. */
+function systemName(tag: string, language: string): string {
+  try {
+    const name = new Intl.DisplayNames([language], { type: "language" }).of(tag) ?? tag;
+    return name.charAt(0).toLocaleUpperCase(language) + name.slice(1);
+  } catch {
+    return tag;
+  }
 }
 
 function browserTimeZone(): string {
@@ -178,6 +227,7 @@ function Arrival({
     one: "",
     other: "",
     timeZone: browserTimeZone(),
+    system: initialSystem(language),
   }));
   const [account, setAccount] = useState<Account>({
     login: "",
@@ -265,6 +315,13 @@ function Arrival({
             languages={languages}
             language={language}
             onLanguage={onLanguage}
+            system={identity.system}
+            onSystem={(system) => {
+              setIdentity((current) => ({ ...current, system }));
+              // the interface's language proposed: the system's, when the portal speaks it
+              const code = system.split("-")[0] ?? "";
+              if (languages?.items.some((l) => l.code === code)) onLanguage(code);
+            }}
             install={install}
             onInstall={setInstall}
           />
@@ -376,6 +433,10 @@ function Arrival({
               </dd>
             </div>
             <div>
+              <dt>{t("account:arrival.welcome.system")}</dt>
+              <dd>{systemName(identity.system, language)}</dd>
+            </div>
+            <div>
               <dt>{t("account:arrival.welcome.language")}</dt>
               <dd>
                 {languageName} · {identity.timeZone}
@@ -413,20 +474,44 @@ function Welcome({
   languages,
   language,
   onLanguage,
+  system,
+  onSystem,
   install,
   onInstall,
 }: {
   languages: Languages | undefined;
   language: string;
   onLanguage: (code: string) => void;
+  system: string;
+  onSystem: (tag: string) => void;
   install: "new" | "import";
   onInstall: (value: "new" | "import") => void;
 }) {
   const t = useT();
   const id = useId();
+  const systemId = useId();
+  const systems = SYSTEM_LANGUAGES.includes(system as (typeof SYSTEM_LANGUAGES)[number])
+    ? SYSTEM_LANGUAGES
+    : [system, ...SYSTEM_LANGUAGES];
   return (
     <>
       <div className="arrival__form">
+        <label htmlFor={systemId}>{t("account:arrival.welcome.system")}</label>
+        <select
+          id={systemId}
+          value={system}
+          aria-describedby={`${systemId}-hint`}
+          onChange={(e) => onSystem(e.target.value)}
+        >
+          {systems.map((tag) => (
+            <option key={tag} value={tag}>
+              {systemName(tag, language)}
+            </option>
+          ))}
+        </select>
+        <p id={`${systemId}-hint`} className="field-hint">
+          {t("account:arrival.welcome.systemHint")}
+        </p>
         <label htmlFor={id}>{t("account:arrival.welcome.language")}</label>
         <select id={id} value={language} onChange={(e) => onLanguage(e.target.value)}>
           {(languages?.items ?? [{ code: language, name_native: language }]).map((l) => (
@@ -683,6 +768,8 @@ function Create({
             email: account.email || null,
             settings: {
               "i18n.defaultLanguage": language,
+              "i18n.systemLanguage": identity.system, // issue 438
+              "i18n.defaultLocale": identity.system,
               "i18n.defaultTimeZone": identity.timeZone,
               "notifications.email.portalUrl": globalThis.location?.origin ?? "",
               "admin.setup.progress": {

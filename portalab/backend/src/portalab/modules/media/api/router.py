@@ -115,9 +115,11 @@ class AgeRatingSource(BaseModel):
 
 
 class AgeRating(BaseModel):
-    """032: a title's age ratings and the strictest age they stand for (a household profile's limit)."""
+    """032: a title's age ratings and the age they stand for (a household profile's limit) — issue 438: its
+    rating in the portal's country (``country``, listed first), else the strictest of the others."""
 
     age: int | None = None
+    country: str | None = None
     ratings: list[AgeRatingSource] = []
 
 

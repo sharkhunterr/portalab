@@ -13302,11 +13302,14 @@ export interface components {
         };
         /**
          * AgeRating
-         * @description 032: a title's age ratings and the strictest age they stand for (a household profile's limit).
+         * @description 032: a title's age ratings and the age they stand for (a household profile's limit) — issue 438: its
+         *     rating in the portal's country (``country``, listed first), else the strictest of the others.
          */
         AgeRating: {
             /** Age */
             age?: number | null;
+            /** Country */
+            country?: string | null;
             /**
              * Ratings
              * @default []

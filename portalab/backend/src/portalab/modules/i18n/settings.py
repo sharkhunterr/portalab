@@ -10,12 +10,19 @@ from portalab.core.config_declaration import SettingCatalog, declare_setting, de
 
 OWNER = "module:i18n"
 Code = Annotated[str, Field(pattern=r"^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$")]
+Regional = Annotated[str, Field(pattern=r"^[a-z]{2,3}-[A-Z]{2}$")]  # issue 438: a language and its country
 
 GLOBAL: tuple[tuple[str, Any, Any, str], ...] = (
     ("i18n.defaultLanguage", Code, "en", "Portal default interface language."),
     ("i18n.enabledLanguages", list[Code], ["en", "fr"], "Languages users may choose."),
     ("i18n.fallbackChain", list[Code], ["en"], "Languages tried, in order, when a translation is missing."),
     ("i18n.defaultLocale", Code, "en", "Default formatting locale (dates, numbers)."),
+    (
+        "i18n.systemLanguage",
+        Regional | None,
+        None,
+        "System language and country (fr-FR): metadata and services use it, age ratings are its country's.",
+    ),
     ("i18n.defaultTimeZone", str, "UTC", "Default time zone (IANA name)."),
     (
         "i18n.unknownLanguagePolicy",

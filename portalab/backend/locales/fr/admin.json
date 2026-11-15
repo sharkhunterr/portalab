@@ -1107,6 +1107,8 @@
   "setting.i18n.schedulingDefault.choice.wall_clock": "Heure locale",
   "setting.i18n.schedulingDefault.hint": "Les éléments planifiés gardent un instant fixe ou la même heure locale lors des changements d'heure.",
   "setting.i18n.schedulingDefault.label": "Mode de planification par défaut",
+  "setting.i18n.systemLanguage.hint": "Langue et pays du portail (ex. fr-FR), distincts de la langue de l'interface : les métadonnées et les services l'utilisent, et la classification d'âge d'un titre est celle de ce pays.",
+  "setting.i18n.systemLanguage.label": "Langue du système",
   "setting.i18n.timeZone.hint": "Fuseau horaire utilisé pour afficher les dates et heures de ce membre.",
   "setting.i18n.timeZone.label": "Fuseau horaire",
   "setting.i18n.unknownLanguagePolicy.choice.hide": "Masquer",

@@ -174,6 +174,16 @@ describe("admin screens", () => {
       </QueryClientProvider>,
     );
     expect(await screen.findByRole("heading", { name: "Welcome to Portalab" })).toBeInTheDocument();
+    // issue 438: the system language (a language and its country) proposes the portal's language
+    const system = screen.getByLabelText("System language") as HTMLSelectElement;
+    fireEvent.change(system, { target: { value: "fr-FR" } });
+    expect(
+      ((await screen.findByLabelText(/Langue du portail|Portal language/)) as HTMLSelectElement).value,
+    ).toBe("fr");
+    fireEvent.change(screen.getByLabelText(/Langue du système|System language/), {
+      target: { value: "en-GB" },
+    });
+    expect(((await screen.findByLabelText("Portal language")) as HTMLSelectElement).value).toBe("en");
     // issue 247: importing another Portalab opens its own step (the archive, its passphrase)
     fireEvent.click(screen.getByRole("button", { name: /Import another Portalab/ }));
     fireEvent.click(screen.getByRole("button", { name: /Continue/ }));
@@ -219,7 +229,12 @@ describe("admin screens", () => {
     const created = calls.find((c) => c.method === "POST" && c.path === "/api/v1/admin/first-run");
     expect(created?.body).toMatchObject({
       login: "admin",
-      settings: { "i18n.defaultLanguage": "en", "admin.setup.progress": { arrival: { step: "services" } } },
+      settings: {
+        "i18n.defaultLanguage": "en",
+        "i18n.systemLanguage": "en-GB",
+        "i18n.defaultLocale": "en-GB",
+        "admin.setup.progress": { arrival: { step: "services" } },
+      },
     });
     expect(calls.some((c) => c.path === "/api/v1/auth/login")).toBe(true);
     const site = calls.find((c) => c.method === "PUT" && c.path === "/api/v1/admin/site");

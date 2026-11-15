@@ -250,6 +250,8 @@
   "arrival.welcome.install": "Installation",
   "arrival.welcome.language": "Langue du portail",
   "arrival.welcome.lead": "Choisissez la langue du portail (celle des membres par défaut, qu'ils peuvent changer), puis comment l'installer.",
+  "arrival.welcome.system": "Langue du système",
+  "arrival.welcome.systemHint": "Langue et pays du portail : les métadonnées et les services l'utilisent, et les classifications d'âge sont celles de ce pays. La langue du portail ci-dessous la suit, et peut être différente.",
   "arrival.welcome.title": "Un nouveau portail",
   "auth.accountTitle": "Mon compte",
   "auth.accountUnavailable": "Ce compte ne peut pas se connecter pour le moment.",

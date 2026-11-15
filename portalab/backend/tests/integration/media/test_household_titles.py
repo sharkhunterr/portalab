@@ -239,9 +239,67 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
 
     await login(client, "zoe")
     smile = (await client.get(f"/api/v1/media/{ids['Smile']}")).json()["age_rating"]
-    assert smile == {"age": 17, "ratings": [{"source": "FR", "value": "12"}, {"source": "US", "value": "R"}]}
+    assert smile == {  # an English portal: the United States' rating counts, listed first
+        "age": 17,
+        "country": "US",
+        "ratings": [{"source": "US", "value": "R"}, {"source": "FR", "value": "12"}],
+    }
     saw = (await client.get(f"/api/v1/media/{ids['Saw']}")).json()["age_rating"]
-    assert saw == {"age": 16, "ratings": [{"source": "server", "value": "fr/-16"}]}
+    assert saw == {"age": 16, "country": "US", "ratings": [{"source": "server", "value": "fr/-16"}]}
+
+
+async def test_the_system_countrys_rating_counts(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 438: a title's age is its rating in the system language's country (Space Jam: FR TP, US PG) —
+    the media server's « fr/… » too — and the strictest of the others only when that country has none."""
+    await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    await media.module.library.upsert(
+        [
+            library_record("j1", title="Space Jam", year=1996),
+            library_record("k1", title="Kirikou", year=1998, content_rating="fr/TP"),
+            library_record("h1", title="Heat", year=1995),
+        ],
+        one,
+    )
+    async with media.database.unit_of_work() as uow:
+        ids = {t: i for t, i in (await uow.session.execute(select(MediaObject.title, MediaObject.id))).all()}
+        for title, certifications in (
+            ("Space Jam", {"DE": "0", "FR": "TP", "GB": "U", "US": "PG"}),
+            ("Kirikou", {"US": "PG-13"}),
+            ("Heat", {"DE": "16", "US": "R"}),
+        ):
+            uow.session.add(
+                ObjectMetadata(
+                    object_id=ids[title],
+                    provider="tmdb",
+                    status="found",
+                    language="fr",
+                    data={"certifications": certifications},
+                    fetched_at=datetime(2026, 1, 1, tzinfo=UTC),
+                )
+            )
+    await login(client, "zoe")
+
+    async def age(title: str) -> Any:
+        return (await client.get(f"/api/v1/media/{ids[title]}")).json()["age_rating"]
+
+    assert (await age("Space Jam"))["age"] == 8  # an English portal: US PG
+    await media.configure("i18n.systemLanguage", "fr-FR")
+    media.module.gate._country = None  # kept a minute otherwise
+    jam = await age("Space Jam")
+    assert jam["age"] == 0 and jam["country"] == "FR" and jam["ratings"][0] == {"source": "FR", "value": "TP"}
+    assert (await age("Kirikou"))["age"] == 0  # the media server's French rating
+    assert (await age("Heat"))["age"] == 17  # France rates it not: the strictest of the others
+    response = await client.get("/api/v1/media", params={"kind": "movie", "age": "6"})
+    assert {i["title"] for i in response.json()["items"]} == {"Space Jam", "Kirikou"}
+    assert await media.module.language() == "fr-FR"  # metadata fetched in it
+    from portalab.core.errors import PortalError
+
+    with pytest.raises(PortalError):  # a language and its country
+        await media.configure("i18n.systemLanguage", "fr")
 
 
 async def test_kinds_titles_and_screen_time(

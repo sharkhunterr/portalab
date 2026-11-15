@@ -250,6 +250,8 @@
   "arrival.welcome.install": "Installation",
   "arrival.welcome.language": "Portal language",
   "arrival.welcome.lead": "Choose the portal's language (the members' default, which they may change), then how it is installed.",
+  "arrival.welcome.system": "System language",
+  "arrival.welcome.systemHint": "The portal's language and country: metadata and services use it, and age ratings are this country's. The portal's language below follows it, and can differ.",
   "arrival.welcome.title": "A new portal",
   "auth.accountTitle": "My account",
   "auth.accountUnavailable": "This account cannot sign in right now.",

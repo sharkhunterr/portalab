@@ -352,9 +352,7 @@ export function CatalogPage() {
             <SelectField
               label={t("media:catalog.unrated")}
               value={filters.unrated ?? "include"}
-              onChange={(event) =>
-                set({ unrated: event.target.value === "exclude" ? "exclude" : undefined })
-              }
+              onChange={(event) => set({ unrated: event.target.value === "exclude" ? "exclude" : undefined })}
             >
               <option value="include">{t("media:catalog.unratedInclude")}</option>
               <option value="exclude">{t("media:catalog.unratedExclude")}</option>

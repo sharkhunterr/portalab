@@ -1107,6 +1107,8 @@
   "setting.i18n.schedulingDefault.choice.wall_clock": "Local clock time",
   "setting.i18n.schedulingDefault.hint": "Whether scheduled items keep a fixed instant or the same local clock time across time changes.",
   "setting.i18n.schedulingDefault.label": "Default scheduling mode",
+  "setting.i18n.systemLanguage.hint": "Language and country of the portal (e.g. fr-FR), apart from the interface's: metadata and services are fetched in it, and a title's age rating is this country's.",
+  "setting.i18n.systemLanguage.label": "System language",
   "setting.i18n.timeZone.hint": "Time zone used to show dates and times for this member.",
   "setting.i18n.timeZone.label": "Time zone",
   "setting.i18n.unknownLanguagePolicy.choice.hide": "Hide",

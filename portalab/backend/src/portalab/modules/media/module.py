@@ -170,6 +170,7 @@ from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
 from portalab.modules.media.radio import RADIO_WIDGET, RadioService, RadioWidget
+from portalab.modules.media.region import system_language
 from portalab.modules.media.requests.discovery import RequestableCatalog
 from portalab.modules.media.requests.insights import RequestInsights
 from portalab.modules.media.requests.journey import RequestJourney
@@ -370,15 +371,9 @@ class MediaModule:
         return out
 
     async def language(self) -> str:
-        """The portal's default language (metadata is fetched in it)."""
-        reader = self._config_reader()
-        if reader is None:
-            return "en"
-        try:
-            value = (await reader.get("i18n.defaultLocale")).value
-        except Exception:
-            return "en"
-        return str(value or "en")
+        """The portal's system language (issue 438: « fr-FR », metadata is fetched in it), else its
+        formatting locale."""
+        return await system_language(self.capabilities)
 
     async def member_language(self, principal: Principal) -> str:
         """#4: the member's own language (what they read the portal in), else the portal's."""

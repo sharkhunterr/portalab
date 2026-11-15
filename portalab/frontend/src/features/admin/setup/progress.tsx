@@ -35,6 +35,7 @@ export const STEPS: readonly Step[] = [
     key: "identity",
     icon: "sparkles",
     settings: [
+      "i18n.systemLanguage", // issue 438: metadata, services and age ratings
       "i18n.defaultLanguage",
       "i18n.defaultLocale",
       "i18n.defaultTimeZone",

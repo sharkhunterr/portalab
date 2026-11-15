@@ -3,7 +3,8 @@ maybe, to rated titles only) is never served a film or a series rated above it �
 episodes — from the catalog, the detail pages, the shelves, the search, the recommendations, the feed, the
 dashboard widgets or the players, unless its master let it open that title (an approved access request).
 
-Ratings are the metadata provider's (TMDB's ``certification``, stored with each film's and series' metadata);
+Ratings are the metadata provider's (TMDB's ``certification``, stored with each film's and series' metadata) —
+issue 438: the portal's country's one counts, the strictest of the others only when it has none;
 other kinds (books, music, games, live TV) have no rating and are never held back. Members without a
 restriction cost one cached lookup: nothing is computed for them."""
 
@@ -21,18 +22,20 @@ from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
-from portalab.capabilities.household import Household, Restrictions, genre_key, strictest_age
+from portalab.capabilities.household import Household, Restrictions, age_of, genre_key, strictest_age
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Forbidden
 from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag, PlaybackSession
+from portalab.modules.media.region import country_of, system_language
 
 # issue 432: every kind a rating may hold to — the unrated rule too (books, games: « unrated titles » off
 # keeps their unrated ones out as well); music has no rating system
 RATED = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "game")
 CACHE_S = 30.0
 AGES_CACHE_S = 300.0  # issue 437: every title's age, for the catalog's filter
+COUNTRY_CACHE_S = 60.0  # issue 438: the system language's country
 AGE_FILTERS = ("mine", "0", "6", "10", "12", "14", "16", "18")
 ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
@@ -63,8 +66,29 @@ def labelled(data: Mapping[str, Any] | None, server: str | None) -> list[tuple[s
     return found
 
 
-def ratings(data: Mapping[str, Any] | None, server: str | None) -> list[str]:
-    return [value for _, value in labelled(data, server)]
+def own_first(sources: list[tuple[str, str]], country: str | None) -> list[tuple[str, str]]:
+    """Issue 438: the country's ratings first (TMDB's, the media server's « fr/12 »), then the others."""
+    if not country:
+        return sources
+    mine = [s for s in sources if _of_country(s, country)]
+    return mine + [s for s in sources if not _of_country(s, country)]
+
+
+def _of_country(source: tuple[str, str], country: str) -> bool:
+    label, value = source
+    return label.upper() == country or (label == "server" and value.upper().startswith(f"{country}/"))
+
+
+def local_age(sources: Iterable[tuple[str, str]], country: str | None) -> int | None:
+    """Issue 438: the age a title is rated for in the portal's country — its rating there (TMDB's, else the
+    media server's « fr/12 »), the strictest of the others only when that country rates it not."""
+    sources = list(sources)
+    if country:
+        country = country.upper()
+        ages = [a for s in sources if _of_country(s, country) and (a := age_of(s[1])) is not None]
+        if ages:
+            return max(ages)
+    return strictest_age(v for _, v in sources)
 
 
 def excluded(column: Any, blocked: frozenset[UUID]) -> Any:
@@ -84,7 +108,16 @@ class TitleGate:
         self.database = database
         self.capabilities = capabilities
         self._cache: dict[UUID, tuple[float, frozenset[UUID]]] = {}
-        self._ages: tuple[float, dict[UUID, int | None]] | None = None
+        self._ages: tuple[float, str | None, dict[UUID, int | None]] | None = None
+        self._country: tuple[float, str | None] | None = None
+
+    async def country(self) -> str | None:
+        """Issue 438: the country whose age ratings count (the system language's), kept a minute."""
+        if self._country is not None and time.monotonic() - self._country[0] < COUNTRY_CACHE_S:
+            return self._country[1]
+        found = country_of(await system_language(self.capabilities))
+        self._country = (time.monotonic(), found)
+        return found
 
     def _household(self) -> Household | None:
         providers = self.capabilities.system_providers(HOUSEHOLD)
@@ -107,6 +140,7 @@ class TitleGate:
         if cached is not None and time.monotonic() - cached[0] < CACHE_S:
             return cached[1]
         granted = await household.grants(user, "media")
+        country = await self.country()
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -127,7 +161,7 @@ class TitleGate:
                 work
                 for work, kind, data, server in rows
                 if str(work) not in granted
-                and not restrictions.allows_age(strictest_age(ratings(data, server)))
+                and not restrictions.allows_age(local_age(labelled(data, server), country))
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
                 tags = await session.execute(
@@ -197,8 +231,13 @@ class TitleGate:
     async def rated_ages(self) -> dict[UUID, int | None]:
         """Issue 437: the strictest age of every title of a rated kind (``None``: unrated) — shared by every
         member, kept for a while."""
-        if self._ages is not None and time.monotonic() - self._ages[0] < AGES_CACHE_S:
-            return self._ages[1]
+        country = await self.country()
+        if (
+            self._ages is not None
+            and self._ages[1] == country
+            and time.monotonic() - self._ages[0] < AGES_CACHE_S
+        ):
+            return self._ages[2]
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -214,10 +253,10 @@ class TitleGate:
             ).all()
         out: dict[UUID, int | None] = {}
         for object_id, data, server in rows:
-            age = strictest_age(ratings(data, server))
+            age = local_age(labelled(data, server), country)
             known = out.get(object_id)
             out[object_id] = age if known is None else known if age is None else max(age, known)
-        self._ages = (time.monotonic(), out)
+        self._ages = (time.monotonic(), country, out)
         return out
 
     async def age_clause(self, viewer: Principal | UUID | None, age: str, *, unrated: bool = True) -> Any:
@@ -260,8 +299,9 @@ class TitleGate:
                 )
             ).all()
         out: dict[UUID, int] = {}
+        country = await self.country()
         for object_id, data, server in rows:
-            age = strictest_age(ratings(data, server))
+            age = local_age(labelled(data, server), country)
             if age is not None:
                 out[object_id] = max(age, out.get(object_id, age))
             elif unrated is not None and object_id not in out:
@@ -518,9 +558,11 @@ class TitleGate:
                 parent, data, server = row
                 sources = labelled(data, server)
                 if sources:
+                    country = await self.country()
                     return {
-                        "age": strictest_age(v for _, v in sources),
-                        "ratings": [{"source": s, "value": v} for s, v in sources],
+                        "age": local_age(sources, country),
+                        "country": country,
+                        "ratings": [{"source": s, "value": v} for s, v in own_first(sources, country)],
                     }
                 current = parent
         return {"age": None, "ratings": []}
