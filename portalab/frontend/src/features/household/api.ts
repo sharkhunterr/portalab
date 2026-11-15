@@ -152,10 +152,11 @@ export function useSetPin() {
   const refresh = useRefresh();
   return useMutation({
     mutationFn: async ({ id, pin, current }: { id: string; pin: string | null; current?: string }) => {
-      await api.PUT("/api/v1/household/members/{member_id}/pin", {
+      const { error } = await api.PUT("/api/v1/household/members/{member_id}/pin", {
         params: { path: { member_id: id } },
         body: { pin, ...(current ? { current } : {}) },
       });
+      if (error) throw new Error("household.pin"); // a wrong current PIN, an invalid new one
     },
     onSuccess: refresh,
   });

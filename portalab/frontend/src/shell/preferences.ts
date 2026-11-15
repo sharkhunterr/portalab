@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { api } from "../api/client";
+import { ME_KEY } from "../features/auth/useAuth";
 
 /**
  * Shell preferences (spec 027 R4): account-level user settings (``/me/preferences``) such as the expanded
@@ -14,18 +15,26 @@ interface PreferenceView {
   value: unknown;
 }
 
-function readMirror(key: string): unknown {
+// 032: one browser, several household members — each member's own mirror (never its master's, say, the
+// welcome already seen); ``who`` is the signed-in account, unknown before ``/me`` answered
+function mirrorKey(key: string, who: string | undefined): string {
+  return who ? `portalab:${who}:${key}` : `portalab:${key}`;
+}
+
+function readMirror(key: string, who: string | undefined): unknown {
+  if (!who) return undefined;
   try {
-    const raw = window.localStorage.getItem(`portalab:${key}`);
+    const raw = window.localStorage.getItem(mirrorKey(key, who));
     return raw === null ? undefined : JSON.parse(raw);
   } catch {
     return undefined;
   }
 }
 
-function writeMirror(key: string, value: unknown): void {
+function writeMirror(key: string, value: unknown, who: string | undefined): void {
+  if (!who) return;
   try {
-    window.localStorage.setItem(`portalab:${key}`, JSON.stringify(value));
+    window.localStorage.setItem(mirrorKey(key, who), JSON.stringify(value));
   } catch {
     // storage unavailable: the server copy is the source of truth anyway
   }
@@ -53,15 +62,17 @@ export function useShellPreference<T>(key: string, fallback: T): [T, (value: T) 
       await api.PUT("/api/v1/me/preferences", { body: { [key]: value } as never });
     },
   });
+  const who = client.getQueryData<{ id?: string } | null>(ME_KEY)?.id;
   const stored = query.data?.[key];
-  const value = (stored ?? readMirror(key) ?? fallback) as T;
+  // the mirror paints first only: once the server answered, its copy (or the default) is the value
+  const value = (stored ?? (query.isSuccess ? undefined : readMirror(key, who)) ?? fallback) as T;
   const set = useCallback(
     (next: T) => {
-      writeMirror(key, next);
+      writeMirror(key, next, who);
       client.setQueryData<Record<string, unknown>>(KEY, (old) => ({ ...(old ?? {}), [key]: next }));
       save.mutate(next);
     },
-    [client, key, save],
+    [client, key, save, who],
   );
   return [value, set, query.isSuccess];
 }

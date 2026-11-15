@@ -459,5 +459,13 @@
   "rules.title": "Les règles de chaque profil",
   "rules.lead": "Chaque profil démarre avec les règles de son type. Ajustez les âges, les genres et le temps d'écran maintenant, ou plus tard dans « Mon foyer ».",
   "rules.none": "Pas encore de profil : ajoutez-les plus tard dans « Mon foyer ».",
-  "rules.set": "Régler les règles de {name}"
+  "rules.set": "Régler les règles de {name}",
+  "pin.title": "Votre code PIN",
+  "pin.lead": "Choisissez un code PIN pour que personne d'autre dans le foyer n'ouvre votre profil. Vous pouvez passer cette étape et le choisir plus tard depuis le menu de votre avatar.",
+  "pin.leadHas": "Votre profil a déjà un code PIN. Changez-le ici si vous voulez, en donnant l'actuel.",
+  "pin.hint": "4 à 6 chiffres.",
+  "pin.again": "Le même code à nouveau",
+  "pin.mismatch": "Les deux codes sont différents.",
+  "pin.save": "Enregistrer mon code",
+  "pin.saved": "Votre code PIN est enregistré. Il vous sera demandé pour entrer dans votre profil."
 }

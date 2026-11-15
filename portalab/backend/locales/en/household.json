@@ -321,5 +321,6 @@
   "made.undo": "I don't want a household",
   "made.undone": "Your household is undone",
   "account.make": "Make a household",
-  "account.makeHint": "Profiles for the people sharing your account, each with their own dashboard and rules."
+  "account.makeHint": "Profiles for the people sharing your account, each with their own dashboard and rules.",
+  "myPin.refused": "This PIN was refused: check the current one, and use 4 to 6 digits."
 }

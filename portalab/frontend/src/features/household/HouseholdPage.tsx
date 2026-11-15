@@ -489,6 +489,7 @@ function MyPin({
                 notify({ severity: "success", title: t("household:myPin.saved") });
                 onClose();
               },
+              onError: () => notify({ severity: "critical", title: t("household:myPin.refused") }),
             },
           );
         }}

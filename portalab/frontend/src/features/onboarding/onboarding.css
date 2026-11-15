@@ -1498,3 +1498,10 @@ button.first-steps__start:focus-visible {
 .onboarding-household__choice small {
   color: var(--color-text-muted);
 }
+
+/* issue 446: a profile's own PIN */
+.onboarding-pin {
+  display: grid;
+  gap: var(--space-2);
+  max-inline-size: 22rem;
+}

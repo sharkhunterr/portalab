@@ -22,6 +22,7 @@ import {
   useHousehold,
   useHouseholdSession,
   useMakeHousehold,
+  useSetPin,
 } from "../household/api";
 import { HouseholdEconomyChoice } from "../household/HouseholdEconomy";
 import { ProfileEditor } from "../household/ProfileEditor";
@@ -47,6 +48,7 @@ import "./onboarding.css";
 const STEPS = [
   "hello",
   "profile",
+  "pin",
   "accounts",
   "retro",
   "household",
@@ -68,6 +70,7 @@ const HOUSEHOLD_STEPS: readonly Step[] = ["household", "policy", "family", "rule
 const ART: Record<Step, string> = {
   hello: "sparkles",
   profile: "user",
+  pin: "lock",
   accounts: "link",
   retro: "joystick",
   household: "home",
@@ -163,7 +166,8 @@ export function WelcomeFlow() {
       (!["policy", "family", "rules"].includes(s) || made) &&
       (s !== "presence" || presence.available) &&
       (s !== "retro" || (!profile && mapped.length > 0 && (toAuthorise || step === "retro"))) &&
-      !(profile && (s === "accounts" || s === "presence")),
+      !(profile && (s === "accounts" || s === "presence")) &&
+      (s !== "pin" || profile), // issue 446: a profile's own PIN, its master's account is its master's
   );
   const index = Math.max(steps.indexOf(step), 0);
   const last = index >= steps.length - 1;
@@ -223,6 +227,9 @@ export function WelcomeFlow() {
               ) : null}
               {step === "profile" && me.data ? (
                 <Profile titleId={titleId} me={me.data} onBack={back} onNext={next} />
+              ) : null}
+              {step === "pin" && me.data ? (
+                <PinStep titleId={titleId} me={me.data.id} nav={<Nav onBack={back} onNext={next} />} />
               ) : null}
               {step === "accounts" ? (
                 <Accounts titleId={titleId} nav={<Nav onBack={back} onNext={next} />} />
@@ -823,6 +830,80 @@ function RetroStep({ titleId, only, nav }: { titleId: string; only: readonly str
       <DialogPrimitive.Title id={titleId}>{t("onboarding:retro.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:retro.lead")}</p>
       <RetroAccountList only={only} />
+      {nav}
+    </>
+  );
+}
+
+/** Issue 446: a profile's own PIN — so that no one else in the household enters it (changed later from the
+ * avatar's menu); one its master set already is replaced by giving it. Skippable. */
+function PinStep({ titleId, me, nav }: { titleId: string; me: string; nav: ReactNode }) {
+  const t = useT();
+  const household = useHousehold();
+  const setPin = useSetPin();
+  const [current, setCurrent] = useState("");
+  const [pin, setPinValue] = useState("");
+  const [again, setAgain] = useState("");
+  const [saved, setSaved] = useState(false);
+  const mine = household.data?.members.find((m) => m.id === me);
+  const has = Boolean(mine?.has_pin) && !saved;
+  const valid = /^\d{4,6}$/.test(pin);
+  const mismatch = again !== "" && again !== pin;
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:pin.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t(has ? "onboarding:pin.leadHas" : "onboarding:pin.lead")}</p>
+      {saved ? (
+        <p className="onboarding-welcome__lead" role="status">
+          <Icon name="check" size={16} /> {t("onboarding:pin.saved")}
+        </p>
+      ) : (
+        <form
+          className="onboarding-pin"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!valid || pin !== again) return;
+            setPin.mutate({ id: me, pin, ...(has ? { current } : {}) }, { onSuccess: () => setSaved(true) });
+          }}
+        >
+          {has ? (
+            <TextField
+              label={t("household:myPin.current")}
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={6}
+              value={current}
+              onChange={(event) => setCurrent(event.target.value.replace(/\D/g, ""))}
+            />
+          ) : null}
+          <TextField
+            label={t("household:myPin.new")}
+            hint={t("onboarding:pin.hint")}
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={6}
+            value={pin}
+            onChange={(event) => setPinValue(event.target.value.replace(/\D/g, ""))}
+          />
+          <TextField
+            label={t("onboarding:pin.again")}
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={6}
+            value={again}
+            error={mismatch ? t("onboarding:pin.mismatch") : undefined}
+            onChange={(event) => setAgain(event.target.value.replace(/\D/g, ""))}
+          />
+          <Button type="submit" variant="secondary" disabled={!valid || pin !== again || setPin.isPending}>
+            <Icon name="lock" size={16} />
+            {t("onboarding:pin.save")}
+          </Button>
+          {setPin.isError ? <p role="alert">{t("household:myPin.refused")}</p> : null}
+        </form>
+      )}
       {nav}
     </>
   );

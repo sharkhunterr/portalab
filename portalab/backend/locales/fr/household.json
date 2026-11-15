@@ -321,5 +321,6 @@
   "made.undo": "Je ne veux pas de foyer",
   "made.undone": "Votre foyer est supprimé",
   "account.make": "Créer un foyer",
-  "account.makeHint": "Des profils pour les personnes qui partagent votre compte, chacun avec son tableau de bord et ses règles."
+  "account.makeHint": "Des profils pour les personnes qui partagent votre compte, chacun avec son tableau de bord et ses règles.",
+  "myPin.refused": "Ce code a été refusé : vérifiez l'actuel, et utilisez 4 à 6 chiffres."
 }

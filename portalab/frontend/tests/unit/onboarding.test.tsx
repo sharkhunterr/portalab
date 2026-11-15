@@ -47,6 +47,7 @@ interface Backend {
   quests?: unknown[];
   assistant?: boolean;
   household?: boolean; // issue 428: profiles turned on
+  me?: Record<string, unknown>; // issue 446: a household profile signed in
 }
 
 function backend({
@@ -57,9 +58,11 @@ function backend({
   links = [],
   retro = [],
   household = false,
+  me = ME,
 }: Backend) {
   const made: unknown[] = [];
   const householdMade: unknown[] = [];
+  const pins: Array<[string, unknown]> = [];
   const puts: Array<Record<string, unknown>> = [];
   const posts: string[] = [];
   const visibility: Array<[string, unknown]> = [];
@@ -75,6 +78,10 @@ function backend({
       visibility.push([path.split("/").pop() ?? "", level]);
       return json(200, { effective: true });
     }
+    if (request.method === "PUT" && path.startsWith("/api/v1/household/members/")) {
+      pins.push([path.split("/")[5] ?? "", await request.json()]); // issue 446
+      return new Response(null, { status: 204 });
+    }
     if (request.method === "POST" && path === "/api/v1/household/made") {
       householdMade.push(await request.json()); // issue 445
       return new Response(null, { status: 204 });
@@ -88,7 +95,7 @@ function backend({
       if (path === "/api/v1/dashboard/reset") resets.push(await request.text());
       return json(200, []);
     }
-    if (path === "/api/v1/me") return json(200, ME);
+    if (path === "/api/v1/me") return json(200, me);
     if (path === "/api/v1/me/preferences") return json(200, { preferences });
     if (path === "/api/v1/me/onboarding/welcome") return json(200, welcome);
     if (path === "/api/v1/me/privacy")
@@ -144,7 +151,7 @@ function backend({
       });
     return json(404, {});
   };
-  return { puts, posts, visibility, resets, made, householdMade };
+  return { puts, posts, visibility, resets, made, householdMade, pins };
 }
 
 const mission = (key: string, done = false) => ({
@@ -227,6 +234,37 @@ describe("welcome", () => {
     expect(await screen.findByText("Léa")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "Each profile's rules" })).toBeInTheDocument();
+  });
+
+  it("welcomes a household profile too — its own PIN, none of its master's screens (issue 446)", async () => {
+    window.localStorage.clear();
+    const PROFILE = "0190f0a0-0000-7000-8000-0000000000c1";
+    // its master saw the welcome on this browser: that is not the profile's
+    window.localStorage.setItem(
+      "portalab:shell.onboarding.welcomedAt",
+      JSON.stringify("2026-10-09T10:00:00Z"),
+    );
+    window.localStorage.setItem(
+      `portalab:${ME.id}:shell.onboarding.welcomedAt`,
+      JSON.stringify("2026-10-09T10:00:00Z"),
+    );
+    const { pins } = backend({
+      household: true,
+      me: { ...ME, id: PROFILE, login: "lea", display_name: "Léa", profile_of: ME.id },
+    });
+    show(<WelcomeFlow />);
+    fireEvent.click(await screen.findByRole("button", { name: "Let's go" }));
+    await screen.findByRole("heading", { name: "A face and a name" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(await screen.findByRole("heading", { name: "Your PIN" })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("New PIN"), { target: { value: "1234" } });
+    fireEvent.change(screen.getByLabelText("The same PIN again"), { target: { value: "1234" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save my PIN" }));
+    await waitFor(() => expect(pins).toEqual([[PROFILE, { pin: "1234" }]]));
+    expect(await screen.findByText(/Your PIN is saved/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // no media accounts, no household: its master's
+    expect(await screen.findByRole("heading", { name: "How far do you want to play?" })).toBeInTheDocument();
   });
 
   it("skips the household when the member wants no profiles, and replays just that part later", async () => {

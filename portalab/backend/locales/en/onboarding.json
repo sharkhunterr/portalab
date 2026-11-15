@@ -459,5 +459,13 @@
   "rules.title": "Each profile's rules",
   "rules.lead": "Each profile starts with its kind's rules. Adjust ages, genres and screen time now, or later in « My household ».",
   "rules.none": "No profile yet: add them later in « My household ».",
-  "rules.set": "Set {name}'s rules"
+  "rules.set": "Set {name}'s rules",
+  "pin.title": "Your PIN",
+  "pin.lead": "Choose a PIN so that no one else in the household opens your profile. You can skip it and choose one later from your avatar's menu.",
+  "pin.leadHas": "Your profile already has a PIN. Change it here if you like, giving the current one.",
+  "pin.hint": "4 to 6 digits.",
+  "pin.again": "The same PIN again",
+  "pin.mismatch": "The two PINs differ.",
+  "pin.save": "Save my PIN",
+  "pin.saved": "Your PIN is saved. You'll be asked for it when entering your profile."
 }
