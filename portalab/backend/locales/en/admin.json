@@ -2225,5 +2225,15 @@
   "widgetPacks.shop": "Shop",
   "widgetPacks.sold": "{price} coins · {rarity}",
   "widgetPacks.title": "Widgets",
-  "widgetPacks.what": "What it is"
+  "widgetPacks.what": "What it is",
+  "systemLanguage.title": "System language and country",
+  "systemLanguage.description": "The portal's own language and country: the language its media metadata is fetched in, the country whose age ratings count (a title rated U in France is not 8+), and the default dates and numbers. Each member keeps the interface language they choose.",
+  "systemLanguage.current": "Now: {tag}.",
+  "systemLanguage.unset": "Not chosen yet: the portal follows {tag}.",
+  "systemLanguage.language": "Language",
+  "systemLanguage.country": "Country",
+  "systemLanguage.countryHint": "Its age ratings come first; with none, the strictest of the others.",
+  "systemLanguage.save": "Save the system language",
+  "systemLanguage.saved": "System language: {tag}",
+  "systemLanguage.error": "The system language was not saved"
 }

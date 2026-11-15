@@ -10,6 +10,7 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { useT } from "../../../i18n/hooks/useT";
 import { SITE_KEY } from "../../../shell/site/site";
 import { ApiError } from "../../../state/regions";
+import { SystemLanguage } from "./SystemLanguage";
 import "../admin.css";
 import "./site.css";
 
@@ -469,6 +470,7 @@ export function SiteIdentityAdmin({ embedded = false }: { embedded?: boolean } =
     content
   ) : (
     <AdminPage icon="sparkles" title={t("admin:site.title")} description={t("admin:site.description")}>
+      <SystemLanguage />
       {content}
     </AdminPage>
   );

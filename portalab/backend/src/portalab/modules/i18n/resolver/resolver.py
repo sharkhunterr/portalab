@@ -39,7 +39,11 @@ def resolve(preference: UserLocalePreference, policy: I18nPolicy) -> LocaleConte
     else:
         language = policy.default_language if policy.default_language in enabled else HARD_LANGUAGE
         retained = preference.language if preference.language and preference.language != language else None
-    locale = preference.locale or policy.default_locale or language
+    # issue 451: dates and numbers in the member's language — the portal's locale when it is that language's
+    # (« fr-FR » for French), else the language itself (a French member of an English portal: « fr »)
+    portal = policy.default_locale
+    same = bool(portal) and portal.replace("_", "-").split("-")[0].lower() == language.split("-")[0].lower()
+    locale = preference.locale or (portal if same else None) or language
     candidates = (preference.time_zone, policy.default_time_zone, HARD_TIME_ZONE)
     time_zone = next((tz for tz in candidates if tz and valid_time_zone(tz)), HARD_TIME_ZONE)
     chain = tuple(dict.fromkeys(code for code in (*policy.fallback_chain, HARD_LANGUAGE) if code != language))

@@ -2225,5 +2225,15 @@
   "widgetPacks.shop": "Boutique",
   "widgetPacks.sold": "{price} pièces · {rarity}",
   "widgetPacks.title": "Widgets",
-  "widgetPacks.what": "Ce que c'est"
+  "widgetPacks.what": "Ce que c'est",
+  "systemLanguage.title": "Langue et pays du système",
+  "systemLanguage.description": "La langue et le pays du portail : la langue dans laquelle les métadonnées des médias sont récupérées, le pays dont les classifications d'âge comptent (un titre « Tous publics » en France n'est pas 8+), et le format par défaut des dates et des nombres. Chaque membre garde la langue d'interface qu'il choisit.",
+  "systemLanguage.current": "Actuellement : {tag}.",
+  "systemLanguage.unset": "Pas encore choisi : le portail suit {tag}.",
+  "systemLanguage.language": "Langue",
+  "systemLanguage.country": "Pays",
+  "systemLanguage.countryHint": "Ses classifications d'âge passent en premier ; sans elles, la plus stricte des autres.",
+  "systemLanguage.save": "Enregistrer la langue système",
+  "systemLanguage.saved": "Langue système : {tag}",
+  "systemLanguage.error": "La langue système n'a pas été enregistrée"
 }

@@ -77,3 +77,16 @@ async def test_a_new_language_counts_without_an_event(monkeypatch: object) -> No
         assert (await resolver.for_user(member)).language == "fr"
     finally:
         patch.undo()
+
+
+def test_dates_follow_the_members_language() -> None:
+    """Issue 451: a French member of an English portal reads French dates (« fr »), not the portal's
+    « en-US » ones; the portal's locale counts when it is the member's language (« fr-FR »)."""
+    from portalab.modules.i18n.resolver.resolver import resolve
+
+    english = I18nPolicy(enabled_languages=("en", "fr"), default_language="en", default_locale="en-US")
+    french = I18nPolicy(enabled_languages=("en", "fr"), default_language="fr", default_locale="fr-FR")
+    assert resolve(UserLocalePreference(language="fr"), english).locale == "fr"
+    assert resolve(UserLocalePreference(language="fr"), french).locale == "fr-FR"
+    assert resolve(UserLocalePreference(), english).locale == "en-US"
+    assert resolve(UserLocalePreference(language="fr", locale="fr-BE"), english).locale == "fr-BE"
