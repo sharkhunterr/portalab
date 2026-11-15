@@ -100,7 +100,7 @@ Only the interfaces you own are offered; the others are in the shop. **Show seas
 
 ### Looks
 
-- **Colour palette**: accent colours laid over your interface, whichever it is.
+- **Colour palette**: accent colours laid over your interface, whichever it is. Twelve are offered to everyone — Ocean, Forest, Tangerine, Wisteria, Ruby, Amber, Seafoam, Sky, Petal, Coral, Stone and Opal, each readable in light and dark; more come from the shop.
 - **Level badge**: how the badge everyone sees next to your name looks. **Classic** changes with your level.
 - **Level-up**: how a new level is celebrated — **Try it** shows it.
 - **Ambience and celebrations**: the **Ambient animation** behind the portal (snow, falling code, fireflies, live weather…) and the **Reward celebration**. **Follow the theme** keeps your interface's own; **Preview** and **Try it** show them first. The *Live weather* ambience follows the real sky over a place you choose.
@@ -173,6 +173,8 @@ On **Language & region** (`/settings/language`) each choice saves at once:
 - **First day of the week**.
 
 **Automatic** lets your browser decide. The *Preview: …* line shows the result. If your language is switched off by the administrator, your choice is kept and applies again when it comes back.
+
+The welcome asks your language first, each one shown by its flag, and applies it at once; its appearance screen also sets the **text size** (100 % by default). Words such as relative times (« 2 hours ago ») and lists are written in your interface language; numbers and dates follow your formats.
 
 ## Notification preferences
 

@@ -27,8 +27,9 @@
 Your friends and family already use your Plex, your Seerr, your book library and your game shelf — through
 a dozen apps and a group chat full of *"is my film there yet?"*. **Portalab puts all of it behind one
 door**: one catalog for every service, requests that explain themselves, a player, a reader and a radio in
-the browser, statistics of everything they watched, read and heard, a wiki, news and support — and, for
-those who want it, a whole game on top: levels, quests, collectible cards cut from your own library and a
+the browser, retro games that play right in the page, statistics of everything they watched, read and
+heard, **a profile for each person at home** with the rules a parent sets, a wiki, news and support — and,
+for those who want it, a whole game on top: levels, quests, collectible cards cut from your own library and a
 shop to spend what they earn.
 
 It runs on your server from **one Docker image and a PostgreSQL database**. Nothing leaves your network
@@ -71,6 +72,10 @@ front page of your homelab: one look, and members know what is new, what works a
   click within your quota (Overseerr / Jellyseerr behind the scenes).
 - **Watch, read and listen without leaving the portal.** A video player with subtitles and Chromecast, a
   reader for EPUB, PDF and comics, an audiobook player that remembers where you stopped — on any device.
+- **Play the retro games in the browser.** The RomM library's games start in the page, with RomM's cores,
+  gamepads and Flash; each member's (and each profile's) saves and save states are kept, and copied to RomM.
+- **Age ratings that mean something where you live.** Every title shows its rating in your portal's country
+  — and, without one, the strictest of the others — and the catalog filters by what each member may watch.
 - **The radio.** The station's live stream (SUB/WAVE) in a player that follows you from page to page; see
   what plays, and ask the DJ for a song.
 - **My taste.** Like, dislike or keep for later, and get recommendations drawn from what you actually watch.
@@ -99,6 +104,34 @@ Time spent, plays, favourite titles, habits by hour and weekday, genres, actors,
 streaming quality — **films, series, live TV, music, books, audiobooks, the radio and games**, each tab
 shown only when a service of yours feeds it. Yours, or the whole server's (anonymous for members), over
 any period, plus a yearly recap.
+
+### One account, a whole household
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/household-picker.jpg" alt="Who's there? — each person sharing the account picks their profile, a PIN on the protected ones"></td>
+    <td width="50%"><img src="assets/screenshots/household.jpg" alt="The family dashboard: what each member watched, read and played lately, their time, sittings and streak"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/household-schedule.jpg" alt="Screen time as an agenda: spans for each day, what counts, the time left right now"></td>
+    <td width="50%"><img src="assets/screenshots/household-profiles.jpg" alt="Profiles: the household's economy, each profile's figures, age limit and quick screen-time buttons"></td>
+  </tr>
+</table>
+
+A shared Plex account often has a family behind it. A member **makes a household** — in their welcome, or
+later from their account page — and creates **a profile for each person**: their own home, recommendations,
+quests, streak and *Continue*, picked on **« Who's there? »**, each behind a PIN if they want.
+
+- **The rules are the parent's.** An age limit (fixed, or growing with a birth date), any genre or title
+  kept out, titles above the age hidden or shown locked, the shop, requests, the assistant or the community
+  switched off — and a locked title can be **asked for**, allowed for good or for a day.
+- **Screen time like an agenda.** A week of spans, each open or with its own time, a maximum per day, the
+  media only or every minute on the portal, and **more time** or **no limits for a while** in two taps.
+- **The household's economy, the master's choice.** A **common pot** (each profile's gains also land on the
+  master's account, which stands for the household) or **separate profiles** with wallets of their own, in
+  the community publicly or anonymously.
+- **A family dashboard** with what each member watched, read and played — and the household wallet, in a
+  common pot.
 
 ### A game for those who want to play
 
@@ -157,6 +190,8 @@ mini-games, challenges and parties), and each member's home starts from the dash
   the team's surveys and review forms.
 - **Service status** for every connected service, and **incidents** that say what broke, since when and
   when it was fixed — no more "is Plex down or is it me?".
+- **No dead ends.** A page that is not there, one you may not open, an error, a service away, the portal
+  loading or out of reach: one calm look, always with a way back home.
 
 ### Make it yours
 
@@ -167,8 +202,9 @@ mini-games, challenges and parties), and each member's home starts from the dash
   </tr>
 </table>
 
-- **Full personalisation** — interface and palette, light or dark, profile (avatar, frame, name style),
-  language and region, and notification preferences per topic, in the portal and by e-mail.
+- **Full personalisation** — interface and palette (twelve offered, more in the shop), light or dark, text
+  size, profile (avatar, frame, name style), language and region, and notification preferences per topic,
+  in the portal and by e-mail.
 - **Search everything** at once — titles, people, wiki pages, news, tickets, products — exact or by meaning.
 - **An AI assistant** (Ollama or any OpenAI-compatible server) that answers about the server and acts only
   with the member's own rights, confirming anything sensitive.
@@ -195,6 +231,13 @@ the members' default dashboard; news, wiki, newsletters, terms and banners; role
 sign-on, privacy policies; automations, the assistant's models and tools; alerts, incidents, backups and
 the audit log — all from the administration, nothing in config files.
 
+<p align="center">
+  <img src="assets/screenshots/system-language.jpg" alt="Site identity: the portal's system language and country, its name, slogan, logo and icon" width="80%">
+</p>
+
+The portal's **system language and country** decide the language metadata is fetched in, whose age ratings
+count and the default dates and numbers; each member keeps the interface language they choose.
+
 ## Connects to your stack
 
 | Area | Services | What members get |
@@ -205,7 +248,7 @@ the audit log — all from the administration, nothing in config files.
 | Downloads | **Sonarr**, **Radarr**, **qBittorrent**, **Deluge** | the request journey, the download queue, calendars |
 | Library cleanup | **Maintainerr** | "leaving soon" on titles |
 | Books and audiobooks | **Grimmory** | reading and listening in the portal, reading history |
-| Retro games | **RomM** | the games library and what was played |
+| Retro games | **RomM** | the games library, playing in the browser with saves per member, what was played |
 | Radio | **SUB/WAVE** | the live station, now playing, asking the DJ |
 | Metadata and art | **TMDB**, **TheTVDB**, **fanart.tv**, **SearXNG** | overviews, cast, artwork, card art |
 | AI | **Ollama**, OpenAI-compatible servers, MCP | the assistant |
@@ -275,7 +318,7 @@ sandboxed visual packs, encrypted secrets and backups. The checklist is in
 | For | Read |
 | --- | --- |
 | Installing and running it | [Getting started](docs/getting-started.md) · [Configuration](docs/configuration.md) · [Operations](docs/admin/operations.md) |
-| Members | [Media](docs/members/media.md) · [Statistics](docs/members/statistics.md) · [Gamification](docs/members/gamification.md) · [Community](docs/members/community.md) · [Support](docs/members/support.md) · [Personalisation](docs/members/personalization.md) · [Assistant and search](docs/members/assistant.md) |
+| Members | [Media](docs/members/media.md) · [Retro games](docs/members/retro-games.md) · [Households](docs/members/households.md) · [Statistics](docs/members/statistics.md) · [Gamification](docs/members/gamification.md) · [Community](docs/members/community.md) · [Support](docs/members/support.md) · [Personalisation](docs/members/personalization.md) · [Assistant and search](docs/members/assistant.md) |
 | Administrators | [Services](docs/admin/services.md) · [Members and roles](docs/admin/members-and-roles.md) · [Gamification and economy](docs/admin/gamification-and-economy.md) · [Content](docs/admin/content.md) · [Customisation](docs/admin/customization.md) · [AI and automations](docs/admin/ai-and-automations.md) |
 | Developers | [Module guides](portalab/docs/) · [Plugin authoring](portalab/docs/plugin-authoring.md) · [Visual packs](portalab/docs/visual-packs.md) |
 

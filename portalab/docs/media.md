@@ -57,6 +57,15 @@ changes none of the catalog facts.
   event id (replays are no-ops). The resume point follows the latest `occurred_at` across sources;
   `finished` is sticky. Personal history is the `media_history` datum class (private by default).
 
+## Age ratings (issues 418, 438)
+
+A title's age (`restrictions.local_age`) is its rating **in the portal's country** — the system language's
+(see [i18n](i18n.md)) — taken from TMDB's `release_dates` / `content_ratings` and the media server's own
+rating (Plex `contentRating`, Jellyfin `OfficialRating`). With no rating for that country, the strictest of
+the others counts (`strictest_age`). Games carry their IGDB age rating through RomM; books and music none.
+`TitleGate` caches the country a minute and the blocked titles per viewer; household restrictions
+(`HOUSEHOLD.restrictions_of`) decide whether a title above the age is hidden, locked or shown.
+
 ## Requests and quota
 
 `POST /media/requests` checks the quota (base `media.requests.quotaPerPeriod` per `media.requests.period`,

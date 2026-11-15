@@ -345,6 +345,13 @@ version; warnings are published knowingly; infos inform.
 - `portalab visuals analyse <folder|zip> [--json]` — the analysis above, offline (no database), exiting
   non-zero on a blocking finding: run it before sending a pack.
 - `portalab visuals builtin sync [--dry-run]` — Portalab's own packs (administrators).
+- `uv run python scripts/stamp_builtin_packs.py` (from `backend/`) — stamps a built-in pack's version from
+  its content after any change (a published version is never changed in place).
+- The **socle** pack (`packs/builtin/portalab-socle`) holds the looks offered to every member (`"free":
+  true`), its twelve palettes among them. The interface draws them before any pack is read, so each socle
+  palette is mirrored in `frontend/src/design-system/themes/palettes.ts` (`PALETTE_COLORS`);
+  `tests/unit/palettes.test.ts` keeps both colour for colour and refuses an accent another palette (the
+  shop's included) already uses.
 - `examples/visual-packs/` — four complete packs to start from; `backend/tests/unit/visuals/test_examples.py`
   keeps every one of them free of any blocking or warning finding.
 

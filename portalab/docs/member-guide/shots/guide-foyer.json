@@ -1,0 +1,127 @@
+[
+  {
+    "name": "foyer-qui",
+    "page": "guide-foyer",
+    "route": "/household",
+    "clip": "body",
+    "height": 800,
+    "settle": 3000,
+    "before": [
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
+        "wait": 300
+      },
+      {
+        "replace": {
+          "Maya": "Léa",
+          "Camille": "Tom",
+          "=M": "L",
+          "=C": "T"
+        },
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "foyer-famille",
+    "page": "guide-foyer",
+    "route": "/household",
+    "clip": "main",
+    "height": 1100,
+    "settle": 4000,
+    "reads": [
+      "/api/v1/household/switch"
+    ],
+    "before": [
+      {
+        "click": "button:has-text(\"Jérémie\")",
+        "wait": 3500
+      },
+      {
+        "goto": "/household",
+        "wait": 2500
+      },
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
+        "wait": 300
+      },
+      {
+        "replace": {
+          "Maya": "Léa",
+          "Camille": "Tom",
+          "=M": "L",
+          "=C": "T"
+        },
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "foyer-economie",
+    "page": "guide-foyer",
+    "route": "/household/profiles",
+    "clip": "main",
+    "height": 1200,
+    "settle": 4000,
+    "reads": [
+      "/api/v1/household/switch"
+    ],
+    "before": [
+      {
+        "click": "button:has-text(\"Jérémie\")",
+        "wait": 3500
+      },
+      {
+        "goto": "/household/profiles",
+        "wait": 2500
+      },
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
+        "wait": 300
+      },
+      {
+        "replace": {
+          "Maya": "Léa",
+          "Camille": "Tom",
+          "=M": "L",
+          "=C": "T"
+        },
+        "wait": 300
+      }
+    ]
+  },
+  {
+    "name": "foyer-horaires",
+    "page": "guide-foyer",
+    "route": "/household/schedule",
+    "clip": "main",
+    "height": 1100,
+    "settle": 4000,
+    "reads": [
+      "/api/v1/household/switch"
+    ],
+    "before": [
+      {
+        "click": "button:has-text(\"Jérémie\")",
+        "wait": 3500
+      },
+      {
+        "goto": "/household/schedule",
+        "wait": 2500
+      },
+      {
+        "css": ".avatar-frame img, .shell-avatar-button img, .profile-hero__avatar img, .ds-avatar img, .shell-profile img, .household-face img, img[src*=\"/avatar\"] { filter: blur(8px); }",
+        "wait": 300
+      },
+      {
+        "replace": {
+          "Maya": "Léa",
+          "Camille": "Tom",
+          "=M": "L",
+          "=C": "T"
+        },
+        "wait": 300
+      }
+    ]
+  }
+]

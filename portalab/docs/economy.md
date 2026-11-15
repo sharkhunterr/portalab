@@ -137,6 +137,28 @@ offering `quests(at)`) and count only while the campaign is active.
 `gamification.daily_objectives`. Presentation surfaces read `economy.catalog` (`achievements_of`,
 `unlocked_of`, `quests_of`).
 
+## Households (issue 443)
+
+A household's master chooses its economy (`household.members.economy`, on the master's row): `pot` (the
+default) or `dispatch`. The gamification module provides the `HOUSEHOLD_POT` capability
+(`ledger/household_pot.py`):
+
+- **pot** — every grant, spend and refund of a profile is written twice in one unit of work: the profile's
+  row, and a copy on the master (`profile_id` = the profile, its own idempotency key). Boosters and
+  rewards a profile receives are duplicated the same way. Daily caps and streaks are the profile's. A
+  spend or reservation the master's pot cannot cover raises `economy.insufficient_coins`; any other
+  debit's copy is capped at what the master holds. Copies publish no reward event.
+- **dispatch** — no copy: each profile's wallet is its own.
+- **Switching** calls `regroup(owner, profiles, pot)`: for each mirrored value it appends the difference
+  between what the profiles hold and the copies already on the master (never below what the master still
+  holds). Nothing is rewritten: the ledger stays append-only.
+
+Administration charts go through `api/household_scope.chart_scope`: grouped
+(`economy.household.grouped`, on by default), a pot's profiles are left out (their master holds the
+copies) and a dispatched profile's rows are drawn on its master's; not grouped, each member has its row
+and a master's copies are left out — one gain is never counted twice. Every chart, leaderboard and history
+filters erased members with `models.not_erased()`.
+
 ## Privacy
 
 Progression is the datum class `progression` (default private; the owner chooses its visibility, 021):

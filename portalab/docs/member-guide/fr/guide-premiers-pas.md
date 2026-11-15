@@ -18,6 +18,7 @@ Bon à savoir :
 - Après plusieurs essais ratés, le portail vous demande d'attendre quelques secondes avant de réessayer.
 - Si l'administrateur vous a envoyé un **code d'activation**, la page d'activation vous demande ce code et un mot de passe à choisir (au moins 12 caractères).
 - Si le portail ne répond pas, une page « Le portail est momentanément indisponible » s'affiche. Elle réessaie toute seule et votre page revient dès que le portail répond.
+- Les autres pages « entre deux pages » ont le même air calme : « Cette page n'est pas là », « Cette page ne vous est pas ouverte », un service momentanément absent, une erreur ou le chargement. Chacune propose « Revenir à l'accueil » ou « Page précédente » : jamais d'impasse.
 
 ### Les conditions d'utilisation
 
@@ -25,11 +26,13 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
 
 ## L'accueil des nouveaux membres
 
-À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur 8 », etc.) :
+À votre première visite, quelques écrans de bienvenue s'ouvrent (« Étape 1 sur … » : leur nombre dépend de votre compte) :
 
 - **Bienvenue** : ce que vous ferez sur le portail (regarder et lire, jouer si vous le voulez, tout régler à votre goût). « C'est parti » ouvre la suite.
-- **Une photo et un nom** : c'est comme ça que les autres membres vous verront ; vous y choisissez aussi votre « Langue ».
-- **Tes comptes médias** : reliez votre compte Plex, Jellyfin… ; ce que vous y regardez compte alors dans vos statistiques et votre progression. Choisissez le « Service », saisissez votre « Compte sur ce service » et touchez « Lier le compte ». Si le service vous a donné un « Code de vérification », saisissez-le et touchez « Vérifier ». Vous lierez d'autres comptes plus tard, dans « Comptes médias » (voir [Compte, apparence et confidentialité](portalab://wiki/guide-compte)).
+- **Une photo et un nom** : c'est comme ça que les autres membres vous verront ; vous y choisissez aussi votre « Langue », chacune avec son drapeau. Elle s'applique tout de suite, au reste de l'accueil compris.
+- **Ton code PIN** (pour un profil d'un foyer seulement) : 4 à 6 chiffres, deux fois, pour que personne d'autre du foyer n'ouvre votre profil. Vous pouvez passer cet écran et le choisir plus tard depuis le menu de votre avatar.
+- **Tes comptes médias** : reliez votre compte Plex, Jellyfin… ; ce que vous y regardez compte alors dans vos statistiques et votre progression. Choisissez le « Service », saisissez votre « Compte sur ce service » et touchez « Lier le compte ». Si le service vous a donné un « Code de vérification », saisissez-le et touchez « Vérifier ». Vous lierez d'autres comptes plus tard, dans « Comptes médias » (voir [Compte, apparence et confidentialité](portalab://wiki/guide-compte)). Un profil d'un foyer n'a pas cet écran : il utilise les comptes du titulaire.
+- **Un foyer ?** (pour le titulaire d'un compte, jamais pour un profil) : d'autres personnes partagent votre compte ? « Créer mon foyer » enchaîne « Comment ton foyer gagne », « Ta famille » et « Les règles de chaque profil » ; « Pas de profil » passe la suite. Voir [Mon foyer et ses profils](portalab://wiki/guide-foyer).
 - **Jusqu'où veux-tu jouer ?** : une jauge à quatre crans. Faites glisser le curseur : chaque cran ajoute au précédent.
 
   | Cran | Ce qu'il apporte |
@@ -57,8 +60,9 @@ Si votre portail en a publié, il vous demande de lire et d'accepter ses **condi
   - « L'essentiel » (recommandé, proposé d'office à la première visite : il s'applique si vous passez à la suite sans rien changer) : tout dans le portail ; par e-mail votre compte, vos médias et vos tickets, en un résumé par jour.
   - « Le minimum » : votre compte, vos médias et vos tickets dans le portail ; par e-mail votre compte seulement, une fois par semaine.
 
-  Pour chaque thème, deux interrupteurs : « Dans le portail » et « Par e-mail ». En dessous, « Résumé par e-mail » règle le rythme des e-mails (« Envoyer chaque e-mail », « Résumé quotidien », « Résumé hebdomadaire ») et « Newsletters par e-mail » les canaux d'actualités que vous recevez. Tout se règle aussi en détail dans « Mes notifications » (voir [Notifications](portalab://wiki/guide-notifications)).
-- **Ton style** : clair, sombre ou « Comme mon appareil », et une couleur.
+  Pour chaque thème, deux interrupteurs : « Dans le portail » et « Par e-mail » (un profil d'un foyer n'a que le portail : les e-mails vont au titulaire du compte). En dessous, « Résumé par e-mail » règle le rythme des e-mails (« Envoyer chaque e-mail », « Résumé quotidien », « Résumé hebdomadaire ») et « Newsletters par e-mail » les canaux d'actualités que vous recevez. Tout se règle aussi en détail dans « Mes notifications » (voir [Notifications](portalab://wiki/guide-notifications)).
+- **Ton style** : clair, sombre ou « Comme mon appareil », une couleur parmi les palettes offertes, et la « Taille du texte » (100 % au départ).
+- **Comment marche le portail** : en quelques mots, le menu et la recherche, regarder, lire et écouter, jouer, le wiki, l'aide, la communauté, et ce que rapportent l'XP, les pièces et la contribution (pour un profil en pot commun : ses gains vont aussi au foyer).
 - **Tout est prêt** : tout reste personnalisable (l'interface, le tableau de bord, les notifications et les e-mails, la confidentialité), chaque réglage à un geste. « Faire la visite » lance une visite d'une minute, « Explorer seul » vous laisse découvrir.
 
 Chaque écran peut être passé avec « Passer », et tout se change plus tard : la jauge de jeu et le tableau de bord de votre profil dans [Mes paramètres → Jeu](/settings/play), public ou anonyme dans votre compte, carte « Ma présence dans la communauté ». Vous pouvez revoir ces écrans depuis la page [Visites guidées](/guide), bouton « Écrans de bienvenue ».

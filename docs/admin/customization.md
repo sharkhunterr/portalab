@@ -27,6 +27,16 @@ Members choose their own theme, palette, effects and layout in **Appearance**, a
 
 The **Preview** shows what members will read, on a computer and on a phone, in the language you pick. **Restore Portalab's** brings the defaults back. Members see changes on their next page load.
 
+### System language and country
+
+The same page sets the portal's own **language and country** (« fr-FR »), apart from the interface's:
+
+- the language **media metadata is fetched in** (titles, overviews from TMDB and the services);
+- the country **whose age ratings count**: a title rated « Tous publics » in France is open to all, not 8+. Without a rating for that country, the strictest of the others counts (see [Household profiles](members-and-roles.md#household-profiles));
+- the **default dates and numbers** for members who chose none.
+
+Until you choose, the portal follows the interface language picked in the arrival wizard (and that language's likeliest country). The arrival wizard and the setup assistant ask for it too.
+
 ## Theme studio
 
 **Theme studio**: "Create themes in a few clicks: start from an existing one, adjust it with a live preview, then offer it to members or sell it in the shop."
