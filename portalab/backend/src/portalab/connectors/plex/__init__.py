@@ -248,7 +248,18 @@ class _Library:
         self.connector, self.service = connector, service
 
     async def fetch_image(self, ref: str) -> bytes:
-        return await self.connector.get_bytes(self.service, f"/library/metadata/{image_key(ref)}/thumb")
+        # issue 461: through Plex's photo transcoder — for a poster kept on its original host
+        # (metadata.plex.tv, TMDB), ``/thumb`` answers a redirect to that host, which is refused; the
+        # transcoder fetches and keeps the picture itself and answers it
+        return await self.connector.get_bytes(
+            self.service,
+            "/photo/:/transcode",
+            url=f"/library/metadata/{image_key(ref)}/thumb",
+            width=1000,
+            height=1500,
+            minSize=1,
+            upscale=0,
+        )
 
 
 class _Themes:

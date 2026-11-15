@@ -18,7 +18,7 @@ from typing import Any, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
+from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError, RedirectRefused
 from portalab.capabilities.connector_sdk import (
     Candidate,
     CapabilityBinding,
@@ -194,8 +194,14 @@ class HttpConnector:
     async def get_bytes(self, service: ServiceHandle, path: str, **params: Any) -> bytes:
         try:
             response = await self._http(service).get(
-                path, headers=self.auth_headers(service), params={k: v for k, v in params.items() if v}
+                path,
+                headers=self.auth_headers(service),
+                params={k: v for k, v in params.items() if v is not None and v != ""},
             )
+        except RedirectRefused as exc:
+            # issue 461: the item's file is kept on another host — an answer about this item, not an outage
+            # (never retried, never counted against the service's circuit breaker)
+            raise ProviderNotFound("the item's file is kept on another host") from exc
         except ConnectorHttpError as exc:
             raise ConnectionError(str(exc)) from exc
         if response.status_code in (401, 403):
