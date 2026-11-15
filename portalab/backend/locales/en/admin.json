@@ -2235,5 +2235,9 @@
   "systemLanguage.countryHint": "Its age ratings come first; with none, the strictest of the others.",
   "systemLanguage.save": "Save the system language",
   "systemLanguage.saved": "System language: {tag}",
-  "systemLanguage.error": "The system language was not saved"
+  "systemLanguage.error": "The system language was not saved",
+  "setup.step.household.title": "Households and profiles",
+  "setup.step.household.lead": "A member may make a household: profiles for the people sharing their account, each with its own rules (ages, screen time) and its own progress. Set how many profiles an account may hold, and whether the administration's charts show the profiles on their master's row. Each master chooses their household's economy (a common pot or separate profiles) in « My household ».",
+  "setup.step.household.todo": "Choose how many profiles an account may hold",
+  "setup.link.household": "My household"
 }

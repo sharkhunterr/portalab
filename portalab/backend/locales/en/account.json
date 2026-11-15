@@ -633,5 +633,7 @@
   "visibility.community": "Portal members",
   "visibility.leaderboard": "Leaderboards only",
   "visibility.private": "Only me",
-  "visibility.public": "Everyone"
+  "visibility.public": "Everyone",
+  "features.household.title": "Households",
+  "features.household.hint": "One account, several people: profiles with their own rules and progress."
 }

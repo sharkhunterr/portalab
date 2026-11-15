@@ -16,6 +16,7 @@ export type StepKey =
   | "access"
   | "services"
   | "members"
+  | "household"
   | "media"
   | "communication"
   | "appearance"
@@ -34,13 +35,8 @@ export const STEPS: readonly Step[] = [
   {
     key: "identity",
     icon: "sparkles",
-    settings: [
-      "i18n.systemLanguage", // issue 438: metadata, services and age ratings
-      "i18n.defaultLanguage",
-      "i18n.defaultLocale",
-      "i18n.defaultTimeZone",
-      "notifications.email.portalUrl",
-    ],
+    // issue 453: the system language and country in their own card (above); the time zone and the address
+    settings: ["i18n.defaultTimeZone", "notifications.email.portalUrl"],
   },
   { key: "features", icon: "blocks", links: [["/admin/modules", "modules"]] }, // issue 246
   {
@@ -68,6 +64,14 @@ export const STEPS: readonly Step[] = [
   },
   { key: "services", icon: "server", links: [["/admin/services", "services"]] },
   { key: "members", icon: "users", links: [["/admin/members", "members"]] }, // issue 246
+  {
+    // issue 453: the households — profiles per account, how the charts show them; each master chooses
+    // its own household's economy (a common pot or separate profiles) in « My household »
+    key: "household",
+    icon: "home",
+    settings: ["household.maxProfiles", "economy.household.grouped"],
+    links: [["/household", "household"]],
+  },
   {
     key: "media",
     icon: "film",

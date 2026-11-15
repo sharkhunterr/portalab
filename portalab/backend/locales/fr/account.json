@@ -633,5 +633,7 @@
   "visibility.community": "Les membres du portail",
   "visibility.leaderboard": "Seulement dans les classements",
   "visibility.private": "Moi seulement",
-  "visibility.public": "Tout le monde"
+  "visibility.public": "Tout le monde",
+  "features.household.title": "Foyers",
+  "features.household.hint": "Un compte, plusieurs personnes : des profils avec leurs règles et leur progression."
 }

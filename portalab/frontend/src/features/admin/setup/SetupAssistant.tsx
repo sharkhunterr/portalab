@@ -13,6 +13,7 @@ import { RequestQuotaDefaults } from "../media/RequestQuotasAdmin";
 import { ServiceAccountsPanel } from "../members/ServiceAccountsPanel";
 import { AddServiceWizard } from "../services/ServicesAdmin";
 import { SiteIdentityAdmin } from "../site/SiteIdentityAdmin";
+import { SystemLanguage } from "../site/SystemLanguage";
 import { type Progress, STEPS, type Step, type StepKey, useReadiness, useSetupProgress } from "./progress";
 import "./setup.css";
 
@@ -56,7 +57,12 @@ function StepBody({ step, settings }: { step: Step; settings: SettingItem[] }) {
   const quotas = step.key === "media" && seerr;
   const embedded: Partial<Record<StepKey, ReactNode>> = {
     media: quotas ? <RequestQuotaDefaults /> : null,
-    identity: <SiteIdentityAdmin embedded />,
+    identity: (
+      <>
+        <SystemLanguage />
+        <SiteIdentityAdmin embedded />
+      </>
+    ),
     services: <AddServiceWizard />,
     features: <PortalFeatures />,
     members: <ServiceAccountsPanel />,

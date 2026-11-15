@@ -50,6 +50,8 @@ export const FEATURES: readonly Feature[] = [
     setting: "support.incidents.enabled",
   },
   { key: "status", group: "help", icon: "activity", modules: ["health"] },
+  // issue 453: households — one account, several people (profiles), each with its rules
+  { key: "household", group: "media", icon: "users", modules: ["household"] },
   { key: "ai", group: "help", icon: "bot", modules: ["ai"] },
   { key: "play", group: "play", icon: "trophy", modules: ["gamification", "campaigns", "community"] },
   { key: "shop", group: "play", icon: "store", modules: ["marketplace"], needs: ["play"] },
