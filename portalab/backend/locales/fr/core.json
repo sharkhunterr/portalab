@@ -26,5 +26,6 @@
   "state.maintenance": "En maintenance",
   "state.unauthorized": "Non autorisé",
   "state.no-data": "Pas encore de données",
-  "state.syncing": "Synchronisation"
+  "state.syncing": "Synchronisation",
+  "goHome": "Revenir à l'accueil"
 }

@@ -76,3 +76,18 @@ describe("functional states across themes", () => {
     expect(document.documentElement.style.getPropertyValue("--color-surface")).toBe("#121418");
   });
 });
+
+describe("a page this account may not open", () => {
+  it("leads back to the home page, never a dead end (issue 447)", () => {
+    const { getByRole, unmount } = render(
+      <PreferencesProvider initial={{ theme: "dark" }} policy={{ allowedThemes: ["light", "dark"] }}>
+        <ThemeProvider themes={BUILTIN_THEMES}>
+          <FunctionalState state="unauthorized" onRetry={() => undefined} />
+        </ThemeProvider>
+      </PreferencesProvider>,
+    );
+    expect(getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
+    expect(getByRole("button", { name: "Retry" })).toBeTruthy();
+    unmount();
+  });
+});

@@ -380,6 +380,9 @@ describe("welcome", () => {
     expect(resets.map((body) => JSON.parse(body))).toEqual([{ tastes }]);
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "Your look" })).toBeInTheDocument();
+    // issue 447: the text size, 100 % to begin with
+    expect(screen.getByRole("slider", { name: "Text size" })).toHaveValue("1");
+    expect(screen.getByText("100%")).toBeInTheDocument();
     expect(visibility).toEqual(
       level === null
         ? []

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { AiPanel } from "../features/ai/panel/AiPanel";
 import { AssistantFab } from "../features/ai/panel/AssistantFab";
 import { useAiAssistant } from "../features/ai/panel/useAiAssistant";
@@ -18,6 +18,15 @@ import { ShellSlotsProvider } from "./slots/providers";
 export function ShellLayout() {
   const me = useMe();
   const logout = useLogout();
+  // 032: a household member chosen in another tab — this tab (an administration page, say) becomes its,
+  // from the home page: nothing of the previous member's page stays
+  const account = useRef<string | null>(null);
+  const current = me.data?.id ?? null;
+  useEffect(() => {
+    if (!current) return;
+    if (account.current && account.current !== current) globalThis.location?.assign("/");
+    account.current = current;
+  }, [current]);
   const bell = useNotificationSummary(); // 010 bell — 027: opens the panel
   const notifications = bell.summary;
   const help = useHelpSlot(); // 011 contextual help

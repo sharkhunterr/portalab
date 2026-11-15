@@ -467,5 +467,6 @@
   "pin.again": "The same PIN again",
   "pin.mismatch": "The two PINs differ.",
   "pin.save": "Save my PIN",
-  "pin.saved": "Your PIN is saved. You'll be asked for it when entering your profile."
+  "pin.saved": "Your PIN is saved. You'll be asked for it when entering your profile.",
+  "style.textScale": "Text size"
 }

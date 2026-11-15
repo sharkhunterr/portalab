@@ -467,5 +467,6 @@
   "pin.again": "Le même code à nouveau",
   "pin.mismatch": "Les deux codes sont différents.",
   "pin.save": "Enregistrer mon code",
-  "pin.saved": "Votre code PIN est enregistré. Il vous sera demandé pour entrer dans votre profil."
+  "pin.saved": "Votre code PIN est enregistré. Il vous sera demandé pour entrer dans votre profil.",
+  "style.textScale": "Taille du texte"
 }

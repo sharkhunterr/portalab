@@ -78,6 +78,12 @@ export function FunctionalState({ state, label, detail, asOf, onRetry, retryLabe
           {retryLabel ?? t("core:retry")}
         </button>
       ) : null}
+      {state === "unauthorized" ? (
+        // a page this account may not open (a household profile on an administration page…): never a dead end
+        <a className="functional-state__retry" href="/">
+          {t("core:goHome")}
+        </a>
+      ) : null}
     </div>
   );
 }

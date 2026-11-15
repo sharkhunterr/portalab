@@ -1505,3 +1505,46 @@ button.first-steps__start:focus-visible {
   gap: var(--space-2);
   max-inline-size: 22rem;
 }
+
+/* issue 447: a field never runs past the screen's edges on a phone — the screen scrolls, which clips; room
+   for the focus ring on each side, and fields that may shrink to the screen's width */
+.onboarding-welcome__screen {
+  --onboarding-ring: calc(var(--focus-ring-width, 2px) + var(--focus-ring-offset, 2px));
+  margin-inline: calc(-1 * var(--onboarding-ring));
+  padding-inline: var(--onboarding-ring);
+}
+
+.onboarding-welcome__screen > *,
+.onboarding-welcome__screen .ds-field,
+.onboarding-profile__fields {
+  min-inline-size: 0;
+}
+
+.onboarding-welcome__screen
+  :is(input:not([type="checkbox"], [type="radio"], [type="range"]), select, textarea) {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+/* issue 447: the text size */
+.onboarding-scale__row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.onboarding-scale__row input {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.onboarding-scale__big {
+  font-size: 1.4em;
+}
+
+.onboarding-scale__row output {
+  min-inline-size: 3.5ch;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}

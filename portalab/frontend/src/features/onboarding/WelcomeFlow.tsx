@@ -500,7 +500,9 @@ const MODES: Array<{ key: UiPreferences["colorMode"]; icon: string }> = [
 
 function Style({ titleId, onBack, onNext }: { titleId: string; onBack: () => void; onNext: () => void }) {
   const t = useT();
-  const { preferences, setPreference } = usePreferences();
+  const { preferences, setPreference, policy } = usePreferences();
+  const scaleId = useId();
+  const scale = preferences.textScale ?? 1; // 100 % until the member moves it
   return (
     <>
       <DialogPrimitive.Title id={titleId}>{t("onboarding:style.title")}</DialogPrimitive.Title>
@@ -529,6 +531,27 @@ function Style({ titleId, onBack, onNext }: { titleId: string; onBack: () => voi
       </fieldset>
       <div className="onboarding-palettes">
         <PalettePicker />
+      </div>
+      {/* issue 447: the text size, as in the appearance settings (the administrator's bounds) */}
+      <div className="ds-field onboarding-scale">
+        <label htmlFor={scaleId}>{t("onboarding:style.textScale")}</label>
+        <span className="onboarding-scale__row">
+          <span aria-hidden="true">A</span>
+          <input
+            id={scaleId}
+            type="range"
+            min={policy.textScaleMin}
+            max={policy.textScaleMax}
+            step={0.05}
+            value={scale}
+            aria-valuetext={`${Math.round(scale * 100)}%`}
+            onChange={(event) => setPreference("textScale", Number(event.target.value))}
+          />
+          <span aria-hidden="true" className="onboarding-scale__big">
+            A
+          </span>
+          <output htmlFor={scaleId}>{Math.round(scale * 100)}%</output>
+        </span>
       </div>
       <p className="onboarding-welcome__hint">{t("onboarding:style.more")}</p>
       <Nav onBack={onBack} onNext={onNext} />
