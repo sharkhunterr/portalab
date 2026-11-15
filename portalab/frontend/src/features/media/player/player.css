@@ -305,6 +305,7 @@ html[data-playing="true"] body {
 
 /* --- controls ----------------------------------------------------------------------------------------- */
 .player-controls {
+  position: relative; /* issue 462: the settings' panel is placed on the whole row, never past its edges */
   display: flex;
   align-items: center;
   gap: clamp(0px, 0.6vw, var(--space-2));
@@ -558,14 +559,14 @@ html[data-playing="true"] body {
 
 /* --- settings ----------------------------------------------------------------------------------------- */
 .player-menu-anchor {
-  position: relative;
+  position: static;
 }
 
 .player-menu {
   position: absolute;
   right: 0;
   bottom: calc(100% + 0.5rem);
-  inline-size: min(22rem, calc(100vw - 2rem));
+  inline-size: min(22rem, 100%);
   max-block-size: min(28rem, 60vh);
   overflow: auto;
   padding: var(--space-2);
