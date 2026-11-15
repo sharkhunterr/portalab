@@ -55,6 +55,62 @@
 
 ---
 
+# v1.6.0
+
+## Portalab v1.6.0 — the member guide built into the wiki, and guided tours for the newest features
+
+**Portalab now ships its own member guide**: about twenty pages, in English and French, installed in your
+wiki and kept up to date by every release — each member reads it in their language. **New guided tours**
+walk members through their household, the retro games, their settings and age ratings, and every tour is now
+checked end to end before a release goes out.
+
+![Portalab's member guide in the wiki, read in the member's language](https://raw.githubusercontent.com/sharkhunterr/portalab/v1.6.0/assets/screenshots/wiki.jpg)
+
+### Highlights
+
+- **The member guide, built in** — first steps, the home page, watching and reading, requests, the shop,
+  progression, Mediacards, the community, statistics, the assistant, notifications, support, the household,
+  retro games and an FAQ, with screenshots. While the wiki is on, Portalab installs it and updates it with
+  each release; a page you edit or delete stays as you left it, and a switch removes the guide.
+- **Wiki pages in each member's language** — a translated page and the wiki's navigation follow the
+  member's interface language.
+- **New guided tours** — *My household* for the account's holder (the family dashboard, the household's
+  economy, screen time as an agenda, access requests), *Retro games*, *My settings*, and age ratings in
+  *Watch and read*. A tour is offered only to members who may use its feature.
+- **Dates in your language** — the calendar, its widget and the statistics' month labels follow the
+  interface's language, not the browser's.
+
+### Closed issues
+
+#### Fixed
+
+- `bug` The calendar and a few dates were written in the browser's language (« Novembre 2026 » for a member
+  who chose English); they follow the interface's language
+- `bug` The catalog was wider than a phone's screen and slid sideways
+- `bug` Over the assistant's window, a guided tour's bubble was hidden from screen readers
+- `bug` A translated wiki page and the wiki's navigation always showed the source language
+- `bug` A household profile was offered the tours of features it cannot use
+
+#### New
+
+- `feat` Portalab's member guide in the wiki, in English and French, kept up to date by every release
+- `feat` Guided tours of My household, Retro games and My settings; age ratings in « Watch and read »
+
+#### Documentation and tooling
+
+- `doc` Every guided tour is walked end to end, on a phone and a computer, before each release
+- `doc` The README's and the guide's screenshots taken again in each language
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts).
+- With the wiki module on, the member guide installs itself at the first start; switch it off with
+  *Configuration › Portalab's member guide in the wiki*. Pages of the guide imported by hand before are
+  taken over; your own pages are never touched.
+- Images of versions before 1.6.0 are no longer on Docker Hub: use `1.6.0` or `latest`.
+
+---
+
 # v1.5.0
 
 ## Portalab v1.5.0 — households and profiles, retro games in the portal, age ratings that follow your country
