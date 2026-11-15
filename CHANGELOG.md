@@ -3,6 +3,25 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.6.0](https://github.com/sharkhunterr/portalab/compare/v1.5.0...v1.6.0) (2026-11-15)
+
+
+### Features
+
+* **onboarding:** tours of My household, retro games and My settings; age ratings in Watch and read ([abaffb1](https://github.com/sharkhunterr/portalab/commit/abaffb1c3091e73be0680ef811d523086651816e))
+* **retro:** the emulator's menus and windows in Portalab's look ([f48967d](https://github.com/sharkhunterr/portalab/commit/f48967d9db9b79615dab8b4937227919fca41206))
+* **wiki:** Portalab's member guide shipped in English and French, kept up to date ([44f7a45](https://github.com/sharkhunterr/portalab/commit/44f7a450fe310901606ac280fa9fec16fbae17eb))
+
+
+### Bug Fixes
+
+* **docs:** the real names hidden in screenshots are no longer written in the repository ([d695569](https://github.com/sharkhunterr/portalab/commit/d695569389df590f851fa1962108a6d140f97e9c))
+* **i18n:** dates written outside useFormat follow the interface's language, not the browser's ([3d5955f](https://github.com/sharkhunterr/portalab/commit/3d5955f9288c0dc14ca650a4d7eb866402da254f))
+* **i18n:** the short name's example matches its site name ([742a094](https://github.com/sharkhunterr/portalab/commit/742a0943faab9687bec15febae7df6574fbe6d52))
+* **player:** the settings panel stays inside a phone's screen ([a151e44](https://github.com/sharkhunterr/portalab/commit/a151e444a3999a5c20574ebb3c93eec203a6e498))
+* **plex:** posters through Plex's photo transcoder; a picture kept elsewhere is not an outage ([c2ae9c0](https://github.com/sharkhunterr/portalab/commit/c2ae9c0431745931201dd6946dd806db8eee8b0e))
+* **retro:** no colour written in the code — the emulator keeps its own when the theme gives none ([320d611](https://github.com/sharkhunterr/portalab/commit/320d611b8d29181924c787df91b990b327721a09))
+
 ## [1.5.0](https://github.com/sharkhunterr/portalab/compare/v1.4.1...v1.5.0) (2026-11-15)
 
 
