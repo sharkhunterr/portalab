@@ -28,7 +28,7 @@ from portalab.capabilities.events import (
     default_event_types,
 )
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
-from portalab.capabilities.household import Household
+from portalab.capabilities.household import Household, pot_master
 from portalab.capabilities.notifications import declare_category, default_categories
 from portalab.capabilities.observability import (
     Check,
@@ -187,6 +187,7 @@ class GamificationModule:
         self.pipeline.quests = self.quests
         self.progression = ProgressionService(database, self.levels, self.achievements.unlock_shares)
         self.streaks = Streaks(database, config)
+        self.streaks.pot = lambda user: pot_master(capabilities, user)  # issue 444
         self.pipeline.streaks = self.streaks
         self.pace = Pace(config)
         self.perks = Perks(database, self.streaks, clock=clock, writer=self.writer)

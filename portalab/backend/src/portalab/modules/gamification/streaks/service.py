@@ -4,7 +4,7 @@ multiplied — e.g. x1.5 from 2 days, x2 from 5 days. Provided as a reward modif
 instance ``streak``), so it combines with campaigns under the global boost cap; the day of each counted
 event is recorded at reward time (a missed day breaks the streak). Days follow the economy time zone."""
 
-from collections.abc import Callable, Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -119,6 +119,8 @@ class Streaks:
     def __init__(self, database: Database, config: Callable[[], Any]) -> None:
         self.database = database
         self.config = config
+        # issue 444: a common pot's master of a profile (its day keeps the pot's streak too), else None
+        self.pot: Callable[[UUID], Awaitable[UUID | None]] | None = None
 
     def settings(self) -> StreakConfig:
         return parse_streak(self.config().streak)
@@ -230,12 +232,14 @@ class Streaks:
         config = self.settings()
         if not config.enabled or not counts(config, event):
             return
+        master = await self.pot(user) if self.pot is not None else None
+        day = self._day(event.occurred_at)
         async with self.database.unit_of_work() as uow:
-            await uow.session.execute(
-                insert(StreakDay)
-                .values(user_id=user, day=self._day(event.occurred_at))
-                .on_conflict_do_nothing()
-            )
+            # issue 444: a profile's own streak — and, in a common pot, its master's (the household's) too
+            for member in (user, *([master] if master is not None else [])):
+                await uow.session.execute(
+                    insert(StreakDay).values(user_id=member, day=day).on_conflict_do_nothing()
+                )
 
     async def modifiers_for(
         self, user: UUID, event: Envelope, value: Value, at: datetime

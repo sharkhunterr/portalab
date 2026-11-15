@@ -205,3 +205,34 @@ async def test_the_admin_charts_group_profiles_on_their_master_or_not(
     assert (await rows()) == {str(owner): 10, str(lea): 40}
     await client.put("/api/v1/admin/gamification/household", json={"grouped": True})
     assert (await rows()) == {str(owner): 50}  # dispatched, grouped: Léa's drawn on her master's row
+
+
+async def test_a_profile_keeps_its_own_streak_and_the_pots(gm: GamHarness, app: FastAPI) -> None:
+    """Issue 444: a profile's counted plays keep its own streak; in a common pot they keep its master's (the
+    household's) too, dispatched its own only."""
+    from dataclasses import replace
+    from datetime import timedelta
+
+    gm.module.config = replace(
+        gm.module.config,
+        streak={
+            "enabled": True,
+            "event_types": ["media.played"],
+            "values": ["xp"],
+            "tiers": [{"days": 2, "multiplier": 1.5}],
+        },
+    )
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    start = gm.clock.now() + timedelta(hours=1)
+    await gm.emit(lea, at=start)
+    await gm.emit(lea, at=start + timedelta(days=1))
+    later = start + timedelta(days=1)
+    assert (await gm.module.streaks.current(lea, later))["days"] == 2  # its own
+    assert (await gm.module.streaks.current(owner, later))["days"] == 2  # the pot's
+
+    await households(app).set_economy(Principal(user_id=owner), "dispatch")
+    await gm.emit(lea, at=start + timedelta(days=2))
+    after = start + timedelta(days=2)
+    assert (await gm.module.streaks.current(lea, after))["days"] == 3
+    assert (await gm.module.streaks.current(owner, after))["today"] is False  # its master's no longer
