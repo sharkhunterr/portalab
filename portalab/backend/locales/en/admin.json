@@ -1723,7 +1723,7 @@
   "site.resetConfirm": "The name « {name} », its slogan, mark and « Coins » come back; the logo and icon are removed.",
   "site.save": "Save",
   "site.saved": "Saved — members see it on their next page load.",
-  "site.shortName.hint": "Up to 12 characters: on phones and on the home screen (e.g. « XP » for « Starport »).",
+  "site.shortName.hint": "Up to 12 characters: on phones and on the home screen (e.g. « SP » for « Starport »).",
   "site.shortName.label": "Short name",
   "site.tagline.hint": "Under the name on the sign-in page. Empty: Portalab's slogan.",
   "site.tagline.label": "Slogan · {language}",

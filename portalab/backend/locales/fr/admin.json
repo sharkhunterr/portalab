@@ -1723,7 +1723,7 @@
   "site.resetConfirm": "Le nom « {name} », son slogan, son symbole et les « Coins » reviennent ; le logo et l'icône sont retirés.",
   "site.save": "Enregistrer",
   "site.saved": "Enregistré — les membres le voient au prochain chargement de page.",
-  "site.shortName.hint": "12 caractères au plus : sur téléphone et sur l'écran d'accueil (par exemple « XP » pour « Starport »).",
+  "site.shortName.hint": "12 caractères au plus : sur téléphone et sur l'écran d'accueil (par exemple « SP » pour « Starport »).",
   "site.shortName.label": "Diminutif",
   "site.tagline.hint": "Sous le nom, sur la page de connexion. Vide : le slogan de Portalab.",
   "site.tagline.label": "Slogan · {language}",
