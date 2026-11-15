@@ -1,6 +1,7 @@
 import { type CSSProperties, type KeyboardEvent, useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { useT } from "../../i18n/hooks/useT";
 import { useShellStrings } from "../strings";
 import type { NavSection } from "./NavigationProvider";
@@ -399,7 +400,7 @@ export function MastheadNav({ sections }: { sections: readonly NavSection[] }) {
         <span className="shell-masthead__edition">{t("shell:masthead.edition")}</span>
         <span className="shell-masthead__title">{t("shell:masthead.title")}</span>
         <span className="shell-masthead__date">
-          {today.toLocaleDateString(undefined, {
+          {today.toLocaleDateString(uiLocale(), {
             weekday: "long",
             day: "numeric",
             month: "long",

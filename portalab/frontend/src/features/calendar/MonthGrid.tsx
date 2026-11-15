@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import "./month-grid.css";
+import { uiLocale } from "../../i18n/format/uiLocale";
 
 /**
  * Month grid shared by the calendar widget and the calendar page (027): each kind has its colour **and**
@@ -147,7 +148,7 @@ export function MonthGrid({
   const labels =
     weekdayLabels ??
     (days.slice(0, 7).map((day) =>
-      new Date(`${day}T12:00:00Z`).toLocaleDateString(undefined, {
+      new Date(`${day}T12:00:00Z`).toLocaleDateString(uiLocale(), {
         weekday: compact ? "narrow" : "short",
         timeZone: "UTC",
       }),
@@ -181,7 +182,7 @@ export function MonthGrid({
                   data-outside={month && day.slice(0, 7) !== month.slice(0, 7) ? true : undefined}
                   data-busy={count ? true : undefined}
                   aria-pressed={picked === day}
-                  aria-label={`${date.toLocaleDateString(undefined, { day: "numeric", month: "long", timeZone: "UTC" })}${
+                  aria-label={`${date.toLocaleDateString(uiLocale(), { day: "numeric", month: "long", timeZone: "UTC" })}${
                     count ? ` · ${t("calendar:count", { count })}` : ""
                   }`}
                   onClick={() => onPick?.(picked === day ? null : day)}

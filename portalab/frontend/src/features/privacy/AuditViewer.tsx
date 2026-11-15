@@ -5,6 +5,7 @@ import { AdminPage, AdminSection, AdminTable, StatusBadge } from "../../design-s
 import { Button } from "../../design-system/components/Button";
 import { Icon } from "../../design-system/components/Icon";
 import { FunctionalState } from "../../design-system/FunctionalState";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { stateForError } from "../../state/regions";
 import { privacyStrings, usePrivacyStrings } from "./strings";
 
@@ -92,7 +93,9 @@ export function AuditViewer() {
                 key: "when",
                 header: t.auditWhen,
                 render: (item) => (
-                  <time dateTime={item.occurred_at}>{new Date(item.occurred_at).toLocaleString()}</time>
+                  <time dateTime={item.occurred_at}>
+                    {new Date(item.occurred_at).toLocaleString(uiLocale())}
+                  </time>
                 ),
               },
               {

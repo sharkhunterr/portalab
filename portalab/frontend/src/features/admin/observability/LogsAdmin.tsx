@@ -9,6 +9,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import "../admin.css";
 import "./logs.css";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 
 /**
  * The log journal (issue 158, Monitoring): the server's and the worker's lines — already redacted by the
@@ -166,7 +167,7 @@ function Line({
   onToggle: () => void;
   onCorrelation: (id: string) => void;
 }) {
-  const time = new Date(line.at).toLocaleTimeString(undefined, {
+  const time = new Date(line.at).toLocaleTimeString(uiLocale(), {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",

@@ -10,6 +10,7 @@ import { type CalendarItem, useCalendar, useReminderActions, useReminders } from
 import "./calendar.css";
 import { Icon } from "../../design-system/components/Icon";
 import { PageHeader } from "../../design-system/components/PageHeader";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { CATEGORY_ICONS, type CalEntry, CalendarLegend, categoryOf, MonthGrid } from "./MonthGrid";
 
 /**
@@ -209,7 +210,7 @@ export function CalendarPage() {
             </Button>
           </div>
           <h3 className="calendar-page__period" aria-live="polite">
-            {new Date(`${anchor}T12:00:00Z`).toLocaleDateString(undefined, {
+            {new Date(`${anchor}T12:00:00Z`).toLocaleDateString(uiLocale(), {
               month: "long",
               year: "numeric",
               timeZone: "UTC",

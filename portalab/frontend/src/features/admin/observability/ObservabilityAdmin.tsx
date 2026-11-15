@@ -13,6 +13,7 @@ import {
 } from "../../../design-system/admin/AdminKit";
 import { Button } from "../../../design-system/components/Button";
 import { TextField } from "../../../design-system/components/Field";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 import { useStrings } from "../../../i18n/hooks/useStrings";
 import { DataRegion } from "../../../state/regions";
 import { useHasPermission } from "../../authz/useMyPermissions";
@@ -207,7 +208,9 @@ function Overview() {
                     </StatusBadge>
                     <span className="admin-list__main">
                       <strong>{problem.title}</strong>
-                      <span className="admin-muted">{new Date(problem.since).toLocaleString()}</span>
+                      <span className="admin-muted">
+                        {new Date(problem.since).toLocaleString(uiLocale())}
+                      </span>
                     </span>
                     {problem.diagnostics.length > 0 ? (
                       <fieldset className="admin-list__actions obs-diagnostics" aria-label={s.diagnostics}>

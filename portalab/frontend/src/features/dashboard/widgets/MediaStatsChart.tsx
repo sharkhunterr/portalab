@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BarsChart, DonutChart, LinesChart } from "../../../design-system/charts/Charts";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMeasures } from "../../media/insights/api";
@@ -51,7 +52,7 @@ export default function MediaStatsChart({
     metric === "time" ? measures.duration(n * 3600) : t("media:insights.plays", { count: n });
   // the axis keeps its dates short: the day and the month (the whole date in the tooltip)
   const label = (iso: string) => {
-    if (unit === "month") return new Date(iso).toLocaleDateString(undefined, { month: "short" });
+    if (unit === "month") return new Date(iso).toLocaleDateString(uiLocale(), { month: "short" });
     const { day, month } = format.dayMonth(iso);
     return `${day} ${month}`;
   };

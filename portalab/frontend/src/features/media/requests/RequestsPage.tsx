@@ -47,6 +47,7 @@ import "../../admin/admin.css";
 import "../media.css";
 import "../insights/insights.css"; // 027: the poster rows are the statistics' own
 import "./requests.css";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 import { LockedStat } from "../insights/LockedStat";
 import { AcquisitionView } from "./Acquisition";
 import { AudienceSummary, AudienceTitles, Leaders } from "./Audience";
@@ -189,7 +190,7 @@ function OverTime({ data }: { data: RequestInsights }) {
   }
   const label = (iso: string) =>
     data.timeline.unit === "month"
-      ? new Date(iso).toLocaleDateString(undefined, { month: "short", year: "2-digit" })
+      ? new Date(iso).toLocaleDateString(uiLocale(), { month: "short", year: "2-digit" })
       : format.date(iso, "short");
   return (
     <ResponsiveContainer width="100%" height={220}>

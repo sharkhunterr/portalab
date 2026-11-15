@@ -13,6 +13,7 @@ import {
 } from "../../calendar/MonthGrid";
 import { registerWidgetComponent, type WidgetProps } from "./registry";
 import "./calendar.css";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 
 /**
  * Calendar widget (027): the month grid — each kind with its colour and icon, what lasts several days as a
@@ -54,7 +55,7 @@ function WeekStrip({ today, entries }: { today: string; entries: CalEntry[] }) {
         const kinds = [...new Set(entries.filter((e) => e.date <= iso && e.end >= iso).map(categoryOf))];
         return (
           <span key={iso} className="cal-week__day" data-today={iso === today || undefined}>
-            <small>{day.toLocaleDateString(undefined, { weekday: "narrow", timeZone: "UTC" })}</small>
+            <small>{day.toLocaleDateString(uiLocale(), { weekday: "narrow", timeZone: "UTC" })}</small>
             <strong>{day.getUTCDate()}</strong>
             <span className="cal-week__dots" aria-hidden="true">
               {kinds.slice(0, 3).map((kind) => (
@@ -94,7 +95,7 @@ function MonthCalendar({ payload, rows }: WidgetProps) {
     <div className="cal-widget">
       <div className="cal-widget__head">
         <p className="cal-widget__month">
-          {new Date(`${month.slice(0, 7)}-01T12:00:00Z`).toLocaleDateString(undefined, {
+          {new Date(`${month.slice(0, 7)}-01T12:00:00Z`).toLocaleDateString(uiLocale(), {
             month: "long",
             year: "numeric",
             timeZone: "UTC",
@@ -117,7 +118,7 @@ function MonthCalendar({ payload, rows }: WidgetProps) {
       <CalendarLegend entries={entries} />
       <p className="cal-widget__heading">
         {picked
-          ? new Date(`${picked}T12:00:00Z`).toLocaleDateString(undefined, {
+          ? new Date(`${picked}T12:00:00Z`).toLocaleDateString(uiLocale(), {
               dateStyle: "full",
               timeZone: "UTC",
             })

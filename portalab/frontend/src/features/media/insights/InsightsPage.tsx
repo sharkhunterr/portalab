@@ -36,6 +36,7 @@ import { CastingTab, PlaybackTab, ProductionTab, ProfileTab, RequestsTab } from 
 import { LockedStat } from "./LockedStat";
 import "../../admin/admin.css";
 import "./insights.css";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 
 /**
  * Media statistics (027 — « like Telemetra, but better »): time spent, plays, titles and active days with
@@ -89,7 +90,7 @@ function Timeline({ data }: { data: Insights }) {
   }));
   const label = (iso: string) =>
     data.timeline.unit === "month"
-      ? new Date(iso).toLocaleDateString(undefined, { month: "short", year: "2-digit" })
+      ? new Date(iso).toLocaleDateString(uiLocale(), { month: "short", year: "2-digit" })
       : format.date(iso, "short");
   const toggle = (
     <fieldset className="insights-toggle">

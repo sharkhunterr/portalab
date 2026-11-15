@@ -15,6 +15,7 @@ import { CommunityPresence } from "./CommunityPresence";
 import { FormMessage } from "./FormMessage";
 import { ME_KEY, type Me } from "./useAuth";
 import "../community/profile/profile.css";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { useHouseholdSession } from "../household/api";
 import { openWelcome } from "../onboarding/api";
 import { passwordRuleMessage } from "./passwordRules";
@@ -256,7 +257,7 @@ export function DeletionSection() {
         {mutation.data?.deletion_due_at ? (
           <FormMessage kind="success">
             {t("account:deletion.requested", {
-              until: new Date(mutation.data.deletion_due_at).toLocaleString(),
+              until: new Date(mutation.data.deletion_due_at).toLocaleString(uiLocale()),
             })}
           </FormMessage>
         ) : null}

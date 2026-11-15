@@ -5,6 +5,7 @@ import { Dialog } from "../../design-system/components/Overlays";
 import { ApiError } from "../../state/regions";
 import { useSignInTerms } from "../terms/api";
 import "../content/content.css";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { FormMessage } from "./FormMessage";
 import { authStrings, useAuthStrings } from "./strings";
 import { isMfaRequired, useLogin, useLoginMfa } from "./useAuth";
@@ -18,7 +19,7 @@ export function loginErrorMessage(error: unknown, t = authStrings): string {
   if (error.code === "auth.account_unavailable") {
     const until = error.extensions.deletion_cancellable_until;
     return typeof until === "string"
-      ? t.pendingDeletion(new Date(until).toLocaleString())
+      ? t.pendingDeletion(new Date(until).toLocaleString(uiLocale()))
       : t.accountUnavailable;
   }
   if (error.status === 503) return t.unavailable;

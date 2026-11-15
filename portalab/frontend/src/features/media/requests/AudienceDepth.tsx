@@ -1,4 +1,5 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { useMeasures } from "../insights/api";
@@ -21,7 +22,7 @@ export function AudienceDepth({ data }: { data: Depth }) {
   const ratio = (value: number | null) => (value === null ? "—" : format.number(value));
   const label = (iso: string) =>
     data.over_time.unit === "month"
-      ? new Date(iso).toLocaleDateString(undefined, { month: "short", year: "2-digit" })
+      ? new Date(iso).toLocaleDateString(uiLocale(), { month: "short", year: "2-digit" })
       : format.date(iso, "short");
   return (
     <div className="requests-depth">

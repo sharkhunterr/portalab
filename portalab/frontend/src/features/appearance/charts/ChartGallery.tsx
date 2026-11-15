@@ -24,6 +24,7 @@ import {
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import "./chart-gallery.css";
+import { uiLocale } from "../../../i18n/format/uiLocale";
 
 /**
  * The chart gallery (issue 117): every shape of the chart kit, drawn in the current theme with sample data,
@@ -31,7 +32,7 @@ import "./chart-gallery.css";
  */
 // a week from Monday, named in the member's language
 const DAYS = Array.from({ length: 7 }, (_, i) =>
-  new Date(Date.UTC(2026, 9, 12 + i, 12)).toLocaleDateString(undefined, { weekday: "short" }),
+  new Date(Date.UTC(2026, 9, 12 + i, 12)).toLocaleDateString(uiLocale(), { weekday: "short" }),
 );
 const WEEK = DAYS.map((day, i) => ({
   day,

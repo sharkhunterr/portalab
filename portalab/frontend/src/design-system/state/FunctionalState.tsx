@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { uiLocale } from "../../i18n/format/uiLocale";
 import { useT } from "../../i18n/hooks/useT";
 import { useTheme } from "../themes/ThemeProvider";
 import { DEFAULT_ICONS, type FunctionalStateName, ICON_PATHS, isFunctionalState } from "./stateMap";
@@ -69,7 +70,11 @@ export function FunctionalState({ state, label, detail, asOf, onRetry, retryLabe
       <span className="functional-state__label">{text}</span>
       {detail ? <span className="functional-state__detail">{detail}</span> : null}
       {asOf ? (
-        <time className="functional-state__as-of" dateTime={asOf.toISOString()} title={asOf.toLocaleString()}>
+        <time
+          className="functional-state__as-of"
+          dateTime={asOf.toISOString()}
+          title={asOf.toLocaleString(uiLocale())}
+        >
           {relative(asOf)}
         </time>
       ) : null}
