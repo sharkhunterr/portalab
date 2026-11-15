@@ -98,7 +98,9 @@ class LevelRewards:
                 gifts = self.capabilities.system_providers(GIFTS)
                 if gifts:
                     try:
-                        offered = await gifts[0].provider.gift(user, tier.product, f"level {tier.level}")
+                        offered = await gifts[0].provider.gift(  # once per level, however often reached
+                            user, tier.product, f"level {tier.level}", key=f"level:{user}:{tier.level}"
+                        )
                         given += 1 if offered else 0
                     except Exception:
                         log.warning("level reward product not offered")

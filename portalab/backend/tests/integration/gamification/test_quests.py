@@ -227,7 +227,7 @@ async def test_a_quest_gives_a_booster_and_counts_only_who_wears_the_interface(g
     worn: dict[str, tuple[str, str]] = {}
 
     class Gifts:
-        async def gift(self, user: Any, product_key: str, reason: str) -> bool:
+        async def gift(self, user: Any, product_key: str, reason: str, key: str | None = None) -> bool:
             given.append((str(user), product_key))
             return True
 

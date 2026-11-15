@@ -8,6 +8,7 @@
 
 Nothing here changes a connected service."""
 
+import hashlib
 import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
@@ -401,3 +402,28 @@ async def refuse_profile(capabilities: Any, actor: Principal | None, user: UUID 
         owner = None
     if owner is not None:
         raise ProfileNoProjects()
+
+
+async def pot_master(capabilities: Any, user: UUID) -> UUID | None:
+    """Issue 443: the master of a profile whose household shares a common pot — what the profile gets (items
+    too) is duplicated on it; ``None`` for anyone else (a master, a dispatched profile, no household)."""
+    try:
+        providers = capabilities.system_providers(CAPABILITY)
+        if not providers:
+            return None
+        household = providers[0].provider
+        owner = await household.owner_of(user)
+        if owner is None:
+            return None
+        economy = getattr(household, "economy_of", None)
+        if economy is not None and await economy(user) != "pot":
+            return None
+        return owner  # type: ignore[no-any-return]
+    except Exception:
+        return None
+
+
+def copy_key(profile: UUID, key: str) -> str:
+    """Issue 443: the idempotency key of a master's copy of a profile's item — once, and found again by its
+    prefix (``household:<profile>:``) when the pot is given back."""
+    return f"household:{profile}:{hashlib.sha256(key.encode('utf-8')).hexdigest()[:40]}"

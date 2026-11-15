@@ -1011,3 +1011,37 @@ async def test_my_mediacards_on_the_dashboard(database: Database, tmp_path: Any)
     # a member who plays without the cards: nothing, never an error
     await module.packs.give(other, "trial", None, "t1")
     assert (await load(other)).state == "no-data"
+
+
+async def test_a_common_pots_packs_are_its_masters_too(database: Database, monkeypatch: Any) -> None:
+    """Issue 443: a pack given to a common pot's profile gives its master one too (once; a shop's comes with
+    the master's copy of the booster); dispatched, the master's unopened copies go; pooled again, back."""
+    from portalab.modules.cards import packs as packs_module
+    from portalab.modules.cards.models import Pack
+
+    profile, master = uuid4(), uuid4()
+    async with database.unit_of_work() as uow:
+        for user in (profile, master):
+            await uow.session.execute(INSERT_USER, {"id": user, "login": f"u{user.hex[:8]}"})
+
+    async def pot_master(_: Any, user: UUID) -> UUID | None:
+        return master if user == profile else None
+
+    monkeypatch.setattr(packs_module, "pot_master", pot_master)
+    packs = Packs(database, new_registry(), rng=random.Random(3))  # noqa: S311 — deterministic test data
+
+    async def keys(user: UUID) -> list[str]:
+        async with database.session() as session:
+            return list(await session.scalars(select(Pack.idempotency_key).where(Pack.user_id == user)))
+
+    await packs.give(profile, "watched", None, "content:1")
+    await packs.give(profile, "watched", None, "content:1")  # once
+    await packs.give(profile, "shop", None, "shop:ownership")  # the master's booster copy brings its own
+    assert len(await keys(profile)) == 2
+    (copied,) = await keys(master)
+    assert copied.startswith(f"household:{profile}:")
+
+    await packs.regroup(master, [profile], pot=False)
+    assert await keys(master) == []  # unopened: given back
+    await packs.regroup(master, [profile], pot=True)
+    assert await keys(master) == [copied]  # the same pack again, the shop's left to its booster

@@ -36,7 +36,7 @@ class Gifts:
         self.ok = ok
         self.given: list[tuple[UUID, str]] = []
 
-    async def gift(self, user: UUID, product_key: str, reason: str) -> bool:
+    async def gift(self, user: UUID, product_key: str, reason: str, key: str | None = None) -> bool:
         self.given.append((user, product_key))
         return self.ok
 

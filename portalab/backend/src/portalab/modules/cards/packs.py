@@ -19,10 +19,11 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
+from portalab.capabilities.household import copy_key, pot_master
 from portalab.capabilities.marketplace import ActivationResult, OwnershipView
 from portalab.capabilities.media_core import CARD_SOURCES
 from portalab.capabilities.registry import CapabilityRegistry
@@ -279,7 +280,51 @@ class Packs:
                         acquired_at=now,
                     )
                 )
+        if not key.startswith(("shop:", "household:")):
+            # issue 443: a common pot's profile — its master gets a pack too (a shop's comes with the master's
+            # copy of the booster it bought)
+            master = await pot_master(self.capabilities, user)
+            if master is not None:
+                await self.give(master, source, set_key, copy_key(user, key), detail, among, size, guarantee)
         return pack_id
+
+    async def regroup(self, owner: UUID, profiles: Sequence[UUID], pot: bool) -> None:
+        """Issue 443: to a common pot, each profile's packs (but the shop's: the master's copies of the
+        boosters bring theirs) are given to its master once; to dispatched profiles, the master's unopened
+        copies go."""
+        if pot:
+            async with self.database.session() as session:
+                packs = list(
+                    (
+                        await session.scalars(
+                            select(Pack).where(
+                                Pack.user_id.in_(profiles),
+                                ~Pack.idempotency_key.like("shop:%"),
+                                ~Pack.idempotency_key.like("household:%"),
+                            )
+                        )
+                    ).all()
+                )
+            for pack in packs:
+                await self.give(
+                    owner,
+                    pack.source,
+                    pack.set_key,
+                    copy_key(pack.user_id, pack.idempotency_key),
+                    pack.detail,
+                )
+            return
+        prefixes = [f"household:{profile}:%" for profile in profiles]
+        async with self.database.unit_of_work() as uow:
+            unopened = select(Pack.id).where(
+                Pack.user_id == owner,
+                Pack.opened_at.is_(None),
+                or_(*(Pack.idempotency_key.like(prefix) for prefix in prefixes)),
+            )
+            ids = list((await uow.session.scalars(unopened)).all())
+            if ids:
+                await uow.session.execute(delete(Copy).where(Copy.pack_id.in_(ids)))
+                await uow.session.execute(delete(Pack).where(Pack.id.in_(ids)))
 
     def _signed(self, variant: str, signature: str | None, may: bool) -> str:
         """Issue 296: a booster's signature frame — on a card in its base frame (foil or not), never over an

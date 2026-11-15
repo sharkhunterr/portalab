@@ -11,6 +11,7 @@ from sqlalchemy import update
 from portalab.capabilities.administration import BACKUP_LEFT_OUT_CAPABILITY
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import WidgetRegistry, default_widgets
+from portalab.capabilities.economy import HOUSEHOLD_POT
 from portalab.capabilities.events import (
     ConsumerRegistry,
     EventTypeRegistry,
@@ -130,6 +131,9 @@ class CardsModule:
         for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
             if not any(p.instance_ref == "cards" for p in self.capabilities.system_providers(capability)):
                 self.capabilities.provide(capability, participant, instance_ref="cards", owner=OWNER)
+        if not any(p.instance_ref == "cards" for p in self.capabilities.system_providers(HOUSEHOLD_POT)):
+            # issue 443: a master's switch of its household economy, the card packs' side
+            self.capabilities.provide(HOUSEHOLD_POT, self.packs, instance_ref="cards", owner=OWNER)
         # issue 234: the shop's boosters of cards (a genre, an edition…), sealed in the member's inventory
         if self.product_types.get(CARD_BOOSTER) is None:
             self.product_types.register(

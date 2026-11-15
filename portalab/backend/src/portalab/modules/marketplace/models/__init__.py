@@ -317,6 +317,8 @@ class ReserveItem(MarketplaceBase):
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     received_at: Mapped[datetime | None] = mapped_column(TZDateTime)  # the last one that came in
+    # issue 443: of a master's quantity, how many came from its profiles' common pot (given back on dispatch)
+    household_copies: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
 
 class ReserveSeen(MarketplaceBase):

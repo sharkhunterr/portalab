@@ -21,6 +21,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.economy import PERKS, InsufficientCoins
+from portalab.capabilities.household import pot_master
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.visuals import VISUAL_POOL, pack_products
@@ -341,9 +342,14 @@ class Openings:
                 session.add(opening)
                 await session.flush()
                 await self._opened(session, actor, user, booster.key, opening, drawn, now)
+                # issue 443: a common pot's profile — what it draws is its master's too, unless it opened a
+                # sealed booster (its master holds a copy of that booster to open)
+                master = None if sealed else await pot_master(self.capabilities, user)
                 for index, card in enumerate(drawn):
                     if card.outcome == "reserve":
                         await self._stock(session, user, card.product.id, 1)
+                        if master is not None:
+                            await self._stock(session, master, card.product.id, 1, copied=True)
                     elif card.outcome == "new":
                         ownership = await self._grant(
                             session,
@@ -375,7 +381,7 @@ class Openings:
             await self._credit(user, refund, booster.key, str(opening.id))
         metrics.increment("marketplace.boosters_opened")
         for ownership_id in granted:
-            await self.activation.activate(ownership_id)
+            await self.activation.activate(ownership_id, household=not sealed)
         return opening, drawn
 
     async def _opened(
@@ -450,15 +456,28 @@ class Openings:
         ]
         return opening, drawn
 
-    async def _stock(self, session: AsyncSession, user: UUID, product: UUID, delta: int) -> None:
+    async def _stock(
+        self, session: AsyncSession, user: UUID, product: UUID, delta: int, *, copied: bool = False
+    ) -> None:
         now = utc_now(self.clock)
         received = {"received_at": now} if delta > 0 else {}  # what came in, not what was used
+        copies = delta if copied else 0  # issue 443: a common pot's, given back on dispatch
         statement = insert(ReserveItem).values(
-            user_id=user, product_id=product, quantity=delta, updated_at=now, **received
+            user_id=user,
+            product_id=product,
+            quantity=delta,
+            updated_at=now,
+            household_copies=copies,
+            **received,
         )
         statement = statement.on_conflict_do_update(
             index_elements=[ReserveItem.user_id, ReserveItem.product_id],
-            set_={"quantity": ReserveItem.quantity + delta, "updated_at": now, **received},
+            set_={
+                "quantity": ReserveItem.quantity + delta,
+                "household_copies": ReserveItem.household_copies + copies,
+                "updated_at": now,
+                **received,
+            },
         )
         await session.execute(statement)
 

@@ -17,6 +17,7 @@ from portalab.capabilities.ai import AIToolRegistry, default_ai_tools
 from portalab.capabilities.community import SectionRegistry, default_sections
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.dashboard import ENTITLEMENTS, WidgetRegistry, default_widgets
+from portalab.capabilities.economy import HOUSEHOLD_POT
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.identity_directory import ACCOUNTS as IDENTITY_ACCOUNTS
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
@@ -61,6 +62,7 @@ from portalab.modules.marketplace.entitlements.reader import (
 from portalab.modules.marketplace.events import register_event_types
 from portalab.modules.marketplace.funding.service import Fundings
 from portalab.modules.marketplace.grants.service import Grants
+from portalab.modules.marketplace.household_pot import MarketplacePot
 from portalab.modules.marketplace.integrations import (
     FEATURED_WIDGET,
     RESERVE_WIDGET,
@@ -99,9 +101,10 @@ class MarketplaceGifts:
     def __init__(self, grants: Any) -> None:
         self.grants = grants
 
-    async def gift(self, user: UUID, product_key: str, reason: str) -> bool:
+    async def gift(self, user: UUID, product_key: str, reason: str, key: str | None = None) -> bool:
+        """``key``: once per key (a level's reward is offered once, however often the level is reached)."""
         try:
-            await self.grants.grant(Principal(channel="system"), user, product_key, reason)
+            await self.grants.grant(Principal(channel="system"), user, product_key, reason, key=key)
         except Exception:
             return False  # unknown product, or already owned
         return True
@@ -162,6 +165,7 @@ class MarketplaceModule:
         self.eligibility = Eligibility(capabilities)
         self.availability = Availability(database, audit, clock=clock)
         self.activation = Activation(database, events, product_types, config, clock=clock)
+        self.activation.capabilities = capabilities  # issue 443: a common pot's copies
         self.purchases = Purchases(
             database,
             events,
@@ -318,6 +322,10 @@ class MarketplaceModule:
             self.capabilities.provide(GIFTS, gifts, instance_ref=INSTANCE, owner=OWNER)
         if not self.capabilities.system_providers(ENTITLEMENTS):
             self.capabilities.provide(ENTITLEMENTS, self.entitlements, instance_ref=INSTANCE, owner=OWNER)
+        if not any(p.instance_ref == INSTANCE for p in self.capabilities.system_providers(HOUSEHOLD_POT)):
+            # issue 443: a master's switch of its household economy, the items' side
+            pot = MarketplacePot(self.database, self.activation, clock=self.clock)
+            self.capabilities.provide(HOUSEHOLD_POT, pot, instance_ref=INSTANCE, owner=OWNER)
         if not self.capabilities.system_providers(THEME_ENTITLEMENTS):
             self.capabilities.provide(
                 THEME_ENTITLEMENTS, ThemeEntitlementsReader(self.database), instance_ref=INSTANCE, owner=OWNER

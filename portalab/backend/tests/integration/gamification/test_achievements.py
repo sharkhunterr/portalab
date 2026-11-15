@@ -136,7 +136,7 @@ async def test_some_achievements_unlock_cosmetics(gm: GamHarness) -> None:
         def __init__(self) -> None:
             self.given: list[tuple[Any, str]] = []
 
-        async def gift(self, user: Any, product_key: str, reason: str) -> bool:
+        async def gift(self, user: Any, product_key: str, reason: str, key: str | None = None) -> bool:
             self.given.append((user, product_key))
             return True
 

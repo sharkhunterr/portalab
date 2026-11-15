@@ -84,7 +84,7 @@ class Gifts(Protocol):
     """027: offer a product to a member on the portal's behalf (a level reward…) — ``False`` when the
     product is unknown or already owned; never charged."""
 
-    async def gift(self, user: UUID, product_key: str, reason: str) -> bool: ...
+    async def gift(self, user: UUID, product_key: str, reason: str, key: str | None = None) -> bool: ...
 
 
 GIFTS_SPEC = CapabilitySpec(

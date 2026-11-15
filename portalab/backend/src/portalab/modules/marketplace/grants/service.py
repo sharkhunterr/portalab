@@ -36,9 +36,24 @@ class Grants:
         self.clock = clock
 
     async def grant(
-        self, actor: Principal, user: UUID, product_key: str, reason: str, expires_at: datetime | None = None
+        self,
+        actor: Principal,
+        user: UUID,
+        product_key: str,
+        reason: str,
+        expires_at: datetime | None = None,
+        *,
+        key: str | None = None,
     ) -> Ownership:
         now = utc_now(self.clock)
+        idempotency = f"grant:{key}"[:200] if key else f"grant:{uuid4()}"
+        if key:
+            async with self.database.session() as session:
+                given = await session.scalar(
+                    select(Ownership).where(Ownership.idempotency_key == idempotency)
+                )
+            if given is not None:
+                raise AlreadyOwned("This gift was offered already.")
         if expires_at is not None and expires_at <= now:
             raise ValidationFailed("A grant expires in the future.", code="marketplace.invalid_grant")
         async with self.database.unit_of_work() as uow:
@@ -64,7 +79,7 @@ class Grants:
                 product_version=product.current_version,
                 price_paid=0,
                 conditions_snapshot=[],
-                idempotency_key=f"grant:{uuid4()}",
+                idempotency_key=idempotency,
                 state="activation_failed",
                 configuration={},
                 acquired_at=now,

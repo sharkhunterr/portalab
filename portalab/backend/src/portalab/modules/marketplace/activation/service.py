@@ -9,12 +9,15 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 
+from portalab.capabilities.household import copy_key, pot_master
 from portalab.capabilities.marketplace import OwnershipView, ProductTypeRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.errors import Conflict, NotFound
 from portalab.core.event_port import EventPublisher, SubjectRef
+from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
 from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
 from portalab.modules.marketplace.observability import log, metrics
@@ -41,6 +44,7 @@ class Activation:
         self.types = types
         self.config = config
         self.clock = clock
+        self.capabilities: Any = None  # issue 443: wired by the module (a common pot's copies)
 
     async def view(self, ownership: Ownership) -> OwnershipView:
         async with self.database.session() as session:
@@ -56,7 +60,7 @@ class Activation:
             dict(ownership.configuration),
         )
 
-    async def activate(self, ownership_id: UUID) -> Ownership:
+    async def activate(self, ownership_id: UUID, *, household: bool = True) -> Ownership:
         async with self.database.session() as session:
             ownership = await session.get(Ownership, ownership_id)
         if ownership is None:
@@ -95,7 +99,82 @@ class Activation:
                     dedup_key=f"marketplace.unlock:{row.id}",
                 )
         metrics.increment(f"marketplace.activation.{state}")
+        if household and row.state in USABLE:
+            await self.household_copy(row)
         return row
+
+    async def household_copy(self, ownership: Ownership) -> UUID | None:
+        """Issue 443: a profile's item in a common pot — the same for its master, once, activated as its own
+        (a booster sealed in its reserve, a perk, a card pack…). Never a community project, never what a
+        profile took from its reserve (its master got the reserve item already), never a copy of a copy."""
+        if self.capabilities is None or ownership.idempotency_key.startswith(("household:", "reserve:")):
+            return None
+        master = await pot_master(self.capabilities, ownership.user_id)
+        if master is None:
+            return None
+        now = utc_now(self.clock)
+        async with self.database.unit_of_work() as uow:
+            session = uow.session
+            product = await session.get(Product, ownership.product_id)
+            version = await session.get(ProductVersion, (ownership.product_id, ownership.product_version))
+            if product is None or version is None or product.type == "project_launch":
+                return None
+            if not product.repeatable and await session.scalar(
+                select(Ownership.id).where(
+                    Ownership.user_id == master,
+                    Ownership.product_id == product.id,
+                    Ownership.state.not_in(("revoked", "refunded", "expired")),
+                )
+            ):
+                return None  # the master owns it already
+            copy = (
+                await session.execute(
+                    insert(Ownership)
+                    .values(
+                        id=new_id(),
+                        user_id=master,
+                        product_id=product.id,
+                        origin="grant",
+                        repeatable=product.repeatable,
+                        product_version=version.version,
+                        price_paid=0,
+                        conditions_snapshot=list(version.conditions),
+                        idempotency_key=copy_key(ownership.user_id, ownership.idempotency_key),
+                        state="needs_configuration" if version.config_required else "activation_failed",
+                        configuration={},
+                        acquired_at=now,
+                        expires_at=ownership.expires_at,
+                        activation_attempts=0,
+                    )
+                    .on_conflict_do_nothing(index_elements=["idempotency_key"])
+                    .returning(Ownership.id)
+                )
+            ).scalar_one_or_none()
+            if copy is None:  # copied already — or given back when the profiles were dispatched: back again
+                given_back = await session.scalar(
+                    select(Ownership)
+                    .where(
+                        Ownership.idempotency_key == copy_key(ownership.user_id, ownership.idempotency_key),
+                        Ownership.revoke_reason == "household dispatched",
+                    )
+                    .with_for_update()
+                )
+                if given_back is None:
+                    return None
+                given_back.state = "needs_configuration" if version.config_required else "activation_failed"
+                given_back.revoked_at = given_back.revoke_ground = given_back.revoke_reason = None
+                copy = given_back.id
+            await self.events.publish(
+                session,
+                "marketplace.grant",
+                {"product": product.key, "ownership": str(copy), "price": 0},
+                occurred_at=now,
+                actor=Principal(user_id=master, channel="system"),
+                subject=SubjectRef("user", str(master)),
+                dedup_key=f"marketplace.grant:{copy}",
+            )
+        await self.activate(copy)
+        return copy
 
     async def deactivate(self, ownership: Ownership) -> None:
         view = await self.view(ownership)
