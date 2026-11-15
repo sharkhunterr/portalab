@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, type RouteObject, redirect } from "react-router";
-import { FunctionalState } from "../../design-system/FunctionalState";
 import type { RouteHandle } from "./handle";
 import { RouteErrorElement } from "./RouteBoundary";
+import { LoadingPage } from "./StatusPages";
 
 /**
  * Route table (spec 004 T002/T019): every page is lazy-loaded (one chunk per area) inside the persistent
@@ -146,7 +146,7 @@ export function routes(shell: RouteObject["element"]): RouteObject[] {
       path: "/setup",
       errorElement: <RouteErrorElement />,
       element: (
-        <Suspense fallback={<FunctionalState state="loading" detail="Portalab" />}>
+        <Suspense fallback={<LoadingPage />}>
           <ArrivalContinue />
         </Suspense>
       ),

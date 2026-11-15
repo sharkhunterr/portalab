@@ -38,7 +38,9 @@ describe("route states", () => {
       </MemoryRouter>,
     );
     expect(missing.container.innerHTML).toBe(html);
-    expect(screen.getByText("This page is not available.")).toBeInTheDocument();
+    // issue 448: a page of its own (« not here »), the same for a forbidden and a missing object
+    expect(screen.getByRole("heading", { name: "This page is not here" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
   });
 
   it("a failing region keeps the rest of the page alive and offers a retry", () => {
@@ -74,14 +76,16 @@ describe("route states", () => {
     expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
   });
 
-  it("renders every route state with a functional state", () => {
-    for (const state of ["unauthorized", "unavailable", "error"] as const) {
+  it("renders every route state as a page of its own, with a way home", () => {
+    for (const state of ["unauthorized", "unavailable", "error", "not-found"] as const) {
       const { container, unmount } = render(
         <MemoryRouter>
-          <RouteStateView state={state} />
+          <RouteStateView inline state={state} />
         </MemoryRouter>,
       );
-      expect(container.querySelector("[data-state]")).not.toBeNull();
+      expect(container.querySelector(`[data-state="${state}"]`)).not.toBeNull();
+      expect(screen.getByRole("heading")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Back to the home page" })).toBeInTheDocument();
       unmount();
     }
   });

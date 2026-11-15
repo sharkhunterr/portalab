@@ -234,5 +234,16 @@
   "terms.version": "Version {version} · publiée le {date}",
   "unauthorized": "Vous n'avez pas accès à cette page.",
   "unread": "{count, plural, =0 {Aucune notification non lue} one {# notification non lue} other {# notifications non lues}}",
-  "xpGained": "+{amount} XP"
+  "xpGained": "+{amount} XP",
+  "status.loading": "Chargement…",
+  "status.home": "Revenir à l'accueil",
+  "status.back": "Page précédente",
+  "status.notFound.title": "Cette page n'est pas là",
+  "status.notFound.text": "L'adresse est peut-être erronée, ou la page a été déplacée ou supprimée.",
+  "status.forbidden.title": "Cette page ne vous est pas ouverte",
+  "status.forbidden.text": "Votre compte ne peut pas l'ouvrir. Sur un profil du foyer, elle est peut-être réservée à votre maître.",
+  "status.unavailable.title": "Ce service est momentanément absent",
+  "status.unavailable.text": "Il redémarre peut-être. Réessayez dans un instant.",
+  "status.error.title": "Cette page n'a pas pu être chargée",
+  "status.error.text": "Quelque chose s'est mal passé en route. Réessayez, ou revenez plus tard."
 }

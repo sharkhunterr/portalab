@@ -46,7 +46,7 @@ import {
 } from "./nav/UniverseNavs";
 import { CommandPalette } from "./palette/CommandPalette";
 import { PaletteContext } from "./palette/PaletteContext";
-import { RegionBoundary } from "./router/RouteBoundary";
+import { RegionBoundary, RouteStateView } from "./router/RouteBoundary";
 import { isSafeMode } from "./safeMode";
 import { ShortcutManager } from "./shortcuts/ShortcutManager";
 import { AnnouncementBanner } from "./status/AnnouncementBanner";
@@ -87,6 +87,16 @@ export function AppShell({
   const shellStrings = useShellStrings();
   const navigate = useNavigate();
   const location = useLocation();
+  // issue 448: the administration's pages, for a member whose menu holds it (the server's say) — else the
+  // page « not open to you », never a page of refused panels
+  const navigationState = useNavigationView();
+  const adminLocked =
+    !children &&
+    /^\/admin(\/|$)/.test(location.pathname) &&
+    !navigationState.loading &&
+    !navigationState.failed &&
+    !navigationState.view.degraded &&
+    !navigationState.view.sections.some((section) => section.key === "admin");
   const arrangement = useArrangement();
   const { view } = useNavigationView();
   const header = useHeaderData();
@@ -234,7 +244,11 @@ export function AppShell({
             <div className="shell-content">
               <Breadcrumbs />
               {nav === "terminal" ? null : <HubTabs />}
-              <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
+              {adminLocked ? (
+                <RouteStateView inline state="unauthorized" />
+              ) : (
+                <RegionBoundary resetKey={location.pathname}>{children ?? <Outlet />}</RegionBoundary>
+              )}
               <RelatedLinks />
             </div>
           </main>

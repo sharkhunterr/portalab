@@ -234,5 +234,16 @@
   "terms.version": "Version {version} · published {date}",
   "unauthorized": "You do not have access to this page.",
   "unread": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
-  "xpGained": "+{amount} XP"
+  "xpGained": "+{amount} XP",
+  "status.loading": "Loading…",
+  "status.home": "Back to the home page",
+  "status.back": "Previous page",
+  "status.notFound.title": "This page is not here",
+  "status.notFound.text": "The address may be wrong, or the page moved or was removed.",
+  "status.forbidden.title": "This page is not open to you",
+  "status.forbidden.text": "Your account may not open it. On a household profile, it may be your master's.",
+  "status.unavailable.title": "This service is away for a moment",
+  "status.unavailable.text": "It may be restarting. Try again in a moment.",
+  "status.error.title": "This page could not be loaded",
+  "status.error.text": "Something went wrong on the way. Try again, or come back later."
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "../../design-system/components/Icon";
+import { StatusPage } from "../../design-system/components/StatusPage";
 import { useT } from "../../i18n/hooks/useT";
 import { rememberedSite, useSite } from "../site/site";
 
@@ -79,32 +80,29 @@ export function PortalUnreachable({ onBack }: { onBack?: () => void }) {
   }, [attempt, tryNow]);
 
   return (
-    <main className="portal-down" role="alert" aria-live="assertive">
-      <div className="portal-down__card">
-        <p className="portal-down__brand">
-          {site.icon ? <img src={site.icon} alt="" width={28} height={28} /> : null}
-          {site.name}
-        </p>
-        <span className="portal-down__art" aria-hidden="true">
-          <Icon name="server" size={40} />
-          <span className="portal-down__pulse" />
-        </span>
-        <h1 className="portal-down__title">{say("shell:down.title")}</h1>
-        <p className="portal-down__text">{say("shell:down.text")}</p>
-        <p className="portal-down__next" aria-live="polite">
-          {trying || left === 0 ? say("shell:down.trying") : say("shell:down.next", { seconds: left })}
-        </p>
-        <button
-          ref={button}
-          type="button"
-          className="ds-button ds-button--primary portal-down__retry"
-          onClick={() => void tryNow()}
-          disabled={trying}
-        >
-          <Icon name="retry" size={16} />
-          {say("shell:retry")}
-        </button>
-      </div>
-    </main>
+    // issue 448: the look of every page between pages (the sign-in's)
+    <StatusPage
+      icon="server"
+      pulse
+      alert
+      brand={site.name}
+      logo={site.icon}
+      title={say("shell:down.title")}
+      text={say("shell:down.text")}
+    >
+      <p aria-live="polite">
+        {trying || left === 0 ? say("shell:down.trying") : say("shell:down.next", { seconds: left })}
+      </p>
+      <button
+        ref={button}
+        type="button"
+        className="ds-button ds-button--primary"
+        onClick={() => void tryNow()}
+        disabled={trying}
+      >
+        <Icon name="retry" size={16} />
+        {say("shell:retry")}
+      </button>
+    </StatusPage>
   );
 }

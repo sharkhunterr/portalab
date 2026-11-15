@@ -1,11 +1,12 @@
 import { Component, type ErrorInfo, type ReactNode, Suspense, useEffect, useState } from "react";
-import { isRouteErrorResponse, Link, useMatches, useRouteError } from "react-router";
-import { FunctionalState } from "../../design-system/state/FunctionalState";
+import { isRouteErrorResponse, useMatches, useRouteError } from "react-router";
 import { ApiError } from "../../state/regions";
 import { isStaleBuildError, reloadForNewBuild } from "../staleBuild";
-import { useShellStrings } from "../strings";
 import type { RouteHandle } from "./handle";
 import { PortalUnreachable, portalAnswers } from "./PortalUnreachable";
+import { LoadingPage, type RouteState, RouteStateView } from "./StatusPages";
+
+export { type RouteState, RouteStateView } from "./StatusPages";
 
 /**
  * Route-level states (spec 004 T022; R12/R13, FR-026..028): loading, error, unavailable, unauthorized and
@@ -13,8 +14,6 @@ import { PortalUnreachable, portalAnswers } from "./PortalUnreachable";
  * object, so the page never reveals that something exists. A failing chunk or region is isolated with a
  * retry; the shell (navigation, search, palette) stays usable.
  */
-export type RouteState = "unauthorized" | "not-available" | "unavailable" | "error";
-
 export function stateFor(error: unknown, existenceSensitive: boolean): RouteState {
   const status =
     error instanceof ApiError ? error.status : isRouteErrorResponse(error) ? error.status : undefined;
@@ -22,34 +21,6 @@ export function stateFor(error: unknown, existenceSensitive: boolean): RouteStat
   if (status === 401 || status === 403) return "unauthorized";
   if (status === 503 || status === 504) return "unavailable";
   return "error";
-}
-
-export function RouteStateView({ state, onRetry }: { state: RouteState; onRetry?: () => void }) {
-  const shellStrings = useShellStrings();
-  if (state === "not-available") {
-    return (
-      <div>
-        <FunctionalState
-          state="unavailable"
-          label={shellStrings.notAvailable}
-          detail={shellStrings.notAvailableDetail}
-        />
-        <Link to="/">{shellStrings.goHome}</Link>
-      </div>
-    );
-  }
-  if (state === "unauthorized")
-    return <FunctionalState state="unauthorized" label={shellStrings.unauthorized} />;
-  if (state === "unavailable")
-    return <FunctionalState state="unavailable" onRetry={onRetry} retryLabel={shellStrings.retry} />;
-  return (
-    <FunctionalState
-      state="error"
-      label={shellStrings.routeError}
-      onRetry={onRetry}
-      retryLabel={shellStrings.retry}
-    />
-  );
 }
 
 /** ``errorElement`` of every route — issue 16: when the portal itself does not answer, its own page. */
@@ -106,11 +77,12 @@ export class RegionBoundary extends Component<
     if (this.state.error) {
       return (
         <RouteStateView
+          inline
           state={stateFor(this.state.error, this.props.existenceSensitive ?? false)}
           onRetry={() => this.setState({ error: null })}
         />
       );
     }
-    return <Suspense fallback={<FunctionalState state="loading" />}>{this.props.children}</Suspense>;
+    return <Suspense fallback={<LoadingPage inline />}>{this.props.children}</Suspense>;
   }
 }

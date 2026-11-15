@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { api } from "../../api/client";
 import { AuthLayout } from "../../design-system/components/AuthLayout";
-import { FunctionalState } from "../../design-system/FunctionalState";
 import { PortalUnreachable } from "../../shell/router/PortalUnreachable";
+import { LoadingPage, RouteStateView } from "../../shell/router/StatusPages";
 import { inLanguage, useSite } from "../../shell/site/site";
 import { ApiError, stateForError } from "../../state/regions";
 import { ArrivalWizard } from "../admin/arrival/ArrivalWizard";
@@ -46,12 +46,13 @@ export function AuthGate({
       </AuthLayout>
     );
   }
-  if (me.isPending) return <FunctionalState state="loading" detail={t.loginTitle} />;
+  if (me.isPending) return <LoadingPage />; // issue 448: the sign-in's look while the portal starts
   if (me.isError) {
     // issue 16: the portal does not answer (no reply, or a server error) — its own page, trying again
     const status = me.error instanceof ApiError ? me.error.status : 0;
     if (!status || status >= 500) return <PortalUnreachable />;
-    return <FunctionalState state={stateForError(me.error)} onRetry={() => void me.refetch()} />;
+    const state = stateForError(me.error) === "unauthorized" ? "unauthorized" : "error";
+    return <RouteStateView state={state} onRetry={() => void me.refetch()} />;
   }
   if (!me.data)
     return (

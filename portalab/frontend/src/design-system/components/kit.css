@@ -971,6 +971,7 @@ input[type="file"] {
 .ds-auth__brand {
   display: flex;
   align-items: center;
+  justify-content: center; /* issue 448: as on every page between pages */
   gap: var(--space-3);
   margin-block-end: var(--space-2);
 }
@@ -998,6 +999,7 @@ input[type="file"] {
 .ds-auth__tagline {
   margin: 0 0 var(--space-4);
   color: var(--color-text-muted);
+  text-align: center;
 }
 .ds-auth .auth-form {
   margin-block-end: 0;
@@ -1104,4 +1106,144 @@ input[type="file"] {
   line-height: 1.4;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* issue 448: the pages between pages — the sign-in's look (the ambient, a glass card, the site's name) */
+.ds-status {
+  display: grid;
+  place-items: center;
+  min-block-size: 100dvh;
+  padding: var(--space-6) var(--space-4);
+  background: var(--ambient), var(--color-surface);
+  color: var(--color-text);
+}
+.ds-status--inline {
+  min-block-size: min(60dvh, 32rem);
+  padding: var(--space-6) 0;
+  background: none;
+}
+.ds-status__card {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  inline-size: min(28rem, 100%);
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-3);
+  text-align: center;
+  animation: ds-status-in var(--motion-duration-normal, 0.25s) var(--motion-easing-out, ease-out) both;
+}
+.ds-status--inline .ds-status__card {
+  padding: var(--space-6) var(--space-5);
+  box-shadow: var(--shadow-2);
+}
+.ds-status[aria-busy] .ds-status__card {
+  /* a quick load shows nothing: the card comes after a moment */
+  animation-delay: 0.3s;
+}
+@keyframes ds-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ds-status__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+.ds-status__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-md);
+  background: var(--xp-gradient);
+  color: var(--color-accent-contrast);
+  box-shadow: var(--shadow-glow);
+}
+.ds-status__logo {
+  block-size: 2rem;
+  max-inline-size: 9rem;
+  object-fit: contain;
+}
+.ds-status__art {
+  --tone: var(--color-accent);
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 5rem;
+  block-size: 5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--tone);
+}
+.ds-status--inline .ds-status__art {
+  inline-size: 4rem;
+  block-size: 4rem;
+}
+.ds-status__art[data-tone="warning"] {
+  --tone: var(--state-partial-fg, var(--color-accent));
+}
+.ds-status__art[data-tone="danger"] {
+  --tone: var(--state-error-fg, var(--color-accent));
+}
+.ds-status__pulse {
+  position: absolute;
+  inset: 0;
+  border: 2px solid color-mix(in srgb, var(--tone) 50%, transparent);
+  border-radius: 50%;
+  animation: ds-status-pulse 2.4s ease-out infinite;
+}
+@keyframes ds-status-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-status__card,
+  .ds-status__pulse {
+    animation: none;
+  }
+}
+.ds-status__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+}
+.ds-status__text {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.ds-status__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+.ds-status__actions > p {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
