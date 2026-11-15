@@ -1365,6 +1365,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/gamification/household": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Household */
+        get: operations["get_household_api_v1_admin_gamification_household_get"];
+        /** Put Household */
+        put: operations["put_household_api_v1_admin_gamification_household_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/gamification/level-curve": {
         parameters: {
             query?: never;
@@ -16422,6 +16440,14 @@ export interface components {
             /** Minutes */
             minutes?: number | null;
         };
+        /**
+         * HouseholdGrouping
+         * @description Issue 441: household profiles grouped on their master (XP, contribution, statistics), or dispatched.
+         */
+        HouseholdGrouping: {
+            /** Grouped */
+            grouped: boolean;
+        };
         /** HouseholdMemberOut */
         HouseholdMemberOut: {
             /** Age */
@@ -25393,6 +25419,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EventTypeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_household_api_v1_admin_gamification_household_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdGrouping"];
+                };
+            };
+        };
+    };
+    put_household_api_v1_admin_gamification_household_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseholdGrouping"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HouseholdGrouping"];
                 };
             };
             /** @description Validation Error */

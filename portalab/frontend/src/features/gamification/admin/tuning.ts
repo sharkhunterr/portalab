@@ -311,3 +311,21 @@ export function keyOf(label: string): string {
     .replace(/^[^a-z]+/, "")
     .slice(0, 60);
 }
+
+/** Issue 441: household profiles grouped on their master (XP, contribution, statistics), or dispatched. */
+export function useHouseholdGrouping() {
+  const client = useQueryClient();
+  const query = useQuery({
+    queryKey: [...KEY, "household"],
+    queryFn: async () => (await api.GET("/api/v1/admin/gamification/household")).data as { grouped: boolean },
+  });
+  const save = useMutation({
+    mutationFn: async (grouped: boolean) => {
+      const { data, error } = await api.PUT("/api/v1/admin/gamification/household", { body: { grouped } });
+      if (error) throw new Error("gamification.household");
+      return data as { grouped: boolean };
+    },
+    onSuccess: (data) => client.setQueryData([...KEY, "household"], data),
+  });
+  return { query, save };
+}

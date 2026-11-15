@@ -26,7 +26,7 @@ from sqlalchemy import func, select, text
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.insights.aggregate import COMPLETED
-from portalab.modules.media.insights.stats import CATEGORIES, Window, window
+from portalab.modules.media.insights.stats import CATEGORIES, Whose, Window, of_whom, window
 from portalab.modules.media.models import Activity, MediaObject, ObjectMetadata, ObjectTag
 
 SECTIONS = ("casting", "production", "playback", "profile")
@@ -103,7 +103,7 @@ class DeepInsights:
         *,
         period: str,
         category: str,
-        user: UUID | None,
+        user: Whose,
         detailed: bool,
         tz: str = "UTC",
     ) -> dict[str, Any]:
@@ -130,7 +130,7 @@ class DeepInsights:
             return {**common, **self._playback(rows, previous, slots, shift, detailed)}
         return {**common, **await self._profile(rows, previous, slots, shift, ZoneInfo(tz))}
 
-    async def _rows(self, win: Window, kinds: Sequence[str], user: UUID | None) -> list[dict[str, Any]]:
+    async def _rows(self, win: Window, kinds: Sequence[str], user: Whose) -> list[dict[str, Any]]:
         query = select(
             Activity.started_at,
             Activity.work_id,
@@ -150,7 +150,7 @@ class DeepInsights:
         if win.start is not None:
             query = query.where(Activity.started_at >= win.start)
         if user is not None:
-            query = query.where(Activity.user_id == user)
+            query = query.where(of_whom(Activity.user_id, user))
         async with self.database.session() as session:
             result = await session.execute(query)
             return [

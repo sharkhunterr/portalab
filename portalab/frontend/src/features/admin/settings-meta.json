@@ -355,6 +355,10 @@
     "advanced": false,
     "group": "engagement"
   },
+  "economy.household.grouped": {
+    "advanced": false,
+    "group": "engagement"
+  },
   "economy.leaderboards.includeCoins": {
     "advanced": false,
     "group": "engagement"

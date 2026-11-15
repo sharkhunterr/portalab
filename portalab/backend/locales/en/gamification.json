@@ -1095,5 +1095,11 @@
   "admin.streak.radio": "Radio listening",
   "admin.streak.radioHint": "A radio sitting in the portal's player counts from the minimum length.",
   "admin.streak.minimum": "Minimum length of a sitting (minutes)",
-  "admin.streak.minimumHint": "Applies to interrupted plays, live TV, the radio and music. 0: any length."
+  "admin.streak.minimumHint": "Applies to interrupted plays, live TV, the radio and music. 0: any length.",
+  "admin.household.title": "Household profiles",
+  "admin.household.hint": "Whether what a household profile earns and watches also counts on its master's account. Coins are always the household's, and « My household » statistics always show everyone.",
+  "admin.household.grouped": "Group profiles on their master",
+  "admin.household.groupedHint": "A profile's XP, contribution and statistics count on its master too.",
+  "admin.household.dispatchedHint": "Each profile keeps its own XP, contribution and statistics; the master keeps only its own.",
+  "admin.household.saved": "Saved"
 }

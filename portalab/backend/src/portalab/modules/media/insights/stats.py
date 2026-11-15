@@ -29,6 +29,15 @@ from portalab.modules.media.models import (
     SourceItem,
 )
 
+# issue 441: whose statistics — one member, a household (its master and its profiles), or everyone (None)
+Whose = UUID | frozenset[UUID] | None
+
+
+def of_whom(column: Any, user: Whose) -> Any:
+    """The rows of ``user``: one member's, or (a household) any of its members'."""
+    return column.in_(sorted(user)) if isinstance(user, frozenset) else column == user
+
+
 CATEGORIES: dict[str, tuple[str, ...]] = {
     # #351: the games count in « all » too (#283 kept them out)
     "all": ("movie", "episode", "live", "track", "book", "audiobook", "radio", "game", "other"),
@@ -130,22 +139,22 @@ class InsightsQuery:
         fed = {CATEGORY_OF_KIND[k] for k in kinds if k in CATEGORY_OF_KIND} | ({"radio"} if radio else set())
         return ["all", *(c for c in CATEGORIES if c != "all" and c in fed)]
 
-    def _rows(self, win: Window, kinds: Sequence[str], user: UUID | None, *columns: Any) -> Select[Any]:
+    def _rows(self, win: Window, kinds: Sequence[str], user: Whose, *columns: Any) -> Select[Any]:
         query = select(*columns).where(
             Activity.counted.is_(True), Activity.kind.in_(kinds), Activity.started_at < win.end
         )
         if win.start is not None:
             query = query.where(Activity.started_at >= win.start)
         if user is not None:
-            query = query.where(Activity.user_id == user)
+            query = query.where(of_whom(Activity.user_id, user))
         return query
 
-    def _daily(self, win: Window, kinds: Sequence[str], user: UUID | None, *columns: Any) -> Select[Any]:
+    def _daily(self, win: Window, kinds: Sequence[str], user: Whose, *columns: Any) -> Select[Any]:
         query = select(*columns).where(ActivityDaily.kind.in_(kinds), ActivityDaily.day < win.end)
         if win.start is not None:
             query = query.where(ActivityDaily.day >= win.start)
         if user is not None:
-            query = query.where(ActivityDaily.user_key == user)
+            query = query.where(of_whom(ActivityDaily.user_key, user))
         return query
 
     async def overview(
@@ -153,7 +162,7 @@ class InsightsQuery:
         *,
         period: str,
         category: str,
-        user: UUID | None,
+        user: Whose,
         manager: bool,
         tz: str = "UTC",
         top: int = TOP,
@@ -272,9 +281,7 @@ class InsightsQuery:
             "unattributed": int(unattributed) if unattributed is not None else None,
         }
 
-    async def _timeline(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None
-    ) -> dict[str, Any]:
+    async def _timeline(self, session: Any, win: Window, kinds: Sequence[str], user: Whose) -> dict[str, Any]:
         days = win.days
         if days is None:
             first = await session.scalar(self._daily(win, kinds, user, func.min(ActivityDaily.day)))
@@ -312,7 +319,7 @@ class InsightsQuery:
         return {"unit": unit, "points": sorted(points.values(), key=lambda p: p["date"])}
 
     async def _heatmap(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None, zone: ZoneInfo
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose, zone: ZoneInfo
     ) -> list[dict[str, Any]]:
         local = func.timezone(zone.key, Activity.started_at)
         weekday, hour = extract("isodow", local), extract("hour", local)
@@ -333,7 +340,7 @@ class InsightsQuery:
         session: Any,
         win: Window,
         kinds: Sequence[str],
-        user: UUID | None,
+        user: Whose,
         *,
         show_members: bool,
         limit: int = TOP,
@@ -380,7 +387,7 @@ class InsightsQuery:
         ]
 
     async def _tags(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None, tag_kind: str
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose, tag_kind: str
     ) -> list[dict[str, Any]]:
         rows = (
             await session.execute(
@@ -407,7 +414,7 @@ class InsightsQuery:
         ]
 
     async def _decades(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose
     ) -> list[dict[str, Any]]:
         year = func.coalesce(MediaObject.year, Activity.year)
         decade = (func.floor(year / 10) * 10).label("decade")
@@ -423,7 +430,7 @@ class InsightsQuery:
         return [{"decade": int(d), "plays": int(n), "seconds": float(s or 0)} for d, n, s in rows]
 
     async def _records(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None, zone: ZoneInfo
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose, zone: ZoneInfo
     ) -> dict[str, Any]:
         longest = (
             await session.execute(
@@ -486,7 +493,7 @@ class InsightsQuery:
         }
 
     async def _box_office(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose
     ) -> dict[str, Any] | None:
         if "movie" not in kinds:
             return None
@@ -528,7 +535,7 @@ class InsightsQuery:
         }
 
     async def _platforms(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose
     ) -> list[dict[str, Any]]:
         name = func.coalesce(Activity.platform, Activity.device)
         rows = (
@@ -543,7 +550,7 @@ class InsightsQuery:
         return [{"name": n, "plays": int(c), "seconds": float(s or 0)} for n, c, s in rows]
 
     async def _recent(
-        self, session: Any, win: Window, kinds: Sequence[str], user: UUID | None
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose
     ) -> list[dict[str, Any]]:
         rows = (
             await session.execute(
@@ -611,12 +618,12 @@ class InsightsQuery:
             for key, plays, seconds, completed, days, last in rows
         ]
 
-    async def _requests(self, session: Any, win: Window, user: UUID | None) -> dict[str, Any]:
+    async def _requests(self, session: Any, win: Window, user: Whose) -> dict[str, Any]:
         query = select(MediaRequest.state, func.count()).where(MediaRequest.requested_at < win.end)
         if win.start is not None:
             query = query.where(MediaRequest.requested_at >= win.start)
         if user is not None:
-            query = query.where(MediaRequest.requester_user_id == user)
+            query = query.where(of_whom(MediaRequest.requester_user_id, user))
         states = {
             state: int(count)
             for state, count in (await session.execute(query.group_by(MediaRequest.state))).all()

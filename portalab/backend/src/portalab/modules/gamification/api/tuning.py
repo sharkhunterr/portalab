@@ -116,6 +116,23 @@ async def put_streak(principal: Manager, body: StreakConfig, module: Module) -> 
     return parse_streak(module.config.streak)
 
 
+class HouseholdGrouping(BaseModel):
+    """Issue 441: household profiles grouped on their master (XP, contribution, statistics), or dispatched."""
+
+    grouped: bool
+
+
+@router.get("/admin/gamification/household", response_model=HouseholdGrouping)
+async def get_household(_: Manager, module: Module) -> HouseholdGrouping:
+    return HouseholdGrouping(grouped=module.config.household_grouped)
+
+
+@router.put("/admin/gamification/household", response_model=HouseholdGrouping)
+async def put_household(principal: Manager, body: HouseholdGrouping, module: Module) -> HouseholdGrouping:
+    await _write(module, principal, "household_grouped", body.grouped, "household profiles")
+    return HouseholdGrouping(grouped=module.config.household_grouped)
+
+
 @router.get("/admin/gamification/pace", response_model=PaceConfig)
 async def get_pace(_: Manager, module: Module) -> PaceConfig:
     return parse_pace(module.config.pace)

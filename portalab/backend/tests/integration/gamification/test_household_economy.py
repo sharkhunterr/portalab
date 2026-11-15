@@ -6,6 +6,7 @@ master holds. A profile's master may keep features out of it: their permissions 
 from typing import Any
 from uuid import UUID
 
+import httpx
 import pytest
 from fastapi import FastAPI
 from sqlalchemy import func, select
@@ -14,6 +15,7 @@ from portalab.capabilities.economy import ECONOMY, InsufficientCoins
 from portalab.core.authz_port import Principal
 from portalab.modules.gamification.models import LedgerTransaction
 from tests.integration.gamification.conftest import GamHarness
+from tests.integration.identity.helpers import login
 
 
 def households(app: FastAPI) -> Any:
@@ -54,6 +56,34 @@ async def test_a_profile_earns_for_its_household(gm: GamHarness, app: FastAPI) -
     # the master's own earnings stay its own
     await gm.module.rewards.grant_manual(boss, owner, "coins", 100, reason="own", idempotency_key="own")
     assert await gm.balance(lea, "coins") == 15 and await gm.balance(owner, "coins") == 115
+
+
+async def test_profiles_dispatched_keep_their_xp_and_contribution(
+    gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 441: its administrator dispatches the household profiles — a profile's XP and contribution stay
+    its own, its Coins still the household's; grouped again, they count on its master too."""
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    await login(client, "boss")
+    assert (await client.get("/api/v1/admin/gamification/household")).json() == {"grouped": True}
+    saved = await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
+    assert saved.status_code == 200 and saved.json() == {"grouped": False}
+    boss = gm.p("boss")
+    for value, amount in (("xp", 40), ("coins", 15), ("contribution", 3)):
+        await gm.module.rewards.grant_manual(
+            boss, lea, value, amount, reason="quest", idempotency_key=f"d-{value}"
+        )
+    assert [await gm.balance(lea, v) for v in ("xp", "coins", "contribution")] == [40, 15, 3]
+    assert [await gm.balance(owner, v) for v in ("xp", "coins", "contribution")] == [0, 15, 0]
+
+    await client.put("/api/v1/admin/gamification/household", json={"grouped": True})
+    await gm.module.rewards.grant_manual(boss, lea, "xp", 10, reason="quest", idempotency_key="g-xp")
+    assert await gm.balance(lea, "xp") == 50 and await gm.balance(owner, "xp") == 10
+    await login(client, "ursula")
+    assert (
+        await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
+    ).status_code == 403
 
 
 async def test_a_profile_spends_the_household_wallet(gm: GamHarness, app: FastAPI) -> None:

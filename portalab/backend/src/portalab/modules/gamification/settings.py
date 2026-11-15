@@ -43,6 +43,9 @@ class EconomyConfig:
     withheld_retention_days: int = 90
     level_curve_active: int = 0  # 0: the latest published curve
     contribution_amount: int = 10
+    # issue 441: a household profile's XP and contribution also count on its master (« group »), or stay the
+    # profile's own (« dispatch ») — its Coins are the household's either way
+    household_grouped: bool = True
     # 027: play streaks — consecutive days with one of these events multiply their rewards
     streak: dict[str, Any] = field(
         default_factory=lambda: {
@@ -88,6 +91,7 @@ SETTINGS: dict[str, str] = {
     "withheld_retention_days": "economy.withheldRetentionDays",
     "level_curve_active": "economy.levelCurve.active",
     "contribution_amount": "economy.contribution.amount",
+    "household_grouped": "economy.household.grouped",
     "streak": "economy.streak",
     "level_rewards": "economy.levelRewards",
     "reward_bonuses": "economy.rewardBonuses",
@@ -107,6 +111,8 @@ _DESCRIPTIONS = {
     "withheld_retention_days": "Days withheld rewards are kept after review.",
     "level_curve_active": "Level curve version in force (0: the latest).",
     "contribution_amount": "Contribution granted for a recognised contribution (e.g. a converted report).",
+    "household_grouped": "Household profiles grouped on their master: their XP, contribution and statistics "
+    "count on the master's too (off: each profile keeps its own). Coins stay the household's.",
     "streak": "Play streaks: {enabled, event_types, values, tiers: [{days, multiplier}]}.",
     "level_rewards": "Level rewards: [{level, coins, contribution, product, label}].",
     "reward_bonuses": "Rewards that follow the streak, campaigns, boosts and pace like an action's gains: "

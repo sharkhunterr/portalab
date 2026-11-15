@@ -1022,6 +1022,8 @@
   "setting.economy.anomaly.maxGrantsPerHour.label": "Gains par heure avant vérification",
   "setting.economy.contribution.amount.hint": "Points de contribution accordés pour une contribution reconnue, comme un signalement pris en compte.",
   "setting.economy.contribution.amount.label": "Récompense de contribution",
+  "setting.economy.household.grouped.hint": "L'XP, la contribution et les statistiques d'un profil comptent aussi pour son maître (désactivé : chaque profil garde les siens). Les pièces restent celles du foyer.",
+  "setting.economy.household.grouped.label": "Profils du foyer regroupés sur le maître",
   "setting.economy.leaderboards.includeCoins.hint": "Propose un classement des membres selon leurs Coins.",
   "setting.economy.leaderboards.includeCoins.label": "Classement des Coins",
   "setting.economy.leaderboards.metrics.hint": "Classements proposés aux membres : XP, niveau, contribution, succès.",

@@ -818,3 +818,54 @@ async def test_a_profiles_media_is_not_in_its_masters_continue(
     assert (await client.post("/api/v1/household/switch", json={"user_id": str(arthur)})).status_code == 200
     theirs = (await client.get("/api/v1/me/media/journal")).json()["continue"]
     assert {c["title"] for c in theirs} == {"Film", "Pilot"}  # its own sittings in the portal
+
+
+async def test_my_households_statistics_count_every_profile(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: Any
+) -> None:
+    """Issue 441: « My household » counts the master's plays and each profile's (in the portal: theirs); the
+    master's own count its profiles' too while its administrator groups them, its own only once dispatched."""
+    from portalab.modules.media.insights.portal import PortalActivity
+
+    people = await users(app, media, "zoe")
+    ids = await _library(app, media)
+    owner = Principal(user_id=people["zoe"])
+    arthur = UUID(
+        str(
+            (
+                await households(app).create(
+                    owner, display_name="Arthur", kind="standard", color=None, pin=None
+                )
+            )["id"]
+        )
+    )
+    portal = PortalActivity(media.database)
+    now = clock.now()  # the statistics' own time
+    for ref, who, title in (("a", arthur, "Toy Story"), ("z", people["zoe"], "Coco")):
+        await portal.store(
+            ref=f"portal:{ref}",
+            user=who,
+            service=media.service(1).service_id,
+            object_id=ids[title],
+            kind="movie",
+            watched=30 * 60,
+            duration=None,
+            share=None,
+            ended=now - timedelta(hours=1),
+        )
+    while await media.module.aggregator.run():
+        pass
+
+    async def plays(scope: str) -> int:
+        seen = await client.get("/api/v1/media/insights", params={"scope": scope, "period": "7d"})
+        assert seen.status_code == 200, seen.text
+        return int(seen.json()["totals"]["plays"])
+
+    await login(client, "zoe")
+    assert await plays("household") == 2
+    assert await plays("me") == 2  # grouped (the default): the master's own count Arthur's
+    await media.configure("economy.household.grouped", False)
+    assert await plays("me") == 1  # dispatched: its own only
+    assert await plays("household") == 2
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(arthur)})).status_code == 200
+    assert await plays("me") == 1 and await plays("household") == 2

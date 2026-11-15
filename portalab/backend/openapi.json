@@ -9439,6 +9439,20 @@
         "title": "HouseholdFreeIn",
         "type": "object"
       },
+      "HouseholdGrouping": {
+        "description": "Issue 441: household profiles grouped on their master (XP, contribution, statistics), or dispatched.",
+        "properties": {
+          "grouped": {
+            "title": "Grouped",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "grouped"
+        ],
+        "title": "HouseholdGrouping",
+        "type": "object"
+      },
       "HouseholdMemberOut": {
         "properties": {
           "age": {
@@ -31235,6 +31249,66 @@
           }
         },
         "summary": "Event Types",
+        "tags": [
+          "gamification-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/gamification/household": {
+      "get": {
+        "operationId": "get_household_api_v1_admin_gamification_household_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdGrouping"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Household",
+        "tags": [
+          "gamification-admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_household_api_v1_admin_gamification_household_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseholdGrouping"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdGrouping"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Household",
         "tags": [
           "gamification-admin"
         ]

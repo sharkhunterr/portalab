@@ -138,6 +138,7 @@ class GamificationModule:
         self.levels = LevelService(database, lambda: self.config.level_curve_active, clock=clock)
         self.writer = LedgerWriter(events, self.levels, clock=clock)
         self.writer.household = self._household  # 032: a profile's amounts are its household's too
+        self.writer.grouped = lambda: self.config.household_grouped  # issue 441
         self.economy = EconomyServiceImpl(database, self.writer, clock=clock)
         self.rules = RuleStore(database, audit, events, event_types, clock=clock)
         self.combiner = ModifierCombiner(capabilities)

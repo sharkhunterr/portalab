@@ -112,6 +112,7 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>, rul
       sent.push({ method: request.method, path, body });
       if (path.endsWith("/pace")) return json(200, body);
       if (path.endsWith("/streak")) return json(200, body);
+      if (path.endsWith("/household")) return json(200, body);
       if (path.includes("/rules/") && !path.endsWith("/publish"))
         return json(201, {
           key: "watch",
@@ -133,6 +134,8 @@ function serve(sent: Array<{ method: string; path: string; body: unknown }>, rul
       return json(200, { items, next_cursor: next, total: OPERATIONS.length });
     }
     switch (path) {
+      case "/api/v1/admin/gamification/household":
+        return json(200, { grouped: true });
       case "/api/v1/admin/gamification/pace":
         return json(200, { factor: 1, values: ["xp"] });
       case "/api/v1/admin/gamification/population":
@@ -287,6 +290,31 @@ describe("gamification administration", () => {
       event_types: ["media.playback_finished", "media.playback_abandoned", "media.radio_listened"],
       min_watched_s: 1800,
     });
+  });
+
+  it("groups the household profiles on their master, or dispatches them (issue 441)", async () => {
+    const sent: Array<{ method: string; path: string; body: unknown }> = [];
+    serve(sent);
+    show("/admin/gamification");
+    const toggle = await screen.findByRole("checkbox", { name: "Group profiles on their master" });
+    expect((toggle as HTMLInputElement).checked).toBe(true);
+    expect(
+      screen.getByText("A profile's XP, contribution and statistics count on its master too."),
+    ).toBeTruthy();
+    fireEvent.click(toggle);
+    await waitFor(() =>
+      expect(sent).toContainEqual({
+        method: "PUT",
+        path: "/api/v1/admin/gamification/household",
+        body: { grouped: false },
+      }),
+    );
+    expect(
+      await screen.findByText(
+        "Each profile keeps its own XP, contribution and statistics; the master keeps only its own.",
+      ),
+    ).toBeTruthy();
+    expect((toggle as HTMLInputElement).checked).toBe(false);
   });
 
   it("shows what made every member gain, or one of them", async () => {

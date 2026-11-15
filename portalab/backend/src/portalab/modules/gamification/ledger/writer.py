@@ -8,7 +8,8 @@
 5. for XP and Coins, queue a ``progression.changed`` live notification to the owner only (spec 027 R6), so
    the header updates without polling — and never on rollback, since it shares the transaction;
 6. 032: for a household profile, record the same XP, Contribution or Coins once more for its master, in the
-   same transaction (the master's balances are the household's): a debit the household cannot cover refuses
+   same transaction (the master's balances are the household's; issue 441: its Coins only when its
+   administrator dispatches the profiles): a debit the household cannot cover refuses
    a spend or a reservation, and an administrator's correction is mirrored up to what the master holds; the
    copy publishes no reward event (it rewards nothing twice).
 Rows are never updated or deleted (database triggers); corrections are new rows."""
@@ -107,6 +108,8 @@ class LedgerWriter:
         self.levels = levels
         self.clock = clock
         self.household: Callable[[], Household | None] = lambda: None  # 032: wired by the module
+        # issue 441: a profile's XP and contribution on its master too (« group »), else its Coins only
+        self.grouped: Callable[[], bool] = lambda: True
 
     async def record(self, session: AsyncSession, entry: Entry) -> Recorded:
         if entry.value not in ("xp", "contribution", "coins", "booster"):
@@ -161,7 +164,7 @@ class LedgerWriter:
             await self._publish(session, row, level_up)
         if row.value in ("xp", "coins"):
             await self._live(session, row, level_up)
-        if entry.profile_id is None and row.value in MIRRORED:
+        if entry.profile_id is None and row.value in MIRRORED and (row.value == "coins" or self.grouped()):
             await self._mirror(session, entry)
         return Recorded(to_transaction(row), level_up=level_up)
 

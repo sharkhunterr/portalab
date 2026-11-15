@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
 from portalab.capabilities.themes import COSMETICS
@@ -33,7 +34,7 @@ from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
 from portalab.modules.media.insights.enrich import TASK as ENRICH_TASK
 from portalab.modules.media.insights.family import family_activity
 from portalab.modules.media.insights.progress import history_task
-from portalab.modules.media.links.household import link_holder
+from portalab.modules.media.links.household import link_holder, profiles_of
 from portalab.modules.media.models import (
     Activity,
     ActivityCursor,
@@ -55,6 +56,8 @@ from portalab.modules.media.permissions import (
 from portalab.modules.media.providers.insight_widgets import posters, with_posters
 from portalab.modules.media.requests.insights import kind_of, lookup_of, told
 from portalab.modules.media.sections.service import SECTIONS
+
+HOUSEHOLD_GROUPED = "economy.household.grouped"  # issue 441: the economy's setting
 
 router = APIRouter(prefix="/api/v1", tags=["media"])
 
@@ -650,14 +653,31 @@ async def _guard_filters(module: Any, principal: Principal, period: str, scope: 
     return locked
 
 
-async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | None:
-    """Whose statistics: mine, the server's (``None``), or (032) my household's — its master's, which the
-    shared media account's plays all go to (a profile has its own too: what it watched with the portal's
-    player)."""
+async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | frozenset[UUID] | None:
+    """Whose statistics: mine, the server's (``None``), or (032) my household's — its master and (issue 441)
+    each of its profiles (what they watched with the portal's player is theirs). A master's own include its
+    profiles' when its administrator groups the profiles on their master."""
     if scope == "all":
         return None
     me = _me(principal)
-    return await link_holder(module.capabilities, me) if scope == "household" else me
+    owner = await link_holder(module.capabilities, me)
+    if scope == "household":
+        return frozenset({owner, *await profiles_of(module.capabilities, owner)})
+    if owner == me and await _grouped(module):
+        profiles = await profiles_of(module.capabilities, me)
+        return frozenset({me, *profiles}) if profiles else me
+    return me
+
+
+async def _grouped(module: Any) -> bool:
+    """Issue 441: household profiles grouped on their master (the economy's setting; grouped by default)."""
+    try:
+        providers = module.capabilities.system_providers(CONFIG)
+        if providers:
+            return bool((await providers[0].provider.get(HOUSEHOLD_GROUPED)).value)
+    except Exception:  # noqa: S110 — undeclared (an older portal, tests): grouped, as before
+        pass
+    return True
 
 
 class SpanUseOut(BaseModel):

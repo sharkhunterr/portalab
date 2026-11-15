@@ -1095,5 +1095,11 @@
   "admin.streak.radio": "Écoute de la radio",
   "admin.streak.radioHint": "Une séance de radio dans le lecteur du portail compte à partir de la durée minimale.",
   "admin.streak.minimum": "Durée minimale d'une séance (minutes)",
-  "admin.streak.minimumHint": "S'applique aux lectures interrompues, à la TV en direct, à la radio et à la musique. 0 : toute durée."
+  "admin.streak.minimumHint": "S'applique aux lectures interrompues, à la TV en direct, à la radio et à la musique. 0 : toute durée.",
+  "admin.household.title": "Profils du foyer",
+  "admin.household.hint": "Ce qu'un profil du foyer gagne et regarde compte-t-il aussi sur le compte maître ? Les pièces restent toujours celles du foyer, et les statistiques « Mon foyer » montrent toujours tout le monde.",
+  "admin.household.grouped": "Regrouper les profils sur le compte maître",
+  "admin.household.groupedHint": "L'XP, la contribution et les statistiques d'un profil comptent aussi pour son maître.",
+  "admin.household.dispatchedHint": "Chaque profil garde son XP, sa contribution et ses statistiques ; le maître ne garde que les siens.",
+  "admin.household.saved": "Enregistré"
 }

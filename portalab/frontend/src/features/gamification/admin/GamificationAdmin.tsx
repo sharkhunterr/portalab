@@ -4,6 +4,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
 import { AchievementsPanel, QuestsPanel } from "./AchievementsPanel";
 import { ActionRules } from "./ActionRules";
+import { HouseholdGrouping } from "./HouseholdGrouping";
 import { LevelsPanel } from "./LevelsPanel";
 import { Overview } from "./Overview";
 import { ProgressionTuner } from "./ProgressionTuner";
@@ -85,7 +86,12 @@ export default function GamificationAdmin() {
         />
       }
     >
-      {tab === "overview" ? <Overview /> : null}
+      {tab === "overview" ? (
+        <>
+          <HouseholdGrouping />
+          <Overview />
+        </>
+      ) : null}
       {tab === "gains" ? (
         <>
           <ProgressionTuner />
