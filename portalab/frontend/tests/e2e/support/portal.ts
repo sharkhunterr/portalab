@@ -254,7 +254,8 @@ export async function signIn(page: Page) {
     .first()
     .fill("correct horse battery");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("banner")).toBeVisible();
+  // signed in: the portal's header — or a window over it (the welcome, modal, hides the rest from the tree)
+  await expect(page.getByRole("banner").or(page.getByRole("dialog")).first()).toBeVisible();
 }
 
 /** Nothing wider than the screen: the page never slides sideways (the widest culprits named). */

@@ -271,9 +271,25 @@ function TourRun({ tour, onClose }: { tour: TourDef; onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [leave, next, back]);
 
+  // issue 459: a modal window opened by a step (the assistant) hides everything else from assistive
+  // technologies — the tour is what the member follows: it stays readable and reachable over it
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = root.current;
+    if (!element) return;
+    const reveal = () => {
+      if (element.getAttribute("aria-hidden") === "true") element.removeAttribute("aria-hidden");
+      if (element.hasAttribute("inert")) element.removeAttribute("inert");
+    };
+    reveal();
+    const watch = new MutationObserver(reveal);
+    watch.observe(element, { attributes: true, attributeFilter: ["aria-hidden", "inert"] });
+    return () => watch.disconnect();
+  }, []);
+
   const text = (field: "title" | "text") => t(`onboarding:tours.${tour.key}.${step.key}.${field}`);
   return (
-    <div className="tour" data-ready={ready ? "true" : undefined}>
+    <div ref={root} className="tour" data-ready={ready ? "true" : undefined}>
       <div
         className="tour__scrim"
         aria-hidden="true"
