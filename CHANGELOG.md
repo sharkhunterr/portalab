@@ -3,6 +3,72 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.5.0](https://github.com/sharkhunterr/portalab/compare/v1.4.1...v1.5.0) (2026-11-15)
+
+
+### Features
+
+* **admin:** the setup assistant knows the households and the system language card ([2136d8a](https://github.com/sharkhunterr/portalab/commit/2136d8aad2c4b786e3558c590c8420920617d8d4))
+* **admin:** the system language and country in one place; members' dates follow their language ([7bff366](https://github.com/sharkhunterr/portalab/commit/7bff3663254d9a4af05afabce345a295e4fae51e))
+* **community:** the community follows the household economy; profiles stay out of projects ([b82d1e2](https://github.com/sharkhunterr/portalab/commit/b82d1e2c47fb7ce85d1b3f1ec0d3de619938e955))
+* **gamification:** a common pot's profile keeps the household's streak too ([d55c84a](https://github.com/sharkhunterr/portalab/commit/d55c84ae2b5aa56e61fe580be470dfbb24e7e91a))
+* **gamification:** admin charts group household profiles on their master, never a gain twice ([8bb7c3f](https://github.com/sharkhunterr/portalab/commit/8bb7c3fe74e7909e9319e51f0ae1c4c510df4478))
+* **gamification:** group household profiles on their master or dispatch them ([b79304b](https://github.com/sharkhunterr/portalab/commit/b79304be3bd2a318fa27afc09477c3952f6d083b))
+* **gamification:** retire the daily quest « Mailbox » ([38d9b8a](https://github.com/sharkhunterr/portalab/commit/38d9b8a95281abfdda16497863e210c21784f14e))
+* **gamification:** the admin chooses the plays that keep a streak and their minimum length ([daa2ed6](https://github.com/sharkhunterr/portalab/commit/daa2ed64cb1b0fd0bfebb15662029c4a2fdb918a))
+* **household:** a master's household economy, common pot or dispatched profiles ([c6dd24d](https://github.com/sharkhunterr/portalab/commit/c6dd24db33af053408a5eb025ccac3a17214e5ec))
+* **household:** any genre, a weekly plan, allowed hours, a « shown » mode and time given in a few taps; age badges on every thumbnail ([641b1e4](https://github.com/sharkhunterr/portalab/commit/641b1e4189a3146b790dd3d38ea0968b80f11467))
+* **household:** screen time as a week calendar, and a « Schedule » tab with the time left ([50ff982](https://github.com/sharkhunterr/portalab/commit/50ff982d95223b27398baff6e04de853fc50a5a4))
+* **household:** screen time as a week planner — spans drawn on each day, each its own time ([9d222c7](https://github.com/sharkhunterr/portalab/commit/9d222c779ef4a40d46e4b593402018e64d729235))
+* **household:** the family's dashboard, hub tabs and a welcome step to make profiles ([8d8ea44](https://github.com/sharkhunterr/portalab/commit/8d8ea44a28c9628b75bc7932d3edd7d881b2ade5))
+* **household:** the master chooses what screen time counts — media only, or all of Portalab with the portal locked once it is over; the schedule always names its profile ([1130719](https://github.com/sharkhunterr/portalab/commit/11307196231141c8043ec24ed4bdfb85b50e2511))
+* **i18n:** a system language set by the admin — age ratings are its country's, metadata fetched in it, asked first in the arrival wizard ([edc4c06](https://github.com/sharkhunterr/portalab/commit/edc4c06b3822a5782f125933b6535a8c13ddd8ba))
+* **identity:** household policy, profile plays, strictest age rating ([b62528c](https://github.com/sharkhunterr/portalab/commit/b62528c29655ac31e0c2b88755124511eee8bdea))
+* **identity:** household profiles — several people behind one account ([c470e2e](https://github.com/sharkhunterr/portalab/commit/c470e2ef5a8c33d6b38c462e3d8b04e0780fd01f))
+* **identity:** the master's policy as switches, kept-out titles and kinds, screen time ([6f72f9e](https://github.com/sharkhunterr/portalab/commit/6f72f9ec382e47e92ec5836cf1fb86200e327983))
+* **marketplace:** a common pot's items are its master's too ([e2ef19f](https://github.com/sharkhunterr/portalab/commit/e2ef19fdd9af39f0cd6c5c53323f2b2c919850c8))
+* **media,retro:** linked accounts by their name; the welcome offers one's own RomM account ([6f62775](https://github.com/sharkhunterr/portalab/commit/6f62775ad040228cf002c4d8625e57c5b4d548de))
+* **media:** a row of what arrived last for each kind on the media home ([daf6c12](https://github.com/sharkhunterr/portalab/commit/daf6c127810daa004f72cc75857cd1300ac99434))
+* **media:** age ratings shown as badges, coloured by age, for every kind of media ([209bea3](https://github.com/sharkhunterr/portalab/commit/209bea3db087315240a64033b14893ebe189263a))
+* **media:** filter the catalog by age rating — up to an age, unrated titles kept or not, or what I may watch ([0797275](https://github.com/sharkhunterr/portalab/commit/07972757554804b4275d1f444fc0052612c82798))
+* **onboarding:** make a household in the welcome, replayable on its own ([8456885](https://github.com/sharkhunterr/portalab/commit/845688560f612c9712b19a3fa32c55c17217ef62))
+* **retro:** each member's own RomM account, authorised by the member ([8bf24aa](https://github.com/sharkhunterr/portalab/commit/8bf24aa5d5a0fb3b85ab2b8202ffe1a915257d4c))
+* **retro:** play the RomM library's games in the portal ([1982107](https://github.com/sharkhunterr/portalab/commit/1982107389d33587864fb871293b45053f1c532e))
+* **retro:** resume from a chosen save, and the loading step by step ([0381ed6](https://github.com/sharkhunterr/portalab/commit/0381ed6fe62c2feb5370c05c4ddd9a2dbf549ad5))
+* **retro:** RomM's cores and gamepads, Flash in Ruffle, game age ratings ([c796e7d](https://github.com/sharkhunterr/portalab/commit/c796e7ddb18a8c5592780d6ab617d708a9b666cd))
+* **retro:** saves and save states per member and profile, copied to RomM ([b8d95eb](https://github.com/sharkhunterr/portalab/commit/b8d95ebc1e8786d620fb84cc8f6ba7d551a4de84))
+* **retro:** the saves always on the game's page; a new game asks which copy ([0a1b731](https://github.com/sharkhunterr/portalab/commit/0a1b731cef28c5ab940f408b8b343c1099686177))
+* **shell:** one look for the pages between pages ([6d80375](https://github.com/sharkhunterr/portalab/commit/6d80375358068ccb257271d5f65c34d682c39585))
+* **visuals:** ten colour palettes offered to everyone ([3729331](https://github.com/sharkhunterr/portalab/commit/37293312ce2b7f7777b61aaf36d1b3ae6bd99bb4))
+
+
+### Bug Fixes
+
+* **design-system:** a visually hidden element never widens the page ([0227810](https://github.com/sharkhunterr/portalab/commit/022781043032b261979ea8b40ec01010b77f2373))
+* **gamification:** a live TV sitting keeps a play streak ([63fb9b9](https://github.com/sharkhunterr/portalab/commit/63fb9b909ce9a848259240d577940e860a53a880))
+* **household,gamification:** an erased profile leaves no trace on the admin's screens; the welcome tells how the portal works ([89b0ad2](https://github.com/sharkhunterr/portalab/commit/89b0ad2fa154eb222c079d601834b97b6ade4628))
+* **household:** a removed profile leaves its household ([d8f0c76](https://github.com/sharkhunterr/portalab/commit/d8f0c769aa7b8adbb54911a598152abd0b9b7fc9))
+* **household:** separate profiles see no common wallet ([3f8ce70](https://github.com/sharkhunterr/portalab/commit/3f8ce70da0474a9a0da61208ec1f12dc2c0758be))
+* **household:** the request service's shelves follow a profile's lock; no ticket calls without the support ([00ccc06](https://github.com/sharkhunterr/portalab/commit/00ccc06b91d764833ba6b4771d2422ae0656aefe))
+* **i18n:** the library's video games (RomM) told from the portal's mini-games ([42e1009](https://github.com/sharkhunterr/portalab/commit/42e1009eb8c4fc2567cd908b4d105e35f1c0767b))
+* **i18n:** the welcome's and the household's new French texts say « tu » like the rest ([f97cb3f](https://github.com/sharkhunterr/portalab/commit/f97cb3f32ad2e560c985ee40a48c36918d5c5125))
+* **i18n:** without a system language, the languages the admin chose count before the factory locale ([91084cb](https://github.com/sharkhunterr/portalab/commit/91084cbe288e58ea14b43d0798ed270bf20f5757))
+* **identity:** « My household » in the avatar menu and in « My settings » ([d218e42](https://github.com/sharkhunterr/portalab/commit/d218e42ece9f132cc044793340edef159b240b09))
+* **identity:** a protected profile always asks its PIN, one-tap switch, a profile's own welcome ([ecd5b12](https://github.com/sharkhunterr/portalab/commit/ecd5b12339bdf7f205830f7133b2fcd525b6c2cf))
+* **media:** a live TV sitting counts its whole length ([ad5a9da](https://github.com/sharkhunterr/portalab/commit/ad5a9dabb5f9f68e2463ce0783886c872d712a67))
+* **media:** a play the portal recorded is not its shared account's too ([5255be7](https://github.com/sharkhunterr/portalab/commit/5255be741f825c5126952a373232a446c2d29629))
+* **media:** a profile's media is not in its master's Continue, whatever its kind ([22fb03f](https://github.com/sharkhunterr/portalab/commit/22fb03f34eb904227b0cca408252daf524565be7))
+* **notifications:** e-mail pictures no longer listed as "noname" attachments ([23270ac](https://github.com/sharkhunterr/portalab/commit/23270ac75f975bc33372650c96455c649f088ef1))
+* **onboarding:** household profiles get their welcome, with their own PIN ([da053db](https://github.com/sharkhunterr/portalab/commit/da053db5ae6ce2783e0eba7d1087afbdb922e120))
+* **onboarding:** text size in the welcome, fields within a phone's screen, no « Not allowed » dead end ([e24be29](https://github.com/sharkhunterr/portalab/commit/e24be298ad5b13557a76d067947b7267394637f6))
+* **onboarding:** the chosen language applies, flags, profiles without e-mail, a clean footer ([c376e18](https://github.com/sharkhunterr/portalab/commit/c376e18598aa08ad198e8072e91b632924e79b91))
+* **packs:** each offered palette has accents of its own, the shop's included ([57d33e8](https://github.com/sharkhunterr/portalab/commit/57d33e80a75b1b2050c52a2b1b38cfa9b630bb96))
+* **retro:** a game's time keeps counting after the page was in the background ([9ad30fb](https://github.com/sharkhunterr/portalab/commit/9ad30fb1136b90ee34b525ee1948de22381c2a78))
+* **security:** a household profile refused by its master's rules is no intrusion probe ([c87215d](https://github.com/sharkhunterr/portalab/commit/c87215daf474ae5440dbf5dabff4441ae06fbb82))
+* **shell:** every route's crumb has its words, « My household » included ([e85539e](https://github.com/sharkhunterr/portalab/commit/e85539e080030f7df2d2aca0103550e3328647d4))
+* **ui:** « Switch profile » as an icon beside the name; articles and newsletters in two columns on wide screens ([d40279e](https://github.com/sharkhunterr/portalab/commit/d40279ef33da6a616683744613a99632ad250a50))
+* **ui:** wide screens used; bingo, profile card, avatar menu; IGDB and access-request e-mail ([0487bbe](https://github.com/sharkhunterr/portalab/commit/0487bbee2cbbd69601e236ec9dbf0fc5b80a9479))
+
 ### [1.4.1](https://github.com/sharkhunterr/portalab/compare/v1.4.0...v1.4.1) (2026-11-13)
 
 
