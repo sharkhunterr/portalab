@@ -10,6 +10,8 @@
  *     node scripts/guide_shots.mjs docs/member-guide/shots --base https://127.0.0.1:8443 --login admin \
  *         --password-file <file> --out <folder> [--language fr] [--only name,name]
  *
+ * A step may replace names in the picture (``"replace": {"Real": "Shown"}``), after the page is drawn; a key
+ * starting with ``=`` replaces only a whole text (an initial: ``"=R": "S"``).
  * The password is read from a file, never from the command line. Then ``wiki_import.py --shots <folder>``.
  */
 
@@ -172,6 +174,18 @@ async function act(page, step) {
     }, step.css);
   }
   if (step.click) await page.locator(step.click).first().click();
+  // issue 456: names replaced in the picture (a real family's children never shown in public screenshots)
+  if (step.replace) {
+    await page.evaluate((pairs) => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        let text = node.nodeValue ?? "";
+        for (const [from, to] of Object.entries(pairs))
+          text = from.startsWith("=") ? (text.trim() === from.slice(1) ? to : text) : text.split(from).join(to);
+        if (text !== node.nodeValue) node.nodeValue = text;
+      }
+    }, step.replace);
+  }
   if (step.follow) {
     // a link's address, rewritten (a set's page → its work's page)
     let href = await page.locator(step.follow).first().getAttribute("href");

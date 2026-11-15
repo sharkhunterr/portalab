@@ -59,8 +59,10 @@ export function useFormat() {
      * region's: the words around them are in that language) */
     list: (items: string[]) => new Intl.ListFormat(ctx.language, { type: "conjunction" }).format(items),
     percent: (ratio: number) => new Intl.NumberFormat(ctx.locale, { style: "percent" }).format(ratio),
+    /** « 2 hours ago » — words too, so in the interface's language (an English page in France never reads
+     * « il y a 2 heures », issue 456) */
     relative: (seconds: number) => {
-      const rtf = new Intl.RelativeTimeFormat(ctx.locale, { numeric: "auto" });
+      const rtf = new Intl.RelativeTimeFormat(ctx.language, { numeric: "auto" });
       const abs = Math.abs(seconds);
       if (abs < 60) return rtf.format(Math.round(seconds), "second");
       if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
