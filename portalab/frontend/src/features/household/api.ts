@@ -54,9 +54,10 @@ export function useSwitchProfile() {
   });
 }
 
-export function useHousehold() {
+export function useHousehold(enabled = true) {
   return useQuery({
     queryKey: HOUSEHOLD_KEY,
+    enabled,
     queryFn: async () => (await api.GET("/api/v1/household")).data as Household,
   });
 }

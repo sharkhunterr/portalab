@@ -1,7 +1,8 @@
 """Privacy participant (T028; CD-005, R12): final deletion releases then **destroys** remaining Coins with
 recorded ``destruction`` transactions (never refunded or transferred) — XP and Contribution are zeroed the
 same way so the ledger still balances — removes balances, counters, windows,
-progress and withheld entries; ledger rows stay bound to the tombstoned user id with no free text. Idempotent
+progress and withheld entries; ledger rows stay bound to the tombstoned user id with no free text (issue 450:
+the account listed as erased, the administration's screens leave them out). Idempotent
 on retry. Export lists the user's own transactions and achievements."""
 
 from collections.abc import Sequence
@@ -9,6 +10,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import delete, select
+from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.privacy_participants import ErasureMode, ExportRecord
 from portalab.core.db import Database
@@ -19,6 +21,7 @@ from portalab.modules.gamification.models import (
     AppliedEvent,
     Balance,
     Counter,
+    ErasedMember,
     LedgerTransaction,
     PlayKind,
     QuestProgress,
@@ -157,5 +160,9 @@ class GamificationParticipant:
                 WheelSpin,
             ):
                 await session.execute(delete(model).where(model.user_id == user_id))
+            # issue 450: its rows stay (append-only) but no administration screen shows them any more
+            await session.execute(
+                insert(ErasedMember).values(user_id=user_id, erased_at=now).on_conflict_do_nothing()
+            )
         if self.leaderboards is not None:
             await self.leaderboards.forget(user_id)

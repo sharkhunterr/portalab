@@ -236,3 +236,62 @@ async def test_a_profile_keeps_its_own_streak_and_the_pots(gm: GamHarness, app: 
     after = start + timedelta(days=2)
     assert (await gm.module.streaks.current(lea, after))["days"] == 3
     assert (await gm.module.streaks.current(owner, after))["today"] is False  # its master's no longer
+
+
+async def test_the_admin_sees_each_profiles_streak_and_no_deleted_account(
+    gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 450: the members' streaks list the household profiles (none yet included), named as their
+    master's; a deleted account leaves the administration's charts."""
+    from portalab.modules.identity.domain.state_machine import AccountState
+    from tests.integration.identity.helpers import module_of, set_state
+
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    boss = gm.p("boss")
+    await gm.module.rewards.grant_manual(
+        boss, gm.people["ulrich"], "xp", 5, reason="quest", idempotency_key="u"
+    )
+    await login(client, "boss")
+    streaks = (await client.get("/api/v1/admin/gamification/streaks")).json()
+    mine = next(row for row in streaks if row["user_id"] == str(lea))
+    assert mine["days"] == 0 and mine["profile_of"] == "ursula"
+
+    await set_state(module_of(app), gm.people["ulrich"], AccountState.DELETED)
+    members = (await client.get("/api/v1/admin/gamification/members", params={"value": "xp"})).json()
+    assert str(gm.people["ulrich"]) not in {m["user_id"] for m in members["members"]}
+
+
+async def test_an_erased_profile_leaves_every_admin_screen(
+    gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 450: an erased profile's ledger rows stay (append-only, non-identifying) but no administration
+    screen shows them — the journal, the charts, its transactions; its master's own rows stay."""
+    from portalab.modules.gamification.privacy.participant import GamificationParticipant
+
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    boss = gm.p("boss")
+    await gm.module.rewards.grant_manual(boss, lea, "xp", 40, reason="quest", idempotency_key="e1")
+    await gm.module.rewards.grant_manual(boss, owner, "xp", 10, reason="own", idempotency_key="e2")
+    await login(client, "boss")
+
+    async def journal() -> set[str]:
+        page = (await client.get("/api/v1/admin/gamification/operations", params={"days": 30})).json()
+        return {item["user_id"] for item in page["items"]}
+
+    assert str(lea) in await journal()
+    participant = GamificationParticipant(gm.database, gm.module.writer, clock=gm.clock)
+    await participant.erase(lea, "final")
+
+    assert str(lea) not in await journal() and str(owner) in await journal()
+    await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
+    members = (await client.get("/api/v1/admin/gamification/members", params={"value": "xp"})).json()
+    assert str(lea) not in {m["user_id"] for m in members["members"]}
+    theirs = await client.get("/api/v1/admin/economy/transactions", params={"user": str(lea)})
+    assert theirs.status_code == 200 and theirs.json()["items"] == []
+    async with gm.database.session() as session:  # the ledger itself still holds them
+        kept = await session.scalar(
+            select(func.count()).select_from(LedgerTransaction).where(LedgerTransaction.user_id == lea)
+        )
+    assert kept and kept > 0

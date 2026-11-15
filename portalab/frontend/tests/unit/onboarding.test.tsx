@@ -414,6 +414,10 @@ describe("welcome", () => {
     );
     await waitFor(() => expect(puts).toContainEqual({ "shell.onboarding.play": play }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    // issue 450: how the portal works, before it opens
+    expect(await screen.findByRole("heading", { name: "How the portal works" })).toBeInTheDocument();
+    expect(screen.getByText("XP, Coins and Contribution")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(await screen.findByRole("heading", { name: "All set, Alice!" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Notifications and e-mails/ })).toHaveAttribute(
       "href",

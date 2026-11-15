@@ -6,11 +6,13 @@ from portalab.capabilities.administration import EXTENSION_STATE_CAPABILITY
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
 from portalab.capabilities.navigation.attention import ATTENTION
 from portalab.capabilities.notifications import declare_category, default_categories
+from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY, EXPORT_CAPABILITY
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.audit_port import AuditSink
 from portalab.core.db import Database
 from portalab.core.time import Clock
 from portalab.modules.household import settings as _settings  # noqa: F401 — declares its settings
+from portalab.modules.household.participant import HouseholdParticipant
 from portalab.modules.household.service import CATEGORY, HouseholdAttention, HouseholdService
 
 KEY = "household"
@@ -37,6 +39,10 @@ class HouseholdModule:
             self.capabilities.provide(
                 ATTENTION, HouseholdAttention(self.service), instance_ref=KEY, owner=OWNER
             )
+        participant = HouseholdParticipant(self.database, self.service.forget)  # issue 450
+        for capability in (ERASURE_CAPABILITY, EXPORT_CAPABILITY):
+            if not any(p.instance_ref == KEY for p in self.capabilities.system_providers(capability)):
+                self.capabilities.provide(capability, participant, instance_ref=KEY, owner=OWNER)
         if default_categories.get(CATEGORY) is None:
             declare_category(CATEGORY, OWNER, "household:category", default_channels=("portal", "email"))
 

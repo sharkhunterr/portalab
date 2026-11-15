@@ -35,12 +35,24 @@ export function MemberStreaks({ onMember }: { onMember?: (user: string) => void 
               primary: true,
               render: (row) => {
                 const name = row.name ?? t("gamification:admin.streak.unknown");
-                return onMember ? (
+                const who = onMember ? (
                   <button type="button" className="ds-link" onClick={() => onMember(row.user_id)}>
                     {name}
                   </button>
                 ) : (
                   name
+                );
+                // issue 450: a household profile, and whose
+                return row.profile_of ? (
+                  <span className="streak-profile">
+                    {who}
+                    <span className="household-badge">
+                      <Icon name="users" size={12} />
+                      {t("gamification:admin.streak.profileOf", { name: row.profile_of })}
+                    </span>
+                  </span>
+                ) : (
+                  who
                 );
               },
             },

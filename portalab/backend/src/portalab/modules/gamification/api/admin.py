@@ -19,7 +19,13 @@ from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, Unavailable, ValidationFailed
 from portalab.core.time import utc_now
 from portalab.modules.gamification.api.me import EconomyTransactionPage, Module, transaction_out
-from portalab.modules.gamification.models import Balance, LedgerTransaction, RewardRule
+from portalab.modules.gamification.models import (
+    Balance,
+    ErasedMember,
+    LedgerTransaction,
+    RewardRule,
+    not_erased,
+)
 from portalab.modules.gamification.permissions import ECONOMY_MANAGE, GRANT, MANAGE
 from portalab.modules.gamification.rules.simulate import simulate
 from portalab.modules.gamification.verify.verifier import verify
@@ -347,7 +353,11 @@ async def economy_summary(
                     func.sum(case((LedgerTransaction.delta > 0, LedgerTransaction.delta), else_=0)),
                     func.sum(case((LedgerTransaction.delta < 0, -LedgerTransaction.delta), else_=0)),
                 )
-                .where(LedgerTransaction.occurred_at >= since, LedgerTransaction.value.in_(("coins", "xp")))
+                .where(
+                    LedgerTransaction.occurred_at >= since,
+                    LedgerTransaction.value.in_(("coins", "xp")),
+                    not_erased(LedgerTransaction.user_id),  # issue 450: an erased account, out
+                )
                 .group_by("day", LedgerTransaction.value)
             )
         ).all()
@@ -408,6 +418,9 @@ async def ledger(
                 sensitive=True,
             ),
         )
+    async with module.database.session() as session:
+        if await session.get(ErasedMember, user) is not None:  # issue 450: an erased account, gone
+            return EconomyTransactionPage(items=[], next_cursor=None)
     page = await module.economy.history(user, value=value, cursor=cursor)
     return EconomyTransactionPage(
         items=[transaction_out(t) for t in page.items], next_cursor=page.next_cursor

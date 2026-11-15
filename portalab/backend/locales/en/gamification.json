@@ -1101,5 +1101,6 @@
   "admin.household.grouped": "Group profiles on their master in the charts",
   "admin.household.groupedHint": "A profile's figures are shown on its master's row.",
   "admin.household.dispatchedHint": "Each profile has its own row in the charts.",
-  "admin.household.saved": "Saved"
+  "admin.household.saved": "Saved",
+  "admin.streak.profileOf": "Profile of {name}"
 }

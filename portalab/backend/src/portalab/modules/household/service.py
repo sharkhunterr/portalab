@@ -12,7 +12,7 @@ from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -603,6 +603,8 @@ class HouseholdService:
             row = await uow.session.get(HouseholdMember, profile, with_for_update=True)
             if row is not None:
                 await uow.session.delete(row)
+            # issue 450: nor its access requests (unnamed, they waited for its master)
+            await uow.session.execute(delete(AccessRequest).where(AccessRequest.profile_id == profile))
         self.forget(profile)
 
     # --- supervision ---------------------------------------------------------------------------------

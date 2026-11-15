@@ -125,6 +125,7 @@ MEMBER_COLUMNS: dict[tuple[str, str], Policy] = {
     ("gamification.streak_days", "user_id"): "drop",
     ("gamification.freeze_grants", "user_id"): "drop",
     ("gamification.boosts", "user_id"): "drop",
+    ("gamification.erased_members", "user_id"): "drop",  # 450: an erased account, out of the admin screens
     ("gamification.transactions", "actor_user_id"): "reassign",
     ("marketplace.requests", "user_id"): "drop",
     ("marketplace.requests", "decided_by"): "reassign",

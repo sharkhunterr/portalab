@@ -18179,6 +18179,8 @@ export interface components {
             /** Name */
             name: string | null;
             next: components["schemas"]["StreakNextOut"] | null;
+            /** Profile Of */
+            profile_of?: string | null;
             /**
              * Recent
              * @default []

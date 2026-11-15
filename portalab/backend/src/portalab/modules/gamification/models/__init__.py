@@ -20,6 +20,7 @@ from sqlalchemy import (
     Numeric,
     String,
     UniqueConstraint,
+    select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -341,6 +342,21 @@ class QuestProgress(GamificationBase):
     counts: Mapped[list[int]] = mapped_column(JSONB, nullable=False, default=list)
     completed_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+class ErasedMember(GamificationBase):
+    """Issue 450: an account erased — its ledger rows stay (append-only, non-identifying, the ledger balances)
+    but no administration screen shows them any more: for the administrators, the member is gone."""
+
+    __tablename__ = "erased_members"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    erased_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+
+
+def not_erased(column: Any) -> Any:
+    """Issue 450: the rows of members still there (an erased account's are left out)."""
+    return column.not_in(select(ErasedMember.user_id))
 
 
 class StreakDay(GamificationBase):

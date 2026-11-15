@@ -10,7 +10,7 @@ from uuid import UUID
 
 from sqlalchemy import case, literal, true
 
-from portalab.modules.gamification.models import LedgerTransaction
+from portalab.modules.gamification.models import LedgerTransaction, not_erased
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,8 +42,9 @@ async def chart_scope(module: Any) -> ChartScope:
                     dispatched[profile] = owner
         except Exception:
             pot, dispatched = set(), {}
+    present = not_erased(LedgerTransaction.user_id)  # issue 450: an erased account, out of every chart
     if not module.config.household_grouped:
-        return ChartScope(LedgerTransaction.user_id, LedgerTransaction.profile_id.is_(None))
+        return ChartScope(LedgerTransaction.user_id, LedgerTransaction.profile_id.is_(None) & present)
     kind = LedgerTransaction.user_id.type
     who = (
         case(
@@ -53,5 +54,5 @@ async def chart_scope(module: Any) -> ChartScope:
         if dispatched
         else LedgerTransaction.user_id
     )
-    keep = LedgerTransaction.user_id.not_in(sorted(pot)) if pot else true()
+    keep = (LedgerTransaction.user_id.not_in(sorted(pot)) if pot else true()) & present
     return ChartScope(who, keep, dispatched)

@@ -6,7 +6,7 @@ its profiles' access requests; deleting a profile signs out the browsers using i
 takes its profiles along; a profile kept out of the community is no member there."""
 
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import httpx
 import pytest
@@ -326,3 +326,30 @@ async def test_a_master_makes_its_household_or_undoes_an_empty_one(
     assert (await client.delete(f"/api/v1/household/profiles/{zoe}")).status_code == 204
     assert (await client.delete("/api/v1/household/made")).status_code == 204  # its removed profile gone too
     assert await made() is False
+
+
+async def test_a_removed_profile_leaves_no_request_behind(app: FastAPI, client: httpx.AsyncClient) -> None:
+    """Issue 450: a removed profile's access requests go with it (they waited, unnamed, for its master), and
+    its household takes part in the erasure of an account (its row, its requests)."""
+    from portalab.capabilities.privacy_participants import ERASURE_CAPABILITY
+
+    module, alice, lea, tom = await _family(app, client)
+    service = households(app)
+    for profile in (lea, tom):
+        await service.ask(
+            Principal(user_id=profile, profile_of=alice),
+            kind="media",
+            ref=str(uuid4()),
+            title="Alien",
+            rating="16",
+            note=None,
+        )
+    assert len(await service.requests(Principal(user_id=alice))) == 2
+    assert (await client.delete(f"/api/v1/household/profiles/{tom}")).status_code == 204
+    assert [r["profile_id"] for r in await service.requests(Principal(user_id=alice))] == [lea]
+
+    participants = module.ctx.capabilities.system_providers(ERASURE_CAPABILITY)
+    household = next(p.provider for p in participants if p.instance_ref == "household")
+    await household.erase(lea, "final")
+    assert await service.requests(Principal(user_id=alice)) == []
+    assert await service.exists(lea) is False

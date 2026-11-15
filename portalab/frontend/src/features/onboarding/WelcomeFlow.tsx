@@ -11,6 +11,7 @@ import { TextField } from "../../design-system/components/Field";
 import { Icon } from "../../design-system/components/Icon";
 import { useT } from "../../i18n/hooks/useT";
 import { useLocaleContext } from "../../i18n/provider/I18nProvider";
+import { useNavigationView } from "../../shell/nav/NavigationProvider";
 import { useShellPreference } from "../../shell/preferences";
 import { ApiError } from "../../state/regions";
 import { PalettePicker } from "../appearance/PalettePicker";
@@ -60,6 +61,7 @@ const STEPS = [
   "home",
   "notify",
   "style",
+  "discover",
   "ready",
 ] as const;
 type Step = (typeof STEPS)[number];
@@ -82,6 +84,7 @@ const ART: Record<Step, string> = {
   presence: "eye",
   notify: "bell",
   style: "palette",
+  discover: "compass",
   ready: "rocket",
 };
 
@@ -273,6 +276,9 @@ export function WelcomeFlow() {
                 />
               ) : null}
               {step === "style" ? <Style titleId={titleId} onBack={back} onNext={next} /> : null}
+              {step === "discover" ? (
+                <Discover titleId={titleId} profile={profile} nav={<Nav onBack={back} onNext={next} />} />
+              ) : null}
               {step === "ready" ? (
                 <Ready
                   titleId={titleId}
@@ -533,7 +539,8 @@ const FLAG_COUNTRY: Record<string, string> = {
 
 function flagOf(code: string): string {
   const parts = code.split(/[-_]/);
-  const region = parts[1]?.length === 2 ? parts[1].toUpperCase() : FLAG_COUNTRY[parts[0]?.toLowerCase() ?? ""];
+  const region =
+    parts[1]?.length === 2 ? parts[1].toUpperCase() : FLAG_COUNTRY[parts[0]?.toLowerCase() ?? ""];
   if (!region) return "🌐";
   return String.fromCodePoint(...[...region].map((letter) => 0x1f1e6 + letter.charCodeAt(0) - 65));
 }
@@ -899,6 +906,60 @@ function RetroStep({ titleId, only, nav }: { titleId: string; only: readonly str
       <DialogPrimitive.Title id={titleId}>{t("onboarding:retro.title")}</DialogPrimitive.Title>
       <p className="onboarding-welcome__lead">{t("onboarding:retro.lead")}</p>
       <RetroAccountList only={only} />
+      {nav}
+    </>
+  );
+}
+
+/** Issue 450: how the portal works, before it opens — what this member's menu holds (watching, playing, the
+ * wiki, help, the community) and how they progress (XP, Coins, Contribution); for a household profile, its
+ * household's share. */
+const DISCOVER: Array<{ key: string; icon: string; route?: string }> = [
+  { key: "menu", icon: "menu" },
+  { key: "media", icon: "play", route: "/media" },
+  { key: "games", icon: "gamepad", route: "/games" },
+  { key: "wiki", icon: "book-open", route: "/wiki" },
+  { key: "support", icon: "lifebuoy", route: "/support" },
+  { key: "community", icon: "users", route: "/community" },
+  { key: "progress", icon: "trophy", route: "/progression" },
+];
+
+function Discover({ titleId, profile, nav }: { titleId: string; profile: boolean; nav: ReactNode }) {
+  const t = useT();
+  const navigation = useNavigationView();
+  const household = useHousehold(profile);
+  const routes = new Set(
+    navigation.view.sections.flatMap((section) => [
+      ...section.entries.map((entry) => entry.route),
+      ...section.topics.flatMap((topic) => topic.entries.map((entry) => entry.route)),
+    ]),
+  );
+  const known = routes.size > 0; // the menu not there yet: every part is told
+  const pot = profile && (household.data?.economy ?? "pot") === "pot";
+  const parts = DISCOVER.filter((part) => !part.route || !known || routes.has(part.route));
+  const text = (key: string) => {
+    if (key === "community" && profile) return t("onboarding:discover.communityProfile");
+    if (key === "progress" && profile)
+      return t(pot ? "onboarding:discover.progressPot" : "onboarding:discover.progressOwn");
+    return t(`onboarding:discover.${key}`);
+  };
+  return (
+    <>
+      <DialogPrimitive.Title id={titleId}>{t("onboarding:discover.title")}</DialogPrimitive.Title>
+      <p className="onboarding-welcome__lead">{t("onboarding:discover.lead")}</p>
+      <ul className="onboarding-discover">
+        {parts.map((part) => (
+          <li key={part.key}>
+            <span className="onboarding-discover__icon" aria-hidden="true">
+              <Icon name={part.icon} size={20} />
+            </span>
+            <span>
+              <strong>{t(`onboarding:discover.${part.key}Title`)}</strong>
+              <span>{text(part.key)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
       {nav}
     </>
   );

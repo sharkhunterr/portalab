@@ -14075,6 +14075,17 @@
               }
             ]
           },
+          "profile_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Of"
+          },
           "recent": {
             "default": [],
             "items": {

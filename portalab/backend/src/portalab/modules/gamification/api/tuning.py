@@ -31,6 +31,7 @@ from portalab.modules.gamification.models import (
     PlayKind,
     Quest,
     RewardRule,
+    not_erased,
 )
 from portalab.modules.gamification.permissions import MANAGE
 from portalab.modules.gamification.progression.plays import plays as plays_by_kind
@@ -291,16 +292,11 @@ async def progress(
                 .limit(12)
             )
         ).all()
-    directory = module.capabilities.system_providers(DIRECTORY)
     members: list[MemberSeriesOut] = []
     for user_id, total in leaders:
-        name = None
-        if directory:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
         running = int(before.get(user_id) or 0)
         points: list[MemberPointOut] = []
         for owner, when, delta in moves:
@@ -358,6 +354,7 @@ class MemberStreakOut(StreakOut):
     user_id: UUID
     name: str | None
     freezes: int = 0
+    profile_of: str | None = None  # issue 450: a household profile — its master's name
 
 
 @router.get("/admin/gamification/streaks", response_model=list[MemberStreakOut])
@@ -366,20 +363,40 @@ async def member_streaks(
 ) -> list[MemberStreakOut]:
     """#389: every member's play streak — the longest now first —, its record and its last days, with
     the freezes they hold."""
-    board = (await module.streaks.board(utc_now(module.clock)))[:limit]
-    directory = module.capabilities.system_providers(DIRECTORY)
+    now = utc_now(module.clock)
+    board = (await module.streaks.board(now))[:limit]
+    # issue 450: the household profiles too, with no streak yet (each its own, its master's named)
+    household = module._household()
+    profiles: dict[UUID, UUID] = {}
+    if household is not None:
+        try:
+            for profile in await household.profiles():
+                owner = await household.owner_of(profile)
+                if owner is not None:
+                    profiles[profile] = owner
+        except Exception:
+            profiles = {}
+    listed = {user for user, _ in board}
+    empty = module.streaks.summary({}, module.streaks._day(now))
+    board += [(profile, empty) for profile in sorted(profiles) if profile not in listed]
     out: list[MemberStreakOut] = []
-    for user_id, state in board:
-        name = None
-        if directory:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+    for user_id, state in board[:limit]:
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
+        owner = profiles.get(user_id)
+        master = await _name_of(module, owner) if owner is not None else None
         freezes = await module.perks.freezes_available(user_id)
         out.append(
-            MemberStreakOut.model_validate({**state, "user_id": user_id, "name": name, "freezes": freezes})
+            MemberStreakOut.model_validate(
+                {
+                    **state,
+                    "user_id": user_id,
+                    "name": name,
+                    "freezes": freezes,
+                    "profile_of": master if isinstance(master, str) else None,
+                }
+            )
         )
     return out
 
@@ -440,20 +457,15 @@ async def population(
             )
         ).all()
         curve = await module.levels.curve(session)
-    directory = module.capabilities.system_providers(DIRECTORY)
     members: list[MemberPositionOut] = []
     rates: list[float] = []
     for user_id, first, total, recent in rows:
         days = max(0, (now - first).days)
         if recent and int(recent) > 0:
             rates.append(int(recent) / min(30, max(1, days)))
-        name = None
-        if directory and len(members) < 50:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
         members.append(
             MemberPositionOut(
                 user_id=user_id, name=name, days=days, xp=int(total), level=curve.level_for(int(total))
@@ -604,16 +616,11 @@ async def members_progress(
                 .order_by(day)
             )
         ).all()
-    directory = module.capabilities.system_providers(DIRECTORY)
     members: list[MemberProgressOut] = []
     for user_id, balance in balances:
-        name = None
-        if directory:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
         gains = await gain_sources(module.database, user_id, value, since, zone, whose=scope.whose(user_id))
         running = int(before.get(user_id) or 0)
         points = [MemberPointOut(day=since.astimezone(UTC).date().isoformat(), total=running)]
@@ -743,16 +750,11 @@ async def members_details(
     spent: dict[UUID, dict[str, dict[str, int]]] = {}
     for user, value, when, amount in taken:
         spent.setdefault(user, {}).setdefault(value, {})[when.isoformat()] = -int(amount or 0)
-    directory = module.capabilities.system_providers(DIRECTORY)
     out: list[MemberDetailOut] = []
     for user_id in ids:
-        name = None
-        if directory:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
         line = await gain_timeline(module.database, user_id, since, zone, curve, whose=scope.whose(user_id))
         mine = spent.get(user_id, {})
         reached: dict[str, list[int]] = {}
@@ -971,8 +973,13 @@ async def _operations(
         inner = inner.where(LedgerTransaction.value == value)
     ledger = inner.subquery()
     row = aliased(LedgerTransaction, ledger)
-    query = select(row, ledger.c.running).where(row.occurred_at >= since)
-    counted = select(func.count()).select_from(ledger).where(ledger.c.occurred_at >= since)
+    # issue 450: an erased account's rows stay (append-only) but leave the journal
+    query = select(row, ledger.c.running).where(row.occurred_at >= since, not_erased(row.user_id))
+    counted = (
+        select(func.count())
+        .select_from(ledger)
+        .where(ledger.c.occurred_at >= since, not_erased(ledger.c.user_id))
+    )
     if play:  # issue 160: only the gains of one kind of play (episodes, films, books…) — balances unchanged
         raw = [kind for kind, source in PLAY_SOURCES.items() if source == play] or [play]
         of_play = select(PlayKind.event_id).where(PlayKind.kind.in_(raw))
@@ -1217,16 +1224,28 @@ async def _works(module: Any, viewer: Principal, objects: set[str]) -> dict[str,
     return out
 
 
-async def _names(module: Any, ids: set[UUID]) -> dict[UUID, str | None]:
+GONE: Any = object()  # issue 450: an account deleted (or unknown) — out of the charts
+
+
+async def _name_of(module: Any, user_id: UUID) -> Any:
+    """A member's name for a chart (``None`` when it has none), ``GONE`` for a deleted account."""
     directory = module.capabilities.system_providers(DIRECTORY)
+    if not directory:
+        return None
+    try:
+        summary = await directory[0].provider.get_user_summary(user_id)
+    except Exception:
+        return None
+    if summary is None or summary.anonymized or not summary.is_active:
+        return GONE
+    return summary.display_name
+
+
+async def _names(module: Any, ids: set[UUID]) -> dict[UUID, str | None]:
     out: dict[UUID, str | None] = {}
     for user_id in ids:
-        name = None
-        if directory:
-            try:
-                summary = await directory[0].provider.get_user_summary(user_id)
-                name = summary.display_name if summary else None
-            except Exception:
-                name = None
+        name = await _name_of(module, user_id)
+        if name is GONE:
+            continue  # issue 450: a deleted account leaves the administration's charts
         out[user_id] = name
     return out

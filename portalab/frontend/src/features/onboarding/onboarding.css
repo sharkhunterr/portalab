@@ -1604,3 +1604,38 @@ button.first-steps__start:focus-visible {
   font-size: 1.3em;
   line-height: 1;
 }
+
+/* issue 450: how the portal works */
+.onboarding-discover {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.onboarding-discover li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.onboarding-discover li > span:last-child {
+  display: grid;
+  gap: var(--space-1);
+}
+.onboarding-discover li > span:last-child > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.onboarding-discover__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}

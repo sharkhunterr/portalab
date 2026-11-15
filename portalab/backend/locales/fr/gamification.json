@@ -1101,5 +1101,6 @@
   "admin.household.grouped": "Regrouper les profils sur le maître dans les graphiques",
   "admin.household.groupedHint": "Les chiffres d'un profil apparaissent sur la ligne de son maître.",
   "admin.household.dispatchedHint": "Chaque profil a sa propre ligne dans les graphiques.",
-  "admin.household.saved": "Enregistré"
+  "admin.household.saved": "Enregistré",
+  "admin.streak.profileOf": "Profil de {name}"
 }
