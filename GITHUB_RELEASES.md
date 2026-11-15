@@ -79,6 +79,11 @@ checked end to end before a release goes out.
   *Watch and read*. A tour is offered only to members who may use its feature.
 - **Dates in your language** — the calendar, its widget and the statistics' month labels follow the
   interface's language, not the browser's.
+- **Plex steady again** — Plex was marked unavailable for a minute every ten minutes, cutting live
+  sessions, the watch history and the library sync meanwhile; posters now come through Plex's own photo
+  transcoder, and a poster kept elsewhere is no longer taken for an outage.
+- **The retro player in Portalab's look** — the emulator's menus, windows, buttons and fields take the
+  theme's colours, font and corners.
 
 ### Closed issues
 
@@ -90,11 +95,15 @@ checked end to end before a release goes out.
 - `bug` Over the assistant's window, a guided tour's bubble was hidden from screen readers
 - `bug` A translated wiki page and the wiki's navigation always showed the source language
 - `bug` A household profile was offered the tours of features it cannot use
+- `bug` Plex was marked unavailable a minute every ten minutes (posters kept on another host were taken
+  for an outage); its posters come through its photo transcoder and Plex stays available
+- `bug` On a phone, the video player's settings panel ran past the screen's left edge
 
 #### New
 
 - `feat` Portalab's member guide in the wiki, in English and French, kept up to date by every release
 - `feat` Guided tours of My household, Retro games and My settings; age ratings in « Watch and read »
+- `feat` The retro player's emulator in Portalab's look
 
 #### Documentation and tooling
 
