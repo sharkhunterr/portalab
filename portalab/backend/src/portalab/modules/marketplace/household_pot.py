@@ -77,8 +77,10 @@ class MarketplacePot:
                     )
                     await uow.session.flush()
                 else:
-                    row.quantity += quantity
-                    row.household_copies += quantity
+                    # what it consumed of an earlier pot still counts: a switch back never fills it again
+                    more = max(0, quantity - row.household_copies)
+                    row.quantity += more
+                    row.household_copies += more
                     row.updated_at = now
 
     async def _give_back(self, owner: UUID, profiles: Sequence[UUID]) -> None:
@@ -105,10 +107,11 @@ class MarketplacePot:
             await session.execute(
                 update(ReserveItem)
                 .where(ReserveItem.user_id == owner, ReserveItem.household_copies > 0)
-                .values(
+                .values(  # what it consumed already stays counted (never copied again on a switch back)
                     quantity=ReserveItem.quantity
                     - func.least(ReserveItem.household_copies, ReserveItem.quantity),
-                    household_copies=0,
+                    household_copies=ReserveItem.household_copies
+                    - func.least(ReserveItem.household_copies, ReserveItem.quantity),
                     updated_at=now,
                 )
             )

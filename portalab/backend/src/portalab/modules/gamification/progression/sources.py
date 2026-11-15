@@ -122,7 +122,10 @@ def split(row_kind: str, delta: int, base: int, modifiers: dict[str, Any], actio
     return out
 
 
-async def sources(database: Database, user: UUID, value: str, since: datetime, zone: str) -> dict[str, Any]:
+async def sources(
+    database: Database, user: UUID, value: str, since: datetime, zone: str, *, whose: Any = None
+) -> dict[str, Any]:
+    """``whose``: the rows to count (issue 443: a household's, as an administration chart groups it)."""
     day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
     async with database.session() as session:
         events = {
@@ -145,7 +148,7 @@ async def sources(database: Database, user: UUID, value: str, since: datetime, z
                 )
                 .outerjoin(PlayKind, PlayKind.event_id == LedgerTransaction.trigger_event_id)
                 .where(
-                    LedgerTransaction.user_id == user,
+                    (LedgerTransaction.user_id == user) if whose is None else whose,
                     LedgerTransaction.value == value,
                     # a correction takes back part of a gain: counted against the day it is dated
                     or_(LedgerTransaction.delta > 0, LedgerTransaction.kind == "correction"),

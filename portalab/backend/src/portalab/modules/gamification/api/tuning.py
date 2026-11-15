@@ -21,6 +21,7 @@ from portalab.core.authorization import require
 from portalab.core.authz_port import Principal
 from portalab.core.errors import Unavailable
 from portalab.core.time import utc_now
+from portalab.modules.gamification.api.household_scope import chart_scope
 from portalab.modules.gamification.api.me import Me, Module, _me
 from portalab.modules.gamification.events import GOAL_TYPES, OWN_TYPES
 from portalab.modules.gamification.models import (
@@ -225,12 +226,14 @@ async def progress(
     zone = module.config.timezone or "UTC"
     since = utc_now(module.clock) - timedelta(days=days)
     day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
+    scope = await chart_scope(module)  # issue 443: a household's rows, never one gain twice
     gained = (
+        scope.keep,
         LedgerTransaction.value == value,
         LedgerTransaction.delta > 0,
         LedgerTransaction.kind.in_(("grant", "manual", "refund", "correction")),
     )
-    active = func.count(distinct(LedgerTransaction.user_id))
+    active = func.count(distinct(scope.who))
     async with module.database.session() as session:
         daily = (
             await session.execute(
@@ -242,9 +245,9 @@ async def progress(
         ).all()
         leaders = (
             await session.execute(
-                select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta).label("gained"))
+                select(scope.who, func.sum(LedgerTransaction.delta).label("gained"))
                 .where(*gained, LedgerTransaction.occurred_at >= since)
-                .group_by(LedgerTransaction.user_id)
+                .group_by(scope.who)
                 .order_by(func.sum(LedgerTransaction.delta).desc())
                 .limit(top)
             )
@@ -254,25 +257,27 @@ async def progress(
             user: int(amount or 0)
             for user, amount in (
                 await session.execute(
-                    select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
+                    select(scope.who, func.sum(LedgerTransaction.delta))
                     .where(
-                        LedgerTransaction.user_id.in_(ids),
+                        scope.keep,
+                        scope.who.in_(ids),
                         LedgerTransaction.value == value,
                         LedgerTransaction.occurred_at < since,
                     )
-                    .group_by(LedgerTransaction.user_id)
+                    .group_by(scope.who)
                 )
             ).all()
         }
         moves = (
             await session.execute(
-                select(LedgerTransaction.user_id, day, func.sum(LedgerTransaction.delta))
+                select(scope.who, day, func.sum(LedgerTransaction.delta))
                 .where(
-                    LedgerTransaction.user_id.in_(ids),
+                    scope.keep,
+                    scope.who.in_(ids),
                     LedgerTransaction.value == value,
                     LedgerTransaction.occurred_at >= since,
                 )
-                .group_by(LedgerTransaction.user_id, day)
+                .group_by(scope.who, day)
                 .order_by(day)
             )
         ).all()
@@ -412,11 +417,12 @@ async def population(
     (XP per day over the last 30 days) — what the progression chart draws and projects."""
     now = utc_now(module.clock)
     window = now - timedelta(days=30)
+    scope = await chart_scope(module)  # issue 443
     async with module.database.session() as session:
         rows = (
             await session.execute(
                 select(
-                    LedgerTransaction.user_id,
+                    scope.who,
                     func.min(LedgerTransaction.occurred_at),
                     func.sum(LedgerTransaction.delta),
                     # the pace counts what members earn by themselves, not manual grants
@@ -426,8 +432,8 @@ async def population(
                         LedgerTransaction.delta > 0,
                     ),
                 )
-                .where(LedgerTransaction.value == "xp")
-                .group_by(LedgerTransaction.user_id)
+                .where(LedgerTransaction.value == "xp", scope.keep)
+                .group_by(scope.who)
                 .having(func.sum(LedgerTransaction.delta) > 0)
                 .order_by(func.sum(LedgerTransaction.delta).desc())
                 .limit(limit)
@@ -565,35 +571,36 @@ async def members_progress(
     zone = module.config.timezone or "UTC"
     since = since_days(utc_now(module.clock), days)
     day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
-    of_value = LedgerTransaction.value == value
+    scope = await chart_scope(module)  # issue 443: a household's rows, never one gain twice
+    of_value = (LedgerTransaction.value == value) & scope.keep
     async with module.database.session() as session:
-        query = select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta)).where(of_value)
+        query = select(scope.who, func.sum(LedgerTransaction.delta)).where(of_value)
         if member is not None:
-            query = query.where(LedgerTransaction.user_id == member)
+            query = query.where(scope.who == member)
         balances = (
             await session.execute(
-                query.group_by(LedgerTransaction.user_id)
+                query.group_by(scope.who)
                 .order_by(func.sum(LedgerTransaction.delta).desc())
                 .limit(MEMBERS_SHOWN)
             )
         ).all()
         ids = [user for user, _ in balances]
-        theirs = (of_value, LedgerTransaction.user_id.in_(ids))
+        theirs = (of_value, scope.who.in_(ids))
         before: dict[UUID, int] = {
             user: int(amount or 0)
             for user, amount in (
                 await session.execute(
-                    select(LedgerTransaction.user_id, func.sum(LedgerTransaction.delta))
+                    select(scope.who, func.sum(LedgerTransaction.delta))
                     .where(*theirs, LedgerTransaction.occurred_at < since)
-                    .group_by(LedgerTransaction.user_id)
+                    .group_by(scope.who)
                 )
             ).all()
         }
         moves = (
             await session.execute(
-                select(LedgerTransaction.user_id, day, func.sum(LedgerTransaction.delta))
+                select(scope.who, day, func.sum(LedgerTransaction.delta))
                 .where(*theirs, LedgerTransaction.occurred_at >= since)
-                .group_by(LedgerTransaction.user_id, day)
+                .group_by(scope.who, day)
                 .order_by(day)
             )
         ).all()
@@ -607,7 +614,7 @@ async def members_progress(
                 name = summary.display_name if summary else None
             except Exception:
                 name = None
-        gains = await gain_sources(module.database, user_id, value, since, zone)
+        gains = await gain_sources(module.database, user_id, value, since, zone, whose=scope.whose(user_id))
         running = int(before.get(user_id) or 0)
         points = [MemberPointOut(day=since.astimezone(UTC).date().isoformat(), total=running)]
         for owner, when, delta in moves:
@@ -708,29 +715,29 @@ async def members_details(
     since = since_days(utc_now(module.clock), days)
     day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
     curve = await module.levels.curve()
+    scope = await chart_scope(module)  # issue 443: a household's rows, never one gain twice
     async with module.database.session() as session:
-        query = select(LedgerTransaction.user_id, LedgerTransaction.value, func.sum(LedgerTransaction.delta))
+        query = select(scope.who, LedgerTransaction.value, func.sum(LedgerTransaction.delta)).where(
+            scope.keep
+        )
         if member is not None:
-            query = query.where(LedgerTransaction.user_id == member)
-        totals = (
-            await session.execute(query.group_by(LedgerTransaction.user_id, LedgerTransaction.value))
-        ).all()
+            query = query.where(scope.who == member)
+        totals = (await session.execute(query.group_by(scope.who, LedgerTransaction.value))).all()
         balances: dict[UUID, dict[str, int]] = {}
         for user, value, amount in totals:
             balances.setdefault(user, {})[value] = int(amount or 0)
         ids = sorted(balances, key=lambda u: -balances[u].get("xp", 0))[:MEMBERS_SHOWN]
         taken = (
             await session.execute(
-                select(
-                    LedgerTransaction.user_id, LedgerTransaction.value, day, func.sum(LedgerTransaction.delta)
-                )
+                select(scope.who, LedgerTransaction.value, day, func.sum(LedgerTransaction.delta))
                 .where(
-                    LedgerTransaction.user_id.in_(ids),
+                    scope.keep,
+                    scope.who.in_(ids),
                     LedgerTransaction.delta < 0,
                     LedgerTransaction.kind != "correction",  # a correction lowers the gain itself
                     LedgerTransaction.occurred_at >= since,
                 )
-                .group_by(LedgerTransaction.user_id, LedgerTransaction.value, day)
+                .group_by(scope.who, LedgerTransaction.value, day)
             )
         ).all()
     spent: dict[UUID, dict[str, dict[str, int]]] = {}
@@ -746,7 +753,7 @@ async def members_details(
                 name = summary.display_name if summary else None
             except Exception:
                 name = None
-        line = await gain_timeline(module.database, user_id, since, zone, curve)
+        line = await gain_timeline(module.database, user_id, since, zone, curve, whose=scope.whose(user_id))
         mine = spent.get(user_id, {})
         reached: dict[str, list[int]] = {}
         for up in line["level_ups"]:

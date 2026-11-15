@@ -177,3 +177,31 @@ async def test_the_community_follows_the_households_economy(gm: GamHarness, app:
     with pytest.raises(ProfileNoProjects):
         await refuse_profile(capabilities, Principal(user_id=lea, profile_of=owner), lea)
     await refuse_profile(capabilities, Principal(user_id=owner), owner)  # its master takes part
+
+
+async def test_the_admin_charts_group_profiles_on_their_master_or_not(
+    gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 443: grouped, a household is one row (a common pot's master holds its profiles' gains, a
+    dispatched profile's are drawn on its master's row); not grouped, each member its own row — never one
+    gain counted twice."""
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    boss = gm.p("boss")
+    await gm.module.rewards.grant_manual(boss, lea, "xp", 40, reason="quest", idempotency_key="c1")
+    await gm.module.rewards.grant_manual(boss, owner, "xp", 10, reason="own", idempotency_key="c2")
+    await login(client, "boss")
+
+    async def rows() -> dict[str, int]:
+        seen = await client.get("/api/v1/admin/gamification/members", params={"value": "xp"})
+        assert seen.status_code == 200, seen.text
+        return {m["user_id"]: m["balance"] for m in seen.json()["members"]}
+
+    assert (await rows()) == {str(owner): 50}  # a common pot, grouped: one row, Léa's 40 once
+    await client.put("/api/v1/admin/gamification/household", json={"grouped": False})
+    assert (await rows()) == {str(owner): 10, str(lea): 40}  # each its own, the copies left out
+
+    await households(app).set_economy(Principal(user_id=owner), "dispatch")
+    assert (await rows()) == {str(owner): 10, str(lea): 40}
+    await client.put("/api/v1/admin/gamification/household", json={"grouped": True})
+    assert (await rows()) == {str(owner): 50}  # dispatched, grouped: Léa's drawn on her master's row

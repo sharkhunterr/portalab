@@ -19,15 +19,17 @@ MAX_LEVEL_UPS = 60
 
 
 async def timeline(
-    database: Database, user: UUID, since: datetime, zone: str, curve: Curve
+    database: Database, user: UUID, since: datetime, zone: str, curve: Curve, *, whose: Any = None
 ) -> dict[str, Any]:
+    """``whose``: the rows to count (issue 443: a household's, as an administration chart groups it)."""
+    mine = (LedgerTransaction.user_id == user) if whose is None else whose
     day = cast(func.timezone(zone, LedgerTransaction.occurred_at), Date)
     async with database.session() as session:
         gains = (
             await session.execute(
                 select(day, LedgerTransaction.value, func.sum(LedgerTransaction.delta))
                 .where(
-                    LedgerTransaction.user_id == user,
+                    mine,
                     or_(LedgerTransaction.delta > 0, LedgerTransaction.kind == "correction"),
                     LedgerTransaction.kind.in_(GAINS),
                     LedgerTransaction.occurred_at >= since,
@@ -38,7 +40,7 @@ async def timeline(
         before = (
             await session.execute(
                 select(func.coalesce(func.sum(LedgerTransaction.delta), 0)).where(
-                    LedgerTransaction.user_id == user,
+                    mine,
                     LedgerTransaction.value == "xp",
                     LedgerTransaction.occurred_at < since,
                 )
@@ -48,7 +50,7 @@ async def timeline(
             await session.execute(
                 select(LedgerTransaction.occurred_at, day, LedgerTransaction.delta)
                 .where(
-                    LedgerTransaction.user_id == user,
+                    mine,
                     LedgerTransaction.value == "xp",
                     LedgerTransaction.occurred_at >= since,
                 )

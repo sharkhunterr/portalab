@@ -8,7 +8,7 @@ from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.household import copy_key, pot_master
@@ -19,13 +19,14 @@ from portalab.core.errors import Conflict, NotFound
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.ids import new_id
 from portalab.core.time import Clock, utc_now
-from portalab.modules.marketplace.models import Ownership, Product, ProductVersion
+from portalab.modules.marketplace.models import Ownership, Product, ProductVersion, ReserveItem
 from portalab.modules.marketplace.observability import log, metrics
 
 # what a member holds — ``locked`` (#81): won in a booster before they meet its level or Contribution
 LIVE = ("active", "needs_configuration", "activation_failed", "locked")
 # what a member may use (wear, see in their entitlements)
 USABLE = ("active", "needs_configuration", "activation_failed")
+SEALED = ("booster", "early_unlock")  # issue 443: owned, they go sealed into the reserve
 MAX_ATTEMPTS = 10
 
 
@@ -173,7 +174,15 @@ class Activation:
                 subject=SubjectRef("user", str(master)),
                 dedup_key=f"marketplace.grant:{copy}",
             )
-        await self.activate(copy)
+        activated = await self.activate(copy)
+        if activated.state == "active" and product.type in SEALED:
+            # its booster sealed in the master's reserve: the pot's, taken back on dispatch
+            async with self.database.unit_of_work() as uow:
+                await uow.session.execute(
+                    update(ReserveItem)
+                    .where(ReserveItem.user_id == master, ReserveItem.product_id == product.id)
+                    .values(household_copies=ReserveItem.household_copies + 1)
+                )
         return copy
 
     async def deactivate(self, ownership: Ownership) -> None:
