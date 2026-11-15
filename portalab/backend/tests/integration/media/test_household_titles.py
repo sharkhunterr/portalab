@@ -692,3 +692,129 @@ async def test_each_profiles_screen_time_is_its_own(
     assert own.json()["used"] == 20
     sibling = await client.get("/api/v1/me/media/screen-time", params={"profile": str(tom)})
     assert sibling.status_code == 404
+
+
+async def test_a_profiles_media_is_not_in_its_masters_continue(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 440, every kind of media: a profile watches with its master's account in the portal. Neither the
+    server's own « Continue » (Plex's On Deck: a film, a series' episode) nor that account's history (Plex,
+    a server's ended sessions) puts it on its master's shelf — the profile keeps it. The master's own plays,
+    in the portal too, stay the master's."""
+    from portalab.capabilities.media import STREAMING, ResumePoint
+    from portalab.capabilities.media.testkit import FakeStreaming
+    from portalab.modules.media.insights.portal import PortalActivity
+    from portalab.modules.media.models import Activity
+
+    people = await users(app, media, "zoe")
+    owner = Principal(user_id=people["zoe"])
+    arthur = UUID(
+        str(
+            (
+                await households(app).create(
+                    owner, display_name="Arthur", kind="standard", color=None, pin=None
+                )
+            )["id"]
+        )
+    )
+    plex = media.service(3, "plex")
+    await media.module.library.upsert(
+        [
+            library_record("m1", title="Film", year=2020),
+            library_record("m2", title="Mine", year=2021),
+            library_record("s1", kind="series", title="Firefly"),
+            library_record("e1", kind="episode", title="Pilot", parent="s1"),
+        ],
+        plex,
+    )
+    async with media.database.session() as session:
+        ids = dict((await session.execute(select(MediaObject.title, MediaObject.id))).tuples().all())
+    now = datetime.now(UTC)
+    fake = FakeStreaming(
+        resume=[
+            ResumePoint(
+                "m1", "movie", "Film", position_s=1500, duration_s=6000, at=now - timedelta(minutes=1)
+            ),
+            ResumePoint(
+                "e1",
+                "episode",
+                "Pilot",
+                parent_title="Firefly",
+                label="S01E01",
+                series_id="s1",
+                at=now - timedelta(minutes=2),
+            ),
+            ResumePoint(
+                "m2", "movie", "Mine", position_s=600, duration_s=6000, at=now - timedelta(minutes=3)
+            ),
+        ]
+    )
+    media.ev.full.identity.capabilities.provide(
+        STREAMING, fake, instance_ref=str(plex.service_id), owner="service:3", metadata={"connector": "plex"}
+    )
+    await media.module.links.claim(people["zoe"], plex.service_id, "7", verified=True)
+    portal = PortalActivity(media.database)
+    for who, title, ago in ((arthur, "Film", 1), (arthur, "Pilot", 2), (people["zoe"], "Mine", 3)):
+        await portal.store(
+            ref=f"portal:{uuid4()}",
+            user=who,
+            service=plex.service_id,
+            object_id=ids[title],
+            kind="episode" if title == "Pilot" else "movie",
+            watched=20 * 60,
+            duration=6000,
+            share=0.25,
+            ended=now - timedelta(minutes=ago),
+        )
+
+    def echo(ref: str, title: str, family: str | None) -> Activity:  # the shared account's history of it
+        return Activity(
+            service_id=plex.service_id,
+            ref=ref,
+            family=family,
+            priority=10,
+            counted=True,
+            external_user_id="7",
+            user_id=people["zoe"],
+            kind="episode" if title == "Pilot" else "movie",
+            title=title,
+            object_id=ids[title],
+            ids={},
+            started_at=now - timedelta(minutes=22),
+            stopped_at=now - timedelta(minutes=2),
+            watched_s=1200.0,
+            duration_s=6000.0,
+            progress=0.25,
+            received_at=now,
+        )
+
+    async with media.database.unit_of_work() as uow:
+        uow.session.add_all(
+            [
+                echo("plex:film", "Film", "plex"),
+                echo("plex:pilot", "Pilot", "plex"),
+                echo("session:film", "Film", None),  # a server without a history: its ended session
+                echo("plex:mine", "Mine", "plex"),  # the master's own, in the portal: still the master's
+            ]
+        )
+    await media.module.ingestor.dedup("plex")
+    await media.module.ingestor.echoes()
+    async with media.database.session() as session:
+        counted = {
+            a.ref: a.counted
+            for a in (await session.execute(select(Activity).where(~Activity.ref.like("portal:%")))).scalars()
+        }
+    assert counted == {"plex:film": False, "plex:pilot": False, "session:film": False, "plex:mine": True}
+
+    await login(client, "zoe")
+    shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    assert [c["title"] for c in shelf] == ["Mine"]
+    fake.resume[2] = ResumePoint(  # the master watches Arthur's film later, on the TV: the master's again
+        "m1", "movie", "Film", position_s=3000, duration_s=6000, at=now + timedelta(hours=1)
+    )
+    shelf = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    assert [c["title"] for c in shelf] == ["Film"]
+
+    assert (await client.post("/api/v1/household/switch", json={"user_id": str(arthur)})).status_code == 200
+    theirs = (await client.get("/api/v1/me/media/journal")).json()["continue"]
+    assert {c["title"] for c in theirs} == {"Film", "Pilot"}  # its own sittings in the portal

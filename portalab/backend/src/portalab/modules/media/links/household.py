@@ -16,3 +16,12 @@ async def link_holder(capabilities: CapabilityRegistry, user: UUID) -> UUID:
     except Exception:
         owner = None
     return owner or user
+
+
+async def profiles_of(capabilities: CapabilityRegistry, owner: UUID) -> frozenset[UUID]:
+    """Issue 440: the household profiles watching with ``owner``'s links (none without a household)."""
+    try:
+        providers = capabilities.system_providers(HOUSEHOLD)
+        return frozenset(await providers[0].provider.profiles_of(owner)) if providers else frozenset()
+    except Exception:
+        return frozenset()

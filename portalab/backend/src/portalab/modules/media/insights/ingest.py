@@ -117,6 +117,26 @@ RICHER_RUNNING = timedelta(hours=12)
 PORTAL_ECHO = timedelta(minutes=10)
 
 
+def portal_echo() -> Any:
+    """Issue 440: another member's sitting in the portal's player recorded this play already — a household
+    profile watching, reading, listening or playing with its master's account (or anyone told back to the
+    service's own): its echo in that account's history (Plex, Tautulli, RomM, a server's ended sessions) is
+    not the account holder's. Any kind of media: the same catalog object, the same time."""
+    portal = aliased(Activity)
+    return (
+        select(literal(1))
+        .where(
+            portal.ref.like("portal:%"),
+            portal.object_id.is_not(None),
+            portal.object_id == Activity.object_id,
+            or_(Activity.user_id.is_(None), portal.user_id != Activity.user_id),
+            portal.started_at <= func.coalesce(Activity.stopped_at, Activity.started_at) + PORTAL_ECHO,
+            Activity.started_at <= func.coalesce(portal.stopped_at, portal.started_at) + PORTAL_ECHO,
+        )
+        .exists()
+    )
+
+
 class _Resolver:
     """Item → (object, work), cached for the run."""
 
@@ -255,6 +275,7 @@ class ActivityIngestor:
         families = await self._families_touched()
         for family in families:
             await self.dedup(family)
+        await self.echoes()
         metrics.increment("media.activity.stored", stored)
         return stored
 
@@ -284,6 +305,7 @@ class ActivityIngestor:
                 raise
         for family in await self._families_touched():
             await self.dedup(family)
+        await self.echoes()
         metrics.increment("media.activity.stored", stored)
         return SinkResult(added=stored)
 
@@ -640,21 +662,7 @@ class ActivityIngestor:
             )
             .exists(),
         )
-        # issue 440: the portal's player recorded that play already — and its player: a household profile
-        # playing with its master's account (or anyone told back to the service's own) is not that account's
-        portal = aliased(Activity)
-        portal_echo = (
-            select(literal(1))
-            .where(
-                portal.ref.like("portal:%"),
-                portal.object_id.is_not(None),
-                portal.object_id == Activity.object_id,
-                portal.started_at <= func.coalesce(Activity.stopped_at, Activity.started_at) + PORTAL_ECHO,
-                Activity.started_at <= func.coalesce(portal.stopped_at, portal.started_at) + PORTAL_ECHO,
-            )
-            .exists()
-        )
-        set_aside = or_(same_play, bulk_mark, richer_missed_it, portal_echo)
+        set_aside = or_(same_play, bulk_mark, richer_missed_it, portal_echo())
         async with self.database.unit_of_work() as uow:
             session = uow.session
             changed = (
@@ -673,6 +681,27 @@ class ActivityIngestor:
                 )
             ).all()
             await mark_days(session, (r[0] for r in changed))
+
+    async def echoes(self) -> None:
+        """Issue 440: the rows of no family (a server's ended sessions, Grimmory's) that echo another member's
+        sitting in the portal are set aside too — the families' are in :meth:`dedup`."""
+        echo = portal_echo()
+        async with self.database.unit_of_work() as uow:
+            changed = (
+                await uow.session.execute(
+                    update(Activity)
+                    .where(
+                        Activity.family.is_(None),
+                        Activity.object_id.is_not(None),
+                        ~Activity.ref.like("portal:%"),
+                        or_(and_(echo, Activity.counted.is_(True)), and_(~echo, Activity.counted.is_(False))),
+                    )
+                    .values(counted=~echo)
+                    .returning(Activity.started_at)
+                    .execution_options(synchronize_session=False)
+                )
+            ).all()
+            await mark_days(uow.session, (r[0] for r in changed))
 
     async def behind(self) -> dict[UUID, datetime]:
         """#24: the richest source of a family that stopped receiving plays while another one goes on

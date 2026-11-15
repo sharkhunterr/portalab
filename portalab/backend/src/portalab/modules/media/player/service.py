@@ -37,8 +37,8 @@ from portalab.core.db import Database
 from portalab.core.errors import Conflict, Forbidden, NotFound, PortalError, Unavailable
 from portalab.core.event_port import EventPublisher, SubjectRef
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.links.household import link_holder
-from portalab.modules.media.models import PortalStream, SourceItem, UserLink
+from portalab.modules.media.links.household import link_holder, profiles_of
+from portalab.modules.media.models import Activity, PortalStream, SourceItem, UserLink
 from portalab.modules.media.player.subtitles import SubtitleFeeds
 from portalab.modules.media.player.tickets import (
     LIFETIME_S,
@@ -57,6 +57,9 @@ SEGMENT_TIMEOUT_S = 90.0
 CREDITS_TIMEOUT_S = 5.0  # #101: asked as a play ends — never holds it long
 CREDITS_REMEMBERED = 2000
 KEPT = timedelta(days=2)  # 032: who started a stream, for its live session
+# issue 440: a resume point this close to a profile's sitting in the portal is that sitting's
+THEIRS_BEFORE, THEIRS_AFTER = timedelta(hours=6), timedelta(minutes=15)
+THEIRS_DAYS = timedelta(days=90)
 
 
 class PlayerOff(Forbidden):
@@ -397,11 +400,30 @@ class PlayerService:
             series = objects.get((service, point.series_id)) if point.series_id else None
             return series or objects.get((service, point.external_id))
 
+        cards = [(point, card_of(point, service)) for point, service in points]
+        theirs = await self._profiles_sittings(user)
         return Continuing(
-            [(point, card_of(point, service)) for point, service in points][:limit],
+            [(point, card) for point, card in cards if not _theirs(point, card, theirs)][:limit],
             services,
             families,
         )
+
+    async def _profiles_sittings(self, user: UUID) -> list[tuple[UUID, UUID | None, Any]]:
+        """Issue 440: what ``user``'s household profiles watched, read or listened to in the portal lately
+        (each sitting's object, work and end) — with its account, so in its server's « Continue »."""
+        profiles = await profiles_of(self.capabilities, user)
+        if not profiles:
+            return []
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(Activity.object_id, Activity.work_id, Activity.stopped_at).where(
+                    Activity.user_id.in_(profiles),
+                    Activity.ref.like("portal:%"),
+                    Activity.object_id.is_not(None),
+                    Activity.started_at >= utc_now(self.clock) - THEIRS_DAYS,
+                )
+            )
+            return [(o, w, at) for o, w, at in rows.tuples().all() if o is not None]
 
     async def objects_on(self, services: set[UUID], object_ids: list[UUID]) -> set[UUID]:
         """The objects among ``object_ids`` that the given services hold."""
@@ -490,3 +512,17 @@ class PlayerService:
         self.feeds.close(ticket.session)
         channel = self._channel(ticket.service, ticket.account)
         await _call(channel.stop(ticket.session))
+
+
+def _theirs(point: ResumePoint, card: UUID | None, sittings: list[tuple[UUID, UUID | None, Any]]) -> bool:
+    """Issue 440: a resume point of the shared account a household profile left there — the same title (an
+    episode: its series) as its sitting in the portal, at the time it ended. The master's own later play
+    moves the point on: it is the master's again."""
+    if card is None:
+        return False
+    for object_id, work_id, ended in sittings:
+        if card not in (object_id, work_id):
+            continue
+        if point.at is None or ended is None or ended - THEIRS_BEFORE <= point.at <= ended + THEIRS_AFTER:
+            return True
+    return False
