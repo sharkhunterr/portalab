@@ -152,10 +152,13 @@ export function WelcomeFlow() {
   // issue 426: the game library accounts the administrator mapped this member to, to authorise Portalab on
   const retro = useRetroAccounts();
   const links = useLinks();
-  const mapped = (retro.data ?? [])
-    .filter((a) => (links.data ?? []).some((l) => l.verified && l.service_id === a.service_id))
+  // never a crash of the whole portal on an unexpected answer: lists only
+  const retroAccounts = Array.isArray(retro.data) ? retro.data : [];
+  const myLinks = Array.isArray(links.data) ? links.data : [];
+  const mapped = retroAccounts
+    .filter((a) => myLinks.some((l) => l.verified && l.service_id === a.service_id))
     .map((a) => a.service_id);
-  const toAuthorise = (retro.data ?? []).some((a) => mapped.includes(a.service_id) && a.state !== "linked");
+  const toAuthorise = retroAccounts.some((a) => mapped.includes(a.service_id) && a.state !== "linked");
   // issue 428: the account's holder makes its household's profiles here (not a profile itself)
   const session = useHouseholdSession(open && !profile);
   const family = Boolean(session.data?.enabled) && !profile;
