@@ -212,7 +212,9 @@ export function Notify({
   return (
     <>
       <DialogPrimitive.Title id={titleId}>{t("onboarding:notify.title")}</DialogPrimitive.Title>
-      <p className="onboarding-welcome__lead">{t("onboarding:notify.lead")}</p>
+      <p className="onboarding-welcome__lead">
+        {t(profile ? "onboarding:notify.leadPortal" : "onboarding:notify.lead")}
+      </p>
       <fieldset className="onboarding-presets" disabled={!data || save.isPending}>
         <legend className="visually-hidden">{t("onboarding:notify.presets")}</legend>
         {PRESETS.map((choice) => (

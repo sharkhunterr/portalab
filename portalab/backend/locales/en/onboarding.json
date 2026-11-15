@@ -490,5 +490,6 @@
   "discover.progressTitle": "XP, Coins and Contribution",
   "discover.progress": "What you do earns XP (your level and its rewards) and Coins (to spend in the shop). Helping the portal (a report, an idea) earns Contribution, which counts in the community projects.",
   "discover.progressPot": "What you do earns XP and Coins, yours — and your household's too: your household shares a common pot on your master's account.",
-  "discover.progressOwn": "What you do earns XP (your level and its rewards) and Coins (to spend in the shop), in your own wallet."
+  "discover.progressOwn": "What you do earns XP (your level and its rewards) and Coins (to spend in the shop), in your own wallet.",
+  "notify.leadPortal": "Pick a ready-made choice, then fine-tune theme by theme: in the portal, or not at all."
 }

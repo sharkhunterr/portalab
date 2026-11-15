@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, type Page, type Route } from "@playwright/test";
-import { stubApi } from "../../a11y/support";
+import { NAVIGATION, stubApi } from "../../a11y/support";
 import { serveCatalogs } from "./support";
 
 /** 028: the Admin API of visual packs faked for one pack (its report the real analysis's), a signed-in
@@ -148,6 +148,33 @@ export async function signIn(page: Page, width: number) {
   await page.route("**/api/v1/me/permissions", (route) =>
     route.fulfill({
       json: { permissions: ["users.self.manage", "visuals.manage", "admin.access"], roles: ["admin"] },
+    }),
+  );
+  // issue 448: an administrator's menu holds the administration (the server's say opens its pages)
+  await page.route("**/api/v1/me/navigation", (route) =>
+    route.fulfill({
+      json: {
+        ...NAVIGATION,
+        sections: [
+          ...NAVIGATION.sections,
+          {
+            key: "admin",
+            label_key: "nav.section.admin",
+            icon: "settings",
+            audience: "administration",
+            direct: false,
+            topics: [],
+            entries: [
+              {
+                key: "visuals.admin",
+                label_key: "nav.admin.visuals",
+                icon: "palette",
+                route: "/admin/visuals",
+              },
+            ],
+          },
+        ],
+      },
     }),
   );
   await page.goto("/");

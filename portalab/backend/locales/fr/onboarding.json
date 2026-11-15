@@ -490,5 +490,6 @@
   "discover.progressTitle": "XP, pièces et contribution",
   "discover.progress": "Ce que vous faites rapporte de l'XP (votre niveau et ses récompenses) et des pièces (à dépenser dans la boutique). Aider le portail (un signalement, une idée) rapporte de la contribution, qui compte dans les projets communautaires.",
   "discover.progressPot": "Ce que vous faites rapporte de l'XP et des pièces, les vôtres — et aussi celles de votre foyer : votre foyer partage un pot commun sur le compte de votre maître.",
-  "discover.progressOwn": "Ce que vous faites rapporte de l'XP (votre niveau et ses récompenses) et des pièces (à dépenser dans la boutique), dans votre propre porte-monnaie."
+  "discover.progressOwn": "Ce que vous faites rapporte de l'XP (votre niveau et ses récompenses) et des pièces (à dépenser dans la boutique), dans votre propre porte-monnaie.",
+  "notify.leadPortal": "Choisissez un réglage tout prêt, puis affinez thème par thème : dans le portail, ou pas du tout."
 }

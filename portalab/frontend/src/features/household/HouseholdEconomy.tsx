@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
 import { useT } from "../../i18n/hooks/useT";
@@ -21,7 +21,12 @@ export function HouseholdEconomyChoice({ household }: { household: Household }) 
   const name = useId();
   const change = useHouseholdEconomy();
   const current = (household.economy ?? "pot") as Economy;
-  const shown = change.isPending && change.variables ? change.variables : current;
+  // the choice holds from the tap until the household read again says it (never back to the old one between)
+  const [picked, setPicked] = useState<Economy | null>(null);
+  useEffect(() => {
+    if (picked && current === picked) setPicked(null);
+  }, [current, picked]);
+  const shown = picked ?? current;
   if (!household.can_manage)
     return (
       <p className="household-note">
@@ -48,13 +53,17 @@ export function HouseholdEconomyChoice({ household }: { household: Household }) 
               value={choice.key}
               checked={shown === choice.key}
               disabled={change.isPending}
-              onChange={() =>
+              onChange={() => {
+                setPicked(choice.key);
                 change.mutate(choice.key, {
                   onSuccess: () =>
                     notify({ severity: "success", title: t(`household:economy.saved_${choice.key}`) }),
-                  onError: () => notify({ severity: "critical", title: t("household:error") }),
-                })
-              }
+                  onError: () => {
+                    setPicked(null);
+                    notify({ severity: "critical", title: t("household:error") });
+                  },
+                });
+              }}
             />
             <Icon name={choice.icon} size={18} />
             <span>
