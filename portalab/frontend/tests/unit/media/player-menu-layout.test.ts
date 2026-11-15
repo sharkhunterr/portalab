@@ -10,7 +10,8 @@ const css = readFileSync(
   "utf8",
 );
 const rule = (selector: string) =>
-  new RegExp(`(^|\\n)${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(css)?.[2] ?? "";
+  new RegExp(`(^|\\n)${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(css)?.[2] ??
+  "";
 
 describe("the player's settings panel", () => {
   it("is placed on the row of controls, not on its button", () => {

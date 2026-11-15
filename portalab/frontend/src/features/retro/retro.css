@@ -284,3 +284,79 @@
   color: var(--player-ink);
   white-space: pre-line;
 }
+
+/* issue 463: the emulator's own frame, menus and windows in Portalab's look — the video player's panel,
+   ink, accent, font and corners; what the emulator draws of the game is left alone */
+.retro-game .ejs_parent,
+.retro-game .ejs_parent *,
+.retro-game .ejs_parent ::before,
+.retro-game .ejs_parent ::after {
+  font-family: var(--player-font);
+}
+.retro-game .ejs_settings_parent,
+.retro-game .ejs_context_menu,
+.retro-game .ejs_list_selector,
+.retro-game .ejs_popup_box {
+  /* biome-ignore lint/complexity/noImportantStyles: the emulator's own rule is !important */
+  background: var(--player-panel) !important;
+  color: var(--player-panel-ink);
+  border-color: color-mix(in srgb, var(--player-panel-ink) 15%, transparent);
+  border-radius: var(--player-radius);
+  backdrop-filter: blur(12px);
+}
+.retro-game .ejs_settings_parent::before,
+.retro-game .ejs_settings_parent::after {
+  border-top-color: var(--player-panel);
+}
+.retro-game .ejs_settings_main_bar,
+.retro-game .ejs_context_menu ul,
+.retro-game .ejs_context_menu li a,
+.retro-game .ejs_list_selector ul,
+.retro-game .ejs_list_selector li a {
+  /* biome-ignore lint/complexity/noImportantStyles: the emulator's own rule is !important */
+  color: var(--player-panel-ink) !important;
+}
+.retro-game .ejs_popup_container {
+  background: color-mix(in srgb, var(--player-stage) 80%, transparent);
+}
+.retro-game .ejs_popup_container *,
+.retro-game .ejs_popup_container h4 {
+  color: var(--player-panel-ink);
+}
+.retro-game
+  :is(
+    .ejs_button,
+    .ejs_button_button,
+    .ejs_control_set_button,
+    .ejs_cheat_row_button,
+    .ejs_netplay_join_button
+  ) {
+  border-radius: 999px;
+  background-color: var(--player-accent);
+  /* biome-ignore lint/complexity/noImportantStyles: the emulator's own rule is !important */
+  color: var(--color-accent-contrast) !important;
+  font-weight: var(--font-weight-semibold);
+}
+.retro-game .ejs_popup_container :is(input, select) {
+  border: 1px solid color-mix(in srgb, var(--player-panel-ink) 18%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--player-panel-ink) 8%, var(--player-stage));
+  color: var(--player-panel-ink);
+}
+.retro-game .ejs_big_screen .ejs_menu_text {
+  border-radius: var(--radius-sm);
+  background: var(--player-panel);
+  color: var(--player-panel-ink);
+}
+.retro-game .ejs_big_screen .ejs_menu_text::before {
+  border-top-color: var(--player-panel);
+}
+.retro-game .ejs_loading_text {
+  color: var(--player-ink-muted);
+}
+.retro-game .ejs_control_body input[type="text"] {
+  border: 1px solid color-mix(in srgb, var(--player-panel-ink) 18%, transparent);
+  background-color: color-mix(in srgb, var(--player-panel-ink) 8%, var(--player-stage));
+  /* biome-ignore lint/complexity/noImportantStyles: the emulator's own rule is !important */
+  color: var(--player-panel-ink) !important;
+}
