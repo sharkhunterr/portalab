@@ -42,7 +42,8 @@ class InvalidImage(ValueError):
     pass
 
 
-def normalize_image(data: bytes) -> bytes:
+def normalize_image(data: bytes, side: int | None = None) -> bytes:
+    """An untrusted picture decoded and saved afresh as a JPEG at most ``side`` pixels wide or high."""
     if not data or len(data) > MAX_BYTES:
         raise InvalidImage("size")
     try:
@@ -62,7 +63,7 @@ def normalize_image(data: bytes) -> bytes:
         raise InvalidImage("undecodable") from exc
     except PILImage.DecompressionBombWarning as exc:
         raise InvalidImage("bomb") from exc
-    frame.thumbnail((OUTPUT_SIDE, OUTPUT_SIDE))
+    frame.thumbnail((side or OUTPUT_SIDE, side or OUTPUT_SIDE))
     output = io.BytesIO()
     frame.save(output, format="JPEG", quality=85, optimize=True)  # fresh file: no EXIF/ICC/comments
     return output.getvalue()

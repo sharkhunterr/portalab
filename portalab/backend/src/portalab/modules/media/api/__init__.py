@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from portalab.modules.media.api.books import router as books_router
 from portalab.modules.media.api.collections import router as collections_router
+from portalab.modules.media.api.extras import router as extras_router
 from portalab.modules.media.api.feed import router as feed_router
 from portalab.modules.media.api.people import router as people_router
 from portalab.modules.media.api.player import router as player_router
@@ -19,6 +20,7 @@ def routers() -> list[APIRouter]:
         books_router,
         people_router,
         collections_router,
+        extras_router,  # issue 465
         radio_router,
         taste_router,
         reviews_router,

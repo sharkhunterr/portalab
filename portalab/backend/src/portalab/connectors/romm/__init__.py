@@ -37,10 +37,15 @@ from portalab.capabilities.household import RATING_WORDS, age_of
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
+    EXTRAS,
     ITEM_LINKS,
     LIBRARY,
     PLAY_STYLES,
+    YOUTUBE_ID,
     ActivityPage,
+    ExtraImage,
+    ExtraVideo,
+    MediaExtras,
     ServiceAccount,
     SourceActivity,
     StreamBody,
@@ -204,6 +209,31 @@ def game_payload(game: Mapping[str, Any], title: str) -> dict[str, Any]:
     }
 
 
+SCREENSHOTS = 16
+
+
+def game_extras(game: Mapping[str, Any]) -> MediaExtras:
+    """Issue 465: a RomM game's YouTube video (``youtube_video_id``) and its screenshots kept by RomM
+    (``path_screenshots``, else the local ones of ``merged_screenshots``) — not the remote ones."""
+    video = str(game.get("youtube_video_id") or "")
+    paths: list[str] = []
+    for value in [*(game.get("path_screenshots") or []), *(game.get("merged_screenshots") or [])]:
+        path = str(value).split("?")[0] if isinstance(value, str) else ""
+        if not path or "://" in path:
+            continue
+        try:
+            path = cover_path(path)  # one spelling of each (a relative path and its /assets/ one)
+        except InvalidPayload:
+            continue
+        if path not in paths:
+            paths.append(path)
+    return MediaExtras(
+        # its kind untold (another service may tell it)
+        videos=[ExtraVideo(site="youtube", key=video)] if YOUTUBE_ID.fullmatch(video) else [],
+        images=[ExtraImage(kind="screenshot", ref=p) for p in paths[:SCREENSHOTS]],
+    )
+
+
 class RommConnector(HttpConnector):
     key = "romm"
     name = "RomM"
@@ -219,6 +249,7 @@ class RommConnector(HttpConnector):
         binding(ITEM_LINKS),  # 027: each game's page in RomM, where it is played
         binding(ACTIVITY_HISTORY, driven=True),  # #190: what the account played
         binding(RETRO_SOURCE),  # 419: its games played in the portal (RomM's own EmulatorJS)
+        binding(EXTRAS),  # issue 465: a game's video and its screenshots
     )
     status_path = "/api/users/me"
     public_path = "/api/heartbeat"
@@ -295,6 +326,8 @@ class RommConnector(HttpConnector):
             return _Played(self, service)
         if capability == RETRO_SOURCE:
             return _Retro(self, service)
+        if capability == EXTRAS:
+            return _Covers(self, service)
         return None
 
 
@@ -304,6 +337,18 @@ class _Covers:
 
     async def fetch_image(self, ref: str) -> bytes:
         return await self.connector.get_bytes(self.service, cover_path(ref))
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        """Issue 465: a game's YouTube video and the screenshots RomM keeps of it (its own copies)."""
+        if kind != "game" or not external_id or not external_id.isdigit():
+            return MediaExtras()
+        game = await self.connector.get_json(self.service, f"/api/roms/{safe_id(external_id)}")
+        return game_extras(game) if isinstance(game, Mapping) else MediaExtras()
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return await self.fetch_image(ref)
 
 
 class _Links:

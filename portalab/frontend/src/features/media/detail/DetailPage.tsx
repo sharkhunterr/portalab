@@ -41,6 +41,7 @@ import { usePlayerInfo, useResetResume } from "../player/api";
 import { TasteButtons } from "../taste/TasteButtons";
 import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
+import { Extras } from "./Extras";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
 import { ReviewButton, Reviews } from "./Reviews";
@@ -52,6 +53,7 @@ import { TitleHero } from "./TitleHero";
  * health and sync state are separate facts in the sources section (text, never color alone).
  */
 // 027 (#22): « viewing » (my plays and how many watched it) replaces progress, history and statistics
+const EXTRA_KINDS = ["movie", "series", "game"]; // issue 465: titles with videos and pictures told
 const SECTIONS = ["info", "sources", "viewing", "requests", "people", "events", "links", "blocks"];
 type Data = Record<string, unknown>;
 
@@ -1097,6 +1099,8 @@ export function DetailPage() {
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
       ) : null}
+      {/* issue 465: its trailers, featurettes, gameplay videos… and its pictures */}
+      {EXTRA_KINDS.includes(media.kind) ? <Extras objectId={media.id} title={media.title} /> : null}
       {/* issue 361: its saga, series or franchise — the same block for a film, a book, a game */}
       <CollectionRow objectId={media.id} />
       {collects && (media.kind === "movie" || media.kind === "series") ? (

@@ -30,6 +30,7 @@ from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
     ACCOUNTS,
     ACTIVITY_HISTORY,
+    EXTRAS,
     ITEM_LINKS,
     LIBRARY,
     PLAYBACK,
@@ -38,6 +39,9 @@ from portalab.capabilities.media import (
     THEMES,
     VIDEO_FRAMES,
     ActivityPage,
+    ExtraVideo,
+    ExtraVideoKind,
+    MediaExtras,
     ServiceAccount,
     SourceActivity,
     SourceHistoryItem,
@@ -117,6 +121,7 @@ class PlexConnector(HttpConnector):
         binding(STREAMING),
         binding(VIDEO_FRAMES),
         binding(THEMES),
+        binding(EXTRAS),  # issue 465: its extras (trailers, featurettes…)
     )
     status_path = "/"
     public_path = "/identity"
@@ -236,6 +241,8 @@ class PlexConnector(HttpConnector):
             return PlexFrames(self, service)
         if capability == THEMES:
             return _Themes(self, service)
+        if capability == EXTRAS:
+            return _Extras(self, service)
         if capability == TECHNICAL:
             from portalab.connectors.plex.technical import PlexTechnical
 
@@ -257,6 +264,85 @@ class _Library:
             url=f"/library/metadata/{image_key(ref)}/thumb",
             width=1000,
             height=1500,
+            minSize=1,
+            upscale=0,
+        )
+
+
+# issue 465: Plex's extras (``subtype``, else ``extraType``) → the portal's kinds
+EXTRA_SUBTYPES: dict[str, ExtraVideoKind] = {
+    "trailer": "trailer",
+    "behindTheScenes": "behind_the_scenes",
+    "deleted": "deleted",
+    "featurette": "featurette",
+    "interview": "interview",
+    "sceneOrSample": "clip",
+    "short": "clip",
+}
+EXTRA_TYPES: dict[int, ExtraVideoKind] = {
+    1: "trailer",
+    2: "deleted",
+    3: "interview",
+    5: "behind_the_scenes",
+    6: "clip",
+    10: "featurette",
+    11: "clip",
+}
+EXTRAS_KEPT = 40
+
+
+def map_extras(document: Any) -> list[ExtraVideo]:
+    """Issue 465: a title's extras as Plex lists them (``/library/metadata/{key}/extras``)."""
+    container = document.get("MediaContainer") if isinstance(document, Mapping) else None
+    out: list[ExtraVideo] = []
+    for item in (container or {}).get("Metadata") or [] if isinstance(container, Mapping) else []:
+        if not isinstance(item, Mapping) or not item.get("ratingKey"):
+            continue
+        key = str(item["ratingKey"])
+        if not key.isdigit():
+            continue
+        extra_type = str(item.get("extraType") or "")
+        kind: ExtraVideoKind = EXTRA_SUBTYPES.get(str(item.get("subtype") or "")) or (
+            EXTRA_TYPES.get(int(extra_type), "other") if extra_type.isdigit() else "other"
+        )
+        duration = item.get("duration")
+        out.append(
+            ExtraVideo(
+                site="service",
+                key=key,
+                name=str(item.get("title") or "")[:200],
+                kind=kind,
+                duration_s=float(duration) / 1000 if isinstance(duration, int) and duration > 0 else None,
+                picture=key if item.get("thumb") else None,
+            )
+        )
+    return out[:EXTRAS_KEPT]
+
+
+class _Extras:
+    """Issue 465: the extras Plex keeps with a title it holds (trailers, featurettes, deleted scenes…) —
+    played by the portal's own player, as the title is."""
+
+    def __init__(self, connector: PlexConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        if kind not in ("movie", "series") or not external_id:
+            return MediaExtras()
+        document = await self.connector.get_json(
+            self.service, f"/library/metadata/{safe_id(external_id)}/extras"
+        )
+        return MediaExtras(videos=map_extras(document))
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return await self.connector.get_bytes(
+            self.service,
+            "/photo/:/transcode",
+            url=f"/library/metadata/{safe_id(ref)}/thumb",
+            width=480 if preview else 1280,
+            height=270 if preview else 720,
             minSize=1,
             upscale=0,
         )

@@ -10520,6 +10520,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/{object_id}/extras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Title Extras
+         * @description Issue 465: a title's videos (trailers first, the member's language first) and extra pictures.
+         */
+        get: operations["title_extras_api_v1_media__object_id__extras_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/extras/images/{index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Title Extra Image
+         * @description Issue 465: one of a title's extra pictures, small (``preview``) or large.
+         */
+        get: operations["title_extra_image_api_v1_media__object_id__extras_images__index__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{object_id}/extras/videos/{index}/picture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Title Extra Video Picture
+         * @description Issue 465: a video's picture (a YouTube video's, fetched by the portal: the browser never calls it).
+         */
+        get: operations["title_extra_video_picture_api_v1_media__object_id__extras_videos__index__picture_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/{object_id}/journey": {
         parameters: {
             query?: never;
@@ -15809,6 +15869,41 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** ExtraImageOut */
+        ExtraImageOut: {
+            /** Full */
+            full: string;
+            /** Index */
+            index: number;
+            /** Kind */
+            kind: string;
+            /** Preview */
+            preview: string;
+        };
+        /** ExtraVideoOut */
+        ExtraVideoOut: {
+            /** Duration S */
+            duration_s?: number | null;
+            /** Index */
+            index: number;
+            /** Kind */
+            kind: string;
+            /** Language */
+            language?: string | null;
+            /** Name */
+            name: string;
+            /** Picture */
+            picture?: string | null;
+            /** Play */
+            play?: string | null;
+            /**
+             * Site
+             * @enum {string}
+             */
+            site: "youtube" | "service";
+            /** Youtube */
+            youtube?: string | null;
+        };
         /** FamilyActivityOut */
         FamilyActivityOut: {
             /** Days */
@@ -17769,6 +17864,19 @@ export interface components {
             title: string;
             /** Year */
             year: number | null;
+        };
+        /** MediaExtrasOut */
+        MediaExtrasOut: {
+            /**
+             * Images
+             * @default []
+             */
+            images: components["schemas"]["ExtraImageOut"][];
+            /**
+             * Videos
+             * @default []
+             */
+            videos: components["schemas"]["ExtraVideoOut"][];
         };
         /** MediaFacets */
         MediaFacets: {
@@ -42497,6 +42605,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CollectionOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    title_extras_api_v1_media__object_id__extras_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaExtrasOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    title_extra_image_api_v1_media__object_id__extras_images__index__get: {
+        parameters: {
+            query?: {
+                preview?: boolean;
+            };
+            header?: never;
+            path: {
+                object_id: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    title_extra_video_picture_api_v1_media__object_id__extras_videos__index__picture_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                object_id: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

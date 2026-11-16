@@ -132,6 +132,7 @@ class PlayerService:
         *,
         events: EventPublisher | None = None,
         clock: Clock | None = None,
+        extras: Any = None,
     ) -> None:
         self.database = database
         self.capabilities = capabilities
@@ -139,8 +140,10 @@ class PlayerService:
         self.key = key
         self.events = events
         self.clock = clock
+        self.extras = extras  # issue 465: a title's extras, played through it
         self.feeds = SubtitleFeeds()
         self.credits: dict[UUID, float | None] = {}  # #101: where each title's end credits begin
+        self.items: dict[tuple[UUID, str], bool] = {}  # issue 466: items found to belong to a title
 
     # --- where and as whom --------------------------------------------------------------------------------
     def _providers(self) -> dict[str, tuple[Any, str | None]]:
@@ -266,11 +269,36 @@ class PlayerService:
         cap = self.config().player_max_quality
         return keys[keys.index(cap) :] if cap in keys else keys
 
+    async def _belongs(
+        self, object_id: UUID, source: SourceItem, account: str | None, item: str | None
+    ) -> None:
+        """Issue 466: an item played through a title is the title itself, one of its episodes (of the same
+        series) or one of its extras — never any other item of the media server: the title's own age rating
+        and screen time are what was checked."""
+        if item is None or item == source.external_id or self.items.get((object_id, item)):
+            return
+        channel = self._channel(source.service_id, account)
+        asked: PlayableItem = await _call(channel.playable(item))
+        allowed = False
+        if asked.kind == "episode" and asked.series_id:
+            series = source.external_id if source.kind == "series" else None
+            if series is None and source.kind in ("season", "episode"):
+                series = (await _call(channel.playable(source.external_id))).series_id
+            allowed = asked.series_id == series
+        elif asked.kind == "clip" and self.extras is not None:
+            allowed = await self.extras.service_video(object_id, item)
+        if not allowed:
+            raise NothingToPlay("This is not part of this title.")
+        if len(self.items) >= CREDITS_REMEMBERED:
+            self.items.pop(next(iter(self.items)))
+        self.items[(object_id, item)] = True
+
     # --- before playing -----------------------------------------------------------------------------------
     async def info(self, user: UUID, object_id: UUID, item: str | None = None) -> PlayerInfo:
         self._enabled()
         source = await self._source(object_id)
         account = await self._account(user, source.service_id)
+        await self._belongs(object_id, source, account, item)
         playable: PlayableItem = await _call(
             self._channel(source.service_id, account).playable(item or source.external_id)
         )
@@ -301,6 +329,7 @@ class PlayerService:
         allowed = self.qualities()
         if options.quality not in allowed:
             options = replace(options, quality=allowed[0])
+        await self._belongs(object_id, source, account, item)
         session = uuid.uuid4().hex[:24]
         started: StreamStart = await _call(
             self._channel(source.service_id, account).start(item, options, session)
@@ -442,6 +471,7 @@ class PlayerService:
         self._enabled()
         source = await self._source(object_id)
         account = await self._account(user, source.service_id)
+        await self._belongs(object_id, source, account, item)
         await _call(self._channel(source.service_id, account).reset(item or source.external_id))
 
     # --- while playing ------------------------------------------------------------------------------------

@@ -22,8 +22,14 @@ from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorH
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
 from portalab.capabilities.media import (
+    EXTRAS,
     METADATA,
     PEOPLE,
+    YOUTUBE_ID,
+    ExtraImage,
+    ExtraVideo,
+    ExtraVideoKind,
+    MediaExtras,
     MetadataPerson,
     MetadataRecord,
     PersonCredit,
@@ -204,6 +210,50 @@ def _artwork(document: Mapping[str, Any], key: str, limit: int) -> list[str]:
     return out
 
 
+# issue 465: TMDB's video types → the portal's kinds
+VIDEO_KINDS: dict[str, ExtraVideoKind] = {
+    "Trailer": "trailer",
+    "Teaser": "teaser",
+    "Featurette": "featurette",
+    "Behind the Scenes": "behind_the_scenes",
+    "Clip": "clip",
+    "Bloopers": "bloopers",
+}
+EXTRA_VIDEOS = 30
+EXTRA_IMAGES = 24
+
+
+def map_extras(document: Mapping[str, Any]) -> MediaExtras:
+    """Issue 465: a TMDB document's YouTube videos (its ``videos``) and backdrops (its ``images``)."""
+    videos: list[ExtraVideo] = []
+    for video in (document.get("videos") or {}).get("results") or []:
+        if not isinstance(video, Mapping) or video.get("site") != "YouTube":
+            continue
+        key = str(video.get("key") or "")
+        if not YOUTUBE_ID.fullmatch(key):
+            continue
+        language = video.get("iso_639_1")
+        videos.append(
+            ExtraVideo(
+                site="youtube",
+                key=key,
+                name=str(video.get("name") or "")[:200],
+                kind=VIDEO_KINDS.get(str(video.get("type") or ""), "other"),
+                language=str(language)[:8] if language else None,
+                official=bool(video.get("official")),
+            )
+        )
+    images = [
+        ExtraImage(kind="backdrop", ref=ref, lang=image.get("iso_639_1") or None)
+        for image in sorted(
+            (i for i in (document.get("images") or {}).get("backdrops") or [] if isinstance(i, Mapping)),
+            key=lambda i: (i.get("iso_639_1") is not None, -(i.get("vote_average") or 0)),
+        )
+        if (ref := image_ref(image.get("file_path")))
+    ]
+    return MediaExtras(videos=videos[:EXTRA_VIDEOS], images=images[:EXTRA_IMAGES])
+
+
 class TmdbConnector(HttpConnector):
     key = "tmdb"
     name = "TMDB (The Movie Database)"
@@ -215,6 +265,7 @@ class TmdbConnector(HttpConnector):
     provides: Sequence[CapabilityBinding] = (
         binding(METADATA, driven=True),
         binding(PEOPLE),
+        binding(EXTRAS),
         binding(HEALTH_PROBE),
     )
     status_path = "/3/configuration"
@@ -241,6 +292,8 @@ class TmdbConnector(HttpConnector):
     def provider(self, capability: str, service: ServiceHandle) -> Any:
         if capability in (METADATA, PEOPLE):
             return _Metadata(self, service)
+        if capability == EXTRAS:
+            return _Extras(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
         return None
@@ -424,3 +477,45 @@ class _Metadata:
         if response.status_code >= 400:
             raise ConnectionError(f"TMDB images answered HTTP {response.status_code}")
         return response.content
+
+
+class _Extras(_Metadata):
+    """Issue 465: a film's or a series' videos on YouTube and its backdrops, in the member's language first
+    (then English, then without language)."""
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        if kind not in ("movie", "series"):
+            return MediaExtras()
+        lang = self._language(language)
+        tmdb_id = ids.get("tmdb") if str(ids.get("tmdb") or "").isdigit() else None
+        if tmdb_id is None:
+            tmdb_id = await self._by_ids(kind, ids, lang)
+        if tmdb_id is None:
+            return MediaExtras()
+        short = lang.split("-")[0]
+        document = await self.connector.get_json(
+            self.service,
+            f"/3/{'movie' if kind == 'movie' else 'tv'}/{int(tmdb_id)}",
+            language=lang,
+            append_to_response="videos,images",
+            include_video_language=f"{short},en,null",
+            include_image_language=f"null,{short},en",
+        )
+        return map_extras(document) if isinstance(document, Mapping) else MediaExtras()
+
+    async def _by_ids(self, kind: str, ids: Mapping[str, str], language: str) -> str | None:
+        for scheme, source in (("imdb", "imdb_id"), ("tvdb", "tvdb_id")):
+            value = ids.get(scheme)
+            if value and re.fullmatch(r"[A-Za-z0-9]{1,20}", value):
+                found = await self.connector.get_json(
+                    self.service, f"/3/find/{value}", external_source=source, language=language
+                )
+                results = (found or {}).get("movie_results" if kind == "movie" else "tv_results") or []
+                if results:
+                    return str(results[0]["id"])
+        return None
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return await self.fetch_image(ref, "w300" if preview else "w1280")

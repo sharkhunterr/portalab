@@ -31,9 +31,13 @@ from portalab.capabilities.media import (
     ACQUISITION,
     CALENDAR,
     DOWNLOADS,
+    EXTRAS,
     LIBRARY,
+    YOUTUBE_ID,
     AcquisitionEvent,
+    ExtraVideo,
     FoundRelease,
+    MediaExtras,
     SourceAcquisition,
     SourceDownload,
     SourceRelease,
@@ -319,12 +323,39 @@ class _Covers:
         return await self.connector.get_bytes(self.service, f"/api/v3/mediacover/{item_id}/poster.jpg")
 
 
+class _Trailer:
+    """Issue 465: the trailer Radarr knows of a film it follows (its YouTube id)."""
+
+    def __init__(self, connector: _ArrConnector, service: ServiceHandle) -> None:
+        self.connector, self.service = connector, service
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        if kind != "movie" or not external_id or not external_id.startswith("movie:"):
+            return MediaExtras()
+        movie = await self.connector.get_json(self.service, f"/api/v3/movie/{safe_id(external_id[6:])}")
+        key = str((movie or {}).get("youTubeTrailerId") or "") if isinstance(movie, Mapping) else ""
+        if not YOUTUBE_ID.fullmatch(key):
+            return MediaExtras()
+        return MediaExtras(videos=[ExtraVideo(site="youtube", key=key, kind="trailer")])
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        raise InvalidPayload("Radarr gives no extra picture")
+
+
 class RadarrConnector(_ArrConnector):
     key = "radarr"
     name = "Radarr"
     app = "Radarr"
     description = "The films Radarr follows, and whether they are downloaded."
     icon = "film"
+    provides: Sequence[CapabilityBinding] = (*_ArrConnector.provides, binding(EXTRAS))
+
+    def provider(self, capability: str, service: ServiceHandle) -> Any:
+        if capability == EXTRAS:
+            return _Trailer(self, service)
+        return super().provider(capability, service)
 
     def download(self, record: Mapping[str, Any]) -> SourceDownload | None:
         nested = record.get("movie")

@@ -7430,6 +7430,121 @@
         "title": "ExportOut",
         "type": "object"
       },
+      "ExtraImageOut": {
+        "properties": {
+          "full": {
+            "title": "Full",
+            "type": "string"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "preview": {
+            "title": "Preview",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "kind",
+          "preview",
+          "full"
+        ],
+        "title": "ExtraImageOut",
+        "type": "object"
+      },
+      "ExtraVideoOut": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "picture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Picture"
+          },
+          "play": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Play"
+          },
+          "site": {
+            "enum": [
+              "youtube",
+              "service"
+            ],
+            "title": "Site",
+            "type": "string"
+          },
+          "youtube": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Youtube"
+          }
+        },
+        "required": [
+          "index",
+          "site",
+          "name",
+          "kind"
+        ],
+        "title": "ExtraVideoOut",
+        "type": "object"
+      },
       "FamilyActivityOut": {
         "properties": {
           "days": {
@@ -12977,6 +13092,28 @@
           "sections"
         ],
         "title": "MediaDetail",
+        "type": "object"
+      },
+      "MediaExtrasOut": {
+        "properties": {
+          "images": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ExtraImageOut"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "videos": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ExtraVideoOut"
+            },
+            "title": "Videos",
+            "type": "array"
+          }
+        },
+        "title": "MediaExtrasOut",
         "type": "object"
       },
       "MediaFacets": {
@@ -56350,6 +56487,166 @@
           }
         },
         "summary": "Title Collection",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/extras": {
+      "get": {
+        "description": "Issue 465: a title's videos (trailers first, the member's language first) and extra pictures.",
+        "operationId": "title_extras_api_v1_media__object_id__extras_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaExtrasOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Title Extras",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/extras/images/{index}": {
+      "get": {
+        "description": "Issue 465: one of a title's extra pictures, small (``preview``) or large.",
+        "operationId": "title_extra_image_api_v1_media__object_id__extras_images__index__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "preview",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Preview",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Title Extra Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/{object_id}/extras/videos/{index}/picture": {
+      "get": {
+        "description": "Issue 465: a video's picture (a YouTube video's, fetched by the portal: the browser never calls it).",
+        "operationId": "title_extra_video_picture_api_v1_media__object_id__extras_videos__index__picture_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Title Extra Video Picture",
         "tags": [
           "media"
         ]

@@ -86,6 +86,7 @@ from portalab.modules.media.cleanup import CleanupService
 from portalab.modules.media.databases import DatabaseTitles
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
+from portalab.modules.media.extras import MediaExtrasService
 from portalab.modules.media.feed import Feed
 from portalab.modules.media.fields.resolver import FieldResolver
 from portalab.modules.media.games import MediaGameSources
@@ -329,6 +330,7 @@ class MediaModule:
             sections=self.sections,
         )
         # 027 (#2): the portal's player (its stream tickets are signed with a key of the portal's secret)
+        self.extras = MediaExtrasService(database, capabilities, blobs=blobs)  # issue 465
         self.player = PlayerService(
             database,
             capabilities,
@@ -336,6 +338,7 @@ class MediaModule:
             player_key or os.urandom(32),
             events=events,  # #103: a title cast to a TV is the member's event
             clock=clock,
+            extras=self.extras,  # issue 465: a title's extras played through it
         )
         # #20, #21: listening and reading in the portal (their tickets: another key of the same secret)
         self.books = BookService(

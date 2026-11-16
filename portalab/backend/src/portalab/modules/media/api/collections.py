@@ -479,7 +479,11 @@ async def game_sheet(
                 route=f"/media/collection?{urlencode({'ref': f'{SERIES}{found}'})}" if rows else None,
             )
         )
-    images = [_game_image(service, ref_, "screenshot") for ref_ in game.images]
+    # issue 465: each picture at its own size (an artwork's is larger than a screenshot's)
+    sized = [(r, "artwork") for r in game.artworks] + [(r, "screenshot") for r in game.screenshots]
+    images = [
+        _game_image(service, ref_, size) for ref_, size in sized or [(r, "screenshot") for r in game.images]
+    ]
     return GameSheetOut(
         service=service,
         ref=game.ref,

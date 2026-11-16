@@ -13,6 +13,7 @@ The fakes below are what Media's own tests use; they simulate outages, timeouts 
 """
 
 import asyncio
+import base64
 from collections.abc import AsyncIterator, Mapping, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -27,6 +28,7 @@ from portalab.capabilities.media import (
     AudioPosition,
     BookFormat,
     LibraryPayload,
+    MediaExtras,
     MediaPlayback,
     PlayableItem,
     ReadableBook,
@@ -239,11 +241,47 @@ class RequestServiceContractKit:
         RequestPayload.model_validate({"title": "x", "kind": "movie", "state": "pending"})
 
 
+# --- issue 465: a title's videos and extra pictures --------------------------------------------------------
+# a 64 by 36 red PNG (the test kit draws no picture itself: only the image service may decode or make one)
+TINY_PNG = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAkCAIAAAC2bqvFAAAAOklEQVR42u3PAQ0AAAQAMKTRP4VYWthsf4PndMdnFc8JCAgI"
+    "CAgICAgICAgICAgICAgICAgICAgIXFub8wFgNFNK6gAAAABJRU5ErkJggg=="
+)
+
+
+@dataclass
+class FakeExtras:
+    """``media.extras``: tells ``told`` of every title — of only the one it holds when ``held_only`` (its
+    item given) —, fails when ``fails``; every picture a small PNG (``bad`` refs: not a picture). Records
+    every call as ``(kind, ids, external_id, language)``."""
+
+    told: MediaExtras = field(default_factory=MediaExtras)
+    held_only: bool = False
+    fails: bool = False
+    calls: list[tuple[str, dict[str, str], str | None, str]] = field(default_factory=list)
+    pictures: list[tuple[str, bool]] = field(default_factory=list)
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        self.calls.append((kind, dict(ids), external_id, language))
+        if self.fails:
+            raise ConnectionError("down")
+        if self.held_only and not external_id:
+            return MediaExtras()
+        return self.told
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        self.pictures.append((ref, preview))
+        return b"not a picture" if ref.startswith("bad") else TINY_PNG
+
+
 # --- 027 (#2): the portal's player ----------------------------------------------------------------------
 @dataclass
 class FakeStreaming:
-    """``media.streaming``: one film (``m1``) with a text and an image subtitle; account ``denied`` has no
-    access. Records every call as ``(account, operation, details)``."""
+    """``media.streaming``: one film (``m1``) with a text and an image subtitle — and (issue 466) another film
+    (``m2``), an episode (``e2``) of the series ``s1`` and a clip (``c1``, an extra); account ``denied`` has
+    no access. Records every call as ``(account, operation, details)``."""
 
     calls: list[tuple[str | None, str, Any]] = field(default_factory=list)
     resume: list[ResumePoint] = field(default_factory=list)
@@ -263,7 +301,7 @@ class FakeChannel:
     def _check(self, external_id: str) -> None:
         if self.account == "denied":
             raise ProviderAuthError("no access")
-        if external_id not in ("m1", "e2"):
+        if external_id not in ("m1", "m2", "e2", "c1", "s1"):
             raise ProviderNotFound("no such item")
 
     async def playable(self, external_id: str) -> PlayableItem:
@@ -279,9 +317,13 @@ class FakeChannel:
                 StreamTrack("s2", "subtitle", "PGS", codec="pgs", text=False),
             ),
         )
+        if external_id == "s1":  # a series plays its next episode
+            external_id = "e2"
+        kinds = {"e2": "episode", "c1": "clip"}
         return PlayableItem(
             external_id=external_id,
-            kind="movie",
+            kind=kinds.get(external_id, "movie"),
+            series_id="s1" if external_id == "e2" else None,
             title="Film",
             duration_s=6000.0,
             resume_s=60.0,

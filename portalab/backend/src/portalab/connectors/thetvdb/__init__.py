@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import CHARACTERS, CharacterImage
+from portalab.capabilities.media import CHARACTERS, EXTRAS, CharacterImage, ExtraVideo, MediaExtras
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
 
@@ -28,6 +28,17 @@ IMAGE_PATH = re.compile(r"^/banners/[A-Za-z0-9/_.-]{1,200}\.(jpg|jpeg|png|webp)$
 TOKEN_SECONDS = 25 * 24 * 3600  # a token lasts a month: asked again a little before
 REMOTE = re.compile(r"^(tt)?[0-9]{1,12}$")
 _TOKENS: dict[Any, tuple[str, float]] = {}
+
+
+# issue 465: TheTVDB's three-letter languages, as the portal's two-letter ones (the common ones)
+LANGUAGES = {
+    "eng": "en", "fra": "fr", "deu": "de", "spa": "es", "ita": "it", "jpn": "ja", "por": "pt",
+    "nld": "nl", "kor": "ko", "zho": "zh", "rus": "ru", "pol": "pl", "swe": "sv",
+}  # fmt: skip
+YOUTUBE = re.compile(
+    r"^https?://(?:www\.|m\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{11})(?:[&?#].*)?$"
+)
+TRAILERS = 10
 
 
 class TvdbConfig(BaseConfig):
@@ -47,6 +58,27 @@ def image_ref(url: Any) -> str | None:
         return None
     path = url[len(ARTWORKS) :]
     return path if IMAGE_PATH.fullmatch(path) else None
+
+
+def map_trailers(record: Any) -> list[ExtraVideo]:
+    """Issue 465: a TheTVDB record's trailers that are on YouTube."""
+    out: list[ExtraVideo] = []
+    for item in (record or {}).get("trailers") or [] if isinstance(record, Mapping) else []:
+        found = YOUTUBE.fullmatch(str(item.get("url") or "")) if isinstance(item, Mapping) else None
+        if found is None:
+            continue
+        runtime = item.get("runtime")
+        out.append(
+            ExtraVideo(
+                site="youtube",
+                key=found.group(1),
+                name=str(item.get("name") or "")[:200],
+                kind="trailer",
+                language=LANGUAGES.get(str(item.get("language") or "")),
+                duration_s=float(runtime) if isinstance(runtime, int) and runtime > 0 else None,
+            )
+        )
+    return out[:TRAILERS]
 
 
 def map_characters(record: Any) -> list[CharacterImage]:
@@ -128,7 +160,7 @@ class TvdbConnector(HttpConnector):
         return "TheTVDB"
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
-        if capability == CHARACTERS:
+        if capability in (CHARACTERS, EXTRAS):
             return _Characters(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
@@ -143,8 +175,21 @@ class _Characters:
         )
 
     async def characters(self, kind: str, ids: Mapping[str, str]) -> list[CharacterImage]:
+        return map_characters(await self._record(kind, ids))
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        """Issue 465: a film's or a series' trailers on YouTube, as its TheTVDB record lists them."""
+        return MediaExtras(videos=map_trailers(await self._record(kind, ids)))
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return await self.fetch_character(ref)
+
+    async def _record(self, kind: str, ids: Mapping[str, str]) -> Mapping[str, Any] | None:
+        """The work's extended record (its characters, its trailers…), found by its ids; None: unknown."""
         if kind not in ("movie", "series"):
-            return []
+            return None
         work = str(ids["tvdb"]) if kind == "series" and str(ids.get("tvdb") or "").isdigit() else None
         for remote in (ids.get("tmdb"), ids.get("imdb")):
             if work or not remote or not REMOTE.fullmatch(str(remote)):
@@ -155,13 +200,14 @@ class _Characters:
                 continue  # TheTVDB does not know this id (it answers 404)
             work = pick((found or {}).get("data") if isinstance(found, Mapping) else None, kind)
         if work is None:
-            return []
+            return None
         path = f"/movies/{work}/extended" if kind == "movie" else f"/series/{work}/extended"
         try:
             record = await self.connector.get_json(self.service, path, short="false")
         except ConnectionError:
-            return []
-        return map_characters((record or {}).get("data") if isinstance(record, Mapping) else None)
+            return None
+        data = (record or {}).get("data") if isinstance(record, Mapping) else None
+        return data if isinstance(data, Mapping) else None
 
     async def fetch_character(self, ref: str) -> bytes:
         if not IMAGE_PATH.fullmatch(ref):

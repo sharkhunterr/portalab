@@ -27,6 +27,7 @@ isolation guard, so calls may return a :class:`~portalab.capabilities.results.Ca
 the core: a Plex, Jellyfin or Sonarr connector only maps its API onto these shapes.
 """
 
+import re
 from collections.abc import AsyncIterator, Mapping, Sequence
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass, field
@@ -68,6 +69,7 @@ REQUEST_DISCOVERY = "request.discovery"  # #4: titles one can ask for — search
 PEOPLE = "media.people"  # #92: what a service knows of a person — biography, portrait, filmography
 BOOK_SERIES = "media.book_series"  # issue 362: a book series' volumes, from a book database (Hardcover)
 GAME_DATABASE = "media.game_database"  # #368: a franchise's games and a game's sheet, from a game database
+EXTRAS = "media.extras"  # issue 465: a title's videos (trailers, featurettes…) and extra pictures
 ACTIVITY_KINDS: tuple[str, ...] = (
     "movie",
     "episode",
@@ -957,6 +959,65 @@ class BookSeriesProvider(Protocol):
     async def cover(self, ref: str, size: str) -> bytes: ...
 
 
+EXTRA_VIDEO_KINDS = (
+    "trailer",
+    "teaser",
+    "featurette",
+    "behind_the_scenes",
+    "interview",
+    "clip",
+    "deleted",
+    "bloopers",
+    "gameplay",
+    "other",
+)
+ExtraVideoKind = Literal[
+    "trailer",
+    "teaser",
+    "featurette",
+    "behind_the_scenes",
+    "interview",
+    "clip",
+    "deleted",
+    "bloopers",
+    "gameplay",
+    "other",
+]
+YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+
+
+@dataclass(frozen=True, slots=True)
+class ExtraVideo:
+    """Issue 465: one video about a title — ``site`` ``youtube`` (``key`` the video's id, played by YouTube)
+    or ``service`` (``key`` the media server's own item, played by the portal's player); ``picture`` a
+    service video's picture reference (served by the provider's ``extra_image``)."""
+
+    site: Literal["youtube", "service"]
+    key: str
+    name: str = ""
+    kind: ExtraVideoKind = "other"
+    language: str | None = None
+    official: bool = False
+    duration_s: float | None = None
+    picture: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ExtraImage:
+    """Issue 465: one more picture of a title — ``kind`` ``backdrop``, ``still``, ``fanart``, ``screenshot``
+    or ``artwork``; ``ref`` the provider's reference (served by its ``extra_image``)."""
+
+    kind: str
+    ref: str
+    lang: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class MediaExtras:
+    videos: Sequence[ExtraVideo] = ()
+    images: Sequence[ExtraImage] = ()
+
+
 @dataclass(frozen=True, slots=True)
 class GameFranchise:
     """#368 — a franchise (or a series) as a game database knows it: its games, the oldest first
@@ -993,6 +1054,10 @@ class GameDetails:
     rating: float | None = None
     votes: int = 0
     trailer: str | None = None
+    # issue 465: every video of it (named: a trailer, a gameplay video…), its screenshots and its artworks
+    videos: Sequence[ExtraVideo] = ()
+    screenshots: Sequence[str] = ()
+    artworks: Sequence[str] = ()
 
 
 @runtime_checkable
@@ -1010,6 +1075,19 @@ class GameDatabase(Protocol):
         ...
 
     async def image(self, ref: str, size: str) -> bytes: ...
+
+
+@runtime_checkable
+class ExtrasProvider(Protocol):
+    """Issue 465: what a service knows of a title's videos and extra pictures — found by the title's ids
+    (``tmdb``, ``tvdb``, ``imdb``, ``igdb``…) or, for the service holding it, by its own item
+    (``external_id``, else None); ``extra_image`` one picture's bytes (``preview``: a small one)."""
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras: ...
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes: ...
 
 
 @runtime_checkable
@@ -1101,7 +1179,7 @@ class PlayableItem:
     """What the player needs to know of a title before playing it, as the member's account sees it."""
 
     external_id: str
-    kind: str  # movie | episode
+    kind: str  # movie | episode | clip (issue 465: a title's extra — its trailer, a featurette…)
     title: str
     duration_s: float | None = None
     resume_s: float = 0.0  # where the member stopped last time (0 = from the start)
@@ -1116,6 +1194,7 @@ class PlayableItem:
     next_id: str | None = None
     next_label: str | None = None
     image: str | None = None  # opaque ref served by ``media.library``'s ``fetch_image``
+    series_id: str | None = None  # issue 466: an episode's series (its item), which the title must be
 
 
 @dataclass(frozen=True, slots=True)
@@ -1517,6 +1596,7 @@ SPECS: tuple[CapabilitySpec, ...] = (
     _spec(PEOPLE, PeopleProvider, "What a service knows of a person: biography, portrait, titles (#92)"),
     _spec(BOOK_SERIES, BookSeriesProvider, "A book series' volumes, from a book database (issue 362)"),
     _spec(GAME_DATABASE, GameDatabase, "A franchise's games and a game's sheet, from a game database (#368)"),
+    _spec(EXTRAS, ExtrasProvider, "A title's videos (trailers, featurettes…) and extra pictures (issue 465)"),
     _spec(
         DIGEST, MediaDigest, "The library's releases, additions and upcoming titles, for newsletters (027)"
     ),

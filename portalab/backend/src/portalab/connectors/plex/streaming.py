@@ -403,7 +403,7 @@ class PlexChannel:
         if item.get("type") in ("show", "season"):
             item = await self._episode_of(item)
         kind = item.get("type")
-        if kind not in ("movie", "episode"):
+        if kind not in ("movie", "episode", "clip"):  # issue 465: a clip is a title's extra
             raise ProviderNotFound("this item cannot be played here")
         key = str(item.get("ratingKey"))
         item = await self._metadata(key, includeMarkers=1, includeChapters=1)
@@ -430,6 +430,9 @@ class PlexChannel:
             next_id=following,
             next_label=following_label,
             image=key if item.get("thumb") else None,
+            series_id=str(item["grandparentRatingKey"])
+            if kind == "episode" and item.get("grandparentRatingKey")
+            else None,
         )
 
     # --- the stream ----------------------------------------------------------------------------------------

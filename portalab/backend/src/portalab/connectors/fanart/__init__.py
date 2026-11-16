@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import ARTWORK, Artwork
+from portalab.capabilities.media import ARTWORK, EXTRAS, Artwork, ExtraImage, MediaExtras
 from portalab.capabilities.results import InvalidPayload
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
 
@@ -84,6 +84,19 @@ def map_artwork(document: Any, kinds: Mapping[str, str]) -> list[Artwork]:
     return out
 
 
+EXTRA_KINDS = {"background": "fanart", "thumb": "still"}  # issue 465: the gallery's pictures, no text art
+EXTRA_IMAGES = 16
+
+
+def extra_images(artwork: Sequence[Artwork]) -> list[ExtraImage]:
+    """Issue 465: a work's backgrounds and thumbs for its gallery — textless first, the most liked first."""
+    kept = sorted(
+        (a for a in artwork if a.kind in EXTRA_KINDS),
+        key=lambda a: (a.kind != "background", a.lang is not None, -a.likes),
+    )
+    return [ExtraImage(kind=EXTRA_KINDS[a.kind], ref=a.image, lang=a.lang) for a in kept][:EXTRA_IMAGES]
+
+
 class FanartConnector(HttpConnector):
     key = "fanart"
     name = "fanart.tv"
@@ -92,7 +105,7 @@ class FanartConnector(HttpConnector):
     category = "metadata"
     config_schema: type[BaseModel] = FanartConfig
     secret_fields: frozenset[str] = frozenset({"api_key"})
-    provides: Sequence[CapabilityBinding] = (binding(ARTWORK), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (binding(ARTWORK), binding(EXTRAS), binding(HEALTH_PROBE))
     status_path = "/v3/movies/550"
     public_path = None
 
@@ -109,7 +122,7 @@ class FanartConnector(HttpConnector):
         return "fanart.tv"
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
-        if capability == ARTWORK:
+        if capability in (ARTWORK, EXTRAS):
             return _Artwork(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
@@ -150,3 +163,12 @@ class _Artwork:
         if response.status_code >= 400:
             raise ConnectionError(f"fanart.tv images answered HTTP {response.status_code}")
         return response.content
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        """Issue 465: a film's or a series' backgrounds and thumbs, for its page's gallery."""
+        return MediaExtras(images=extra_images(await self.artwork(kind, ids)))
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return await self.fetch_artwork(ref, preview)

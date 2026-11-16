@@ -27,7 +27,18 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
-from portalab.capabilities.media import GAME_DATABASE, GameDetails, GameFranchise, PersonCredit
+from portalab.capabilities.media import (
+    EXTRAS,
+    GAME_DATABASE,
+    YOUTUBE_ID,
+    ExtraImage,
+    ExtraVideo,
+    ExtraVideoKind,
+    GameDetails,
+    GameFranchise,
+    MediaExtras,
+    PersonCredit,
+)
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
 
@@ -37,7 +48,13 @@ AUTH_PATH = "/oauth2/token"
 IMAGE_HOST = "https://images.igdb.com"
 IMAGE_ID = re.compile(r"^[a-z0-9]{1,40}$")
 # a reference's size → IGDB's own (a cover's, a screenshot's, an artwork's)
-SIZES = {"cover": "t_cover_big", "screenshot": "t_screenshot_big", "artwork": "t_1080p"}
+SIZES = {
+    "cover": "t_cover_big",
+    "screenshot": "t_screenshot_big",
+    "artwork": "t_1080p",
+    "thumb": "t_screenshot_med",  # issue 465: a gallery's small picture
+}
+VIDEOS = 20  # issue 465: a game's videos told
 CANDIDATES = 5  # the franchises (and series) of a name looked at
 GAMES = 500  # a franchise's games asked at once (the API's cap)
 IMAGES = 12  # a game's screenshots and artworks told
@@ -61,7 +78,7 @@ _GAME = (
     "fields name, summary, storyline, first_release_date, cover.image_id, screenshots.image_id,"
     " artworks.image_id, genres.name, themes.name, game_modes.name, platforms.name,"
     " involved_companies.developer, involved_companies.publisher, involved_companies.company.name,"
-    " franchises.name, collections.name, total_rating, total_rating_count, videos.video_id,"
+    " franchises.name, collections.name, total_rating, total_rating_count, videos.video_id, videos.name,"
     " alternative_names.name, alternative_names.comment, game_localizations.name,"
     " game_localizations.region.identifier; where id = {id};"
 )
@@ -170,6 +187,8 @@ def map_details(game: Any) -> GameDetails | None:
         for ref in (image_ref(i) for key in ("artworks", "screenshots") for i in game.get(key) or [])
         if ref
     ]
+    screenshots = [r for r in (image_ref(i) for i in game.get("screenshots") or []) if r]
+    artworks = [r for r in (image_ref(i) for i in game.get("artworks") or []) if r]
     return GameDetails(
         ref=str(game["id"]),
         title=str(game["name"])[:300],
@@ -190,7 +209,39 @@ def map_details(game: Any) -> GameDetails | None:
         rating=_rating(game.get("total_rating")),
         votes=int(game.get("total_rating_count") or 0),
         trailer=trailer if trailer and re.fullmatch(r"[A-Za-z0-9_-]{6,20}", trailer) else None,
+        videos=map_videos(game.get("videos")),
+        screenshots=list(dict.fromkeys(screenshots))[:IMAGES],
+        artworks=list(dict.fromkeys(artworks))[:IMAGES],
     )
+
+
+def video_kind(name: str) -> ExtraVideoKind:
+    """Issue 465: what a game's video is, from its name (IGDB tells no type)."""
+    folded = name.casefold()
+    for word, kind in (
+        ("teaser", "teaser"),
+        ("trailer", "trailer"),
+        ("gameplay", "gameplay"),
+        ("interview", "interview"),
+        ("behind", "behind_the_scenes"),
+        ("making", "behind_the_scenes"),
+        ("developer", "behind_the_scenes"),
+        ("featurette", "featurette"),
+    ):
+        if word in folded:
+            return kind  # type: ignore[return-value]
+    return "other"
+
+
+def map_videos(videos: Any) -> list[ExtraVideo]:
+    out: list[ExtraVideo] = []
+    for video in videos or [] if isinstance(videos, list) else []:
+        key = str(video.get("video_id") or "") if isinstance(video, Mapping) else ""
+        if not YOUTUBE_ID.fullmatch(key):
+            continue
+        name = str(video.get("name") or "")[:200]
+        out.append(ExtraVideo(site="youtube", key=key, name=name, kind=video_kind(name)))
+    return out[:VIDEOS]
 
 
 def fold(text: str) -> str:
@@ -205,7 +256,7 @@ class IgdbConnector(HttpConnector):
     category = "metadata"
     config_schema: type[BaseModel] = IgdbConfig
     secret_fields: frozenset[str] = frozenset({"client_secret"})
-    provides: Sequence[CapabilityBinding] = (binding(GAME_DATABASE), binding(HEALTH_PROBE))
+    provides: Sequence[CapabilityBinding] = (binding(GAME_DATABASE), binding(EXTRAS), binding(HEALTH_PROBE))
     status_path = API + "platforms"
     public_path = None
 
@@ -289,7 +340,7 @@ class IgdbConnector(HttpConnector):
         return "IGDB"
 
     def provider(self, capability: str, service: ServiceHandle) -> Any:
-        if capability == GAME_DATABASE:
+        if capability in (GAME_DATABASE, EXTRAS):
             return _Games(self, service)
         if capability == HEALTH_PROBE:
             return _Probe(self, service)
@@ -397,6 +448,30 @@ class _Games:
     async def _game(self, ref: str) -> GameDetails | None:
         answer = await self.connector.query(self.service, "games", _GAME.format(id=int(ref)))
         return map_details(answer[0]) if isinstance(answer, list) and answer else None
+
+    async def extras(
+        self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        """Issue 465: a game's videos, screenshots and artworks (``s:`` and ``a:`` references), by its id."""
+        ref = str(ids.get("igdb") or "")
+        if kind != "game" or not ref.isdigit():
+            return MediaExtras()
+        game = await self.game(ref)
+        if game is None:
+            return MediaExtras()
+        return MediaExtras(
+            videos=list(game.videos),
+            images=[
+                *(ExtraImage(kind="screenshot", ref=f"s:{r}") for r in game.screenshots),
+                *(ExtraImage(kind="artwork", ref=f"a:{r}") for r in game.artworks),
+            ],
+        )
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        prefix, _, image = ref.partition(":")
+        if prefix not in ("s", "a"):
+            raise InvalidPayload("unexpected image reference")
+        return await self.image(image, "thumb" if preview else "screenshot" if prefix == "s" else "artwork")
 
     async def image(self, ref: str, size: str) -> bytes:
         if not IMAGE_ID.fullmatch(ref) or size not in SIZES:

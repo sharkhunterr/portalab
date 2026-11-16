@@ -187,8 +187,13 @@ IMAGE_GET_PREFIXES = (
     "/api/v1/media/metadata-images",
     "/api/v1/media/images/",
     "/api/v1/media/person/portrait",
+    "/api/v1/media/artwork-images",
+    "/api/v1/media/game-images",
 )
-IMAGE_GET = re.compile(r"^/api/v1/users/[^/]+/avatar$")
+# a member's avatar; issue 465: a title's extra pictures and its videos' pictures (a gallery shows dozens)
+IMAGE_GET = re.compile(
+    r"^/api/v1/(users/[^/]+/avatar|media/[0-9a-f-]{36}/extras/(images/\d{1,3}|videos/\d{1,3}/picture))$"
+)
 IMAGE_BUDGET = 4
 SESSION_COOKIE_NAME = "__Host-portalab_session"
 SESSION_COOKIE_NAMES = (SESSION_COOKIE_NAME, "portalab_session")  # #395: plain HTTP from a local network
