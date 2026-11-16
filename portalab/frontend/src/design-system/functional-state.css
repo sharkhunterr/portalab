@@ -10,6 +10,25 @@
   font-size: var(--font-size-sm);
 }
 
+/* issue 473: a block asking for it (``data-states="centered"``: a widget's body) shows the states that stand
+   for all of it — loading, unavailable, error, maintenance, not allowed — in its middle, not pressed into its
+   corner (the ones beside its content — partial, stale, syncing, no data — stay where they are) */
+[data-states="centered"]
+:is(
+  .functional-state--loading,
+  .functional-state--unavailable,
+  .functional-state--error,
+  .functional-state--maintenance,
+  .functional-state--unauthorized
+) {
+  position: absolute;
+  inset: 0;
+  inline-size: fit-content;
+  block-size: fit-content;
+  max-inline-size: calc(100% - 2 * var(--space-2));
+  margin: auto;
+}
+
 .functional-state__icon {
   flex: none;
 }

@@ -296,7 +296,7 @@ export function WidgetFrame({
         </span>
         {controls}
       </header>
-      <div className="widget-frame__body" ref={body}>
+      <div className="widget-frame__body" ref={body} data-states="centered">
         {instance.available ? (
           <HeaderSlot.Provider value={slot}>
             <FrameBoundary fallback={<FunctionalState state="error" />}>
