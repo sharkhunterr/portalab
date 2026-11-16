@@ -420,10 +420,10 @@ describe("a game's page laid out like a film's (issue 467)", () => {
 });
 
 describe("a game's age rating (issue 476)", () => {
-  it("shows a PEGI rating as its mark, read out as its age", () => {
+  it("shows a PEGI rating as its official mark, read out as its age", () => {
     render(<AgeRating rating="PEGI 12" />);
     const mark = screen.getByRole("img", { name: /PEGI 12/ });
-    expect(mark.querySelector("rect")?.getAttribute("style")).toContain("--rating-pegi-amber");
+    expect(mark.getAttribute("src")).toContain("pegi-12");
   });
 
   it("shows any other rating system as its words", () => {

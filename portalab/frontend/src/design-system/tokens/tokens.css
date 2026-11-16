@@ -4,13 +4,6 @@
  * The default values below are the light theme so the UI renders correctly before a theme is applied.
  */
 :root {
-  /* issue 476: the PEGI label's colors (a standard's, not a theme's): its age on green, amber or red, its
-     band black with white letters — the same on every interface */
-  --rating-pegi-green: #65b32e;
-  --rating-pegi-amber: #f39200;
-  --rating-pegi-red: #e30613;
-  --rating-pegi-band: #000000;
-  --rating-pegi-ink: #ffffff;
   /* color roles */
   --color-surface: #ffffff;
   --color-surface-raised: #f4f5f7;

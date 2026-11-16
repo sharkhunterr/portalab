@@ -1,3 +1,8 @@
+import pegi3 from "../../../assets/ratings/pegi-3.svg";
+import pegi7 from "../../../assets/ratings/pegi-7.svg";
+import pegi12 from "../../../assets/ratings/pegi-12.svg";
+import pegi16 from "../../../assets/ratings/pegi-16.svg";
+import pegi18 from "../../../assets/ratings/pegi-18.svg";
 import { Icon } from "../../../design-system/components/Icon";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
@@ -11,64 +16,26 @@ function names(value: unknown): string[] {
 }
 
 /**
- * Issue 476: a game's PEGI rating as its mark — the age on the label's color (green 3 and 7, amber 12 and 16,
- * red 18), « PEGI » beneath, as on a box; any other rating system as its words.
+ * Issue 476: a game's PEGI rating as its official mark (the label on the box: the age on green, amber or
+ * red, « PEGI » beneath — public domain on Wikimedia Commons), read out as its age; any other rating system
+ * as its words.
  */
-const PEGI_COLORS: Record<number, string> = {
-  3: "var(--rating-pegi-green)",
-  7: "var(--rating-pegi-green)",
-  12: "var(--rating-pegi-amber)",
-  16: "var(--rating-pegi-amber)",
-  18: "var(--rating-pegi-red)",
-};
+const PEGI_MARKS: Record<number, string> = { 3: pegi3, 7: pegi7, 12: pegi12, 16: pegi16, 18: pegi18 };
 
 export function AgeRating({ rating }: { rating: string }) {
   const t = useT();
   const age = Number(/PEGI\s*(\d{1,2})/i.exec(rating)?.[1]);
-  if (!PEGI_COLORS[age]) return <span className="game-rating__text">{rating}</span>;
+  const mark = PEGI_MARKS[age];
+  if (!mark) return <span className="game-rating__text">{rating}</span>;
   return (
-    <svg
+    <img
       className="game-rating__pegi"
-      viewBox="0 0 40 48"
-      width="34"
-      height="41"
-      role="img"
-      aria-label={t("media:facts.pegi", { age })}
-    >
-      <title>{t("media:facts.pegi", { age })}</title>
-      <rect
-        x="0.5"
-        y="0.5"
-        width="39"
-        height="47"
-        rx="3"
-        style={{ fill: PEGI_COLORS[age], stroke: "var(--rating-pegi-band)" }}
-      />
-      <text
-        x="20"
-        y="27"
-        textAnchor="middle"
-        fontSize={age > 9 ? 21 : 24}
-        fontWeight="800"
-        style={{ fill: "var(--rating-pegi-ink)" }}
-        fontFamily="Arial, sans-serif"
-      >
-        {age}
-      </text>
-      <rect x="0.5" y="35" width="39" height="12.5" style={{ fill: "var(--rating-pegi-band)" }} />
-      <text
-        x="20"
-        y="44.5"
-        textAnchor="middle"
-        fontSize="9"
-        fontWeight="800"
-        style={{ fill: "var(--rating-pegi-ink)" }}
-        fontFamily="Arial, sans-serif"
-        letterSpacing="0.5"
-      >
-        PEGI
-      </text>
-    </svg>
+      src={mark}
+      alt={t("media:facts.pegi", { age })}
+      title={t("media:facts.pegi", { age })}
+      width={34}
+      height={41}
+    />
   );
 }
 

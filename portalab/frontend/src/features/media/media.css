@@ -1854,7 +1854,7 @@ a.media-person__row:hover {
   background: color-mix(in srgb, var(--tone) 35%, var(--color-surface));
 }
 
-/* issue 476: a game's PEGI mark in its production block, beside the words of the other rating systems */
+/* issue 476: a game's official PEGI mark in its production block, beside the words of the other systems */
 .media-enriched__pairs .game-rating__pegi {
   display: inline-block;
   vertical-align: middle;
