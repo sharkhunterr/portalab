@@ -19,7 +19,7 @@ backend/src/portalab/{core, capabilities, modules, connectors, sdk, app}
 backend/migrations/<schema>/versions/
 backend/tests/{unit,integration,contract,security,migrations}/
 frontend/src/{shell, design-system, i18n, features, api}
-frontend/tests/{unit,a11y,e2e}/
+frontend/tests/{unit,a11y,e2e,nightly}/
 plugins/{available,installed}/ · examples/plugins/
 ```
 
@@ -39,6 +39,11 @@ uv run portalab migrate | serve | worker | openapi -o openapi.json   # bootstrap
 # frontend (Node 22)
 cd frontend && npm ci && npm run lint && npm run typecheck && npm test && npm run build
 npm run gen:api && npm run check:api-drift   # after changing the API (backend/openapi.json)
+
+# nightly regression matrix (issue 469): a fresh portal + demo data + every shop product, then Playwright over
+# every interface, widget setting and look on phone/tablet/desktop — report in nightly-report/summary.md
+cd frontend && npm run build && cd ../backend
+DATABASE_URL=postgresql+asyncpg://portalab:portalab_test@127.0.0.1:55432/<empty db> sh tests/nightly/nightly.sh nightly-report [-- -g "interface vhs"]
 
 # image + acceptance checks (docker)
 docker build -f portalab/deploy/Dockerfile -t portalab .   # from the repository root

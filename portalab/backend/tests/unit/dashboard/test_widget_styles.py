@@ -74,3 +74,24 @@ def test_every_look_comes_in_a_pack_with_the_widget_it_needs() -> None:
         for look, widget in LOOK_NEEDS.items():
             if look in contents:
                 assert widget in contents, (pack["key"], look)
+
+
+def test_every_setting_on_sale_is_one_its_widget_offers() -> None:
+    """Issue 469: every widget option sold (a chart, a period, the whole server's view, a series… not only the
+    looks) names a widget, one of its settings and one of that setting's values — a renamed setting or value
+    would sell an option that changes nothing."""
+    from portalab.modules.dashboard.widgets.hosts import CHART
+
+    widgets = {w.key: w for w in (*STYLED, CHART)}
+    wrong = []
+    for product in full_catalog():
+        option = (product.get("payload") or {}).get("option") if product["type"] == "widget_option" else None
+        key, _, setting = (option or "").partition(":")
+        field, _, value = setting.partition("=")
+        if not option or field == "_options":
+            continue  # a pack's add-on: its element names the widget it is made for
+        widget = widgets.get(key)
+        schema = (widget.config_schema.get("properties") or {}).get(field) if widget else None
+        if schema is None or value not in [str(v) for v in schema.get("enum", [])]:
+            wrong.append(f"{product['key']}: {option}")
+    assert wrong == []

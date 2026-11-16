@@ -54,6 +54,14 @@ variables:
 workflow:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    # issue 469: « regression », every night — the whole test suites on main (no release to wait for), then the
+    # nightly regression matrix (test:nightly-regression); no image is built
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK == "regression"'
+      variables:
+        ENABLE_BACKEND_TESTS: "true"
+        ENABLE_FRONTEND_TESTS: "true"
+        ENABLE_DOCKER_BUILD: "false"
+        ENABLE_GITLAB_REGISTRY: "false"
     # issues 402, 404: a scheduled pipeline does one task (SCHEDULE_TASK): « security » rescans what was
     # published and audits the dependencies, « renovate » proposes dependency updates — no test, build nor
     # release runs then
@@ -404,6 +412,48 @@ test:api-fuzz:
     expire_in: 2 weeks
   rules:
     - if: '$ENABLE_BACKEND_TESTS == "true"'
+
+test:nightly-regression:
+  # issue 469: the nightly regression matrix — a fresh portal (migrations, its Admin, the demo data, every shop
+  # product given to one account per device) served with the production bundle, then Playwright over what the
+  # shop sells: every interface (pages, its own navigation, smoothness), every widget with each setting and
+  # add-on, every look, the locked side — on a phone, a tablet and a desktop. Last of the test jobs (the runner
+  # shares its machine); the morning's report: nightly-report/summary.md, the HTML report beside it.
+  image: mcr.microsoft.com/playwright:v1.63.0-noble
+  stage: test
+  needs: [{ job: "test:api-fuzz", artifacts: false, optional: true }]
+  timeout: 3h
+  services:
+    - name: postgres:16-alpine
+      alias: postgres
+      command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+      variables:
+        POSTGRES_DB: nightly
+        POSTGRES_USER: portalab
+        POSTGRES_HOST_AUTH_METHOD: trust
+  variables:
+    DATABASE_URL: "postgresql+asyncpg://portalab@postgres:5432/nightly"
+    NODE_OPTIONS: "--max-old-space-size=3072"
+    NIGHTLY_WORKERS: "2"
+    # the matrix in 3 parts, one a night in turn (all of it every 3 nights, about an hour each); a schedule
+    # with NIGHTLY_SHARDS=1 runs all of it at once (a weekend)
+    NIGHTLY_SHARDS: "3"
+    UV_PYTHON: "3.12"
+  before_script:
+    - curl -LsSf https://astral.sh/uv/0.9.5/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+    - cd portalab/frontend && npm ci --no-audit --no-fund && npm run build
+    - cd ../backend && uv sync --frozen
+  script:
+    - sh tests/nightly/nightly.sh nightly-report
+  artifacts:
+    when: always
+    paths:
+      - portalab/backend/nightly-report/
+    reports:
+      junit: portalab/backend/nightly-report/junit.xml
+    expire_in: 2 weeks
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_TASK == "regression"'
 
 security:published-image:
   # issue 402: the images already published, rescanned every week — a vulnerability found after a release

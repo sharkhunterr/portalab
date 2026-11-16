@@ -5,5 +5,8 @@
   "ignore": ["src/api/generated/**"],
   "rules": {
     "duplicates": "off"
+  },
+  "playwright": {
+    "config": ["playwright.config.ts", "playwright.nightly.config.ts"]
   }
 }

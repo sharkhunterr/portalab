@@ -44,4 +44,5 @@ Thumbs.db
 # issue 401: the API fuzzer's cache and reports
 .schemathesis/
 fuzz-report/
+nightly-report/
 dast-report/
