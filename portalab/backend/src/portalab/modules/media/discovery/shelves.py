@@ -19,6 +19,7 @@ from portalab.modules.media.discovery.recent import Recent, recent_releases, rec
 from portalab.modules.media.history.projection import HistoryProjection
 from portalab.modules.media.models import HistoryEntry, MediaObject
 from portalab.modules.media.observability import log
+from portalab.modules.media.restrictions import excluded
 
 SHELVES = ("new", "released", "recent", "continue", "trending", "recommended")
 COHORT = 5
@@ -49,24 +50,37 @@ class Discovery:
         self.clock = clock
 
     async def recent(
-        self, name: str, *, limit: int, kinds: Sequence[str] | None = None
+        self,
+        name: str,
+        *,
+        limit: int,
+        kinds: Sequence[str] | None = None,
+        hidden: frozenset[UUID] = frozenset(),
     ) -> list[tuple[MediaObject, Recent]]:
-        """027: « new » (added last) or « released » (came out last) works with their date and episode."""
+        """027: « new » (added last) or « released » (came out last) works with their date and episode —
+        issue 474: past the titles a profile's age rating hides (``hidden``), the next ones filling in."""
         async with self.database.session() as session:
             recents = (
-                await recent_releases(session, utc_now(self.clock).date(), limit=limit, kinds=kinds)
+                await recent_releases(
+                    session, utc_now(self.clock).date(), limit=limit, kinds=kinds, hidden=hidden
+                )
                 if name == "released"
-                else await recently_added(session, limit=limit, kinds=kinds)
+                else await recently_added(session, limit=limit, kinds=kinds, hidden=hidden)
             )
             rows = {row.id: row for row in await self._ordered(session, [r.object_id for r in recents])}
         return [(rows[r.object_id], r) for r in recents if r.object_id in rows]
 
-    async def shelf(self, name: str, viewer: Principal) -> tuple[list[MediaObject], str | None]:
+    async def shelf(
+        self, name: str, viewer: Principal, hidden: frozenset[UUID] = frozenset()
+    ) -> tuple[list[MediaObject], str | None]:
+        """A shelf — issue 474: past the titles a profile's age rating hides (``hidden``), left out by the
+        query itself so the next ones fill it."""
         user = viewer.acting_for or viewer.user_id
         size = max(1, min(self.config().discovery_shelf_size, 50))
         now = utc_now(self.clock)
+        skip = [excluded(HistoryEntry.object_id, hidden)] if hidden else []
         if name in ("new", "released"):  # 027: the services' own dates, newest first
-            found = [row for row, _ in await self.recent(name, limit=size)]
+            found = [row for row, _ in await self.recent(name, limit=size, hidden=hidden)]
             return found, (None if found else NEXT_ACTION[name])
         rows: Sequence[MediaObject]
         async with self.database.session() as session:
@@ -75,7 +89,7 @@ class Discovery:
                     r[0]
                     for r in await session.execute(
                         select(HistoryEntry.object_id, func.max(HistoryEntry.occurred_at).label("at"))
-                        .where(HistoryEntry.user_id == user)
+                        .where(HistoryEntry.user_id == user, *skip)
                         .group_by(HistoryEntry.object_id)
                         .order_by(func.max(HistoryEntry.occurred_at).desc())
                         .limit(size)
@@ -83,14 +97,18 @@ class Discovery:
                 ]
                 rows = await self._ordered(session, ids)
             elif name == "continue" and user is not None:
-                rows = [o for _, o in await self.history.continue_items(user, limit=size)]
+                rows = [
+                    o
+                    for _, o in await self.history.continue_items(user, limit=size * (4 if hidden else 1))
+                    if o.id not in hidden
+                ][:size]
             elif name == "trending":
                 since = now - timedelta(days=30)
                 ids = [
                     r[0]
                     for r in await session.execute(
                         select(HistoryEntry.object_id)
-                        .where(HistoryEntry.occurred_at >= since, HistoryEntry.completed.is_(True))
+                        .where(HistoryEntry.occurred_at >= since, HistoryEntry.completed.is_(True), *skip)
                         .group_by(HistoryEntry.object_id)
                         .having(func.count(func.distinct(HistoryEntry.user_id)) >= COHORT)
                         .order_by(func.count(func.distinct(HistoryEntry.user_id)).desc())
@@ -99,8 +117,8 @@ class Discovery:
                 ]
                 rows = await self._ordered(session, ids)
             elif name == "recommended":
-                ids = await self._recommended(viewer, size)
-                rows = await self._ordered(session, ids)
+                ids = await self._recommended(viewer, size * (4 if hidden else 1))
+                rows = (await self._ordered(session, [i for i in ids if i not in hidden]))[:size]
             else:
                 rows = []
         items = list(rows)

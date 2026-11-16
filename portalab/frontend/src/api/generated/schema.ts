@@ -10452,6 +10452,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/requests/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recent Requests
+         * @description Issue 475: the media home's « Recently requested » — what the members asked for last through the
+         *     portal's request tools (films and series through Seerr, books, games…), newest first, one card per title,
+         *     nobody named. A household profile's age rating holds as on every shelf: a title in the library it hides
+         *     is left out, and one outside it (no known rating) too when it opens rated titles only.
+         */
+        get: operations["recent_requests_api_v1_media_requests_recent_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/requests/{request_id}/cancel": {
         parameters: {
             query?: never;
@@ -42488,6 +42511,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recent_requests_api_v1_media_requests_recent_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

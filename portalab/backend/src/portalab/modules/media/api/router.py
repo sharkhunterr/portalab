@@ -15,6 +15,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.i18n import DEFAULT_CONTEXT
 from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
 from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
@@ -422,17 +423,17 @@ async def discovery(
     kind: Annotated[str | None, Query(pattern=r"^[a-z]{2,12}$")] = None,
 ) -> MediaShelf:
     """A discovery shelf — issue 435: « new » and « released » of one kind of media (``kind``) too."""
+    # 032: not what a profile's age rating keeps from it — issue 474: left out by the query itself, so the
+    # next titles fill the shelf instead of leaving it nearly empty
+    hidden = await module.gate.hidden(principal)
     if shelf == "leaving":
-        return await _leaving_shelf(module)
+        return await _leaving_shelf(module, principal, hidden)
     if shelf not in SHELVES:
         raise MediaNotFound("This shelf does not exist.")
     if shelf in ("new", "released"):  # 027: with when it was added or released
         size = max(1, min(module.config.discovery_shelf_size, 50))
-        hidden = await module.gate.hidden(principal)  # 032: not what a profile's age rating keeps from it
         kinds = [kind] if kind else None
-        recents = [
-            r for r in await module.discovery.recent(shelf, limit=size, kinds=kinds) if r[0].id not in hidden
-        ]
+        recents = await module.discovery.recent(shelf, limit=size, kinds=kinds, hidden=hidden)
         async with module.database.session() as session:
             images = await module.catalog._images(session, [r.id for r, _ in recents])
         items = [
@@ -441,7 +442,7 @@ async def discovery(
         ]
         items = await module.gate.mark(principal, await _asked(module, items))
         return MediaShelf(shelf=shelf, items=items, next_action=None if items else "browse")
-    rows, next_action = await module.discovery.shelf(shelf, principal)
+    rows, next_action = await module.discovery.shelf(shelf, principal, hidden)
     rows = await module.gate.keep(principal, rows)
     async with module.database.session() as session:
         images = await module.catalog._images(session, [r.id for r in rows])
@@ -451,12 +452,15 @@ async def discovery(
     return MediaShelf(shelf=shelf, items=cards, next_action=next_action)
 
 
-async def _leaving_shelf(module: MediaModule) -> MediaShelf:
+async def _leaving_shelf(module: MediaModule, principal: Principal, hidden: frozenset[UUID]) -> MediaShelf:
     """#110: what the library's cleanup will delete, the first to go first — a shelf like the others, each
-    title with the day it goes (``at``), none when no cleanup tool is set up."""
+    title with the day it goes (``at``), none when no cleanup tool is set up. Issue 474: like the others, it
+    leaves out what a profile's age rating hides, and each card carries its age badge (or its padlock)."""
     if not module.cleanup.configured():
         return MediaShelf(shelf="leaving", items=[], next_action=None)
-    soonest = await module.cleanup.soonest(limit=max(1, min(module.config.discovery_shelf_size, 50)))
+    soonest = await module.cleanup.soonest(
+        limit=max(1, min(module.config.discovery_shelf_size, 50)), hidden=hidden
+    )
     ids = [UUID(entry["id"]) for entry in soonest]
     async with module.database.session() as session:
         rows = {
@@ -469,7 +473,8 @@ async def _leaving_shelf(module: MediaModule) -> MediaShelf:
         for i, entry in zip(ids, soonest, strict=True)
         if i in rows
     ]
-    return MediaShelf(shelf="leaving", items=await _asked(module, items), next_action=None)
+    items = await module.gate.mark(principal, await _asked(module, items))
+    return MediaShelf(shelf="leaving", items=items, next_action=None)
 
 
 @router.get("/media/images/{image_id}")
@@ -530,6 +535,30 @@ async def discover_title(
     return await module.requestable.details(
         kind, tmdb_id, _me(principal), await module.member_language(principal)
     )
+
+
+@router.get("/media/requests/recent")
+async def recent_requests(principal: Reader, module: Module) -> dict[str, Any]:
+    """Issue 475: the media home's « Recently requested » — what the members asked for last through the
+    portal's request tools (films and series through Seerr, books, games…), newest first, one card per title,
+    nobody named. A household profile's age rating holds as on every shelf: a title in the library it hides
+    is left out, and one outside it (no known rating) too when it opens rated titles only."""
+    registered = module.widgets.get("media.recently_requested")
+    if registered is None:
+        return {"items": []}
+    payload = await registered.provider.load(principal, {"scope": "all", "period": "90d"}, DEFAULT_CONTEXT)
+    items = list((payload.data or {}).get("items") or [])
+    restrictions = await module.gate.restrictions(principal)
+    if restrictions is not None and not restrictions.allow_unrated:
+        items = [item for item in items if item.get("id")]
+    seen: set[tuple[str, str]] = set()
+    out = []
+    for item in items:
+        key = (str(item.get("id") or item.get("title")), str(item.get("kind")))
+        if key not in seen:
+            seen.add(key)
+            out.append(item)
+    return {"items": out}
 
 
 @router.get("/me/media/requests/quota")

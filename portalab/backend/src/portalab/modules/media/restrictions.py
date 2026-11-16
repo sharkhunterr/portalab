@@ -680,6 +680,8 @@ class GatedWidget:
     def __init__(self, inner: Any, gate: TitleGate) -> None:
         self.inner = inner
         self.gate = gate
+        if hasattr(inner, "title_gate"):  # issue 474: a widget drawing titles leaves out the hidden ones
+            inner.title_gate = gate
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.inner, name)

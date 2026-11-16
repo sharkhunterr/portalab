@@ -1,7 +1,8 @@
 """What is new in the library (027): « Recently added » — what the services added last (their own date:
 Plex's ``addedAt``, Grimmory's ``addedOn``…), a new episode bringing its series up — and « Recent releases »
 — what came out last (``released``: a film's or book's release date, an episode's air date). Both newest
-first, one card per work, only what the library holds."""
+first, one card per work, only what the library holds. Issue 474: a household profile's lists leave out, in
+the query itself, the titles its age rating hides (``hidden``) — the next ones fill the shelf."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -13,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.modules.media.models import MediaObject, SourceItem
+from portalab.modules.media.restrictions import excluded
 
 WORKS = ("movie", "series", "book", "comic", "manga", "magazine", "audiobook", "game", "album")
 UNITS = (*WORKS, "episode", "season", "track")
@@ -65,14 +67,18 @@ def _work(object_id: UUID, known: dict[UUID, MediaObject]) -> tuple[MediaObject 
 
 
 async def _rank(
-    session: AsyncSession, rows: Sequence[tuple[UUID, Any]], limit: int, kinds: Sequence[str] | None
+    session: AsyncSession,
+    rows: Sequence[tuple[UUID, Any]],
+    limit: int,
+    kinds: Sequence[str] | None,
+    hidden: frozenset[UUID] = frozenset(),
 ) -> list[Recent]:
     known = await _lineage(session, {object_id for object_id, _ in rows})
     out: list[Recent] = []
     seen: set[UUID] = set()
     for object_id, at in rows:
         work, episode = _work(object_id, known)
-        if work is None or work.id in seen or (kinds and work.kind not in kinds):
+        if work is None or work.id in seen or work.id in hidden or (kinds and work.kind not in kinds):
             continue
         seen.add(work.id)
         stamp = at.isoformat() if isinstance(at, datetime | date) else str(at)
@@ -83,7 +89,11 @@ async def _rank(
 
 
 async def recently_added(
-    session: AsyncSession, *, limit: int = 16, kinds: Sequence[str] | None = None
+    session: AsyncSession,
+    *,
+    limit: int = 16,
+    kinds: Sequence[str] | None = None,
+    hidden: frozenset[UUID] = frozenset(),
 ) -> list[Recent]:
     rows = (
         await session.execute(
@@ -92,16 +102,22 @@ async def recently_added(
                 SourceItem.object_id.is_not(None),
                 SourceItem.availability == "available",
                 SourceItem.kind.in_(units_of(kinds)),
+                *([excluded(SourceItem.object_id, hidden)] if hidden else []),
             )
             .order_by(SourceItem.observed_at.desc())
             .limit(limit * 25)
         )
     ).all()
-    return await _rank(session, [(r[0], r[1]) for r in rows], limit, kinds)
+    return await _rank(session, [(r[0], r[1]) for r in rows], limit, kinds, hidden)
 
 
 async def recent_releases(
-    session: AsyncSession, today: date, *, limit: int = 16, kinds: Sequence[str] | None = None
+    session: AsyncSession,
+    today: date,
+    *,
+    limit: int = 16,
+    kinds: Sequence[str] | None = None,
+    hidden: frozenset[UUID] = frozenset(),
 ) -> list[Recent]:
     released = SourceItem.payload["released"].astext
     rows = (
@@ -113,9 +129,10 @@ async def recent_releases(
                 released.is_not(None),
                 released <= today.isoformat(),
                 SourceItem.kind.in_(units_of(kinds)),
+                *([excluded(SourceItem.object_id, hidden)] if hidden else []),
             )
             .order_by(released.desc())
             .limit(limit * 25)
         )
     ).all()
-    return await _rank(session, [(r[0], str(r[1])[:10]) for r in rows], limit, kinds)
+    return await _rank(session, [(r[0], str(r[1])[:10]) for r in rows], limit, kinds, hidden)

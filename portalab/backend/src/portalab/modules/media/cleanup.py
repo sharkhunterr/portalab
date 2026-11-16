@@ -249,9 +249,10 @@ class CleanupService:
         metrics.increment("media.cleanup.rescued")
         return await self.status(object_id, user)
 
-    async def soonest(self, limit: int = 12) -> list[dict[str, Any]]:
-        """The widget's titles: the first to go first (those without a date last), one card per title."""
-        entries = await self.leaving()
+    async def soonest(self, limit: int = 12, hidden: frozenset[UUID] = frozenset()) -> list[dict[str, Any]]:
+        """The widget's titles: the first to go first (those without a date last), one card per title —
+        issue 474: past those a profile's age rating hides (``hidden``)."""
+        entries = [e for e in await self.leaving() if e.object_id not in hidden]
         firsts: dict[UUID, Leaving] = {}
         for entry in entries:
             known = firsts.get(entry.object_id)

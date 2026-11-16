@@ -38,6 +38,7 @@ from portalab.modules.media.models import (
 )
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 from portalab.modules.media.requests.insights import GROUPS, RequestInsights, ids_of, kind_of, lookup_of
+from portalab.modules.media.restrictions import excluded
 
 OWNER = "module:media"
 CHARTS = ("bars", "area", "donut", "top", "figures")
@@ -378,6 +379,13 @@ class _Base:
         self.database = database
         self.clock = clock
         self.enricher = enricher
+        # issue 474: the gate of a household profile's age rating (set by ``GatedWidget``): a widget drawing
+        # its titles leaves out the hidden ones in its query, so the next ones fill it
+        self.title_gate: Any = None
+
+    async def hidden(self, principal: Principal) -> frozenset[UUID]:
+        """The titles this viewer's lists leave out (empty for nearly everyone)."""
+        return await self.title_gate.hidden(principal) if self.title_gate is not None else frozenset()
 
     def payload(self, data: Mapping[str, Any] | None) -> WidgetPayload:
         empty = not data or (isinstance(data.get("items"), list) and not data["items"])
@@ -447,11 +455,14 @@ class RecentlyAddedWidget(_Base):
         from portalab.modules.media.discovery.recent import recent_releases, recently_added
 
         kinds = KINDS_OF.get(str(config.get("kind") or "all"))
+        hidden = await self.hidden(principal)
         async with self.database.session() as session:
             recents = (
-                await recent_releases(session, utc_now(self.clock).date(), limit=16, kinds=kinds)
+                await recent_releases(
+                    session, utc_now(self.clock).date(), limit=16, kinds=kinds, hidden=hidden
+                )
                 if self.released
-                else await recently_added(session, limit=16, kinds=kinds)
+                else await recently_added(session, limit=16, kinds=kinds, hidden=hidden)
             )
             rows = {
                 row.id: row
@@ -576,7 +587,7 @@ class LeavingWidget(_Base):
     ) -> WidgetPayload:
         if not self.cleanup.configured():
             return self.payload(None)
-        items = await self.cleanup.soonest()
+        items = await self.cleanup.soonest(hidden=await self.hidden(principal))
         return self.payload({"items": await self.cards(items)})
 
 
@@ -740,6 +751,7 @@ class ShuffleWidget(_Base):
         self, principal: Principal, config: Mapping[str, Any], ctx: LocaleContext
     ) -> WidgetPayload:
         kinds = KINDS_OF.get(str(config.get("kind") or "all")) or ("movie", "series")
+        hidden = await self.hidden(principal)
         async with self.database.session() as session:
             rows = (
                 (
@@ -749,6 +761,7 @@ class ShuffleWidget(_Base):
                             MediaObject.status == "active",
                             MediaObject.available.is_(True),
                             MediaObject.kind.in_(kinds),
+                            *([excluded(MediaObject.id, hidden)] if hidden else []),
                         )
                         .order_by(func.random())
                         .limit(self.DRAW * 3)  # some have no poster

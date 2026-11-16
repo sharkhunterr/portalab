@@ -56308,6 +56308,30 @@
         ]
       }
     },
+    "/api/v1/media/requests/recent": {
+      "get": {
+        "description": "Issue 475: the media home's \u00ab Recently requested \u00bb \u2014 what the members asked for last through the\nportal's request tools (films and series through Seerr, books, games\u2026), newest first, one card per title,\nnobody named. A household profile's age rating holds as on every shelf: a title in the library it hides\nis left out, and one outside it (no known rating) too when it opens rated titles only.",
+        "operationId": "recent_requests_api_v1_media_requests_recent_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Recent Requests Api V1 Media Requests Recent Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Recent Requests",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/requests/{request_id}/cancel": {
       "post": {
         "operationId": "cancel_request_api_v1_media_requests__request_id__cancel_post",

@@ -135,6 +135,37 @@ function Row({
   );
 }
 
+/** Issue 475: what the members asked for last through the portal's request tools (Seerr, books, games…). */
+interface RequestedItem extends JournalItem {
+  state?: string | null;
+}
+
+function RequestedRow() {
+  const t = useT();
+  const requested = useQuery({
+    queryKey: ["media", "requests", "recent"],
+    queryFn: async () =>
+      ((await api.GET("/api/v1/media/requests/recent")).data as unknown as { items?: RequestedItem[] })
+        ?.items ?? [],
+    staleTime: 60_000,
+  });
+  const items = (requested.data ?? []).map((item) => ({
+    ...item,
+    progress: null,
+    subtitle: item.state ? t(`media:requests.state.${item.state}`) : null,
+  }));
+  if (!items.length) return null;
+  return (
+    <Row
+      icon="inbox"
+      title={t("media:shelf.requested")}
+      more={{ to: "/media/requests", label: t("media:home.seeAll") }}
+    >
+      <JournalRail items={items} label={t("media:shelf.requested")} />
+    </Row>
+  );
+}
+
 /** Issue 190: what my taste recommends, each with its reason — and what I kept for later. */
 function TasteRows() {
   const t = useT();
@@ -335,6 +366,8 @@ export function MediaHome() {
       {SHELF_KINDS.map((kind) => (
         <Shelf key={kind} name="new" icon={KIND_ICONS[kind] ?? "sparkles"} kind={kind} />
       ))}
+      {/* issue 475: what the members asked for last */}
+      <RequestedRow />
       {/* #4: what one can ask for, like Seerr's home */}
       <DiscoverShelves />
       <Row icon="list" title={t("media:home.byKind")}>
