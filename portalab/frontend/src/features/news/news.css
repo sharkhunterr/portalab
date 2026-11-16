@@ -76,7 +76,11 @@
   backdrop-filter: none;
 }
 .news-card__kicker[data-channel] {
-  color: oklch(from var(--color-accent) l c calc(h + var(--channel-hue)));
+  color: color-mix(
+    in oklab,
+    oklch(from var(--color-accent) l c calc(h + var(--channel-hue))) 55%,
+    var(--color-text)
+  );
 }
 .news-channel-dot {
   display: inline-block;
@@ -116,8 +120,9 @@
   gap: var(--space-1);
   padding: 0 var(--space-2) var(--space-2);
 }
+/* issue 469: the accent drawn toward the text — still the theme's color, readable on every card */
 .news-card__kicker {
-  color: var(--color-accent);
+  color: color-mix(in oklab, var(--color-accent) 55%, var(--color-text));
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;

@@ -96,10 +96,11 @@
 .month-grid__day:hover {
   border-color: var(--color-border);
 }
+/* issue 469: a day of the month before or after, told apart by its plain ground and its quieter color —
+   never by fading it (its number stays readable: the theme's muted text keeps the contrast) */
 .month-grid__day[data-outside] {
   background: transparent;
   color: var(--color-text-muted);
-  opacity: 0.6;
 }
 .month-grid__day[data-today] .month-grid__num {
   display: grid;
@@ -283,7 +284,6 @@
 }
 .month-grid:not([data-compact]) .month-grid__day[data-outside] {
   background: transparent;
-  opacity: 0.5;
 }
 .month-grid:not([data-compact]) .month-grid__bar {
   margin-inline: 4px;

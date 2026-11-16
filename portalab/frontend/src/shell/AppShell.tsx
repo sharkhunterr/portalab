@@ -204,6 +204,7 @@ export function AppShell({
           onNavigate={(to) => navigate(to)}
           onSignOut={onSignOut}
           onOpenNavigation={nav === "drawer" ? () => setMenuOpen(true) : undefined}
+          navigationOpen={menuOpen}
           bottomBar={nav === "bottom-bar"}
         />
         <LevelUpMoment />

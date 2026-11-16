@@ -1724,20 +1724,28 @@ a.mk-kpi__link:hover {
 .shop-carousel__dots {
   display: flex;
   justify-content: center;
-  gap: 0.35rem;
 }
 .shop-carousel__dot {
-  inline-size: 0.45rem;
-  block-size: 0.45rem;
+  /* issue 469: the dot drawn small, the target a finger's size (WCAG 2.5.8: 24 px) */
+  position: relative;
+  inline-size: 24px;
+  block-size: 24px;
   padding: 0;
   border: 0;
+  background: none;
+  cursor: pointer;
+}
+.shop-carousel__dot::before {
+  content: "";
+  position: absolute;
+  inset-block: calc(50% - 0.225rem);
+  inset-inline: calc(50% - 0.225rem);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--color-text) 25%, transparent);
-  cursor: pointer;
-  transition: inline-size var(--motion-duration-fast, 150ms) ease;
+  transition: inset-inline var(--motion-duration-fast, 150ms) ease;
 }
-.shop-carousel__dot[aria-current="true"] {
-  inline-size: 1.2rem;
+.shop-carousel__dot[aria-current="true"]::before {
+  inset-inline: calc(50% - 0.6rem);
   background: var(--color-accent);
 }
 .shop-carousel__dot:focus-visible,

@@ -172,7 +172,7 @@
   font-size: var(--font-size-sm);
 }
 .settings-home__items {
-  opacity: 0.85;
+  color: var(--color-text-muted); /* issue 469: quieter by its color, not faded below the contrast */
 }
 
 .settings-play__problem {

@@ -20,7 +20,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: var(--color-accent);
+  color: color-mix(in oklab, var(--color-accent) 55%, var(--color-text)); /* issue 469: readable everywhere */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;

@@ -13,7 +13,7 @@
   --wheel-bulb: #ff6f91;
   --wheel-pointer: #ff6f91;
   --wheel-hub: #fff6fa;
-  --wheel-hub-ink: #d6336c;
+  --wheel-hub-ink: #b0204f; /* issue 469: 5.9:1 on its hub (#d6336c fell short of 4.5) */
 }
 :is(.widget-frame,.widget-preview__scaled)[data-widget-option~="wheel-pastel"] .wheel__stage {
   background: repeating-conic-gradient(#ff9ebb 0deg 11.25deg, #ffffff 11.25deg 22.5deg);

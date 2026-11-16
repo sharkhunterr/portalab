@@ -35,6 +35,8 @@ export interface AppHeaderProps {
   onSignOut: () => void;
   /** Shown when the navigation lives in a panel the header opens (drawer/orbit variants). */
   onOpenNavigation?: (() => void) | undefined;
+  /** Issue 469: whether that panel is open — the button says so (``aria-expanded``). */
+  navigationOpen?: boolean;
 }
 
 export function AppHeader({
@@ -46,6 +48,7 @@ export function AppHeader({
   onNavigate,
   onSignOut,
   onOpenNavigation,
+  navigationOpen = false,
 }: AppHeaderProps) {
   const strings = useShellStrings();
   const phone = device === "phone";
@@ -77,6 +80,8 @@ export function AppHeader({
             size="icon"
             data-tour="nav"
             aria-label={strings.openNavigation}
+            aria-haspopup="dialog"
+            aria-expanded={navigationOpen}
             onClick={onOpenNavigation}
           >
             <Icon name="menu" />
@@ -95,6 +100,8 @@ export function AppHeader({
             size="icon"
             data-tour="nav"
             aria-label={strings.openNavigation}
+            aria-haspopup="dialog"
+            aria-expanded={navigationOpen}
             onClick={onOpenNavigation}
           >
             <Icon name="menu" />

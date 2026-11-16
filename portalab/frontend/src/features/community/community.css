@@ -122,7 +122,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.15rem;
-  color: var(--color-accent);
+  color: color-mix(in oklab, var(--color-accent) 55%, var(--color-text)); /* issue 469: readable everywhere */
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;

@@ -2502,7 +2502,7 @@ html[data-motion="none"] .widget-shuffle__track {
   padding: 0.1rem var(--space-2);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-  color: var(--color-accent);
+  color: color-mix(in oklab, var(--color-accent) 55%, var(--color-text)); /* issue 469: readable everywhere */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;

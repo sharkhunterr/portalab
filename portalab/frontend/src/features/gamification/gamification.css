@@ -1378,9 +1378,12 @@
   white-space: nowrap;
   animation: boost-glow 3s ease-in-out infinite;
 }
-.boost-tag svg,
-.boost-tag strong {
+.boost-tag svg {
   color: var(--rarity-epic, var(--color-accent));
+}
+/* issue 469: the factor's figures drawn toward the text — readable on a light interface too */
+.boost-tag strong {
+  color: color-mix(in oklab, var(--rarity-epic, var(--color-accent)) 35%, var(--color-text));
 }
 .boost-tag strong {
   font-variant-numeric: tabular-nums;
@@ -1390,6 +1393,12 @@
 }
 .boost-tag[data-variant="mini"] {
   padding: 0.1rem 0.4rem;
+}
+/* issue 469: a link a finger can hit (WCAG 2.5.8: 24 px), however small its text */
+.boost-tag {
+  min-block-size: 24px;
+  min-inline-size: 24px;
+  justify-content: center;
 }
 @keyframes boost-glow {
   0%,
