@@ -970,7 +970,6 @@ export function DetailPage() {
           media.platform ?? null,
           t(`media:kind.${media.kind}`),
           metadata.data?.runtime_min ? measures.duration(metadata.data.runtime_min * 60) : null,
-          ageSources(media.age_rating, t), // 032: each source's rating (the strictest: the badge)
           metadata.data?.vote_average
             ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
             : null,
@@ -1022,17 +1021,22 @@ export function DetailPage() {
       <RequestJourney objectId={media.id} title={media.title} />
       {/* issue 299: what the news sources say of it */}
       <ExternalNews heading={t("news:external.aboutTitle")} asked={{ title: [media.id] }} />
+      {/* issue 478: its classification in full (the CNC, the cinema, the TV, each platform) — among a film's
+          details, after its production; a block of its own for the others */}
       {metadata.data ? (
-        <Enrichment objectId={media.id} saga={false} />
+        <Enrichment
+          objectId={media.id}
+          saga={false}
+          extra={<RatingsBlock rating={media.age_rating} inGrid />}
+        />
       ) : details ? (
-        <EnrichedView data={details} saga={false} />
+        <EnrichedView data={details} saga={false} extra={<RatingsBlock rating={media.age_rating} inGrid />} />
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
       ) : media.kind === "game" ? (
         <GameView objectId={media.id} genres={media.genres} />
       ) : null}
-      {/* issue 478: its classification in full — the CNC, the cinema, the TV, each platform */}
-      <RatingsBlock rating={media.age_rating} />
+      {metadata.data || details ? null : <RatingsBlock rating={media.age_rating} />}
       {/* issue 465: its trailers, featurettes, gameplay videos… and its pictures */}
       {EXTRA_KINDS.includes(media.kind) ? <Extras objectId={media.id} title={media.title} /> : null}
       {/* issue 361: its saga, series or franchise — the same block for a film, a book, a game */}

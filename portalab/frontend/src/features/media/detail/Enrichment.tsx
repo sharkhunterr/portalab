@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
@@ -115,9 +116,17 @@ export function useMetadata(objectId: string) {
   });
 }
 
-export function Enrichment({ objectId, saga = true }: { objectId: string; saga?: boolean }) {
+export function Enrichment({
+  objectId,
+  saga = true,
+  extra,
+}: {
+  objectId: string;
+  saga?: boolean;
+  extra?: ReactNode;
+}) {
   const metadata = useMetadata(objectId);
-  return metadata.data ? <EnrichedView data={metadata.data} saga={saga} /> : null;
+  return metadata.data ? <EnrichedView data={metadata.data} saga={saga} extra={extra} /> : null;
 }
 
 /** The enriched details as such — a library title's (the metadata provider's) or, #4, one the request
@@ -125,10 +134,13 @@ export function Enrichment({ objectId, saga = true }: { objectId: string; saga?:
 export function EnrichedView({
   data,
   saga = true,
+  extra,
 }: {
   data: Metadata;
   /** issue 361: a library title's page tells its saga in its collection's block instead */
   saga?: boolean;
+  /** issue 478: a block of the page's own among the details' (its classification), after the production */
+  extra?: ReactNode;
 }) {
   const t = useT();
   const format = useFormat();
@@ -282,6 +294,7 @@ export function EnrichedView({
             </dl>
           </div>
         ) : null}
+        {extra}
       </div>
       {data.keywords.length ? (
         <ul

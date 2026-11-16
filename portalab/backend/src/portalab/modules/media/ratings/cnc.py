@@ -130,11 +130,27 @@ class CncVisas:
         )
         if url is None:
             raise ValueError("no CSV in the CNC's dataset")
-        data = await self._get(url)
-        data.raise_for_status()
-        if len(data.content) > MAX_BYTES:
-            raise ValueError("the CNC list is unexpectedly large")
-        return data.content
+        return await self._read(url)
+
+    async def _read(self, url: str) -> bytes:
+        """The CSV read as it comes, cut off past ``MAX_BYTES`` (never held whole when far too large)."""
+
+        async def read(client: httpx.AsyncClient) -> bytes:
+            chunks: list[bytes] = []
+            size = 0
+            async with client.stream("GET", url, timeout=120, follow_redirects=True) as answer:
+                answer.raise_for_status()
+                async for chunk in answer.aiter_bytes():
+                    size += len(chunk)
+                    if size > MAX_BYTES:
+                        raise ValueError("the CNC list is unexpectedly large")
+                    chunks.append(chunk)
+            return b"".join(chunks)
+
+        if self.client is not None:
+            return await read(self.client)
+        async with httpx.AsyncClient(timeout=120, event_hooks=egress.hooks()) as client:
+            return await read(client)
 
     async def store(self, visas: Sequence[dict[str, Any]]) -> int:
         """The list replaced as a whole (a visa withdrawn is gone too), in one transaction."""

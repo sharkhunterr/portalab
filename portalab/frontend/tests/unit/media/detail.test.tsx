@@ -470,11 +470,13 @@ describe("a title's classification in full (issue 478)", () => {
       .getAllByRole("heading", { level: 4 })
       .map((h) => h.textContent);
     expect(headings).toEqual(["France", "United States"]); // the portal's country first
-    const france = within(block)
+    const group = within(block).getByRole("heading", { name: "France" }).parentElement as HTMLElement;
+    const france = within(group)
       .getAllByRole("definition")
       .map((d) => d.textContent ?? "");
     expect(france[0]).toContain("12"); // the TV first, as watched at home
     expect(france[0]).toContain("violence");
+    expect(within(block).getAllByRole("definition")[0]?.textContent).toContain("following its TV rating");
   });
 
   it("is not shown without any release nor visa", () => {
