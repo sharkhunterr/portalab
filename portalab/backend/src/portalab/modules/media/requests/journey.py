@@ -222,7 +222,11 @@ class RequestJourney:
                     cinema = datetime(known.year, known.month, known.day, tzinfo=now.tzinfo)
             home = min((d for d in (digital, physical) if d), default=None)
             facts = {"cinema": _iso(cinema), "digital": _iso(digital), "physical": _iso(physical)}
-            if available or (home and home <= now) or (acquisition and acquisition.searchable):
+            # issue 468: a download manager may search a title before it comes out (Radarr's minimum
+            # availability « announced »): that tells it searches, not that it is out — a cinema date to
+            # come keeps it waiting
+            searchable = bool(acquisition and acquisition.searchable) and not (cinema and cinema > now)
+            if available or (home and home <= now) or searchable:
                 steps.append(_step("released", "done", **facts))
             elif cinema and cinema > now:
                 steps.append(_step("released", "waiting", detail="before_cinema", **facts))
@@ -256,7 +260,8 @@ class RequestJourney:
         elif downloads or available or acquisition.has_file:
             steps.append(_step("searched", "done", manager=acquisition.service_name))
         else:
-            ready = steps[-1]["status"] == "done" if steps and steps[-1]["key"] == "released" else True
+            released = steps[-1]["status"] == "done" if steps and steps[-1]["key"] == "released" else True
+            ready = released or bool(acquisition.searchable)  # issue 468: searched already, before it is out
             failed = next((e for e in history if e["event"] == "failed"), None)
             steps.append(
                 _step(

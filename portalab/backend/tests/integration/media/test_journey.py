@@ -37,6 +37,7 @@ class _Radarr:
         self.clock = clock
         self.has_file = False
         self.searches = 0
+        self.releases: dict[str, object] | None = None  # issue 468: else out long ago
 
     async def status(self, kind: str, ids: dict[str, str]) -> SourceAcquisition | None:
         if ids.get("tmdb") != "949":
@@ -49,7 +50,8 @@ class _Radarr:
             has_file=self.has_file,
             status="released",
             searchable=True,
-            releases={"cinema": now - timedelta(days=200), "digital": now - timedelta(days=100)},
+            releases=self.releases  # type: ignore[arg-type]
+            or {"cinema": now - timedelta(days=200), "digital": now - timedelta(days=100)},
             files=1 if self.has_file else 0,
             expected=1,
             link="http://radarr/movie/heat",
@@ -124,6 +126,13 @@ async def test_journey(
         "detail": "no_release",
         "manager": "Radarr",
     }
+    # issue 468: searched already (Radarr's minimum availability « announced »), but its cinema date is to
+    # come: not out yet — waiting for it, while the search goes on
+    radarr.releases = {"cinema": clock.now() + timedelta(days=30)}
+    early = {s["key"]: s for s in (await client.get(path)).json()["steps"]}
+    assert early["released"]["status"] == "waiting" and early["released"]["detail"] == "before_cinema"
+    assert early["searched"]["status"] == "current" and early["searched"]["detail"] == "no_release"
+    radarr.releases = None
     assert "link" not in body["manager"]  # members have no use for the download manager's page
     assert body["can_search"] is False  # the indexers' search is an advanced feature, unlocked per member
     assert (await client.post(f"{path}/search")).status_code == 403
