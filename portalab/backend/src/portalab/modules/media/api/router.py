@@ -1055,7 +1055,7 @@ class MediaAgesOut(BaseModel):
 
 @router.get("/media/ages", response_model=MediaAgesOut)
 async def media_ages(
-    _: Reader, module: Module, ids: Annotated[str, Query(max_length=4000)] = ""
+    principal: Reader, module: Module, ids: Annotated[str, Query(max_length=4000)] = ""
 ) -> MediaAgesOut:
     """Issue 434: the age ratings of the titles a page shows (its thumbnails' badges), in one call."""
     wanted: list[UUID] = []
@@ -1064,14 +1064,14 @@ async def media_ages(
             wanted.append(UUID(part.strip()))
         except ValueError:
             continue
-    known = await module.gate.ages(wanted, unrated=-1)
+    known = await module.gate.ages(wanted, unrated=-1, viewer=principal)  # issue 478: its own countries
     return MediaAgesOut(ages={str(k): v for k, v in known.items()})
 
 
 @router.get("/media/{object_id}", response_model=MediaDetail)
 async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDetail:
     view = _detail(await module.catalog.get(principal, object_id))
-    rating = await module.gate.rating(object_id)  # 032: shown on the title's page
+    rating = await module.gate.rating(object_id, principal)  # 032: shown on the title's page
     kept = await module.gate.kept(principal, object_id, view.title)  # 432: shown, not opened
     return view.model_copy(
         update={

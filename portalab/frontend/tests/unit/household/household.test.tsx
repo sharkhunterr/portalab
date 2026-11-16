@@ -727,3 +727,30 @@ describe("all of Portalab as screen time (issue 439)", () => {
     expect(spent(null)).toBe(false);
   });
 });
+
+describe("a profile's other countries (issue 478)", () => {
+  it("follows the portal by default, and its master chooses its own", async () => {
+    const saved: Array<Record<string, unknown>> = [];
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, { ...HOUSEHOLD, rating_countries: ["DE"] });
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (request.method === "PATCH" || request.method === "PUT") {
+        saved.push((await request.json()) as Record<string, unknown>);
+        return json(200, {});
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage view="profiles" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    expect(await screen.findByText("As the portal: Germany")).toBeTruthy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Choose other countries for this profile" }));
+    // its own choice starts from the portal's
+    expect(screen.getByRole("checkbox", { name: "Germany" })).toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: "United States" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Save/ }));
+    await waitFor(() => expect(saved.length).toBeGreaterThan(0));
+    const restrictions = saved[0]?.restrictions as { rating_countries?: string[] };
+    expect(restrictions.rating_countries).toEqual(["DE", "US"]);
+  });
+});

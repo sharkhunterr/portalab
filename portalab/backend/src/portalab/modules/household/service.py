@@ -105,6 +105,19 @@ class HouseholdService:
             pass
         return MAX_PROFILES
 
+    async def rating_countries(self) -> list[str]:
+        """Issue 478: the other countries whose age ratings count by the administrator's choice — a profile
+        follows them unless its master chooses its own."""
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                value = (await providers[0].provider.get("media.ratings.alsoCountries")).value
+                if isinstance(value, list):
+                    return [str(c) for c in value if isinstance(c, str)]
+        except Exception:  # noqa: S110 — none: the portal's country alone
+            pass
+        return []
+
     def forget(self, *users: UUID) -> None:
         for user in users:
             self._restrictions.pop(user, None)
@@ -430,6 +443,7 @@ class HouseholdService:
             "me": principal.user_id,
             "can_manage": manager,
             "max_profiles": limit,
+            "rating_countries": await self.rating_countries(),  # issue 478: what a profile follows by default
             "palette": list(COLORS),
             "totals": tiles[0]["progress"] if tiles else None,
             "economy": await self.economy_of(owner),  # issue 443

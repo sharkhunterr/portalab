@@ -16785,6 +16785,11 @@ export interface components {
             owner_id: string;
             /** Palette */
             palette: string[];
+            /**
+             * Rating Countries
+             * @default []
+             */
+            rating_countries: string[];
             totals: components["schemas"]["HouseholdFigures"] | null;
         };
         /** HouseholdPinIn */
@@ -20359,6 +20364,8 @@ export interface components {
              * @enum {string}
              */
             mode: "show" | "hide" | "lock";
+            /** Rating Countries */
+            rating_countries?: ("FR" | "DE" | "GB" | "US" | "ES" | "IT" | "BE" | "CH" | "NL" | "CA" | "AU")[] | null;
             /**
              * Requests
              * @default true

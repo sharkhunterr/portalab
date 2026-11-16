@@ -75,6 +75,9 @@ class HouseholdOut(BaseModel):
     me: UUID | None
     can_manage: bool
     max_profiles: int
+    # issue 478: the other countries whose age ratings count by the administrator's choice (a profile follows
+    # them unless its master chooses its own)
+    rating_countries: list[str] = []
     palette: list[str]  # the colours a profile may take
     totals: HouseholdFigures | None
     members: list[HouseholdMemberOut]

@@ -135,3 +135,32 @@ async def test_the_administrator_adds_the_countries_that_count_too(
     # France's TV says 12, the United States R: the strictest of the two
     assert rating["age"] == 17
     assert rating["basis"] == "abroad" and rating["basis_country"] == "US"
+
+
+async def test_a_master_chooses_other_countries_for_one_profile(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    people = await users(app, media, "zoe")
+    film = await _film(media)
+    owner = Principal(user_id=people["zoe"])
+    service = app.state.household_module.service
+    created = await service.create(owner, display_name="Léa", kind="child", color=None, pin=None)
+    lea_id = UUID(str(created["id"]))
+    lea = Principal(user_id=lea_id, profile_of=people["zoe"])
+    settings = RestrictionSettings(max_age=12, allow_unrated=True, genres=[])
+    await service.change(owner, lea_id, restrictions=settings)
+    media.module.gate.forget()
+    assert film not in await media.module.gate.blocked(lea)  # France's TV says 12: open to 12
+    # its master holds it to the United States' ratings too (the administrator chose none)
+    await service.change(owner, lea_id, restrictions=settings.model_copy(update={"rating_countries": ["US"]}))
+    media.module.gate.forget()
+    assert film in await media.module.gate.blocked(lea)  # R: 17
+    assert (await media.module.gate.rating(film, lea))["age"] == 17
+    assert (await media.module.gate.rating(film))["age"] == 12  # the portal's own reading unchanged
+    # an empty choice: the portal's country alone, whatever the administrator ticked
+    await media.configure("media.ratings.alsoCountries", ["US"])
+    await service.change(owner, lea_id, restrictions=settings.model_copy(update={"rating_countries": []}))
+    media.module.gate.forget()
+    assert film not in await media.module.gate.blocked(lea)
+    overview = await service.overview(owner)
+    assert overview["rating_countries"] == ["US"]  # what a profile follows by default

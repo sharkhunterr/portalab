@@ -1753,3 +1753,15 @@ button.screen-cal__max:focus-visible {
 .household-economy__choice small {
   color: var(--color-text-muted);
 }
+
+/* issue 478: other countries whose ratings count for a profile — the switch, then one per country */
+.household-countries {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+.household-countries__list {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

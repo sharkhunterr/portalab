@@ -217,6 +217,14 @@ class TitleGate:
         self._country = (time.monotonic(), found)
         return found
 
+    async def countries_for(self, viewer: Principal | UUID | None) -> tuple[str, ...]:
+        """Issue 478: the other countries whose ratings count for this viewer — its master's choice for a
+        household profile, else the administrator's."""
+        restrictions = await self.restrictions(viewer) if viewer is not None else None
+        if restrictions is not None and restrictions.rating_countries is not None:
+            return restrictions.rating_countries
+        return await self.also_countries()
+
     async def also_countries(self) -> tuple[str, ...]:
         """Issue 478: the other countries whose ratings count too (``media.ratings.alsoCountries``), kept a
         minute."""
@@ -271,7 +279,11 @@ class TitleGate:
         granted = await household.grants(user, "media")
         country = await self.country()
         order = await self.rating_order()
-        also = await self.also_countries()
+        also = (
+            restrictions.rating_countries
+            if restrictions.rating_countries is not None
+            else await self.also_countries()
+        )
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -346,7 +358,7 @@ class TitleGate:
         restrictions = await self.restrictions(viewer) if blocked else None
         flag = "kept" if restrictions is not None and restrictions.mode == "show" else "locked"
         aged = [c for c in cards if "age" in type(c).model_fields]
-        ages = await self.ages([c.id for c in aged], unrated=-1) if aged else {}
+        ages = await self.ages([c.id for c in aged], unrated=-1, viewer=viewer) if aged else {}
         if not blocked and not ages:
             return cards
         out = []
@@ -412,7 +424,9 @@ class TitleGate:
             clauses.append(MediaObject.id == any_(literal(rated, ARRAY(Uuid()))))
         return and_(*clauses) if clauses else None
 
-    async def ages(self, ids: Iterable[UUID], *, unrated: int | None = None) -> dict[UUID, int]:
+    async def ages(
+        self, ids: Iterable[UUID], *, unrated: int | None = None, viewer: Principal | UUID | None = None
+    ) -> dict[UUID, int]:
         """Issue 434: the strictest age each title's ratings stand for — an unrated one left out, or given
         ``unrated`` (« ? » on its badge); unknown ids left out."""
         wanted = list(dict.fromkeys(ids))
@@ -434,7 +448,7 @@ class TitleGate:
         out: dict[UUID, int] = {}
         country = await self.country()
         order = await self.rating_order()
-        also = await self.also_countries()
+        also = await self.countries_for(viewer)
         for object_id, data, server in rows:
             age = title_age(data, server, country, order, also)
             if age is not None:
@@ -671,7 +685,7 @@ class TitleGate:
         « show » choice) — ``None``: it is not kept."""
         if object_id not in await self.blocked(viewer):
             return None
-        found = await self.rating(object_id)
+        found = await self.rating(object_id, viewer)  # issue 478: by its own countries
         restrictions = await self.restrictions(viewer)
         reason = await self._reason(object_id, restrictions, found["age"])
         return {
@@ -723,7 +737,7 @@ class TitleGate:
         found = await self.rating(object_id)
         return f"{found['age']}+" if found["age"] is not None else None
 
-    async def rating(self, object_id: UUID) -> dict[str, Any]:
+    async def rating(self, object_id: UUID, viewer: Principal | UUID | None = None) -> dict[str, Any]:
         """032: a title's age ratings, source by source (TMDB's countries, the media server), and the
         strictest age they stand for — an episode or a season answers with its series' when it has none."""
         async with self.database.session() as session:
@@ -752,18 +766,23 @@ class TitleGate:
                 if sources:
                     country = await self.country()
                     order = await self.rating_order()
-                    also = await self.also_countries()
+                    also = await self.countries_for(viewer)
                     return {
                         "age": title_age(data, server, country, order, also),
                         "country": country,
                         "ratings": [{"source": s, "value": v} for s, v in own_first(sources, country)],
-                        **(await self._details(current, data, server, country)),
+                        **(await self._details(current, data, server, country, also)),
                     }
                 current = parent
         return {"age": None, "ratings": []}
 
     async def _details(
-        self, object_id: UUID, data: Mapping[str, Any] | None, server: str | None, country: str | None
+        self,
+        object_id: UUID,
+        data: Mapping[str, Any] | None,
+        server: str | None,
+        country: str | None,
+        also: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         """Issue 478: a title's ratings in full — which release its age follows, every release's rating,
         and (for a film) the CNC's decision."""
@@ -793,7 +812,6 @@ class TitleGate:
             basis = next((tier for tier in tiers if mine & set(TIERS[tier])), "other")
         # another country the administrator chose rates it stricter: that country sets the age
         abroad = None
-        also = await self.also_countries()
         if also and country:
             order = await self.rating_order()
             own = country_age(data, server, country, order)

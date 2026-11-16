@@ -9959,6 +9959,14 @@
             "title": "Palette",
             "type": "array"
           },
+          "rating_countries": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Rating Countries",
+            "type": "array"
+          },
           "totals": {
             "anyOf": [
               {
@@ -20254,6 +20262,33 @@
             ],
             "title": "Mode",
             "type": "string"
+          },
+          "rating_countries": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "FR",
+                    "DE",
+                    "GB",
+                    "US",
+                    "ES",
+                    "IT",
+                    "BE",
+                    "CH",
+                    "NL",
+                    "CA",
+                    "AU"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Countries"
           },
           "requests": {
             "default": true,

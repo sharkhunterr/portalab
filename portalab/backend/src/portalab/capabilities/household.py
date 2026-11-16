@@ -121,6 +121,9 @@ class Restrictions:
     # issue 439: what its screen time counts — its media (« media »: watched, read, listened to, played) or
     # every minute it spends on the portal (« portal »)
     screen_scope: str = "media"
+    # issue 478: other countries whose age ratings count too for this profile (the strictest wins) — its
+    # master's choice; ``None``: as the portal's administrator set it
+    rating_countries: tuple[str, ...] | None = None
 
     def slots_on(self, weekday: int) -> tuple[Slot, ...]:
         return tuple(sorted((s for s in self.slots if s.day == weekday), key=lambda s: s.start))

@@ -5,6 +5,7 @@ import { Icon } from "../../design-system/components/Icon";
 import { useNotify } from "../../design-system/components/Notification";
 import { Dialog, DialogActions } from "../../design-system/components/Overlays";
 import { useT } from "../../i18n/hooks/useT";
+import { useLocaleContext } from "../../i18n/provider/I18nProvider";
 import { ApiError } from "../../state/regions";
 import { Switch } from "../account/SettingsKit";
 import { useCatalogFacets } from "../media/api";
@@ -18,6 +19,7 @@ import {
   TYPES,
   useCreateProfile,
   useDeleteProfile,
+  useHousehold,
   useSetPin,
   useUpdateProfile,
 } from "./api";
@@ -299,6 +301,10 @@ export function ProfileEditor({
               onChange={(event) => setRestrictions((r) => ({ ...r, requests: event.target.checked }))}
             />
           </div>
+          <RatingCountriesField
+            value={restrictions.rating_countries ?? null}
+            onChange={(rating_countries) => setRestrictions((r) => ({ ...r, rating_countries }))}
+          />
         </fieldset>
 
         <fieldset className="household-editor__section">
@@ -563,5 +569,70 @@ function GenresField({ genres, onChange }: { genres: string[]; onChange: (genres
         </Button>
       </div>
     </fieldset>
+  );
+}
+
+/** Issue 478: the countries whose age ratings the portal keeps — those a profile may also be held to. */
+const RATING_COUNTRIES = ["DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU", "FR"] as const;
+type RatingCountry = (typeof RATING_COUNTRIES)[number];
+
+function regionName(locale: string, code: string): string {
+  try {
+    return new Intl.DisplayNames([locale], { type: "region" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+/**
+ * Issue 478 — other countries whose age ratings count too for this profile (the strictest wins): by default
+ * as the portal's administrator chose (none, unless they ticked some), or its master's own choice.
+ */
+function RatingCountriesField({
+  value,
+  onChange,
+}: {
+  value: RatingCountry[] | null;
+  onChange: (countries: RatingCountry[] | null) => void;
+}) {
+  const t = useT();
+  const { locale } = useLocaleContext();
+  const portal = (useHousehold().data?.rating_countries ?? []).filter((c): c is RatingCountry =>
+    (RATING_COUNTRIES as readonly string[]).includes(c),
+  );
+  const own = value !== null;
+  const names = (codes: readonly string[]) => codes.map((code) => regionName(locale, code)).join(", ");
+  return (
+    <div className="household-countries">
+      <Switch
+        label={t("household:editor.countriesOwn")}
+        checked={own}
+        onChange={(event) => onChange(event.target.checked ? [...portal] : null)}
+      />
+      <p className="household-editor__hint">
+        {own
+          ? t("household:editor.countriesHint")
+          : t("household:editor.countriesPortal", {
+              countries: portal.length ? names(portal) : t("household:editor.countriesNone"),
+            })}
+      </p>
+      {own ? (
+        <fieldset className="household-switches household-countries__list">
+          <legend className="visually-hidden">{t("household:editor.countries")}</legend>
+          {RATING_COUNTRIES.map((code) => (
+            <Switch
+              key={code}
+              label={regionName(locale, code)}
+              checked={value.includes(code)}
+              onChange={(event) =>
+                onChange(
+                  RATING_COUNTRIES.filter((c) => (c === code ? event.target.checked : value.includes(c))),
+                )
+              }
+            />
+          ))}
+        </fieldset>
+      ) : null}
+    </div>
   );
 }

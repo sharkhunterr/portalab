@@ -59,6 +59,10 @@ class SlotIn(BaseModel):
         return self
 
 
+# issue 478: the countries whose age ratings a profile may also be held to (those the portal keeps)
+RatingCountry = Literal["FR", "DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU"]
+
+
 class RestrictionSettings(BaseModel):
     """A profile's restrictions as stored and edited by its master: a fixed maximum age, or a birth date
     (the age then follows the profile, one more at each birthday); hidden or locked titles; access requests
@@ -85,6 +89,9 @@ class RestrictionSettings(BaseModel):
     slots: list[SlotIn] = Field(default_factory=list, max_length=MAX_SLOTS)
     # issue 439: its screen time counts its media only, or all of its time on the portal
     screen_scope: Literal["media", "portal"] = "media"
+    # issue 478: other countries whose age ratings count too (the strictest wins) — ``None``: as the portal's
+    # administrator set it (none by default), a list: its master's own choice (empty: the portal's country)
+    rating_countries: list[RatingCountry] | None = None
 
     @field_validator("slots")
     @classmethod
@@ -197,6 +204,7 @@ class RestrictionSettings(BaseModel):
             bonus_day,
             tuple(Slot(s.day, s.start, s.end, s.minutes) for s in self.slots),
             self.screen_scope,
+            tuple(self.rating_countries) if self.rating_countries is not None else None,
         )
 
 
