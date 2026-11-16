@@ -41,7 +41,8 @@ import { usePlayerInfo, useResetResume } from "../player/api";
 import { TasteButtons } from "../taste/TasteButtons";
 import { BookView } from "./BookView";
 import { EnrichedView, Enrichment, metadataImage, normalize, useMetadata } from "./Enrichment";
-import { Extras } from "./Extras";
+import { Extras, useExtras } from "./Extras";
+import { GameView } from "./GameView";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
 import { ReviewButton, Reviews } from "./Reviews";
@@ -85,84 +86,7 @@ function list(value: unknown): Data[] {
 }
 
 const BOOKS = ["book", "audiobook"];
-
-/** 027: a game's facts (RomM): its platform, publisher and studios, release date, franchises and modes. */
-/** Issue 351: how long a game takes by play style (HowLongToBeat, through RomM), as RomM's page shows it. */
-const PLAY_STYLES = ["main_story", "main_plus_extra", "completionist", "all_styles"] as const;
-export type PlayTimes = Partial<
-  Record<(typeof PLAY_STYLES)[number], { seconds: number; players?: number | null }>
->;
-
-export function PlayTimesFacts({ times }: { times: PlayTimes }) {
-  const t = useT();
-  const measures = useMeasures();
-  const styles = PLAY_STYLES.filter((style) => times[style]?.seconds);
-  if (!styles.length) return null;
-  return (
-    <section className="media-playtimes" aria-labelledby="media-playtimes-title">
-      <h3 id="media-playtimes-title">
-        <Icon name="clock" size={16} />
-        {t("media:facts.playTimes")}
-      </h3>
-      <dl>
-        {styles.map((style) => {
-          const time = times[style];
-          return (
-            <div key={style}>
-              <dt>{t(`media:facts.playTime.${style}`)}</dt>
-              <dd>
-                <strong>{measures.duration(Number(time?.seconds))}</strong>
-                {typeof time?.players === "number" ? (
-                  <span>{t("media:facts.playTimePlayers", { count: time.players })}</span>
-                ) : null}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-    </section>
-  );
-}
-
-export function GameFacts({ data }: { data: Data }) {
-  const t = useT();
-  const format = useFormat();
-  const companies = Array.isArray(data.people) ? (data.people as string[]) : [];
-  const studios = companies.filter((c) => c !== data.publisher);
-  const rows = [
-    data.platform ? { key: "platform", value: String(data.platform) } : null,
-    data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
-    studios.length ? { key: "studios", value: studios.join(", ") } : null,
-    data.released
-      ? { key: "releasedOn", value: format.date(`${String(data.released)}T12:00:00Z`, "long") }
-      : data.year
-        ? { key: "releasedOn", value: String(data.year) }
-        : null,
-  ].filter((row) => row !== null);
-  const tags = Array.isArray(data.tags) ? (data.tags as string[]) : [];
-  const times = (data.play_times && typeof data.play_times === "object" ? data.play_times : {}) as PlayTimes;
-  if (!rows.length && !tags.length && !Object.keys(times).length) return null;
-  return (
-    <>
-      <dl className="media-facts">
-        {rows.map((row) => (
-          <div key={row.key}>
-            <dt>{t(`media:facts.${row.key}`)}</dt>
-            <dd>{row.value}</dd>
-          </div>
-        ))}
-      </dl>
-      {tags.length ? (
-        <ul className="media-enriched__chips" aria-label={t("media:facts.tags")}>
-          {tags.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      ) : null}
-      <PlayTimesFacts times={times} />
-    </>
-  );
-}
+const LAID_OUT = [...BOOKS, "game"]; // issue 467: their summary and facts above the sections, as a film's
 
 const SHOWN = 5;
 const PLAYABLE = ["movie", "episode", "series", "season"];
@@ -427,10 +351,9 @@ function SectionBody({
       return (
         <>
           {/* the enriched details already tell the story: no second summary (027) */}
-          {data.overview && !enriched && !BOOKS.includes(String(data.kind)) ? (
+          {data.overview && !enriched && !LAID_OUT.includes(String(data.kind)) ? (
             <p>{String(data.overview)}</p>
           ) : null}
-          {data.kind === "game" ? <GameFacts data={data} /> : null}
           {list(data.children).length ? (
             <>
               <h4>{t("media:detail.children")}</h4>
@@ -594,11 +517,10 @@ function hasContent(name: string, data: Data, enriched = false): boolean {
   switch (name) {
     case "info":
       return (
-        // #92: a book's summary and facts are laid out like a film's (BookView), above the sections
-        (Boolean(data.overview) && !enriched && !BOOKS.includes(String(data.kind))) ||
-        list(data.children).length > 0 ||
-        (data.kind === "game" &&
-          Boolean(data.platform || data.publisher || data.people || data.released || data.play_times))
+        // #92, issue 467: a book's or a game's summary and facts are laid out like a film's (BookView,
+        // GameView), above the sections
+        (Boolean(data.overview) && !enriched && !LAID_OUT.includes(String(data.kind))) ||
+        list(data.children).length > 0
       );
     case "history":
       return list(data.mine).length > 0 || list(data.concerned_users).length > 0;
@@ -992,6 +914,10 @@ export function DetailPage() {
   );
   const requested = Boolean(useJourney(objectId).data?.request); // 027: asked already — no second request
   const info = useSection(objectId, "info").data?.data as Data | undefined;
+  // issue 467: a game's artwork (else a screenshot) behind its head, as a film's backdrop
+  const gamePictures = useExtras(objectId, known?.kind === "game").data?.images ?? [];
+  const gameBackdrop =
+    (gamePictures.find((image) => image.kind === "artwork") ?? gamePictures[0])?.full ?? null;
   // issue 171: « this title » for the assistant
   useAssistantPage(
     // the name and kind too: without them the model cannot tell whether a question is about this page
@@ -1034,7 +960,10 @@ export function DetailPage() {
         title={media.title}
         kind={media.kind}
         poster={shownPoster}
-        backdrop={metadataImage(details?.backdrop ?? details?.backdrops?.[0] ?? fallback?.backdrop, "w1280")}
+        backdrop={
+          metadataImage(details?.backdrop ?? details?.backdrops?.[0] ?? fallback?.backdrop, "w1280") ??
+          gameBackdrop
+        }
         facts={[
           media.year ? String(media.year) : null,
           media.platform ?? null,
@@ -1044,7 +973,7 @@ export function DetailPage() {
           metadata.data?.vote_average
             ? `★ ${format.number(Math.round(metadata.data.vote_average * 10) / 10)}`
             : null,
-          bookFacts.length
+          bookFacts.length || media.kind === "game" // issue 467: a game's genres come below, as chips
             ? null
             : !enriched && media.genres.length
               ? media.genres.filter((g) => g !== media.platform).join(", ")
@@ -1098,6 +1027,8 @@ export function DetailPage() {
         <EnrichedView data={details} saga={false} />
       ) : BOOKS.includes(media.kind) ? (
         <BookView objectId={media.id} genres={media.genres} />
+      ) : media.kind === "game" ? (
+        <GameView objectId={media.id} genres={media.genres} />
       ) : null}
       {/* issue 465: its trailers, featurettes, gameplay videos… and its pictures */}
       {EXTRA_KINDS.includes(media.kind) ? <Extras objectId={media.id} title={media.title} /> : null}
@@ -1111,7 +1042,8 @@ export function DetailPage() {
       <div className="media-sections">
         {SECTIONS.filter(
           (name) =>
-            !(enriched && (name === "people" || name === "events")) &&
+            // issue 467: a game's studios are in its production block, as a film's crew
+            !((enriched || media.kind === "game") && (name === "people" || name === "events")) &&
             !(BOOKS.includes(media.kind) && name === "people"), // a book's authors are in its facts
         ).map((name) => (
           <SectionFrame key={name} objectId={media.id} name={name} enriched={enriched} />

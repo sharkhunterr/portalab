@@ -19,7 +19,8 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 });
 
 import { CatalogPage } from "../../../src/features/media/catalog/CatalogPage";
-import { DetailPage, PlayTimesFacts } from "../../../src/features/media/detail/DetailPage";
+import { DetailPage } from "../../../src/features/media/detail/DetailPage";
+import { GameDetails, PlayTimesFacts } from "../../../src/features/media/detail/GameView";
 import { RequestsPage } from "../../../src/features/media/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 import { INFO } from "./player-fixtures";
@@ -371,6 +372,49 @@ describe("a game's play times", () => {
     expect(screen.queryByText("Main + extras")).toBeNull();
     cleanup();
     const { container } = render(<PlayTimesFacts times={{}} />);
+    expect(container.innerHTML).toBe("");
+  });
+});
+
+describe("a game's page laid out like a film's (issue 467)", () => {
+  it("tells its facts as chips, its summary, genres, production and play times", () => {
+    render(
+      <GameDetails
+        genres={["Platform", "Game Boy", "Action"]}
+        data={{
+          title: "Alien vs Predator",
+          overview: "In the year 2593…",
+          platform: "Game Boy",
+          publisher: "Activision",
+          people: ["Activision", "ASK Kodansha"],
+          released: "1993-07-01",
+          tags: ["Action", "Sci-fi"],
+          play_times: { main_story: { seconds: 7200, players: 3 } },
+        }}
+      />,
+    );
+    const section = screen.getByRole("region", { name: "About" });
+    expect(within(section).getByText("In the year 2593…")).toBeTruthy();
+    // the platform is a fact, not a genre; a tag already a genre is told once
+    const genres = within(section).getByRole("list", { name: "Genres" });
+    expect(
+      within(genres)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent),
+    ).toEqual(["Platform", "Action"]);
+    const tags = within(section).getByRole("list", { name: "Themes" });
+    expect(
+      within(tags)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent),
+    ).toEqual(["#Sci-fi"]);
+    expect(within(section).getByText("ASK Kodansha")).toBeTruthy();
+    expect(within(section).getByText("Activision")).toBeTruthy();
+    expect(within(section).getByRole("heading", { name: "Time to beat" })).toBeTruthy();
+  });
+
+  it("shows nothing when nothing is known", () => {
+    const { container } = render(<GameDetails genres={[]} data={{ title: "Unknown" }} />);
     expect(container.innerHTML).toBe("");
   });
 });

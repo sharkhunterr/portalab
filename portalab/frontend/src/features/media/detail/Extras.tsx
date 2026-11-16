@@ -17,9 +17,10 @@ export type ExtraImage = components["schemas"]["ExtraImageOut"];
 const SWIPE_PX = 48; // a swipe this long turns the picture
 
 /** Issue 465: a title's videos and extra pictures, as the services that know them tell them. */
-export function useExtras(objectId: string) {
+export function useExtras(objectId: string, enabled = true) {
   return useQuery({
     queryKey: ["media", objectId, "extras"],
+    enabled,
     retry: false,
     staleTime: 30 * 60_000,
     queryFn: async (): Promise<MediaExtras> => {

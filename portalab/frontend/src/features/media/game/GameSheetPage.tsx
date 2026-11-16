@@ -11,7 +11,7 @@ import { ApiError } from "../../../state/regions";
 import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import type { AskStart } from "../../requests/RequestsPage";
-import { GameFacts } from "../detail/DetailPage";
+import { GameFacts } from "../detail/GameView";
 import { TitleHero } from "../detail/TitleHero";
 import "../media.css";
 import "../book/book.css";
