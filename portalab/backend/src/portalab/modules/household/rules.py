@@ -61,6 +61,11 @@ class SlotIn(BaseModel):
 
 # issue 478: the countries whose age ratings a profile may also be held to (those the portal keeps)
 RatingCountry = Literal["FR", "DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU"]
+# issue 478: the warnings a master may keep a profile from — the CNC's « tous publics avec avertissement »
+# and the rating boards' descriptors, by family
+WarningKind = Literal[
+    "cnc", "violence", "fear", "language", "drugs", "sex", "self_harm", "discrimination", "mature"
+]
 
 
 class RestrictionSettings(BaseModel):
@@ -92,6 +97,10 @@ class RestrictionSettings(BaseModel):
     # issue 478: other countries whose age ratings count too (the strictest wins) — ``None``: as the portal's
     # administrator set it (none by default), a list: its master's own choice (empty: the portal's country)
     rating_countries: list[RatingCountry] | None = None
+    # issue 478: titles carrying one of these warnings are kept from it; its age read as the strictest of
+    # its countries' ratings, or the average of every country's
+    avoid_warnings: list[WarningKind] = Field(default_factory=list, max_length=9)
+    rating_blend: Literal["strictest", "average"] = "strictest"
 
     @field_validator("slots")
     @classmethod
@@ -205,6 +214,8 @@ class RestrictionSettings(BaseModel):
             tuple(Slot(s.day, s.start, s.end, s.minutes) for s in self.slots),
             self.screen_scope,
             tuple(self.rating_countries) if self.rating_countries is not None else None,
+            frozenset(self.avoid_warnings),
+            self.rating_blend,
         )
 
 

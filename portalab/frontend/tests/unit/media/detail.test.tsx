@@ -458,6 +458,7 @@ describe("a title's classification in full (issue 478)", () => {
       { country: "FR", type: "tv", certification: "12", age: 12, note: "Novo19", descriptors: ["violence"] },
     ],
     cnc: { visa: 142250, decision: "Avertissement", warning: true, title: "Mad Max : Fury road", year: 2015 },
+    warnings: ["cnc", "violence"],
   };
 
   it("tells the age a profile is held to, the CNC's warning and each country's releases", () => {
@@ -477,10 +478,14 @@ describe("a title's classification in full (issue 478)", () => {
     expect(france[0]).toContain("12"); // the TV first, as watched at home
     expect(france[0]).toContain("violence");
     expect(within(block).getAllByRole("definition")[0]?.textContent).toContain("following its TV rating");
+    expect(within(block).getByText("CNC warning")).toBeInTheDocument(); // its warnings by family
+    expect(within(block).getByText("Violence")).toBeInTheDocument();
   });
 
   it("is not shown without any release nor visa", () => {
-    const { container } = render(<RatingsBlock rating={{ age: 12, ratings: [], releases: [], cnc: null }} />);
+    const { container } = render(
+      <RatingsBlock rating={{ age: 12, ratings: [], releases: [], cnc: null, warnings: [] }} />,
+    );
     expect(container).toBeEmptyDOMElement();
   });
 });
@@ -497,6 +502,7 @@ describe("another country sets the age (issue 478)", () => {
           ratings: [],
           releases: [{ country: "US", type: "cinema", certification: "R", age: 17, descriptors: [] }],
           cnc: null,
+          warnings: [],
         }}
       />,
     );

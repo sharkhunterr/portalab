@@ -1765,3 +1765,27 @@ button.screen-cal__max:focus-visible {
   padding: 0;
   border: 0;
 }
+/* issue 478: the warnings a title is kept for */
+.household-locked__warnings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.household-kept-notice .household-locked__warnings {
+  justify-content: flex-start;
+  margin-block-end: var(--space-2);
+}
+/* issue 478: the profile's classification, a section of its own */
+.household-classification__warnings {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.household-classification__warnings > .household-editor__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}

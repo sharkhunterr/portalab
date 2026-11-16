@@ -38,6 +38,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       requests: true,
       services: true,
       screen_scope: "media",
+      rating_blend: "strictest",
     },
     community: true,
   },
@@ -51,6 +52,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       genres: ["crime", "horror", "thriller", "war"], // issue 432: at least these for a child
       services: false,
       screen_scope: "media",
+      rating_blend: "strictest",
     },
     community: false,
   },
@@ -63,6 +65,7 @@ const PRESETS: Record<ProfileKind, { restrictions: RestrictionSettings; communit
       requests: true,
       services: true,
       screen_scope: "media",
+      rating_blend: "strictest",
     },
     community: true,
   },
@@ -301,11 +304,13 @@ export function ProfileEditor({
               onChange={(event) => setRestrictions((r) => ({ ...r, requests: event.target.checked }))}
             />
           </div>
-          <RatingCountriesField
-            value={restrictions.rating_countries ?? null}
-            onChange={(rating_countries) => setRestrictions((r) => ({ ...r, rating_countries }))}
-          />
         </fieldset>
+
+        <ClassificationField
+          name={`${formId}-read`}
+          restrictions={restrictions}
+          onChange={(change) => setRestrictions((r) => ({ ...r, ...change }))}
+        />
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.types")}</legend>
@@ -584,55 +589,124 @@ function regionName(locale: string, code: string): string {
   }
 }
 
+/** Issue 478: the warnings a profile's master may keep it from — the CNC's, then each family of descriptors. */
+const WARNINGS = [
+  "cnc",
+  "violence",
+  "fear",
+  "language",
+  "drugs",
+  "sex",
+  "self_harm",
+  "discrimination",
+  "mature",
+] as const;
+type WarningKind = (typeof WARNINGS)[number];
+const READINGS = ["portal", "countries", "average"] as const;
+type Reading = (typeof READINGS)[number];
+const READING_ICONS: Record<Reading, string> = { portal: "globe", countries: "flag", average: "scale" };
+
 /**
- * Issue 478 — other countries whose age ratings count too for this profile (the strictest wins): by default
- * as the portal's administrator chose (none, unless they ticked some), or its master's own choice.
+ * Issue 478 — a profile's classification, in its own section: how a title's age is read (as the portal does,
+ * by countries its master picks — the strictest wins —, or by the average of every country), then the
+ * warnings that keep a title from the profile even when it is of its age.
  */
-function RatingCountriesField({
-  value,
+function ClassificationField({
+  name,
+  restrictions,
   onChange,
 }: {
-  value: RatingCountry[] | null;
-  onChange: (countries: RatingCountry[] | null) => void;
+  name: string;
+  restrictions: RestrictionSettings;
+  onChange: (change: Partial<RestrictionSettings>) => void;
 }) {
   const t = useT();
   const { locale } = useLocaleContext();
   const portal = (useHousehold().data?.rating_countries ?? []).filter((c): c is RatingCountry =>
     (RATING_COUNTRIES as readonly string[]).includes(c),
   );
-  const own = value !== null;
+  const countries = restrictions.rating_countries ?? null;
+  const reading: Reading =
+    restrictions.rating_blend === "average" ? "average" : countries !== null ? "countries" : "portal";
+  const avoid = restrictions.avoid_warnings ?? [];
   const names = (codes: readonly string[]) => codes.map((code) => regionName(locale, code)).join(", ");
+  const choose = (next: Reading) =>
+    onChange(
+      next === "average"
+        ? { rating_blend: "average", rating_countries: null }
+        : next === "countries"
+          ? { rating_blend: "strictest", rating_countries: countries ?? [...portal] }
+          : { rating_blend: "strictest", rating_countries: null },
+    );
+  const hint = (mode: Reading) =>
+    mode === "portal"
+      ? portal.length
+        ? t("household:editor.read_portalHint", { countries: names(portal) })
+        : t("household:editor.countriesNone")
+      : t(`household:editor.read_${mode}Hint`);
   return (
-    <div className="household-countries">
-      <Switch
-        label={t("household:editor.countriesOwn")}
-        checked={own}
-        onChange={(event) => onChange(event.target.checked ? [...portal] : null)}
-      />
-      <p className="household-editor__hint">
-        {own
-          ? t("household:editor.countriesHint")
-          : t("household:editor.countriesPortal", {
-              countries: portal.length ? names(portal) : t("household:editor.countriesNone"),
-            })}
-      </p>
-      {own ? (
+    <fieldset className="household-editor__section household-classification">
+      <legend>{t("household:editor.ratingSection")}</legend>
+      <p className="household-editor__hint">{t("household:editor.ratingIntro")}</p>
+      <fieldset className="household-editor__modes">
+        <legend className="household-editor__label">{t("household:editor.ratingRead")}</legend>
+        {READINGS.map((mode) => (
+          <label key={mode} data-checked={reading === mode || undefined}>
+            <input
+              type="radio"
+              name={name}
+              value={mode}
+              checked={reading === mode}
+              onChange={() => choose(mode)}
+            />
+            <Icon name={READING_ICONS[mode]} size={18} />
+            <span>
+              <strong>{t(`household:editor.read_${mode}`)}</strong>
+              <small>{hint(mode)}</small>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      {reading === "countries" && countries !== null ? (
         <fieldset className="household-switches household-countries__list">
-          <legend className="visually-hidden">{t("household:editor.countries")}</legend>
+          <legend className="household-editor__label">{t("household:editor.countriesPick")}</legend>
           {RATING_COUNTRIES.map((code) => (
             <Switch
               key={code}
               label={regionName(locale, code)}
-              checked={value.includes(code)}
+              checked={countries.includes(code)}
               onChange={(event) =>
-                onChange(
-                  RATING_COUNTRIES.filter((c) => (c === code ? event.target.checked : value.includes(c))),
-                )
+                onChange({
+                  rating_countries: RATING_COUNTRIES.filter((c) =>
+                    c === code ? event.target.checked : countries.includes(c),
+                  ),
+                })
               }
             />
           ))}
+          {countries.length ? null : (
+            <p className="household-editor__hint">{t("household:editor.countriesNoneHint")}</p>
+          )}
         </fieldset>
       ) : null}
-    </div>
+      <fieldset className="household-switches household-classification__warnings">
+        <legend className="household-editor__label">{t("household:editor.warnings")}</legend>
+        <p className="household-editor__hint">{t("household:editor.warningsHint")}</p>
+        {WARNINGS.map((kind) => (
+          <Switch
+            key={kind}
+            label={t(`household:warning.${kind}`)}
+            checked={avoid.includes(kind)}
+            onChange={(event) =>
+              onChange({
+                avoid_warnings: WARNINGS.filter((k) =>
+                  k === kind ? event.target.checked : avoid.includes(k as WarningKind),
+                ),
+              })
+            }
+          />
+        ))}
+      </fieldset>
+    </fieldset>
   );
 }

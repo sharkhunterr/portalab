@@ -11,7 +11,24 @@ import "./household.css";
 
 /** The problem code of a title a household profile's age rating keeps from it (spec 032). */
 export const RESTRICTED = "household.restricted";
-const REASONS = ["age", "unrated", "genre", "type", "title"];
+const REASONS = ["age", "unrated", "genre", "type", "title", "warning"];
+
+/** Issue 478: the warnings a title is kept for (reason « warning »), named. */
+function Warnings({ warnings }: { warnings: unknown }) {
+  const t = useT();
+  const list = Array.isArray(warnings) ? warnings.map(String) : [];
+  if (!list.length) return null;
+  return (
+    <ul className="household-locked__warnings" aria-label={t("household:locked.warnings")}>
+      {list.map((kind) => (
+        <li key={kind} className="household-badge">
+          <Icon name="warning" size={14} />
+          {t(`household:warning.${kind}`)}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** A title above the profile's age rating: what it is, and « Ask for access » to the account's master. */
 export function LockedTitle({ problem }: { problem: ApiError }) {
@@ -28,6 +45,7 @@ export function LockedTitle({ problem }: { problem: ApiError }) {
       <h1 id="household-locked">{t("household:locked.title")}</h1>
       {rating ? <span className="household-badge">{t("household:locked.rating", { rating })}</span> : null}
       <p>{t(`household:locked.why.${REASONS.includes(reason) ? reason : "age"}`, { title })}</p>
+      {reason === "warning" ? <Warnings warnings={problem.extensions.warnings} /> : null}
       <AskAccess objectId={ref} title={title} rating={rating} canAsk={problem.extensions.can_ask !== false} />
       <Link to="/media" className="ds-link">
         {t("household:locked.back")}
@@ -44,7 +62,7 @@ export function KeptNotice({
 }: {
   objectId: string;
   title: string;
-  kept: { rating?: string | null; reason?: string | null; can_ask?: boolean };
+  kept: { rating?: string | null; reason?: string | null; can_ask?: boolean; warnings?: string[] };
 }) {
   const t = useT();
   const reason = kept.reason && REASONS.includes(kept.reason) ? kept.reason : "age";
@@ -59,6 +77,7 @@ export function KeptNotice({
           <span className="household-badge">{t("household:locked.rating", { rating: kept.rating })}</span>
         ) : null}
         <p>{t(`household:locked.why.${reason}`, { title })}</p>
+        {reason === "warning" ? <Warnings warnings={kept.warnings} /> : null}
         <AskAccess
           objectId={objectId}
           title={title}

@@ -47,7 +47,12 @@ COUNTRY_CACHE_S = 60.0  # issue 438: the system language's country
 BEATS_KEPT = timedelta(days=8)  # issue 439: a profile's minutes on the portal, kept a week
 MINUTE = timedelta(minutes=1)
 AGE_FILTERS = ("mine", "0", "6", "10", "12", "14", "16", "18")
-ASKABLE = ("age", "unrated", "genre")  # what an access request may open (not the master's own choices)
+ASKABLE = (
+    "age",
+    "unrated",
+    "genre",
+    "warning",
+)  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
 
 
@@ -158,19 +163,100 @@ def country_age(
     return None
 
 
+# issue 478: the rating boards' descriptors by family (TMDB's, in English; a letter for the Netherlands')
+WARNING_WORDS: dict[str, tuple[str, ...]] = {
+    "violence": ("violen", "injur", "gor", "brutal"),
+    "fear": ("threat", "fear", "frighten", "stressful", "disturbing", "horror"),
+    "language": ("language", "profan", "swear"),
+    "drugs": ("drug", "alcohol", "tobacco", "smok", "risk behavior"),
+    "sex": ("sex", "nudity", "erotic"),
+    "self_harm": ("self-harm", "self harm", "suicid"),
+    "discrimination": ("discriminat", "racis"),
+    "mature": ("mature", "not recommended for"),
+}
+WARNING_LETTERS = {
+    "v": "violence",
+    "l": "language",
+    "d": "drugs",
+    "s": "sex",
+    "a": "fear",
+    "g": "discrimination",
+}
+
+
+def warnings_of(data: Mapping[str, Any] | None) -> set[str]:
+    """Issue 478: the families of the warnings a title's ratings carry (« Violence », « Threat »…)."""
+    found: set[str] = set()
+    for release in (data or {}).get("releases") or []:
+        if not isinstance(release, Mapping):
+            continue
+        for raw in release.get("descriptors") or []:
+            text = str(raw).strip().lower()
+            if text in WARNING_LETTERS:
+                found.add(WARNING_LETTERS[text])
+                continue
+            found |= {kind for kind, words in WARNING_WORDS.items() if any(w in text for w in words)}
+    return found
+
+
+def _cnc_warns(data: Mapping[str, Any], cnc: tuple[frozenset[int], frozenset[tuple[str, int]]]) -> bool:
+    """Whether the CNC rated this film « tous publics avec avertissement »: its visa named by its French
+    release, else its title (French or original, folded) and year (±1)."""
+    from portalab.modules.media.ratings.cnc import VISA_NOTE, fold
+
+    visas, keys = cnc
+    for release in data.get("releases") or []:
+        if isinstance(release, Mapping) and str(release.get("country", "")).upper() == "FR":
+            match = VISA_NOTE.search(str(release.get("note") or ""))
+            if match and int(match.group(1)) in visas:
+                return True
+    year = str(data.get("release_date") or "")[:4]
+    if not year.isdigit():
+        return False
+    titles = {fold(str(t)) for t in (data.get("title"), data.get("original_title")) if t}
+    return any((key, int(year) + delta) in keys for key in titles if key for delta in (-1, 0, 1))
+
+
+def _ages_by_country(
+    data: Mapping[str, Any] | None, server: str | None, country: str | None, order: str
+) -> dict[str, int]:
+    """Every country's age for a title (its releases' in the order, else its one certification)."""
+    data = data or {}
+    codes = {str(r.get("country", "")).upper() for r in data.get("releases") or [] if isinstance(r, Mapping)}
+    certifications = data.get("certifications") or {}
+    if isinstance(certifications, Mapping):
+        codes |= {str(c).upper() for c in certifications}
+    if country:
+        codes.add(country.upper())
+    out: dict[str, int] = {}
+    for code in sorted(c for c in codes if c):
+        age = country_age(data, server if country and code == country.upper() else None, code, order)
+        if age is None and isinstance(certifications, Mapping) and certifications.get(code):
+            age = age_of(str(certifications[code]))
+        if age is not None:
+            out[code] = age
+    return out
+
+
 def title_age(
     data: Mapping[str, Any] | None,
     server: str | None,
     country: str | None,
     order: str = DEFAULT_ORDER,
     also: Iterable[str] = (),
+    blend: str = "strictest",
 ) -> int | None:
     """Issue 478: the age a title is held to — as the portal's country rates it, in the administrator's order
     of its releases (by default as it is watched at home: Mad Max: Fury Road, « tous publics » at the cinema,
     -12 on TV, is 12; ``country_age``); when its releases are not known (details looked up before), as issue
     438 rated it (``local_age``). The other countries the administrator chose (``also``) count too: the
     strictest of them wins (Resident Evil, -12 in France, R in the United States: 17) — a country that does
-    not rate the title does not count."""
+    not rate the title does not count. A household profile may be read by the average of every country's
+    rating instead (``blend="average"``, its master's choice), rounded to the nearest year."""
+    if blend == "average":
+        ages = list(_ages_by_country(data, server, country, order).values())
+        if ages:
+            return int(sum(ages) / len(ages) + 0.5)
     own = country_age(data, server, country, order) if country else None
     base = own if own is not None else local_age(labelled(data, server), country)
     found = [base] if base is not None else []
@@ -208,6 +294,7 @@ class TitleGate:
         self.cnc: Any = None  # issue 478: the CNC's visas (``CncVisas``), set by the module
         self._order: tuple[float, str] | None = None
         self._also: tuple[float, tuple[str, ...]] | None = None
+        self._warned: tuple[float, tuple[frozenset[int], frozenset[tuple[str, int]]]] | None = None
 
     async def country(self) -> str | None:
         """Issue 438: the country whose age ratings count (the system language's), kept a minute."""
@@ -216,6 +303,32 @@ class TitleGate:
         found = country_of(await system_language(self.capabilities))
         self._country = (time.monotonic(), found)
         return found
+
+    async def cnc_warned(self) -> tuple[frozenset[int], frozenset[tuple[str, int]]]:
+        """Issue 478: the CNC's films « tous publics avec avertissement » — by visa, and by folded title and
+        year (to match a film whose release does not name its visa), kept an hour."""
+        if self._warned is not None and time.monotonic() - self._warned[0] < 3600:
+            return self._warned[1]
+        found: tuple[frozenset[int], frozenset[tuple[str, int]]] = (frozenset(), frozenset())
+        if self.cnc is not None:
+            found = await self.cnc.warned()
+        self._warned = (time.monotonic(), found)
+        return found
+
+    @staticmethod
+    def _warnings(
+        data: Mapping[str, Any] | None, cnc: tuple[frozenset[int], frozenset[tuple[str, int]]] | None
+    ) -> set[str]:
+        """A title's warnings by family — the rating boards' descriptors, and the CNC's « avertissement »."""
+        found = warnings_of(data)
+        if cnc is not None and data and _cnc_warns(data, cnc):
+            found.add("cnc")
+        return found
+
+    async def blend_for(self, viewer: Principal | UUID | None) -> str:
+        """Issue 478: how this viewer's ages are read — a profile's master may choose the average."""
+        restrictions = await self.restrictions(viewer) if viewer is not None else None
+        return restrictions.rating_blend if restrictions is not None else "strictest"
 
     async def countries_for(self, viewer: Principal | UUID | None) -> tuple[str, ...]:
         """Issue 478: the other countries whose ratings count for this viewer — its master's choice for a
@@ -300,11 +413,18 @@ class TitleGate:
                     .where(MediaObject.kind.in_(RATED))
                 )
             ).all()
+            blend = restrictions.rating_blend
+            avoid = restrictions.avoid_warnings
+            cnc = await self.cnc_warned() if "cnc" in avoid else None
             works = {
                 work
                 for work, kind, data, server in rows
                 if str(work) not in granted
-                and not restrictions.allows_age(title_age(data, server, country, order, also))
+                and (
+                    not restrictions.allows_age(title_age(data, server, country, order, also, blend))
+                    # issue 478: a warning its master keeps it from, whatever its age
+                    or bool(avoid and avoid & self._warnings(data, cnc))
+                )
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
                 tags = await session.execute(
@@ -449,8 +569,9 @@ class TitleGate:
         country = await self.country()
         order = await self.rating_order()
         also = await self.countries_for(viewer)
+        blend = await self.blend_for(viewer)
         for object_id, data, server in rows:
-            age = title_age(data, server, country, order, also)
+            age = title_age(data, server, country, order, also, blend)
             if age is not None:
                 out[object_id] = max(age, out.get(object_id, age))
             elif unrated is not None and object_id not in out:
@@ -663,7 +784,8 @@ class TitleGate:
 
     def forget(self) -> None:
         self._cache.clear()
-        self._order = self._also = None  # issue 478: the administrator's choices read again too
+        # issue 478: the administrator's choices and the CNC's warnings read again too
+        self._order = self._also = self._warned = None
 
     async def check(
         self, viewer: Principal | UUID | None, object_id: UUID, title: str = "", *, viewing: bool = False
@@ -688,7 +810,19 @@ class TitleGate:
         found = await self.rating(object_id, viewer)  # issue 478: by its own countries
         restrictions = await self.restrictions(viewer)
         reason = await self._reason(object_id, restrictions, found["age"])
+        # issue 478: of its age, but carrying a warning its master keeps it from
+        warned = sorted(
+            set(found.get("warnings") or []) & (restrictions.avoid_warnings if restrictions else set())
+        )
+        if (
+            warned
+            and reason in ("age", "unrated")
+            and restrictions is not None
+            and restrictions.allows_age(found["age"])
+        ):
+            reason = "warning"
         return {
+            "warnings": warned if reason == "warning" else [],
             "object_id": str(object_id),
             "name": title,
             "rating": f"{found['age']}+" if found["age"] is not None else None,
@@ -767,11 +901,12 @@ class TitleGate:
                     country = await self.country()
                     order = await self.rating_order()
                     also = await self.countries_for(viewer)
+                    blend = await self.blend_for(viewer)
                     return {
-                        "age": title_age(data, server, country, order, also),
+                        "age": title_age(data, server, country, order, also, blend),
                         "country": country,
                         "ratings": [{"source": s, "value": v} for s, v in own_first(sources, country)],
-                        **(await self._details(current, data, server, country, also)),
+                        **(await self._details(current, data, server, country, also, blend)),
                     }
                 current = parent
         return {"age": None, "ratings": []}
@@ -783,6 +918,7 @@ class TitleGate:
         server: str | None,
         country: str | None,
         also: tuple[str, ...] = (),
+        blend: str = "strictest",
     ) -> dict[str, Any]:
         """Issue 478: a title's ratings in full — which release its age follows, every release's rating,
         and (for a film) the CNC's decision."""
@@ -842,11 +978,17 @@ class TitleGate:
                     "title": found.title,
                     "year": found.year,
                 }
+        if blend == "average":  # issue 478: its master reads it by the average of every country's rating
+            basis, abroad = "average", None
+        warnings = warnings_of(data)
+        if cnc is not None and cnc["warning"]:
+            warnings.add("cnc")
         return {
-            "basis": basis if listed or abroad else None,
+            "basis": basis if listed or abroad or blend == "average" else None,
             "basis_country": abroad,
             "releases": listed,
             "cnc": cnc,
+            "warnings": sorted(warnings),
         }
 
     async def keep(self, viewer: Principal | UUID | None, items: Iterable[Any], key: str = "id") -> list[Any]:

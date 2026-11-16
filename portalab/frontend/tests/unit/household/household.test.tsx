@@ -594,6 +594,27 @@ describe("a locked title", () => {
     expect(screen.queryByRole("button", { name: "Ask for access" })).toBeNull();
   });
 
+  it("names the warnings a title is kept for (issue 478)", async () => {
+    fake.handler = () => json(200, []);
+    const problem = new ApiError(403, "restricted", "household.restricted", {
+      object_id: REQUEST.subject_ref,
+      name: "Mad Max",
+      rating: "12+",
+      reason: "warning",
+      can_ask: true,
+      warnings: ["cnc", "violence"],
+    });
+    show(<LockedTitle problem={problem} />);
+    expect(screen.getByText(/carries a warning kept from your profile/)).toBeTruthy();
+    const list = screen.getByRole("list", { name: "Warnings" });
+    expect(
+      within(list)
+        .getAllByRole("listitem")
+        .map((i) => i.textContent),
+    ).toEqual(["CNC warning", "Violence"]);
+    expect(await screen.findByRole("button", { name: "Ask for access" })).toBeTruthy();
+  });
+
   it("says when the profile cannot ask", () => {
     fake.handler = () => json(200, []);
     const problem = new ApiError(403, "restricted", "household.restricted", {
@@ -728,9 +749,8 @@ describe("all of Portalab as screen time (issue 439)", () => {
   });
 });
 
-describe("a profile's other countries (issue 478)", () => {
-  it("follows the portal by default, and its master chooses its own", async () => {
-    const saved: Array<Record<string, unknown>> = [];
+describe("a profile's classification (issue 478)", () => {
+  const editing = (saved: Array<Record<string, unknown>>) => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
       if (path === "/api/v1/household") return json(200, { ...HOUSEHOLD, rating_countries: ["DE"] });
@@ -742,15 +762,46 @@ describe("a profile's other countries (issue 478)", () => {
       return json(404, {});
     };
     show(<HouseholdPage view="profiles" />);
-    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
-    expect(await screen.findByText("As the portal: Germany")).toBeTruthy();
-    fireEvent.click(screen.getByRole("checkbox", { name: "Choose other countries for this profile" }));
-    // its own choice starts from the portal's
-    expect(screen.getByRole("checkbox", { name: "Germany" })).toBeChecked();
-    fireEvent.click(screen.getByRole("checkbox", { name: "United States" }));
+  };
+  const restrictionsOf = async (saved: Array<Record<string, unknown>>) => {
     fireEvent.click(screen.getByRole("button", { name: /^Save/ }));
     await waitFor(() => expect(saved.length).toBeGreaterThan(0));
-    const restrictions = saved[0]?.restrictions as { rating_countries?: string[] };
+    return saved[0]?.restrictions as {
+      rating_countries?: string[] | null;
+      rating_blend?: string;
+      avoid_warnings?: string[];
+    };
+  };
+
+  it("follows the portal by default, and its master picks its own countries", async () => {
+    const saved: Array<Record<string, unknown>> = [];
+    editing(saved);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const section = screen.getByRole("group", { name: "Age ratings" });
+    expect(within(section).getByRole("radio", { name: /As the portal does/ })).toBeChecked();
+    expect(within(section).getByText(/The portal's country and Germany/)).toBeTruthy();
+    fireEvent.click(within(section).getByRole("radio", { name: /Countries chosen for this profile/ }));
+    // its own choice starts from the portal's
+    expect(within(section).getByRole("checkbox", { name: "Germany" })).toBeChecked();
+    fireEvent.click(within(section).getByRole("checkbox", { name: "United States" }));
+    const restrictions = await restrictionsOf(saved);
     expect(restrictions.rating_countries).toEqual(["DE", "US"]);
+    expect(restrictions.rating_blend).toBe("strictest");
+  });
+
+  it("reads by the average, and keeps the warnings its master ticks away", async () => {
+    const saved: Array<Record<string, unknown>> = [];
+    editing(saved);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const section = screen.getByRole("group", { name: "Age ratings" });
+    fireEvent.click(within(section).getByRole("radio", { name: /Average of every country/ }));
+    expect(within(section).queryByRole("checkbox", { name: "Germany" })).toBeNull();
+    const warnings = within(section).getByRole("group", { name: "Warnings to avoid" });
+    fireEvent.click(within(warnings).getByRole("checkbox", { name: "Violence" }));
+    fireEvent.click(within(warnings).getByRole("checkbox", { name: "CNC warning" }));
+    const restrictions = await restrictionsOf(saved);
+    expect(restrictions.rating_blend).toBe("average");
+    expect(restrictions.rating_countries ?? null).toBeNull();
+    expect(restrictions.avoid_warnings).toEqual(["cnc", "violence"]); // in the list's order
   });
 });

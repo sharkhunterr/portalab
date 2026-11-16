@@ -148,6 +148,7 @@ class AgeRating(BaseModel):
     # release's rating (cinema, TV, platforms) and the CNC's decision
     basis: str | None = None
     basis_country: str | None = None  # « abroad »: the other country whose stricter rating sets the age
+    warnings: list[str] = []  # issue 478: its warnings by family (cnc, violence, fear, language…)
     releases: list[AgeRatingRelease] = []
     cnc: CncDecision | None = None
 
@@ -158,6 +159,7 @@ class KeptOut(BaseModel):
     rating: str | None = None
     reason: str
     can_ask: bool
+    warnings: list[str] = []  # issue 478: the warnings its master keeps it from (reason « warning »)
 
 
 class MediaDetail(MediaCard):
@@ -1076,7 +1078,12 @@ async def detail(principal: Reader, object_id: UUID, module: Module) -> MediaDet
     return view.model_copy(
         update={
             "age_rating": AgeRating.model_validate(rating),
-            "restricted": KeptOut(rating=kept["rating"], reason=kept["reason"], can_ask=kept["can_ask"])
+            "restricted": KeptOut(
+                rating=kept["rating"],
+                reason=kept["reason"],
+                can_ask=kept["can_ask"],
+                warnings=kept.get("warnings") or [],
+            )
             if kept is not None
             else None,
         }

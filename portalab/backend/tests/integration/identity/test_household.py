@@ -151,6 +151,8 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "slots": [],
         "screen_scope": "media",  # issue 439: its media only, unless its master counts all of Portalab
         "rating_countries": None,  # issue 478: as the portal's administrator chose
+        "avoid_warnings": [],  # issue 478: no warning kept away by default
+        "rating_blend": "strictest",
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 

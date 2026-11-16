@@ -1502,5 +1502,16 @@
   "widget.top.description": "The most watched titles on the server over the last 7 days.",
   "widget.top.title": "Top of the week",
   "widget.upcoming.description": "Films and episodes expected in the coming weeks.",
-  "widget.upcoming.title": "Upcoming releases"
+  "widget.upcoming.title": "Upcoming releases",
+  "ratings.warnings": "Warnings",
+  "ratings.basis.average": "following the average of every country's rating",
+  "ratings.warning.cnc": "CNC warning",
+  "ratings.warning.violence": "Violence",
+  "ratings.warning.fear": "Frightening or disturbing scenes",
+  "ratings.warning.language": "Bad language",
+  "ratings.warning.drugs": "Drugs, alcohol, tobacco",
+  "ratings.warning.sex": "Sex, nudity",
+  "ratings.warning.self_harm": "Suicide, self-harm",
+  "ratings.warning.discrimination": "Discrimination",
+  "ratings.warning.mature": "Mature themes"
 }

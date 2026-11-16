@@ -74,6 +74,19 @@ export function RatingsBlock({
             </dd>
           </div>
         ) : null}
+        {rating.warnings?.length ? (
+          <div>
+            <dt>{t("media:ratings.warnings")}</dt>
+            <dd className="media-ratings__warnings">
+              {rating.warnings.map((kind) => (
+                <span key={kind} className="media-ratings__warning">
+                  <Icon name="warning" size={14} />
+                  {t(`media:ratings.warning.${kind}`)}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ) : null}
       </dl>
       {countries.map((country) => (
         <div key={country} className="media-ratings__country">

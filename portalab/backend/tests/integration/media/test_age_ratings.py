@@ -164,3 +164,52 @@ async def test_a_master_chooses_other_countries_for_one_profile(
     assert film not in await media.module.gate.blocked(lea)
     overview = await service.overview(owner)
     assert overview["rating_countries"] == ["US"]  # what a profile follows by default
+
+
+async def _lea(app: FastAPI, media: MediaHarness) -> tuple[Principal, UUID, Any]:
+    people = await users(app, media, "zoe")
+    owner = Principal(user_id=people["zoe"])
+    service = app.state.household_module.service
+    created = await service.create(owner, display_name="Léa", kind="child", color=None, pin=None)
+    return owner, UUID(str(created["id"])), service
+
+
+async def test_a_master_keeps_titles_with_a_warning_from_a_profile(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    film = await _film(media)
+    owner, lea_id, service = await _lea(app, media)
+    lea = Principal(user_id=lea_id, profile_of=owner.user_id)
+    settings = RestrictionSettings(max_age=16, allow_unrated=True, genres=[])
+    await service.change(owner, lea_id, restrictions=settings)
+    media.module.gate.forget()
+    assert film not in await media.module.gate.blocked(lea)  # 12: open to 16
+    for avoid in (["cnc"], ["violence"]):  # the CNC's « avertissement », the TV's « violence »
+        avoiding = settings.model_copy(update={"avoid_warnings": avoid})
+        await service.change(owner, lea_id, restrictions=avoiding)
+        media.module.gate.forget()
+        assert film in await media.module.gate.blocked(lea), avoid
+        kept = await media.module.gate.kept(lea, film)
+        assert kept is not None and kept["reason"] == "warning" and kept["warnings"] == avoid
+        assert kept["can_ask"] is True
+    await service.change(owner, lea_id, restrictions=settings.model_copy(update={"avoid_warnings": ["sex"]}))
+    media.module.gate.forget()
+    assert film not in await media.module.gate.blocked(lea)  # none of its warnings
+    rating = await media.module.gate.rating(film, lea)
+    assert rating["warnings"] == ["cnc", "violence"]
+
+
+async def test_a_master_reads_a_profiles_ages_by_the_average(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    film = await _film(media)
+    owner, lea_id, service = await _lea(app, media)
+    lea = Principal(user_id=lea_id, profile_of=owner.user_id)
+    settings = RestrictionSettings(max_age=14, allow_unrated=True, genres=[], rating_blend="average")
+    await service.change(owner, lea_id, restrictions=settings)
+    media.module.gate.forget()
+    rating = await media.module.gate.rating(film, lea)
+    # France's (12, the TV's) and the United States' (R: 17): 14.5 → 15
+    assert rating["age"] == 15 and rating["basis"] == "average"
+    assert film in await media.module.gate.blocked(lea)
+    assert (await media.module.gate.rating(film))["age"] == 12  # the portal's own reading unchanged

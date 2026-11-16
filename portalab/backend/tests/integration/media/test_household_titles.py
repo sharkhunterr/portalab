@@ -247,6 +247,7 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
         "basis_country": None,
         "releases": [],
         "cnc": None,
+        "warnings": [],
     }
     saw = (await client.get(f"/api/v1/media/{ids['Saw']}")).json()["age_rating"]
     assert saw == {
@@ -257,6 +258,7 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
         "basis_country": None,
         "releases": [],
         "cnc": None,
+        "warnings": [],
     }
 
 

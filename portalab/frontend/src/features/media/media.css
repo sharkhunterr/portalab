@@ -1903,3 +1903,16 @@ a.media-person__row:hover {
   flex-basis: 100%;
   text-align: end;
 }
+/* issue 478: a title's warnings, by family */
+.media-ratings__warnings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1) var(--space-2);
+  color: var(--state-partial-fg, var(--color-text));
+}
+.media-ratings__warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}

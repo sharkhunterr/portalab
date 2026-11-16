@@ -6,7 +6,7 @@ from typing import Any
 
 from portalab.connectors.tmdb import _releases
 from portalab.modules.media.ratings.cnc import VISA_NOTE, fold, parse, titles_of, warning
-from portalab.modules.media.restrictions import title_age
+from portalab.modules.media.restrictions import title_age, warnings_of
 
 MAD_MAX: dict[str, Any] = {
     "certifications": {"FR": "TP", "US": "R"},
@@ -120,3 +120,29 @@ def test_another_country_is_rated_by_the_same_order() -> None:
     assert title_age(MAD_MAX, "fr/TP", "FR", also=("US",)) == 17
     # only a certification known for that country (details from before every release was kept)
     assert title_age({"certifications": {"FR": "TP", "US": "R"}}, "fr/TP", "FR", also=("US",)) == 17
+
+
+def test_the_average_of_every_country() -> None:
+    data = {
+        "releases": [
+            {"country": "FR", "type": "tv", "certification": "12"},
+            {"country": "US", "type": "cinema", "certification": "R"},
+            {"country": "GB", "type": "cinema", "certification": "15"},
+        ]
+    }
+    assert title_age(data, None, "FR") == 12  # the portal's country alone
+    assert title_age(data, None, "FR", blend="average") == 15  # (12 + 17 + 15) / 3: 14.7 → 15
+    assert title_age({}, None, "FR", blend="average") is None  # nothing rated: unrated still
+
+
+def test_warnings_are_read_by_family() -> None:
+    data = {
+        "releases": [
+            {"country": "FR", "type": "tv", "certification": "12", "descriptors": ["Violence"]},
+            {"country": "DE", "type": "cinema", "certification": "16", "descriptors": ["threat"]},
+            {"country": "US", "type": "cinema", "certification": "R", "descriptors": ["Strong language"]},
+            {"country": "NL", "type": "cinema", "certification": "12", "descriptors": ["s", "d"]},
+        ]
+    }
+    assert warnings_of(data) == {"violence", "fear", "language", "sex", "drugs"}
+    assert warnings_of({}) == set()

@@ -170,6 +170,27 @@ class CncVisas:
             return 0
         return await self.store(visas)
 
+    async def warned(self) -> tuple[frozenset[int], frozenset[tuple[str, int]]]:
+        """Issue 478: the films « tous publics avec avertissement » — their visas, their folded titles and
+        years (the original title of a foreign film too)."""
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(CncVisa.visa, CncVisa.title, CncVisa.year).where(
+                        CncVisa.decision.ilike("%avertissement%")
+                    )
+                )
+            ).all()
+        visas = frozenset(int(visa) for visa, _, _ in rows)
+        keys = frozenset(
+            (key, int(year))
+            for _, title, year in rows
+            if year
+            for part in titles_of(title)
+            if (key := fold(part))
+        )
+        return visas, keys
+
     async def find(
         self, notes: Iterable[str | None], titles: Iterable[str | None], year: int | None
     ) -> CncVisa | None:

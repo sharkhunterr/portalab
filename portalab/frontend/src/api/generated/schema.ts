@@ -13512,6 +13512,11 @@ export interface components {
              * @default []
              */
             releases: components["schemas"]["AgeRatingRelease"][];
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings: string[];
         };
         /**
          * AgeRatingRelease
@@ -17053,6 +17058,11 @@ export interface components {
             rating?: string | null;
             /** Reason */
             reason: string;
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings: string[];
         };
         /**
          * KeptTitle
@@ -17885,7 +17895,8 @@ export interface components {
             /**
              * @default {
              *       "ratings": [],
-             *       "releases": []
+             *       "releases": [],
+             *       "warnings": []
              *     }
              */
             age_rating: components["schemas"]["AgeRating"];
@@ -20344,6 +20355,8 @@ export interface components {
              * @default true
              */
             allow_unrated: boolean;
+            /** Avoid Warnings */
+            avoid_warnings?: ("cnc" | "violence" | "fear" | "language" | "drugs" | "sex" | "self_harm" | "discrimination" | "mature")[];
             /** Birth Date */
             birth_date?: string | null;
             /** Blocked */
@@ -20364,6 +20377,12 @@ export interface components {
              * @enum {string}
              */
             mode: "show" | "hide" | "lock";
+            /**
+             * Rating Blend
+             * @default strictest
+             * @enum {string}
+             */
+            rating_blend: "strictest" | "average";
             /** Rating Countries */
             rating_countries?: ("FR" | "DE" | "GB" | "US" | "ES" | "IT" | "BE" | "CH" | "NL" | "CA" | "AU")[] | null;
             /**

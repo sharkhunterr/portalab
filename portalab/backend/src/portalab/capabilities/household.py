@@ -124,6 +124,10 @@ class Restrictions:
     # issue 478: other countries whose age ratings count too for this profile (the strictest wins) — its
     # master's choice; ``None``: as the portal's administrator set it
     rating_countries: tuple[str, ...] | None = None
+    # issue 478: the warnings its master keeps it from (the CNC's « avertissement », violence, fear…) and
+    # how its age is read — the strictest of its countries' ratings, or the average of every country's
+    avoid_warnings: frozenset[str] = frozenset()
+    rating_blend: str = "strictest"
 
     def slots_on(self, weekday: int) -> tuple[Slot, ...]:
         return tuple(sorted((s for s in self.slots if s.day == weekday), key=lambda s: s.start))
@@ -166,7 +170,7 @@ class Restrictions:
         return (
             self.max_age is not None
             or not self.allow_unrated
-            or bool(self.genres or self.types or self.titles)
+            or bool(self.genres or self.types or self.titles or self.avoid_warnings)
         )
 
     @property
