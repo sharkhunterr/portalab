@@ -94,3 +94,29 @@ def test_the_administrator_orders_the_ratings() -> None:
     assert title_age(MAD_MAX, "fr/TP", "FR", "home,tv,cinema") == 18  # the strictest platform
     assert title_age(MAD_MAX, "fr/TP", "FR", "strictest") == 18  # every rating at once
     assert title_age(MAD_MAX, "fr/TP", "FR", "tv,tv,cinema") == 12  # not an order: the default holds
+
+
+RESIDENT_EVIL: dict[str, Any] = {
+    "certifications": {"FR": "12", "US": "R", "GB": "15", "DE": "16"},
+    "releases": [
+        {"country": "FR", "type": "cinema", "certification": "12"},
+        {"country": "DE", "type": "cinema", "certification": "16"},
+        {"country": "GB", "type": "cinema", "certification": "15"},
+        {"country": "US", "type": "cinema", "certification": "R"},
+        {"country": "US", "type": "digital", "certification": "R"},
+    ],
+}
+
+
+def test_other_countries_count_too_when_the_administrator_says_so() -> None:
+    assert title_age(RESIDENT_EVIL, None, "FR") == 12  # the portal's country alone
+    assert title_age(RESIDENT_EVIL, None, "FR", also=("GB",)) == 15
+    assert title_age(RESIDENT_EVIL, None, "FR", also=("GB", "US")) == 17  # the strictest wins
+    assert title_age(RESIDENT_EVIL, None, "FR", also=("JP",)) == 12  # a country that does not rate it
+
+
+def test_another_country_is_rated_by_the_same_order() -> None:
+    # Mad Max in the United States: R everywhere; its French TV rating (12) and the other's R: 17
+    assert title_age(MAD_MAX, "fr/TP", "FR", also=("US",)) == 17
+    # only a certification known for that country (details from before every release was kept)
+    assert title_age({"certifications": {"FR": "TP", "US": "R"}}, "fr/TP", "FR", also=("US",)) == 17

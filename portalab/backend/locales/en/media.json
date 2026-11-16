@@ -1180,6 +1180,7 @@
   "ratings.basis.strictest": "following the strictest of its ratings",
   "ratings.basis.tv": "following its TV rating",
   "ratings.basis.home": "following its video and streaming rating",
+  "ratings.basis.abroad": "following its rating in {country}",
   "ratings.basis.cinema": "following its cinema rating",
   "ratings.basis.other": "following other countries' ratings",
   "ratings.cnc": "CNC",

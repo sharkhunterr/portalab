@@ -1180,6 +1180,7 @@
   "ratings.basis.strictest": "d'après la plus stricte de ses classifications",
   "ratings.basis.tv": "d'après sa classification télé",
   "ratings.basis.home": "d'après sa classification vidéo et streaming",
+  "ratings.basis.abroad": "d'après sa classification ({country})",
   "ratings.basis.cinema": "d'après sa classification cinéma",
   "ratings.basis.other": "d'après les classifications des autres pays",
   "ratings.cnc": "CNC",

@@ -13497,6 +13497,8 @@ export interface components {
             age?: number | null;
             /** Basis */
             basis?: string | null;
+            /** Basis Country */
+            basis_country?: string | null;
             cnc?: components["schemas"]["CncDecision"] | null;
             /** Country */
             country?: string | null;

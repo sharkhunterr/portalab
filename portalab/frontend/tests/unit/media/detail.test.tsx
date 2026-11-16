@@ -484,3 +484,22 @@ describe("a title's classification in full (issue 478)", () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+describe("another country sets the age (issue 478)", () => {
+  it("says which country's stricter rating the age follows", () => {
+    render(
+      <RatingsBlock
+        rating={{
+          age: 17,
+          country: "FR",
+          basis: "abroad",
+          basis_country: "US",
+          ratings: [],
+          releases: [{ country: "US", type: "cinema", certification: "R", age: 17, descriptors: [] }],
+          cnc: null,
+        }}
+      />,
+    );
+    expect(screen.getByText("following its rating in United States")).toBeInTheDocument();
+  });
+});

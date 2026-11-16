@@ -88,13 +88,15 @@ RATING_COUNTRIES = ("FR", "US", "GB", "DE")  # 032: a child's limit holds to the
 
 
 RELEASE_TYPES = {1: "premiere", 2: "cinema_limited", 3: "cinema", 4: "digital", 5: "physical", 6: "tv"}
+# issue 478: the countries whose releases are kept — those an administrator may also hold profiles to
+RELEASE_COUNTRIES = ("FR", "DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU")
 
 
 def _releases(document: Mapping[str, Any], country: str) -> list[dict[str, Any]]:
     """Issue 478: every rated release of the portal's country and the main ones — a film's (TMDB's release
     types: the cinema, the TV, a platform…), a series' (its rating, for the TV) — with its note and the
     descriptors given with its rating."""
-    wanted = set(dict.fromkeys((country, *RATING_COUNTRIES)))
+    wanted = set(dict.fromkeys((country, *RATING_COUNTRIES, *RELEASE_COUNTRIES)))
     out: list[dict[str, Any]] = []
     for result in (document.get("release_dates") or {}).get("results") or []:
         if result.get("iso_3166_1") not in wanted:
@@ -124,7 +126,7 @@ def _releases(document: Mapping[str, Any], country: str) -> list[dict[str, Any]]
                     "date": None,
                 }
             )
-    return out[:40]
+    return out[:80]
 
 
 def _certifications(document: Mapping[str, Any], country: str) -> dict[str, str]:

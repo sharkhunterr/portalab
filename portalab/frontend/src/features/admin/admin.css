@@ -1159,3 +1159,19 @@
 .email-state__text small {
   color: var(--color-text-muted);
 }
+
+/* issue 478: a setting of several of a few (the countries whose ratings count too) — one box each */
+.setting-multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.setting-multi__choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--target-min);
+}

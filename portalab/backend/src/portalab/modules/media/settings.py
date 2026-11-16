@@ -154,6 +154,12 @@ RatingOrder = Literal[
 ]
 
 
+# issue 478: other countries whose ratings count too — the strictest of them and the portal's country's wins
+# (each one rated by the same order; a country that does not rate a title does not count)
+ALSO_COUNTRIES_KEY = "media.ratings.alsoCountries"
+RatingCountry = Literal["FR", "DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU"]
+
+
 def declare_rating_order(catalog: SettingCatalog = default_catalog) -> None:
     declare = declare_setting if catalog is default_catalog else catalog.declare
     if RATING_ORDER_KEY not in {declaration.key for declaration in catalog.all()}:
@@ -165,6 +171,17 @@ def declare_rating_order(catalog: SettingCatalog = default_catalog) -> None:
             owner=OWNER,
             description="Which of a title's age ratings a household profile is held to: the order its "
             "releases count in (TV, video and streaming, cinema — the first known wins), or the strictest.",
+        )
+    if ALSO_COUNTRIES_KEY not in {declaration.key for declaration in catalog.all()}:
+        declare(
+            scope="global",
+            key=ALSO_COUNTRIES_KEY,
+            schema=list[RatingCountry],
+            default=[],
+            owner=OWNER,
+            description="Other countries whose age ratings count too: a household profile is held to the "
+            "strictest of theirs and the portal's country's (a country that does not rate a title does not "
+            "count).",
         )
 
 

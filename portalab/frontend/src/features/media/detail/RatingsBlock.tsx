@@ -55,7 +55,11 @@ export function RatingsBlock({
             <dd className="media-ratings__held">
               <AgeBadge age={rating.age} />
               {rating.basis ? (
-                <span className="media-ratings__note">{t(`media:ratings.basis.${rating.basis}`)}</span>
+                <span className="media-ratings__note">
+                  {t(`media:ratings.basis.${rating.basis}`, {
+                    country: rating.basis_country ? regionName(locale, rating.basis_country) : "",
+                  })}
+                </span>
               ) : null}
             </dd>
           </div>

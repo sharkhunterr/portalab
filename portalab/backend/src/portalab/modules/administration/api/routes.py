@@ -93,6 +93,9 @@ def _kind(declaration: Any) -> dict[str, Any]:
     out: dict[str, Any] = {"kind": kind if kind in ("boolean", "integer", "number", "string") else "json"}
     if isinstance(schema.get("enum"), list):
         out["choices"] = schema["enum"]
+    items = schema.get("items") if kind == "array" else None
+    if isinstance(items, dict) and isinstance(items.get("enum"), list):  # issue 478: several of a few
+        out.update(kind="multi", choices=items["enum"])
     return out
 
 

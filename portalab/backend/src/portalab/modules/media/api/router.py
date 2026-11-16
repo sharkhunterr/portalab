@@ -147,6 +147,7 @@ class AgeRating(BaseModel):
     # issue 478: in full — which release the age follows (« tv », « home », « cinema », « other »), every
     # release's rating (cinema, TV, platforms) and the CNC's decision
     basis: str | None = None
+    basis_country: str | None = None  # « abroad »: the other country whose stricter rating sets the age
     releases: list[AgeRatingRelease] = []
     cnc: CncDecision | None = None
 

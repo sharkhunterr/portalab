@@ -120,40 +120,70 @@ def order_of(order: str | None) -> list[str]:
     return tiers if sorted(tiers) == sorted(TIERS) else DEFAULT_ORDER.split(",")
 
 
-def title_age(
-    data: Mapping[str, Any] | None, server: str | None, country: str | None, order: str = DEFAULT_ORDER
+def country_age(
+    data: Mapping[str, Any] | None, server: str | None, country: str, order: str = DEFAULT_ORDER
 ) -> int | None:
-    """Issue 478: the age a title is held to — in the administrator's order of its releases in the portal's
-    country (by default as it is watched at home: Mad Max: Fury Road, « tous publics » at the cinema, -12 on
-    TV, is 12), the first one known counting (the strictest within it; the media server's own rating counts
-    with the cinema's), or the strictest of them all; when its releases are not known (details looked up
-    before), as issue 438 rated it (``local_age``)."""
-    releases = [r for r in (data or {}).get("releases") or [] if isinstance(r, Mapping)]
-    if country and releases:
-        mine = [r for r in releases if str(r.get("country", "")).upper() == country.upper()]
-        own_server = server is not None and _of_country(("server", server), country.upper())
+    """Issue 478: the age a country rates a title for, in the administrator's order of its releases — the
+    first kind known counting (the strictest within it; the media server's own rating, when it is that
+    country's, with the cinema's), or the strictest of them all; ``None`` when that country's releases are
+    not known."""
+    local = country.upper()
+    mine = [
+        r
+        for r in (data or {}).get("releases") or []
+        if isinstance(r, Mapping) and str(r.get("country", "")).upper() == local
+    ]
+    own_server = server is not None and _of_country(("server", server), local)
 
-        def ages_in(kinds: Iterable[str], with_server: bool) -> list[int]:
-            wanted = set(kinds)
-            found = [
-                age
-                for r in mine
-                if r.get("type") in wanted and (age := age_of(str(r.get("certification")))) is not None
-            ]
-            if with_server and own_server and (age := age_of(str(server))) is not None:
-                found.append(age)
-            return found
+    def ages_in(kinds: Iterable[str], with_server: bool) -> list[int]:
+        wanted = set(kinds)
+        found = [
+            age
+            for r in mine
+            if r.get("type") in wanted and (age := age_of(str(r.get("certification")))) is not None
+        ]
+        if with_server and own_server and (age := age_of(str(server))) is not None:
+            found.append(age)
+        return found
 
-        tiers = order_of(order)
-        if not tiers:  # the strictest of them all
-            every = ages_in([kind for kinds in TIERS.values() for kind in kinds], True)
-            if every:
-                return max(every)
-        for tier in tiers:
-            ages = ages_in(TIERS[tier], tier == "cinema")
-            if ages:
-                return max(ages)
-    return local_age(labelled(data, server), country)
+    if not mine:
+        return None
+    tiers = order_of(order)
+    if not tiers:  # the strictest of them all
+        every = ages_in([kind for kinds in TIERS.values() for kind in kinds], True)
+        return max(every) if every else None
+    for tier in tiers:
+        if ages := ages_in(TIERS[tier], tier == "cinema"):
+            return max(ages)
+    return None
+
+
+def title_age(
+    data: Mapping[str, Any] | None,
+    server: str | None,
+    country: str | None,
+    order: str = DEFAULT_ORDER,
+    also: Iterable[str] = (),
+) -> int | None:
+    """Issue 478: the age a title is held to — as the portal's country rates it, in the administrator's order
+    of its releases (by default as it is watched at home: Mad Max: Fury Road, « tous publics » at the cinema,
+    -12 on TV, is 12; ``country_age``); when its releases are not known (details looked up before), as issue
+    438 rated it (``local_age``). The other countries the administrator chose (``also``) count too: the
+    strictest of them wins (Resident Evil, -12 in France, R in the United States: 17) — a country that does
+    not rate the title does not count."""
+    own = country_age(data, server, country, order) if country else None
+    base = own if own is not None else local_age(labelled(data, server), country)
+    found = [base] if base is not None else []
+    certifications = (data or {}).get("certifications") or {}
+    for other in also:
+        if country and other.upper() == country.upper():
+            continue
+        age = country_age(data, None, other, order)
+        if age is None and isinstance(certifications, Mapping) and certifications.get(other):
+            age = age_of(str(certifications[other]))
+        if age is not None:
+            found.append(age)
+    return max(found) if found else None
 
 
 def excluded(column: Any, blocked: frozenset[UUID]) -> Any:
@@ -177,6 +207,7 @@ class TitleGate:
         self._country: tuple[float, str | None] | None = None
         self.cnc: Any = None  # issue 478: the CNC's visas (``CncVisas``), set by the module
         self._order: tuple[float, str] | None = None
+        self._also: tuple[float, tuple[str, ...]] | None = None
 
     async def country(self) -> str | None:
         """Issue 438: the country whose age ratings count (the system language's), kept a minute."""
@@ -184,6 +215,22 @@ class TitleGate:
             return self._country[1]
         found = country_of(await system_language(self.capabilities))
         self._country = (time.monotonic(), found)
+        return found
+
+    async def also_countries(self) -> tuple[str, ...]:
+        """Issue 478: the other countries whose ratings count too (``media.ratings.alsoCountries``), kept a
+        minute."""
+        if self._also is not None and time.monotonic() - self._also[0] < COUNTRY_CACHE_S:
+            return self._also[1]
+        found: tuple[str, ...] = ()
+        try:
+            providers = self.capabilities.system_providers(CONFIG)
+            if providers:
+                value = (await providers[0].provider.get("media.ratings.alsoCountries")).value or []
+                found = tuple(str(c).upper() for c in value if isinstance(c, str))
+        except Exception:  # noqa: S110 — the portal's country alone
+            pass
+        self._also = (time.monotonic(), found)
         return found
 
     async def rating_order(self) -> str:
@@ -224,6 +271,7 @@ class TitleGate:
         granted = await household.grants(user, "media")
         country = await self.country()
         order = await self.rating_order()
+        also = await self.also_countries()
         async with self.database.session() as session:
             rows = (
                 await session.execute(
@@ -244,7 +292,7 @@ class TitleGate:
                 work
                 for work, kind, data, server in rows
                 if str(work) not in granted
-                and not restrictions.allows_age(title_age(data, server, country, order))
+                and not restrictions.allows_age(title_age(data, server, country, order, also))
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
                 tags = await session.execute(
@@ -316,6 +364,7 @@ class TitleGate:
         member, kept for a while."""
         country = await self.country()
         order = await self.rating_order()
+        also = await self.also_countries()
         if (
             self._ages is not None
             and self._ages[1] == country
@@ -337,7 +386,7 @@ class TitleGate:
             ).all()
         out: dict[UUID, int | None] = {}
         for object_id, data, server in rows:
-            age = title_age(data, server, country, order)
+            age = title_age(data, server, country, order, also)
             known = out.get(object_id)
             out[object_id] = age if known is None else known if age is None else max(age, known)
         self._ages = (time.monotonic(), country, out)
@@ -385,8 +434,9 @@ class TitleGate:
         out: dict[UUID, int] = {}
         country = await self.country()
         order = await self.rating_order()
+        also = await self.also_countries()
         for object_id, data, server in rows:
-            age = title_age(data, server, country, order)
+            age = title_age(data, server, country, order, also)
             if age is not None:
                 out[object_id] = max(age, out.get(object_id, age))
             elif unrated is not None and object_id not in out:
@@ -599,6 +649,7 @@ class TitleGate:
 
     def forget(self) -> None:
         self._cache.clear()
+        self._order = self._also = None  # issue 478: the administrator's choices read again too
 
     async def check(
         self, viewer: Principal | UUID | None, object_id: UUID, title: str = "", *, viewing: bool = False
@@ -701,8 +752,9 @@ class TitleGate:
                 if sources:
                     country = await self.country()
                     order = await self.rating_order()
+                    also = await self.also_countries()
                     return {
-                        "age": title_age(data, server, country, order),
+                        "age": title_age(data, server, country, order, also),
                         "country": country,
                         "ratings": [{"source": s, "value": v} for s, v in own_first(sources, country)],
                         **(await self._details(current, data, server, country)),
@@ -739,6 +791,23 @@ class TitleGate:
                 str(r["type"]) for r in listed if str(r["country"]).upper() == local and r["age"] is not None
             }
             basis = next((tier for tier in tiers if mine & set(TIERS[tier])), "other")
+        # another country the administrator chose rates it stricter: that country sets the age
+        abroad = None
+        also = await self.also_countries()
+        if also and country:
+            order = await self.rating_order()
+            own = country_age(data, server, country, order)
+            own = own if own is not None else local_age(labelled(data, server), country)
+            final = title_age(data, server, country, order, also)
+            if final is not None and (own is None or final > own):
+                certifications = (data or {}).get("certifications") or {}
+                for other in also:
+                    age = country_age(data, None, other, order)
+                    if age is None and isinstance(certifications, Mapping) and certifications.get(other):
+                        age = age_of(str(certifications[other]))
+                    if age == final:
+                        basis, abroad = "abroad", other
+                        break
         cnc = None
         if self.cnc is not None and data and (data.get("title") or data.get("original_title")):
             year = str(data.get("release_date") or "")[:4]
@@ -755,7 +824,12 @@ class TitleGate:
                     "title": found.title,
                     "year": found.year,
                 }
-        return {"basis": basis if listed else None, "releases": listed, "cnc": cnc}
+        return {
+            "basis": basis if listed or abroad else None,
+            "basis_country": abroad,
+            "releases": listed,
+            "cnc": cnc,
+        }
 
     async def keep(self, viewer: Principal | UUID | None, items: Iterable[Any], key: str = "id") -> list[Any]:
         """The items (objects or mappings) whose ``key`` is a title the viewer's lists may show."""

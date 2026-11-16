@@ -121,3 +121,17 @@ async def test_a_child_profile_is_held_to_the_tv_rating(
         media.module.gate.forget()
         # « tous publics » at the cinema would have opened it to any child: the TV's -12 holds a 10-year-old
         assert (film in await media.module.gate.blocked(lea)) is held, age
+
+
+async def test_the_administrator_adds_the_countries_that_count_too(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    await users(app, media, "zoe")
+    film = await _film(media)
+    await media.configure("media.ratings.alsoCountries", ["US"])
+    media.module.gate.forget()
+    await login(client, "zoe")
+    rating = (await client.get(f"/api/v1/media/{film}")).json()["age_rating"]
+    # France's TV says 12, the United States R: the strictest of the two
+    assert rating["age"] == 17
+    assert rating["basis"] == "abroad" and rating["basis_country"] == "US"

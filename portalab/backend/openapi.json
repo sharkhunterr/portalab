@@ -645,6 +645,17 @@
             ],
             "title": "Basis"
           },
+          "basis_country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Basis Country"
+          },
           "cnc": {
             "anyOf": [
               {

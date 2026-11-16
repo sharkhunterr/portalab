@@ -244,6 +244,7 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
         "country": "US",
         "ratings": [{"source": "US", "value": "R"}, {"source": "FR", "value": "12"}],
         "basis": None,  # issue 478: details found before every release was kept
+        "basis_country": None,
         "releases": [],
         "cnc": None,
     }
@@ -253,6 +254,7 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
         "country": "US",
         "ratings": [{"source": "server", "value": "fr/-16"}],
         "basis": None,
+        "basis_country": None,
         "releases": [],
         "cnc": None,
     }

@@ -18,7 +18,7 @@ interface SettingItem {
   source: string;
   default?: unknown;
   /** 027: how it is edited — boolean, integer, number, string or json — and the allowed values. */
-  kind?: "boolean" | "integer" | "number" | "string" | "json";
+  kind?: "boolean" | "integer" | "number" | "string" | "json" | "multi"; // issue 478: « multi », several of a few
   choices?: unknown[];
   /** where it may be set: ``global`` (the portal), ``user`` (each member's own preference)… */
   scopes?: string[];
@@ -204,6 +204,33 @@ export function SettingCard({ item, advanced = false }: { item: SettingItem; adv
         />
         <span aria-hidden="true">{item.value ? t("admin:config.on") : t("admin:config.off")}</span>
       </span>
+    );
+  } else if (kind === "multi" && item.choices?.length && !item.sensitive) {
+    // issue 478: several of a few — one box each, saved as it is ticked
+    const picked = Array.isArray(item.value) ? (item.value as unknown[]).map(String) : [];
+    control = (
+      <fieldset className="setting-multi" id={fieldId} disabled={mutation.isPending}>
+        <legend className="visually-hidden">{text.label(item)}</legend>
+        {item.choices.map((choice) => {
+          const value = String(choice);
+          return (
+            <label key={value} className="setting-multi__choice">
+              <input
+                type="checkbox"
+                checked={picked.includes(value)}
+                onChange={(event) =>
+                  save(
+                    (item.choices ?? [])
+                      .map(String)
+                      .filter((c) => (c === value ? event.target.checked : picked.includes(c))),
+                  )
+                }
+              />
+              {text.choice(item.key, choice)}
+            </label>
+          );
+        })}
+      </fieldset>
     );
   } else if (item.choices?.length && !item.sensitive) {
     control = (
