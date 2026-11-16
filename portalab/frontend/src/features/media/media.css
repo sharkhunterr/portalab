@@ -1853,3 +1853,10 @@ a.media-person__row:hover {
   font-size: var(--font-size-xs, 0.75rem);
   background: color-mix(in srgb, var(--tone) 35%, var(--color-surface));
 }
+
+/* issue 476: a game's PEGI mark in its production block, beside the words of the other rating systems */
+.media-enriched__pairs .game-rating__pegi {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 3px;
+}

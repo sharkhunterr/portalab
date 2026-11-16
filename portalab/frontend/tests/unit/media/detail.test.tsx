@@ -20,7 +20,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 
 import { CatalogPage } from "../../../src/features/media/catalog/CatalogPage";
 import { DetailPage } from "../../../src/features/media/detail/DetailPage";
-import { GameDetails, PlayTimesFacts } from "../../../src/features/media/detail/GameView";
+import { AgeRating, GameDetails, PlayTimesFacts } from "../../../src/features/media/detail/GameView";
 import { RequestsPage } from "../../../src/features/media/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 import { INFO } from "./player-fixtures";
@@ -416,5 +416,24 @@ describe("a game's page laid out like a film's (issue 467)", () => {
   it("shows nothing when nothing is known", () => {
     const { container } = render(<GameDetails genres={[]} data={{ title: "Unknown" }} />);
     expect(container.innerHTML).toBe("");
+  });
+});
+
+describe("a game's age rating (issue 476)", () => {
+  it("shows a PEGI rating as its mark, read out as its age", () => {
+    render(<AgeRating rating="PEGI 12" />);
+    const mark = screen.getByRole("img", { name: /PEGI 12/ });
+    expect(mark.querySelector("rect")?.getAttribute("style")).toContain("--rating-pegi-amber");
+  });
+
+  it("shows any other rating system as its words", () => {
+    render(<AgeRating rating="ESRB E10+" />);
+    expect(screen.getByText("ESRB E10+")).toBeInTheDocument();
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
+  it("puts the rating in the game's production block", () => {
+    render(<GameDetails data={{ platform: "Game Boy Advance", content_rating: "PEGI 3" }} genres={[]} />);
+    expect(screen.getByRole("img", { name: /PEGI 3/ })).toBeInTheDocument();
   });
 });

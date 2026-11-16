@@ -10,6 +10,68 @@ function names(value: unknown): string[] {
   return Array.isArray(value) ? (value as unknown[]).filter((v): v is string => typeof v === "string") : [];
 }
 
+/**
+ * Issue 476: a game's PEGI rating as its mark — the age on the label's color (green 3 and 7, amber 12 and 16,
+ * red 18), « PEGI » beneath, as on a box; any other rating system as its words.
+ */
+const PEGI_COLORS: Record<number, string> = {
+  3: "var(--rating-pegi-green)",
+  7: "var(--rating-pegi-green)",
+  12: "var(--rating-pegi-amber)",
+  16: "var(--rating-pegi-amber)",
+  18: "var(--rating-pegi-red)",
+};
+
+export function AgeRating({ rating }: { rating: string }) {
+  const t = useT();
+  const age = Number(/PEGI\s*(\d{1,2})/i.exec(rating)?.[1]);
+  if (!PEGI_COLORS[age]) return <span className="game-rating__text">{rating}</span>;
+  return (
+    <svg
+      className="game-rating__pegi"
+      viewBox="0 0 40 48"
+      width="34"
+      height="41"
+      role="img"
+      aria-label={t("media:facts.pegi", { age })}
+    >
+      <title>{t("media:facts.pegi", { age })}</title>
+      <rect
+        x="0.5"
+        y="0.5"
+        width="39"
+        height="47"
+        rx="3"
+        style={{ fill: PEGI_COLORS[age], stroke: "var(--rating-pegi-band)" }}
+      />
+      <text
+        x="20"
+        y="27"
+        textAnchor="middle"
+        fontSize={age > 9 ? 21 : 24}
+        fontWeight="800"
+        style={{ fill: "var(--rating-pegi-ink)" }}
+        fontFamily="Arial, sans-serif"
+      >
+        {age}
+      </text>
+      <rect x="0.5" y="35" width="39" height="12.5" style={{ fill: "var(--rating-pegi-band)" }} />
+      <text
+        x="20"
+        y="44.5"
+        textAnchor="middle"
+        fontSize="9"
+        fontWeight="800"
+        style={{ fill: "var(--rating-pegi-ink)" }}
+        fontFamily="Arial, sans-serif"
+        letterSpacing="0.5"
+      >
+        PEGI
+      </text>
+    </svg>
+  );
+}
+
 /** Issue 351: how long a game takes by play style (HowLongToBeat, through RomM), as RomM's page shows it. */
 const PLAY_STYLES = ["main_story", "main_plus_extra", "completionist", "all_styles"] as const;
 export type PlayTimes = Partial<
@@ -115,6 +177,7 @@ export function GameDetails({ data, genres }: { data: Data; genres: string[] }) 
   ].filter((fact) => fact !== null);
   const companies = names(data.people);
   const studios = companies.filter((name) => name !== data.publisher);
+  const rating = data.content_rating ? String(data.content_rating) : null;
   const production = [
     studios.length ? { key: "studios", value: studios.join(", ") } : null,
     data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
@@ -124,6 +187,7 @@ export function GameDetails({ data, genres }: { data: Data; genres: string[] }) 
       : data.year
         ? { key: "releasedOn", value: String(data.year) }
         : null,
+    rating ? { key: "ageRating", value: <AgeRating rating={rating} /> } : null,
   ].filter((row) => row !== null);
   const shownGenres = genres.filter((genre) => genre !== platform);
   const tags = names(data.tags).filter((tag) => !shownGenres.includes(tag));
