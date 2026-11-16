@@ -1860,3 +1860,36 @@ a.media-person__row:hover {
   vertical-align: middle;
   border-radius: 3px;
 }
+
+/* issue 478: a title's classification in full — the age the household holds to, the CNC, each country */
+.media-ratings__held,
+.media-ratings__cnc {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+}
+.media-ratings__cnc[data-warning] {
+  color: var(--state-partial-fg, var(--color-text));
+}
+.media-ratings__country h4 {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.media-ratings__value {
+  font-weight: var(--font-weight-bold);
+}
+.media-ratings__note {
+  color: var(--color-text-muted);
+}
+.media-ratings__descriptors {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.media-ratings__held .age-badge {
+  flex: none; /* the badge whole (« 12+ »), the sentence wrapping beside it */
+}

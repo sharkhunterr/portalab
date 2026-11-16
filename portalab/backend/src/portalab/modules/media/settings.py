@@ -3,6 +3,7 @@
 ``plex:<id>``); an empty list means "no preference"."""
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from portalab.capabilities.media_core import BASELINE
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
@@ -129,6 +130,44 @@ def declare_media_settings(catalog: SettingCatalog = default_catalog) -> None:
                 )
 
 
+# issue 478: which of a title's ratings a household profile is held to — the order its releases count in
+# (the TV's, the platforms' and discs', the cinema's: the first known wins, the strictest within it), or the
+# strictest of them all; « home viewing first » by default
+RATING_ORDER_KEY = "media.ratings.order"
+RATING_ORDERS = (
+    "tv,home,cinema",
+    "tv,cinema,home",
+    "home,tv,cinema",
+    "home,cinema,tv",
+    "cinema,tv,home",
+    "cinema,home,tv",
+    "strictest",
+)
+RatingOrder = Literal[
+    "tv,home,cinema",
+    "tv,cinema,home",
+    "home,tv,cinema",
+    "home,cinema,tv",
+    "cinema,tv,home",
+    "cinema,home,tv",
+    "strictest",
+]
+
+
+def declare_rating_order(catalog: SettingCatalog = default_catalog) -> None:
+    declare = declare_setting if catalog is default_catalog else catalog.declare
+    if RATING_ORDER_KEY not in {declaration.key for declaration in catalog.all()}:
+        declare(
+            scope="global",
+            key=RATING_ORDER_KEY,
+            schema=RatingOrder,
+            default=RATING_ORDERS[0],
+            owner=OWNER,
+            description="Which of a title's age ratings a household profile is held to: the order its "
+            "releases count in (TV, video and streaming, cinema — the first known wins), or the strictest.",
+        )
+
+
 # issue 190: what each member chooses of their taste (``/me/preferences``)
 USER_SETTINGS = (
     ("media.taste.useHistory", bool, True, "Draw your taste from what you watched, listened to and read."),
@@ -153,3 +192,4 @@ def declare_media_user_settings(catalog: SettingCatalog = default_catalog) -> No
 
 declare_media_settings()
 declare_media_user_settings()
+declare_rating_order()

@@ -634,6 +634,27 @@
             ],
             "title": "Age"
           },
+          "basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Basis"
+          },
+          "cnc": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CncDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "country": {
             "anyOf": [
               {
@@ -652,9 +673,82 @@
             },
             "title": "Ratings",
             "type": "array"
+          },
+          "releases": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgeRatingRelease"
+            },
+            "title": "Releases",
+            "type": "array"
           }
         },
         "title": "AgeRating",
+        "type": "object"
+      },
+      "AgeRatingRelease": {
+        "description": "Issue 478: one release's rating \u2014 the country, the kind of release, the rating and its age.",
+        "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "certification": {
+            "title": "Certification",
+            "type": "string"
+          },
+          "country": {
+            "title": "Country",
+            "type": "string"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "descriptors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Descriptors",
+            "type": "array"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country",
+          "type",
+          "certification"
+        ],
+        "title": "AgeRatingRelease",
         "type": "object"
       },
       "AgeRatingSource": {
@@ -4582,6 +4676,46 @@
           "locked"
         ],
         "title": "ChannelStateOut",
+        "type": "object"
+      },
+      "CncDecision": {
+        "description": "Issue 478: the CNC's visa for a film \u2014 its decision as it words it, and whether it warns.",
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "visa": {
+            "title": "Visa",
+            "type": "integer"
+          },
+          "warning": {
+            "title": "Warning",
+            "type": "boolean"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "visa",
+          "decision",
+          "warning",
+          "title"
+        ],
+        "title": "CncDecision",
         "type": "object"
       },
       "CollectionItemOut": {
@@ -12916,7 +13050,8 @@
           "age_rating": {
             "$ref": "#/components/schemas/AgeRating",
             "default": {
-              "ratings": []
+              "ratings": [],
+              "releases": []
             }
           },
           "at": {

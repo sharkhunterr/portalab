@@ -243,9 +243,19 @@ async def test_the_strictest_rating_and_kept_out_genres_hold(
         "age": 17,
         "country": "US",
         "ratings": [{"source": "US", "value": "R"}, {"source": "FR", "value": "12"}],
+        "basis": None,  # issue 478: details found before every release was kept
+        "releases": [],
+        "cnc": None,
     }
     saw = (await client.get(f"/api/v1/media/{ids['Saw']}")).json()["age_rating"]
-    assert saw == {"age": 16, "country": "US", "ratings": [{"source": "server", "value": "fr/-16"}]}
+    assert saw == {
+        "age": 16,
+        "country": "US",
+        "ratings": [{"source": "server", "value": "fr/-16"}],
+        "basis": None,
+        "releases": [],
+        "cnc": None,
+    }
 
 
 async def test_the_system_countrys_rating_counts(

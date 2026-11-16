@@ -21,6 +21,7 @@ vi.mock("../../../src/api/client", async (importOriginal) => {
 import { CatalogPage } from "../../../src/features/media/catalog/CatalogPage";
 import { DetailPage } from "../../../src/features/media/detail/DetailPage";
 import { AgeRating, GameDetails, PlayTimesFacts } from "../../../src/features/media/detail/GameView";
+import { RatingsBlock } from "../../../src/features/media/detail/RatingsBlock";
 import { RequestsPage } from "../../../src/features/media/requests/RequestsPage";
 import { json } from "../../support/fake-api";
 import { INFO } from "./player-fixtures";
@@ -435,5 +436,49 @@ describe("a game's age rating (issue 476)", () => {
   it("puts the rating in the game's production block", () => {
     render(<GameDetails data={{ platform: "Game Boy Advance", content_rating: "PEGI 3" }} genres={[]} />);
     expect(screen.getByRole("img", { name: /PEGI 3/ })).toBeInTheDocument();
+  });
+});
+
+describe("a title's classification in full (issue 478)", () => {
+  const rating = {
+    age: 12,
+    country: "FR",
+    basis: "tv",
+    ratings: [],
+    releases: [
+      { country: "US", type: "cinema", certification: "R", age: 17, descriptors: [] },
+      {
+        country: "FR",
+        type: "cinema",
+        certification: "TP",
+        age: 0,
+        note: "Visa CNC 142250",
+        descriptors: [],
+      },
+      { country: "FR", type: "tv", certification: "12", age: 12, note: "Novo19", descriptors: ["violence"] },
+    ],
+    cnc: { visa: 142250, decision: "Avertissement", warning: true, title: "Mad Max : Fury road", year: 2015 },
+  };
+
+  it("tells the age a profile is held to, the CNC's warning and each country's releases", () => {
+    render(<RatingsBlock rating={rating} />);
+    const block = screen.getByRole("region", { name: "Age rating" });
+    expect(within(block).getByText(/following its TV rating/)).toBeInTheDocument();
+    expect(within(block).getByText("All audiences, with a warning")).toBeInTheDocument();
+    expect(within(block).getByText(/visa 142250/)).toBeInTheDocument();
+    const headings = within(block)
+      .getAllByRole("heading", { level: 4 })
+      .map((h) => h.textContent);
+    expect(headings).toEqual(["France", "United States"]); // the portal's country first
+    const france = within(block)
+      .getAllByRole("definition")
+      .map((d) => d.textContent ?? "");
+    expect(france[0]).toContain("12"); // the TV first, as watched at home
+    expect(france[0]).toContain("violence");
+  });
+
+  it("is not shown without any release nor visa", () => {
+    const { container } = render(<RatingsBlock rating={{ age: 12, ratings: [], releases: [], cnc: null }} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

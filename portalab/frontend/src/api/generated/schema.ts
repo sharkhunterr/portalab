@@ -13495,6 +13495,9 @@ export interface components {
         AgeRating: {
             /** Age */
             age?: number | null;
+            /** Basis */
+            basis?: string | null;
+            cnc?: components["schemas"]["CncDecision"] | null;
             /** Country */
             country?: string | null;
             /**
@@ -13502,6 +13505,34 @@ export interface components {
              * @default []
              */
             ratings: components["schemas"]["AgeRatingSource"][];
+            /**
+             * Releases
+             * @default []
+             */
+            releases: components["schemas"]["AgeRatingRelease"][];
+        };
+        /**
+         * AgeRatingRelease
+         * @description Issue 478: one release's rating — the country, the kind of release, the rating and its age.
+         */
+        AgeRatingRelease: {
+            /** Age */
+            age?: number | null;
+            /** Certification */
+            certification: string;
+            /** Country */
+            country: string;
+            /** Date */
+            date?: string | null;
+            /**
+             * Descriptors
+             * @default []
+             */
+            descriptors: string[];
+            /** Note */
+            note?: string | null;
+            /** Type */
+            type: string;
         };
         /** AgeRatingSource */
         AgeRatingSource: {
@@ -14864,6 +14895,22 @@ export interface components {
             locked: boolean;
             /** Mandatory */
             mandatory: boolean;
+        };
+        /**
+         * CncDecision
+         * @description Issue 478: the CNC's visa for a film — its decision as it words it, and whether it warns.
+         */
+        CncDecision: {
+            /** Decision */
+            decision: string;
+            /** Title */
+            title: string;
+            /** Visa */
+            visa: number;
+            /** Warning */
+            warning: boolean;
+            /** Year */
+            year?: number | null;
         };
         /** CollectionItemOut */
         CollectionItemOut: {
@@ -17830,7 +17877,8 @@ export interface components {
             age?: number | null;
             /**
              * @default {
-             *       "ratings": []
+             *       "ratings": [],
+             *       "releases": []
              *     }
              */
             age_rating: components["schemas"]["AgeRating"];

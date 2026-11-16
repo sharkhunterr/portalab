@@ -267,6 +267,23 @@ class ScreenBeat(MediaBase):
     minute: Mapped[datetime] = mapped_column(TZDateTime, primary_key=True)
 
 
+class CncVisa(MediaBase):
+    """Issue 478: a film's exploitation visa as the CNC lists it (its open data) — its decision tells the
+    French classification in full (« Tout public », « Avertissement », « Interdit -12 ans »…)."""
+
+    __tablename__ = "cnc_visas"
+    __table_args__ = (Index("ix_cnc_visas_key_year", "key", "year"),)
+
+    visa: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(400), nullable=False)
+    key: Mapped[str] = mapped_column(String(200), nullable=False)  # the title folded, to match on
+    year: Mapped[int | None] = mapped_column(Integer)
+    direction: Mapped[str | None] = mapped_column(
+        String(300), info=not_personal("a public credit of a published film (its direction), not a member")
+    )
+    decision: Mapped[str] = mapped_column(String(80), nullable=False)
+
+
 class PortalStream(MediaBase):
     """032: who started a stream with the portal's player — the media server only knows the account, which a
     household profile shares with its master; the live session it reports is told the profile's by this."""

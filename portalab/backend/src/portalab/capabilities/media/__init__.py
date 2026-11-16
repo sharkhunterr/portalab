@@ -715,6 +715,10 @@ class MetadataRecord:
     certification: str | None = None
     # 032: the main countries' age ratings ({"FR": "12", "US": "R"…}): a child's limit holds to the strictest
     certifications: Mapping[str, str] = field(default_factory=dict)
+    # issue 478: every release of the main countries with its own rating — {country, type (premiere,
+    # cinema_limited, cinema, digital, physical, tv), certification, note (« Visa CNC 142250 », « Netflix »),
+    # descriptors, date}: a film is rated for the cinema, the TV and each platform apart
+    releases: Sequence[Mapping[str, Any]] = ()
     collection: Mapping[str, Any] | None = None  # {id, name, poster}
     seasons: int | None = None
     episodes: int | None = None

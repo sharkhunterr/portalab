@@ -875,6 +875,10 @@
     "advanced": false,
     "group": "media"
   },
+  "media.ratings.order": {
+    "advanced": false,
+    "group": "members"
+  },
   "media.reading.enabled": {
     "advanced": false,
     "group": "media"

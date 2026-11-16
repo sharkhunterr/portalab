@@ -87,6 +87,46 @@ def _certification(document: Mapping[str, Any], country: str) -> str | None:
 RATING_COUNTRIES = ("FR", "US", "GB", "DE")  # 032: a child's limit holds to the strictest of them
 
 
+RELEASE_TYPES = {1: "premiere", 2: "cinema_limited", 3: "cinema", 4: "digital", 5: "physical", 6: "tv"}
+
+
+def _releases(document: Mapping[str, Any], country: str) -> list[dict[str, Any]]:
+    """Issue 478: every rated release of the portal's country and the main ones — a film's (TMDB's release
+    types: the cinema, the TV, a platform…), a series' (its rating, for the TV) — with its note and the
+    descriptors given with its rating."""
+    wanted = set(dict.fromkeys((country, *RATING_COUNTRIES)))
+    out: list[dict[str, Any]] = []
+    for result in (document.get("release_dates") or {}).get("results") or []:
+        if result.get("iso_3166_1") not in wanted:
+            continue
+        for release in result.get("release_dates") or []:
+            if not release.get("certification"):
+                continue
+            out.append(
+                {
+                    "country": str(result["iso_3166_1"]),
+                    "type": RELEASE_TYPES.get(release.get("type"), "cinema"),
+                    "certification": str(release["certification"])[:16],
+                    "note": str(release.get("note") or "")[:80] or None,
+                    "descriptors": [str(d)[:40] for d in release.get("descriptors") or []][:8],
+                    "date": str(release.get("release_date") or "")[:10] or None,
+                }
+            )
+    for result in (document.get("content_ratings") or {}).get("results") or []:
+        if result.get("iso_3166_1") in wanted and result.get("rating"):
+            out.append(
+                {
+                    "country": str(result["iso_3166_1"]),
+                    "type": "tv",
+                    "certification": str(result["rating"])[:16],
+                    "note": None,
+                    "descriptors": [str(d)[:40] for d in result.get("descriptors") or []][:8],
+                    "date": None,
+                }
+            )
+    return out[:40]
+
+
 def _certifications(document: Mapping[str, Any], country: str) -> dict[str, str]:
     """032: the age ratings of the main countries (and the portal's), as TMDB knows them."""
     found = {c: r for c in dict.fromkeys((country, *RATING_COUNTRIES)) if (r := _certification(document, c))}
@@ -170,6 +210,7 @@ def map_document(document: Mapping[str, Any], kind: str, country: str = "FR") ->
         status=document.get("status") or None,
         certification=_certification(document, country),
         certifications=_certifications(document, country),
+        releases=_releases(document, country),
         collection=(
             {
                 "id": str(collection.get("id")),

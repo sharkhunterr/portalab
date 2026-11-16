@@ -45,6 +45,7 @@ import { Extras, useExtras } from "./Extras";
 import { GameView } from "./GameView";
 import { RequestJourney, useJourney } from "./Journey";
 import { LeavingNotice } from "./Leaving";
+import { RatingsBlock } from "./RatingsBlock";
 import { ReviewButton, Reviews } from "./Reviews";
 import { TitleHero } from "./TitleHero";
 
@@ -1030,6 +1031,8 @@ export function DetailPage() {
       ) : media.kind === "game" ? (
         <GameView objectId={media.id} genres={media.genres} />
       ) : null}
+      {/* issue 478: its classification in full — the CNC, the cinema, the TV, each platform */}
+      <RatingsBlock rating={media.age_rating} />
       {/* issue 465: its trailers, featurettes, gameplay videos… and its pictures */}
       {EXTRA_KINDS.includes(media.kind) ? <Extras objectId={media.id} title={media.title} /> : null}
       {/* issue 361: its saga, series or franchise — the same block for a film, a book, a game */}

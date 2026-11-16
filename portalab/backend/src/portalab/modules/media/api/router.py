@@ -115,6 +115,28 @@ class AgeRatingSource(BaseModel):
     value: str
 
 
+class AgeRatingRelease(BaseModel):
+    """Issue 478: one release's rating — the country, the kind of release, the rating and its age."""
+
+    country: str
+    type: str  # premiere, cinema_limited, cinema, digital, physical, tv
+    certification: str
+    age: int | None = None
+    note: str | None = None  # « Visa CNC 142250 », « Netflix »…
+    descriptors: list[str] = []
+    date: str | None = None
+
+
+class CncDecision(BaseModel):
+    """Issue 478: the CNC's visa for a film — its decision as it words it, and whether it warns."""
+
+    visa: int
+    decision: str
+    warning: bool
+    title: str
+    year: int | None = None
+
+
 class AgeRating(BaseModel):
     """032: a title's age ratings and the age they stand for (a household profile's limit) — issue 438: its
     rating in the portal's country (``country``, listed first), else the strictest of the others."""
@@ -122,6 +144,11 @@ class AgeRating(BaseModel):
     age: int | None = None
     country: str | None = None
     ratings: list[AgeRatingSource] = []
+    # issue 478: in full — which release the age follows (« tv », « home », « cinema », « other »), every
+    # release's rating (cinema, TV, platforms) and the CNC's decision
+    basis: str | None = None
+    releases: list[AgeRatingRelease] = []
+    cnc: CncDecision | None = None
 
 
 class KeptOut(BaseModel):

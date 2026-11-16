@@ -171,6 +171,7 @@ from portalab.modules.media.providers.widgets import (
     REQUESTS as REQUESTS_WIDGET,
 )
 from portalab.modules.media.radio import RADIO_WIDGET, RadioService, RadioWidget
+from portalab.modules.media.ratings.cnc import CncVisas
 from portalab.modules.media.region import system_language
 from portalab.modules.media.requests.discovery import RequestableCatalog
 from portalab.modules.media.requests.insights import RequestInsights
@@ -278,6 +279,8 @@ class MediaModule:
         )
         self.request_sink = RequestSink(self.requests)
         self.gate = TitleGate(database, capabilities)  # 032: a household profile's age rating
+        self.cnc = CncVisas(database)  # issue 478: the CNC's visas, a film's French classification in full
+        self.gate.cnc = self.cnc
         self.catalog = CatalogQuery(database, authorizer, self.gate)
         self.catalog_port = CatalogPort(self.catalog)
         self.people = People(database)  # #92: the people behind the titles
@@ -624,6 +627,10 @@ class MediaModule:
         async def request_faces() -> None:  # #379: books, games… asked without their cover and sheet
             await self.requests.give_faces()
 
+        async def cnc_visas() -> None:  # issue 478: the CNC's open list, for a portal rating as France
+            if await self.gate.country() == "FR":
+                await self.cnc.refresh()
+
         async def feed_notices() -> None:  # #299: what arrived in « Mon fil », told once
             providers = self.capabilities.system_providers(NOTIFY)
             if providers:
@@ -655,6 +662,15 @@ class MediaModule:
             ),
             register_periodic(
                 jobs, self.database, "media.books_sweep", timedelta(minutes=5), sittings, owner=OWNER
+            ),
+            register_periodic(
+                jobs,
+                self.database,
+                "media.cnc_visas",
+                timedelta(days=7),
+                cnc_visas,
+                owner=OWNER,
+                timeout_seconds=600,
             ),
             register_periodic(
                 jobs,
