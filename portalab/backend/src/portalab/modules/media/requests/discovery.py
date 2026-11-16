@@ -40,7 +40,7 @@ class RequestableCatalog:
     def __init__(self, database: Database, capabilities: CapabilityRegistry) -> None:
         self.database = database
         self.capabilities = capabilities
-        self._shelves: dict[tuple[str, str], tuple[float, list[RequestableTitle]]] = {}
+        self._shelves: dict[tuple[str, str, int], tuple[float, list[RequestableTitle]]] = {}
 
     def provider(self) -> Any | None:
         with suppress(Exception):
@@ -67,16 +67,17 @@ class RequestableCatalog:
         titles = await self._ask(provider.search(query, language, page))
         return await self.annotate(list(titles), user)
 
-    async def shelf(self, name: str, user: UUID, language: str) -> list[dict[str, Any]]:
+    async def shelf(self, name: str, user: UUID, language: str, page: int = 1) -> list[dict[str, Any]]:
         provider = self.provider()
         if provider is None or name not in SHELVES:
             return []
-        cached = self._shelves.get((name, language))
+        cached = self._shelves.get((name, language, page))
         if cached and time.monotonic() - cached[0] < SHELF_TTL:
             titles = cached[1]
         else:
-            titles = list(await self._ask(provider.shelf(name, language)))
-            self._shelves[(name, language)] = (time.monotonic(), titles)
+            call = provider.shelf(name, language) if page == 1 else provider.shelf(name, language, page)
+            titles = list(await self._ask(call))
+            self._shelves[(name, language, page)] = (time.monotonic(), titles)
         return await self.annotate(titles, user)
 
     async def details(self, kind: str, tmdb_id: str, user: UUID, language: str) -> dict[str, Any]:

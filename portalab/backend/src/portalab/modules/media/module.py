@@ -308,6 +308,7 @@ class MediaModule:
         self.ingestor = ActivityIngestor(database, capabilities, clock=clock)
         self.aggregator = ActivityAggregator(database)
         self.enricher = MetadataEnricher(database, capabilities, self.language, blobs=blobs, clock=clock)
+        self.gate.briefs = self.enricher  # issue 478: titles outside the library rated too
         self.insights = InsightsQuery(database, clock=clock)
         self.deep_insights = DeepInsights(database, clock=clock)  # 027: the statistics' tabs
         self.upcoming = Upcoming(database, capabilities, clock=clock)

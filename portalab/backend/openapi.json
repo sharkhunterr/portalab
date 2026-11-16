@@ -19717,6 +19717,40 @@
         "title": "RadioTrackOut",
         "type": "object"
       },
+      "RatingPolicyOut": {
+        "description": "Issue 478: how the portal reads a title's age for the household's profiles (its administrator's).",
+        "properties": {
+          "also": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Also",
+            "type": "array"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "order": {
+            "title": "Order",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country",
+          "order",
+          "also"
+        ],
+        "title": "RatingPolicyOut",
+        "type": "object"
+      },
       "ReadOut": {
         "properties": {
           "book": {
@@ -56389,6 +56423,28 @@
           }
         },
         "summary": "Radio Request",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/ratings/policy": {
+      "get": {
+        "description": "Issue 478: the administrator's classification policy \u2014 what \u00ab as the portal \u00bb means for a profile.",
+        "operationId": "rating_policy_api_v1_media_ratings_policy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RatingPolicyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Rating Policy",
         "tags": [
           "media"
         ]

@@ -8,6 +8,7 @@ issue 438: the portal's country's one counts, the strictest of the others only w
 other kinds (books, music, games, live TV) have no rating and are never held back. Members without a
 restriction cost one cached lookup: nothing is computed for them."""
 
+import asyncio
 import time
 from collections.abc import Iterable, Mapping
 from dataclasses import replace
@@ -295,6 +296,7 @@ class TitleGate:
         self._order: tuple[float, str] | None = None
         self._also: tuple[float, tuple[str, ...]] | None = None
         self._warned: tuple[float, tuple[frozenset[int], frozenset[tuple[str, int]]]] | None = None
+        self.briefs: Any = None  # issue 478: the metadata provider's word on a title outside the library
 
     async def country(self) -> str | None:
         """Issue 438: the country whose age ratings count (the system language's), kept a minute."""
@@ -767,6 +769,7 @@ class TitleGate:
             return items
         blocked = await self.blocked(viewer)
         kept_kinds = restrictions.kinds
+        outside = await self._rate_outside(restrictions, [i for i in items if _id_of(i, "object_id") is None])
         out: list[dict[str, Any]] = []
         for item in items:
             object_id = _id_of(item, "object_id")
@@ -774,13 +777,53 @@ class TitleGate:
             kept = (
                 object_id in blocked
                 if object_id is not None
-                else kind in kept_kinds or not restrictions.allow_unrated
+                else kind in kept_kinds or outside.get(id(item), not restrictions.allow_unrated)
             )
             if not kept:
                 out.append(item)
             elif restrictions.mode in ("lock", "show"):
                 out.append({**item, "locked": True})
         return out
+
+    async def _rate_outside(self, restrictions: Restrictions, items: list[dict[str, Any]]) -> dict[int, bool]:
+        """Issue 478: titles outside the library (the request service's shelves and search) rated as the
+        library's are — their ratings looked up once on the metadata provider (TMDB), then held to the
+        profile's age, countries, reading and warnings, and its kept-out genres. ``id(item)`` → kept; a title
+        the provider does not know is left out of the answer (unrated: as before)."""
+        briefs = self.briefs
+        if briefs is None or not items:
+            return {}
+        country = await self.country()
+        order = await self.rating_order()
+        also = (
+            restrictions.rating_countries
+            if restrictions.rating_countries is not None
+            else await self.also_countries()
+        )
+        avoid = restrictions.avoid_warnings
+        cnc = await self.cnc_warned() if "cnc" in avoid else None
+        gate = asyncio.Semaphore(8)
+
+        async def rate(item: dict[str, Any]) -> tuple[int, bool | None]:
+            kind = "movie" if item.get("kind") == "movie" else "series"
+            tmdb = str(item.get("tmdb_id") or "")
+            if not tmdb.isdigit():
+                return id(item), None
+            async with gate:  # (a lookup that fails is remembered as nothing known: unrated)
+                brief = await briefs.brief(kind, {"tmdb": tmdb}, str(item.get("title") or tmdb), None)
+            data = (brief or {}).get("rated")
+            if not data:
+                return id(item), None
+            age = title_age(data, None, country, order, also, restrictions.rating_blend)
+            if age is None:
+                return id(item), None
+            kept = not restrictions.allows_age(age) or bool(avoid and avoid & self._warnings(data, cnc))
+            if not kept and restrictions.genres:
+                kept = any(genre_key(str(g)) in restrictions.genres for g in data.get("genres") or [])
+            return id(item), kept
+
+        rated = await asyncio.gather(*(rate(item) for item in items))
+        return {key: kept for key, kept in rated if kept is not None}
 
     def forget(self) -> None:
         self._cache.clear()

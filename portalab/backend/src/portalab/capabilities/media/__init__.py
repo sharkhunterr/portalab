@@ -376,8 +376,9 @@ class RequestableDetails:
 class RequestDiscovery(Protocol):
     async def search(self, query: str, language: str, page: int = 1) -> Sequence[RequestableTitle]: ...
 
-    async def shelf(self, name: str, language: str) -> Sequence[RequestableTitle]:
-        """``trending``, ``popular_movies``, ``popular_series``, ``upcoming_movies``, ``upcoming_series``."""
+    async def shelf(self, name: str, language: str, page: int = 1) -> Sequence[RequestableTitle]:
+        """``trending``, ``popular_movies``, ``popular_series``, ``upcoming_movies``, ``upcoming_series`` —
+        ``page``: the next ones (issue 478: a household profile's shelf filled past what it keeps away)."""
         ...
 
     async def details(self, kind: str, tmdb_id: str, language: str) -> RequestableDetails | None: ...

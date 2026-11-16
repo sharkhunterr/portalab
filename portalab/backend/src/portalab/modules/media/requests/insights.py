@@ -76,6 +76,14 @@ def lookup_of(row: MediaRequest) -> tuple[str, dict[str, str], str, None] | None
     return kind_of(row), dict(ref.get("ids") or {}), str(ref.get("title") or ""), None
 
 
+def tmdb_of(row: MediaRequest) -> str | None:
+    """Issue 478: a film's or a series' TMDB id as its request names it (one, or the first of a list)."""
+    found = ((row.external_ref or {}).get("ids") or {}).get("tmdb")
+    if isinstance(found, list):
+        found = found[0] if found else None
+    return str(found) if found and str(found).isdigit() and kind_of(row) in ("movie", "series") else None
+
+
 def told(row: MediaRequest) -> dict[str, Any]:
     """#378: a book's or a game's cover and sheet, as the request keeps them (a film's come from TMDB)."""
     ref = row.external_ref or {}

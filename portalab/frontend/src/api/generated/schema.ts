@@ -10401,6 +10401,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/ratings/policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rating Policy
+         * @description Issue 478: the administrator's classification policy — what « as the portal » means for a profile.
+         */
+        get: operations["rating_policy_api_v1_media_ratings_policy_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/read/{ticket}/pages/{file_ref}": {
         parameters: {
             query?: never;
@@ -20206,6 +20226,18 @@ export interface components {
             title: string;
             /** Year */
             year?: number | null;
+        };
+        /**
+         * RatingPolicyOut
+         * @description Issue 478: how the portal reads a title's age for the household's profiles (its administrator's).
+         */
+        RatingPolicyOut: {
+            /** Also */
+            also: string[];
+            /** Country */
+            country: string | null;
+            /** Order */
+            order: string;
         };
         /** ReadOut */
         ReadOut: {
@@ -42489,6 +42521,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rating_policy_api_v1_media_ratings_policy_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RatingPolicyOut"];
                 };
             };
         };

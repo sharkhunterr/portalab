@@ -280,6 +280,16 @@ class MetadataEnricher:
                     "overview": record.overview,
                     "genres": list(record.genres)[:3],
                     "rating": record.vote_average,
+                    # issue 478: its ratings, for a household profile's age rule (a title outside the library)
+                    "rated": {
+                        "certification": record.certification,
+                        "certifications": dict(record.certifications),
+                        "releases": [dict(release) for release in record.releases],
+                        "genres": list(record.genres),
+                        "release_date": record.release_date,
+                        "title": record.title,
+                        "original_title": getattr(record, "original_title", None),
+                    },
                 }
         except Exception:  # noqa: S110 — nothing known is fine
             pass

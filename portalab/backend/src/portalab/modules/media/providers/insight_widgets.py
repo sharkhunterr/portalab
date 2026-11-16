@@ -37,7 +37,14 @@ from portalab.modules.media.models import (
     SourceItem,
 )
 from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
-from portalab.modules.media.requests.insights import GROUPS, RequestInsights, ids_of, kind_of, lookup_of
+from portalab.modules.media.requests.insights import (
+    GROUPS,
+    RequestInsights,
+    ids_of,
+    kind_of,
+    lookup_of,
+    tmdb_of,
+)
 from portalab.modules.media.restrictions import excluded
 
 OWNER = "module:media"
@@ -524,6 +531,7 @@ class RecentlyRequestedWidget(_Base):
                 "state": r.state,
                 "at": r.requested_at.isoformat(),
                 "_lookup": lookup_of(r),
+                "tmdb_id": tmdb_of(r),  # issue 478: rated on TMDB for a household profile
             }
             for r in rows
         ]

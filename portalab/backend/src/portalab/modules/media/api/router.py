@@ -57,6 +57,8 @@ from portalab.modules.media.providers.insight_widgets import posters, with_poste
 from portalab.modules.media.requests.insights import kind_of, lookup_of, told
 from portalab.modules.media.sections.service import SECTIONS
 
+SHELF_FILL, SHELF_PAGES = 20, 5  # issue 478: a profile's request shelf, filled from up to five pages
+
 router = APIRouter(prefix="/api/v1", tags=["media"])
 
 
@@ -548,8 +550,22 @@ async def discover_shelf(
 ) -> dict[str, Any]:
     """#4: a shelf like the request service's own — ``trending``, ``popular_movies``,
     ``popular_series``, ``upcoming_movies``, ``upcoming_series``."""
-    items = await module.requestable.shelf(name, _me(principal), await module.member_language(principal))
-    items = await module.gate.requestable(principal, items)  # 032: a household profile's restrictions
+    language = await module.member_language(principal)
+    items = await module.requestable.shelf(name, _me(principal), language)
+    if await module.gate.restrictions(principal) is not None:
+        # 032: a household profile's restrictions — issue 478: the next pages fill the shelf past the titles
+        # they keep away (it once showed one film of twenty)
+        items = await module.gate.requestable(principal, items)
+        seen = {(i.get("kind"), i.get("tmdb_id")) for i in items}
+        for page in range(2, SHELF_PAGES + 1):
+            if len(items) >= SHELF_FILL:
+                break
+            more = await module.requestable.shelf(name, _me(principal), language, page)
+            if not more:
+                break
+            fresh = [i for i in more if (i.get("kind"), i.get("tmdb_id")) not in seen]
+            seen.update((i.get("kind"), i.get("tmdb_id")) for i in fresh)
+            items += await module.gate.requestable(principal, fresh)
     return {"items": items, "configured": module.requestable.configured()}
 
 
@@ -579,8 +595,20 @@ async def recent_requests(principal: Reader, module: Module) -> dict[str, Any]:
     payload = await registered.provider.load(principal, {"scope": "all", "period": "90d"}, DEFAULT_CONTEXT)
     items = list((payload.data or {}).get("items") or [])
     restrictions = await module.gate.restrictions(principal)
-    if restrictions is not None and not restrictions.allow_unrated:
-        items = [item for item in items if item.get("id")]
+    if restrictions is not None:
+        # issue 478: a film or series outside the library rated on TMDB as the library's titles are;
+        # another one (no known rating) only when the profile opens unrated titles
+        outside = [item for item in items if not item.get("id") and item.get("tmdb_id")]
+        allowed = {
+            id(item) for item in await module.gate.requestable(principal, outside) if not item.get("locked")
+        }
+        items = [
+            item
+            for item in items
+            if item.get("id")
+            or id(item) in allowed
+            or (not item.get("tmdb_id") and restrictions.allow_unrated)
+        ]
     seen: set[tuple[str, str]] = set()
     out = []
     for item in items:
@@ -1053,6 +1081,24 @@ async def object_metadata(_: Reader, object_id: UUID, module: Module) -> dict[st
 
 class MediaAgesOut(BaseModel):
     ages: dict[str, int]  # issue 434: each title's age rating, -1 for an unrated one (unknown ids left out)
+
+
+class RatingPolicyOut(BaseModel):
+    """Issue 478: how the portal reads a title's age for the household's profiles (its administrator's)."""
+
+    country: str | None  # the portal's country (its system language's)
+    order: str  # « tv,home,cinema »…, or « strictest »
+    also: list[str]  # other countries whose ratings count too (the strictest wins)
+
+
+@router.get("/media/ratings/policy", response_model=RatingPolicyOut)
+async def rating_policy(principal: Reader, module: Module) -> RatingPolicyOut:
+    """Issue 478: the administrator's classification policy — what « as the portal » means for a profile."""
+    return RatingPolicyOut(
+        country=await module.gate.country(),
+        order=await module.gate.rating_order(),
+        also=list(await module.gate.also_countries()),
+    )
 
 
 @router.get("/media/ages", response_model=MediaAgesOut)

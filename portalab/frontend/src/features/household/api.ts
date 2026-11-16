@@ -62,6 +62,17 @@ export function useHousehold(enabled = true) {
   });
 }
 
+export type RatingPolicy = components["schemas"]["RatingPolicyOut"];
+
+/** Issue 478: how the portal reads a title's age (its administrator's policy) — « as the portal » told. */
+export function useRatingPolicy() {
+  return useQuery({
+    queryKey: ["household", "rating-policy"],
+    staleTime: 60_000,
+    queryFn: async () => (await api.GET("/api/v1/media/ratings/policy")).data as RatingPolicy,
+  });
+}
+
 function useRefresh() {
   const client = useQueryClient();
   return () => {

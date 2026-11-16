@@ -20,6 +20,7 @@ import {
   useCreateProfile,
   useDeleteProfile,
   useHousehold,
+  useRatingPolicy,
   useSetPin,
   useUpdateProfile,
 } from "./api";
@@ -242,37 +243,11 @@ export function ProfileEditor({
 
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.ageSection")}</legend>
-          <TextField
-            label={t("household:editor.birthDate")}
-            hint={
-              ageOf(restrictions.birth_date) !== null
-                ? t("household:editor.birthDateAge", { age: ageOf(restrictions.birth_date) ?? 0 })
-                : t("household:editor.birthDateHint")
-            }
-            type="date"
-            max={new Date().toISOString().slice(0, 10)}
-            value={restrictions.birth_date ?? ""}
-            onChange={(event) => setRestrictions((r) => ({ ...r, birth_date: event.target.value || null }))}
+          <AgeLimitField
+            name={`${formId}-limit`}
+            restrictions={restrictions}
+            onChange={(change) => setRestrictions((r) => ({ ...r, ...change }))}
           />
-          <SelectField
-            label={t("household:editor.age")}
-            hint={restrictions.birth_date ? t("household:editor.ageFromBirth") : undefined}
-            disabled={Boolean(restrictions.birth_date)}
-            value={restrictions.max_age ?? ""}
-            onChange={(event) =>
-              setRestrictions((r) => ({
-                ...r,
-                max_age: event.target.value === "" ? null : Number(event.target.value),
-              }))
-            }
-          >
-            <option value="">{t("household:editor.ageNone")}</option>
-            {AGES.map((age) => (
-              <option key={age} value={age}>
-                {age === 0 ? t("household:editor.ageAll") : t("household:editor.ageN", { age })}
-              </option>
-            ))}
-          </SelectField>
           <fieldset className="household-editor__modes">
             <legend className="household-editor__label">{t("household:editor.mode")}</legend>
             {MODES.map((mode) => (
@@ -589,6 +564,88 @@ function regionName(locale: string, code: string): string {
   }
 }
 
+const LIMITS = ["birth", "fixed", "none"] as const;
+type Limit = (typeof LIMITS)[number];
+const LIMIT_ICONS: Record<Limit, string> = { birth: "cake", fixed: "shield", none: "infinity" };
+
+/**
+ * Issue 478 — a profile's age limit, one way at a time: by its birth date (one more at each birthday), a
+ * fixed age, or none — never a fixed age shown beside the birth date it does not follow.
+ */
+function AgeLimitField({
+  name,
+  restrictions,
+  onChange,
+}: {
+  name: string;
+  restrictions: RestrictionSettings;
+  onChange: (change: Partial<RestrictionSettings>) => void;
+}) {
+  const t = useT();
+  const [chosen, setChosen] = useState<Limit | null>(null);
+  const limit: Limit =
+    chosen ?? (restrictions.birth_date ? "birth" : restrictions.max_age != null ? "fixed" : "none");
+  const choose = (next: Limit) => {
+    setChosen(next);
+    onChange(
+      next === "birth"
+        ? { max_age: null }
+        : next === "fixed"
+          ? { birth_date: null, max_age: restrictions.max_age ?? 12 }
+          : { birth_date: null, max_age: null },
+    );
+  };
+  const age = ageOf(restrictions.birth_date);
+  return (
+    <>
+      <fieldset className="household-editor__modes">
+        <legend className="household-editor__label">{t("household:editor.limit")}</legend>
+        {LIMITS.map((mode) => (
+          <label key={mode} data-checked={limit === mode || undefined}>
+            <input
+              type="radio"
+              name={name}
+              value={mode}
+              checked={limit === mode}
+              onChange={() => choose(mode)}
+            />
+            <Icon name={LIMIT_ICONS[mode]} size={18} />
+            <span>
+              <strong>{t(`household:editor.limit_${mode}`)}</strong>
+              <small>{t(`household:editor.limit_${mode}Hint`)}</small>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      {limit === "birth" ? (
+        <TextField
+          label={t("household:editor.birthDate")}
+          hint={
+            age !== null ? t("household:editor.birthDateAge", { age }) : t("household:editor.birthDateHint")
+          }
+          type="date"
+          max={new Date().toISOString().slice(0, 10)}
+          value={restrictions.birth_date ?? ""}
+          onChange={(event) => onChange({ birth_date: event.target.value || null, max_age: null })}
+        />
+      ) : null}
+      {limit === "fixed" ? (
+        <SelectField
+          label={t("household:editor.age")}
+          value={restrictions.max_age ?? 12}
+          onChange={(event) => onChange({ max_age: Number(event.target.value) })}
+        >
+          {AGES.map((value) => (
+            <option key={value} value={value}>
+              {value === 0 ? t("household:editor.ageAll") : t("household:editor.ageN", { age: value })}
+            </option>
+          ))}
+        </SelectField>
+      ) : null}
+    </>
+  );
+}
+
 /** Issue 478: the warnings a profile's master may keep it from — the CNC's, then each family of descriptors. */
 const WARNINGS = [
   "cnc",
@@ -622,7 +679,9 @@ function ClassificationField({
 }) {
   const t = useT();
   const { locale } = useLocaleContext();
-  const portal = (useHousehold().data?.rating_countries ?? []).filter((c): c is RatingCountry =>
+  const policy = useRatingPolicy().data;
+  const household = useHousehold().data;
+  const portal = (policy?.also ?? household?.rating_countries ?? []).filter((c): c is RatingCountry =>
     (RATING_COUNTRIES as readonly string[]).includes(c),
   );
   const countries = restrictions.rating_countries ?? null;
@@ -638,12 +697,18 @@ function ClassificationField({
           ? { rating_blend: "strictest", rating_countries: countries ?? [...portal] }
           : { rating_blend: "strictest", rating_countries: null },
     );
+  // the administrator's policy: the portal's country, the order its ratings count in, the other countries
+  const home = policy?.country ? regionName(locale, policy.country) : t("household:editor.portalCountry");
+  const order = t(`household:editor.order.${policy?.order ?? "tv,home,cinema"}`);
   const hint = (mode: Reading) =>
     mode === "portal"
-      ? portal.length
-        ? t("household:editor.read_portalHint", { countries: names(portal) })
-        : t("household:editor.countriesNone")
-      : t(`household:editor.read_${mode}Hint`);
+      ? [
+          t("household:editor.read_portalPolicy", { country: home, order }),
+          portal.length
+            ? t("household:editor.read_portalAlso", { countries: names(portal) })
+            : t("household:editor.read_portalAlone"),
+        ].join(" ")
+      : t(`household:editor.read_${mode}Hint`, { country: home });
   return (
     <fieldset className="household-editor__section household-classification">
       <legend>{t("household:editor.ratingSection")}</legend>

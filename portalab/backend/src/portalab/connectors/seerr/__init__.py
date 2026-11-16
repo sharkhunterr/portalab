@@ -621,13 +621,13 @@ class _Discovery:
             "/api/v1/search", query=text, page=max(1, min(int(page), 20)), language=language
         )
 
-    async def shelf(self, name: str, language: str) -> Sequence[RequestableTitle]:
+    async def shelf(self, name: str, language: str, page: int = 1) -> Sequence[RequestableTitle]:
         path = SHELVES.get(name)
         if path is None:
             return []
         # no ``language`` here: on the discovery lists Seerr also takes it as the titles' *original*
         # language (popular films would be French films only); the service's own language is used
-        return await self._titles(path, page=1)
+        return await self._titles(path, page=max(1, min(int(page), 10)))
 
     async def details(self, kind: str, tmdb_id: str, language: str) -> RequestableDetails | None:
         media = "movie" if kind == "movie" else "tv"

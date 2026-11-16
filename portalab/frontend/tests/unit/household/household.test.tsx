@@ -339,12 +339,15 @@ describe("my household", () => {
     expect((within(editor).getByLabelText("Horror") as HTMLInputElement).checked).toBe(true);
     expect(within(editor).getByRole("button", { name: /^Most screen time on Monday/ })).toBeTruthy(); // 436: calendar
     expect((within(editor).getByRole("radio", { name: /Child/ }) as HTMLInputElement).checked).toBe(true);
-    // 032: a birth date sets the age (the fixed one is then disabled), hidden or locked titles, requests
-    fireEvent.change(within(editor).getByLabelText("Birth date (optional)"), {
-      target: { value: "2016-03-10" },
-    });
-    expect((within(editor).getByLabelText("Maximum age rating") as HTMLSelectElement).disabled).toBe(true);
+    // 032: a birth date sets the age — issue 478: one way at a time, the fixed age no longer beside it
+    expect(within(editor).getByRole("radio", { name: /Fixed age/ })).toBeChecked();
+    fireEvent.click(within(editor).getByRole("radio", { name: /By birth date/ }));
+    expect(within(editor).queryByLabelText("Maximum age rating")).toBeNull();
+    fireEvent.change(within(editor).getByLabelText("Birth date"), { target: { value: "2016-03-10" } });
     expect(within(editor).getByText(/years old today/)).toBeTruthy();
+    fireEvent.click(within(editor).getByRole("radio", { name: /No limit/ }));
+    expect(within(editor).queryByLabelText("Birth date")).toBeNull();
+    expect(within(editor).queryByLabelText("Maximum age rating")).toBeNull();
     fireEvent.click(within(editor).getByRole("radio", { name: /Shown locked/ }));
     expect((within(editor).getByRole("radio", { name: /Shown locked/ }) as HTMLInputElement).checked).toBe(
       true,
@@ -779,7 +782,7 @@ describe("a profile's classification (issue 478)", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const section = screen.getByRole("group", { name: "Age ratings" });
     expect(within(section).getByRole("radio", { name: /As the portal does/ })).toBeChecked();
-    expect(within(section).getByText(/The portal's country and Germany/)).toBeTruthy();
+    expect(within(section).getByText(/With Germany: the strictest wins/)).toBeTruthy();
     fireEvent.click(within(section).getByRole("radio", { name: /Countries chosen for this profile/ }));
     // its own choice starts from the portal's
     expect(within(section).getByRole("checkbox", { name: "Germany" })).toBeChecked();
@@ -787,6 +790,28 @@ describe("a profile's classification (issue 478)", () => {
     const restrictions = await restrictionsOf(saved);
     expect(restrictions.rating_countries).toEqual(["DE", "US"]);
     expect(restrictions.rating_blend).toBe("strictest");
+  });
+
+  it("tells the administrator's policy for « as the portal »", async () => {
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/household") return json(200, HOUSEHOLD);
+      if (path === "/api/v1/household/requests") return json(200, []);
+      if (path === "/api/v1/media/ratings/policy")
+        return json(200, { country: "FR", order: "tv,home,cinema", also: ["US"] });
+      return json(404, {});
+    };
+    show(<HouseholdPage view="profiles" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const section = screen.getByRole("group", { name: "Age ratings" });
+    const portal = within(section)
+      .getByRole("radio", { name: /As the portal does/ })
+      .closest("label");
+    expect(
+      await within(portal as HTMLElement).findByText(
+        "France: TV, then video and streaming, then cinema. With United States: the strictest wins.",
+      ),
+    ).toBeTruthy();
   });
 
   it("reads by the average, and keeps the warnings its master ticks away", async () => {

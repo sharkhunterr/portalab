@@ -160,3 +160,68 @@ async def test_recently_requested_follows_the_profile(
     seen = (await client.get("/api/v1/media/requests/recent")).json()["items"]
     # the hidden film out, and the one outside the library (no known rating) too: rated titles only
     assert [i["title"] for i in seen] == ["Coco"]
+
+
+class PagedDiscovery:
+    """Issue 478: a request service's popular films, twenty a page — most rated for adults."""
+
+    def __init__(self) -> None:
+        self.pages: list[int] = []
+
+    async def search(self, query: str, language: str, page: int = 1) -> list[Any]:
+        return []
+
+    async def shelf(self, name: str, language: str, page: int = 1) -> list[Any]:
+        from portalab.capabilities.media import RequestableTitle
+
+        self.pages.append(page)
+        return [RequestableTitle(str(page * 100 + n), "movie", f"Film {page}-{n}", 2024) for n in range(20)]
+
+    async def details(self, kind: str, tmdb_id: str, language: str) -> None:
+        return None
+
+
+class Briefs:
+    """What TMDB says of each film: one in five « tous publics », the others -16 (one with a warning)."""
+
+    async def brief(self, kind: str, ids: dict[str, str], title: str, year: int | None) -> dict[str, Any]:
+        n = int(ids["tmdb"]) % 100
+        family = n % 5 == 0
+        releases = [{"country": "FR", "type": "cinema", "certification": "TP" if family else "16"}]
+        if n == 5:
+            releases[0]["descriptors"] = ["violence"]
+        return {"poster": None, "rated": {"releases": releases, "genres": []}}
+
+
+async def test_a_childs_request_shelf_is_rated_and_fills_from_the_next_pages(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    from portalab.capabilities.media import REQUEST_DISCOVERY
+    from portalab.modules.household.rules import RestrictionSettings
+
+    await media.configure("i18n.defaultLanguage", "fr")
+    seerr = media.service(5, "seerr")
+    media.requests(seerr)
+    discovery = PagedDiscovery()
+    media.provide(REQUEST_DISCOVERY, seerr, discovery)
+    media.module.gate.briefs = Briefs()
+    master, lea = await _child(app, client, media)
+    await households(app).change(
+        Principal(user_id=master),
+        lea,
+        restrictions=RestrictionSettings(
+            max_age=12, allow_unrated=False, genres=[], avoid_warnings=["violence"]
+        ),
+    )
+    shelf = (await client.get("/api/v1/media/discover/shelves/popular_movies")).json()["items"]
+    assert len(shelf) == 20  # the master: the first page as it is
+
+    await client.post("/api/v1/household/switch", json={"user_id": str(lea)})
+    discovery.pages.clear()
+    shelf = (await client.get("/api/v1/media/discover/shelves/popular_movies")).json()["items"]
+    titles = [i["title"] for i in shelf]
+    # rated on TMDB instead of left out as unrated: the « tous publics » ones of five pages, but « Film n-5 »
+    # (its violence kept away)
+    assert titles and all(int(t.split("-")[1]) % 5 == 0 and not t.endswith("-5") for t in titles)
+    assert discovery.pages == [2, 3, 4, 5]  # the next pages, looked for to fill the shelf
+    assert len(titles) == 3 * 5
