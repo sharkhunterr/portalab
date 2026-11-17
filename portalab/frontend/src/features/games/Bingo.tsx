@@ -45,13 +45,22 @@ const ICONS: Record<string, string> = {
   review: "star",
   later: "bookmark",
 };
-const GROUP_ICONS: Record<string, string> = { era: "calendar", country: "globe" };
+// issue 497: a book's genre, a console or a game's genre, live TV or the radio — their family's icon
+const GROUP_ICONS: Record<string, string> = {
+  era: "calendar",
+  country: "globe",
+  read: "book",
+  play: "gamepad",
+  listen: "radio",
+};
 
 function useCellLabel() {
   const t = useT();
   const { locale } = useLocaleContext();
   return (key: string) => {
-    const [head, value] = key.split(":");
+    const [head] = key.split(":", 1);
+    const value = head === undefined ? undefined : key.slice(head.length + 1);
+    if (head === "platform" && value) return t("gamification:games.bingo.cell.platform", { platform: value });
     if (head === "country" && value) {
       let country = value;
       try {

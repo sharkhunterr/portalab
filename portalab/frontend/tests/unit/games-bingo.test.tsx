@@ -87,6 +87,21 @@ describe("the month's media bingo", () => {
     expect(screen.queryByText(/Full card!/)).toBeNull();
   });
 
+  it("names the reading and playing squares, a console by its name (issue 497)", async () => {
+    const data = view([]);
+    const keys = ["read:fantasy", "play:shooter", "platform:Sega Mega Drive/Genesis"];
+    data.cells = data.cells.map((cell, i) =>
+      i < keys.length ? { ...cell, key: keys[i] as string, group: i === 0 ? "read" : "play" } : cell,
+    );
+    show(data);
+    const grid = await screen.findByRole("list", { name: /out of 9/ });
+    const squares = within(grid).getAllByRole("listitem");
+    expect(squares[0]?.textContent).toContain("Read some fantasy (15 min)");
+    expect(squares[1]?.textContent).toContain("Play a shooter (10 min)");
+    expect(squares[2]?.textContent).toContain("Play on Sega Mega Drive/Genesis (10 min)");
+    expect(squares[0]?.dataset.group).toBe("read");
+  });
+
   it("celebrates the full card", async () => {
     show(view([0, 1, 2, 3, 4, 5, 6, 7, 8]));
     expect(await screen.findByText(/Full card!/)).toBeTruthy();

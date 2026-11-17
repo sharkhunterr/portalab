@@ -1,9 +1,13 @@
 """Issue 356: the month's media bingo, the media's side — the squares this library can fill (enough titles of
 a genre, an era, a country…), and which ones each member ticked between two moments, each by the first title
 that did it. Nothing to declare: what the services tell (plays, readings, game sessions) and the portal's own
-reviews. A film or an episode counts watched to its end; a book, an audiobook, a game a quarter of an hour at
-a time; live TV and the radio half an hour over the month. An episode stands for its series (its genres, its
-year, its country)."""
+reviews. A film or an episode counts watched to its end. An episode stands for its series (its genres, its
+year, its country).
+
+Issue 497: every kind of media weighs on the card — reading (books, audiobooks, comics, a book's genre),
+playing (any game, a console, a game's genre), live TV and the radio — and only what members can really do:
+a reading, playing or listening square is offered when someone used that kind on the portal lately; reading
+and playing add up over the month (retro sessions are short), live TV and the radio half an hour too."""
 
 from collections import defaultdict
 from collections.abc import Sequence
@@ -12,6 +16,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from portalab.capabilities.media_core import BingoCell, BingoTick
 from portalab.core.db import Database
@@ -26,8 +31,11 @@ from portalab.modules.media.models import (
 from portalab.modules.media.providers.insight_widgets import posters
 
 FINISHED = 0.9
-SITTING_S = 15 * 60  # a book read, an audiobook heard, a game played: a quarter of an hour at a time
+READ_S = 15 * 60  # a book read, an audiobook heard: a quarter of an hour over the month
+PLAYED_S = 10 * 60  # games: ten minutes over the month (retro sessions last a few minutes)
 TIMED_S = 30 * 60  # live TV, the radio: half an hour over the month
+LATELY_DAYS = 90  # a reading, playing or listening square: someone used that kind on the portal lately
+MAX_PLATFORMS = 8  # the consoles the library holds the most games of
 ENOUGH = 5  # the titles of a genre, an era or a country the library holds for its square
 LONG_S = 150 * 60
 SHORT_S = 90 * 60
@@ -74,6 +82,39 @@ ERAS: dict[str, tuple[int, int]] = {
     "1990": (1990, 1999),
     "2000": (2000, 2009),
 }
+# issue 497: a book's genre (books and audiobooks), as the library names it
+BOOK_GENRES: dict[str, frozenset[str]] = {
+    "fantasy": frozenset({"fantasy", "fantastique", "science-fiction et fantasy"}),
+    "scifi": frozenset({"science fiction", "science-fiction", "sf", "science-fiction et fantasy"}),
+    "mystery": frozenset({"mystery", "thriller", "policier", "polar", "crime", "roman policier", "mystère"}),
+    "adventure": frozenset({"adventure", "aventure"}),
+    "humor": frozenset({"humor", "humour"}),
+    "youth": frozenset({"childrens", "children", "jeunesse", "young adult", "juvenile fiction"}),
+    "classics": frozenset({"classics", "classiques", "classique"}),
+    "history": frozenset({"historical fiction", "history", "histoire", "roman historique"}),
+    "romance": frozenset({"romance"}),
+}
+# issue 497: a game's genre — RomM's and its metadata providers' names (« shoot'em up / vertical »…)
+GAME_GENRES: dict[str, frozenset[str]] = {
+    "platform": frozenset({"platform", "platformer", "plateforme"}),
+    "shooter": frozenset({"shooter", "shoot'em up", "shoot 'em up"}),
+    "puzzle": frozenset({"puzzle", "thinking", "réflexion"}),
+    "sport": frozenset({"sport", "sports"}),
+    "racing": frozenset({"racing", "racing, driving", "course"}),
+    "fighting": frozenset({"fighting", "beat'em up", "hack and slash/beat 'em up", "combat"}),
+    "rpg": frozenset({"role-playing (rpg)", "role playing game", "rpg"}),
+    "strategy": frozenset({"strategy", "turn-based strategy (tbs)", "tactical", "stratégie"}),
+    "adventure": frozenset({"adventure", "aventure"}),
+    "board": frozenset({"casino", "card & board game", "board game", "mahjong"}),
+}
+
+
+def _matches(values: set[str], names: frozenset[str]) -> bool:
+    """A genre of the library matches a family when named as one of its names, or a kind of it
+    (« shoot'em up / vertical », « sports / football »)."""
+    return any(value in names or value.split(" /")[0] in names for value in values)
+
+
 COUNTRIES = ("FR", "GB", "JP", "IT", "ES", "DE", "KR", "BE")
 WATCHED = ("movie", "series")
 
@@ -84,6 +125,12 @@ class _Work:
     title: str
     year: int | None
     duration_s: float | None
+    platform: str | None = None
+
+
+def _platform(effective: object) -> str | None:
+    value = effective.get("platform") if isinstance(effective, dict) else None
+    return value if isinstance(value, str) and value else None
 
 
 def _duration(effective: object) -> float | None:
@@ -94,8 +141,10 @@ def _duration(effective: object) -> float | None:
         return None
 
 
-async def cells(database: Database, *, year: int) -> list[BingoCell]:
-    """Every square this library can fill: ``year`` is the month's (« a title out this year or last »)."""
+async def cells(database: Database, *, year: int, lately: datetime | None = None) -> list[BingoCell]:
+    """Every square this library can fill: ``year`` is the month's (« a title out this year or last »);
+    ``lately``: since when a kind must have been used on the portal for its reading, playing or listening
+    squares (issue 497; ``None``: ever)."""
     out: list[BingoCell] = []
     async with database.session() as session:
         genres: dict[str, int] = defaultdict(int)
@@ -147,24 +196,72 @@ async def cells(database: Database, *, year: int) -> list[BingoCell]:
         }
         if kinds.get("series"):
             out += [BingoCell("series:pilot", "series"), BingoCell("series:marathon", "series")]
-        for kind in ("book", "audiobook", "game"):
-            if kinds.get(kind):
-                out.append(BingoCell(f"kind:{kind}", "kind"))
-        comics = await session.scalar(
-            select(func.count(func.distinct(ObjectTag.object_id)))
-            .join(MediaObject, MediaObject.id == ObjectTag.object_id)
-            .where(
-                ObjectTag.tag_kind == "genre",
-                MediaObject.kind == "book",
-                func.lower(ObjectTag.value).in_(COMICS),
+        recent = Activity.started_at >= lately if lately is not None else Activity.id.is_not(None)
+        used = {
+            str(kind)
+            for (kind,) in await session.execute(
+                select(Activity.kind).where(Activity.counted.is_(True), recent).group_by(Activity.kind)
             )
-        )
-        if (comics or 0) >= ENOUGH:
-            out.append(BingoCell("kind:comics", "kind"))
-        for kind in ("live", "radio"):  # watched or listened to on this portal before
-            if await session.scalar(select(Activity.id).where(Activity.kind == kind).limit(1)) is not None:
-                out.append(BingoCell(f"kind:{kind}", "kind"))
+        }
+        out += await _reading(session, kinds, used)
+        out += await _playing(session, kinds, used)
+        out += [BingoCell(f"kind:{kind}", "listen") for kind in ("live", "radio") if kind in used]
     return [*out, BingoCell("review", "community"), BingoCell("later", "community")]
+
+
+async def _tagged(session: AsyncSession, kinds: tuple[str, ...]) -> dict[str, int]:
+    """How many active titles of these kinds carry each genre (lower-cased)."""
+    return {
+        str(value): int(count)
+        for value, count in await session.execute(
+            select(func.lower(ObjectTag.value), func.count(func.distinct(ObjectTag.object_id)))
+            .join(MediaObject, MediaObject.id == ObjectTag.object_id)
+            .where(ObjectTag.tag_kind == "genre", MediaObject.kind.in_(kinds), MediaObject.status == "active")
+            .group_by(func.lower(ObjectTag.value))
+        )
+    }
+
+
+def _families(tags: dict[str, int], families: dict[str, frozenset[str]]) -> list[str]:
+    """The families the library holds enough titles of."""
+    return [
+        key
+        for key, names in families.items()
+        if sum(count for value, count in tags.items() if _matches({value}, names)) >= ENOUGH
+    ]
+
+
+async def _reading(session: AsyncSession, kinds: dict[str, int], used: set[str]) -> list[BingoCell]:
+    """Books, audiobooks, comics and a book's genre — when someone reads or listens on the portal lately."""
+    read = [kind for kind in ("book", "audiobook") if kinds.get(kind) and kind in used]
+    out = [BingoCell(f"kind:{kind}", "read") for kind in read]
+    if not {"book", "audiobook"} & used:
+        return out
+    tags = await _tagged(session, ("book", "audiobook"))
+    if "book" in used and sum(tags.get(name, 0) for name in COMICS) >= ENOUGH:
+        out.append(BingoCell("kind:comics", "read"))
+    out += [BingoCell(f"read:{key}", "read") for key in _families(tags, BOOK_GENRES)]
+    return out
+
+
+async def _playing(session: AsyncSession, kinds: dict[str, int], used: set[str]) -> list[BingoCell]:
+    """Any game, a console the library holds many games of, a game's genre — when someone plays lately."""
+    if not kinds.get("game") or "game" not in used:
+        return []
+    out = [BingoCell("kind:game", "play")]
+    genres = _families(await _tagged(session, ("game",)), GAME_GENRES)
+    out += [BingoCell(f"play:{key}", "play") for key in genres]
+    platform = MediaObject.effective["platform"].astext
+    consoles = await session.execute(
+        select(platform, func.count())
+        .where(MediaObject.kind == "game", MediaObject.status == "active", platform.is_not(None))
+        .group_by(platform)
+        .having(func.count() >= ENOUGH)
+        .order_by(func.count().desc(), platform)
+        .limit(MAX_PLATFORMS)
+    )
+    out += [BingoCell(f"platform:{name}", "play") for name, _ in consoles if name]
+    return out
 
 
 async def ticks(
@@ -197,7 +294,7 @@ async def ticks(
         )
         ids |= {r.object_id for r in written}
         works = {
-            row.id: _Work(row.kind, row.title, row.year, _duration(row.effective))
+            row.id: _Work(row.kind, row.title, row.year, _duration(row.effective), _platform(row.effective))
             for row in (await session.execute(select(MediaObject).where(MediaObject.id.in_(ids)))).scalars()
         }
         genres: dict[UUID, set[str]] = defaultdict(set)
@@ -260,10 +357,25 @@ async def ticks(
                 tick(member, f"kind:{play.kind}", None, play.title, at)
             continue
         if play.kind in ("book", "audiobook", "game"):
-            if play.watched_s >= SITTING_S:
-                tick(member, f"kind:{play.kind}", work_id, title, at)
-                if play.kind == "book" and work_id and genres[work_id] & COMICS:
-                    tick(member, "kind:comics", work_id, title, at)
+            # issue 497: reading and playing add up over the month, square by square
+            tagged = genres[work_id] if work_id else set()
+            if play.kind == "game":
+                keys = ["kind:game"]
+                keys += [f"play:{k}" for k, names in GAME_GENRES.items() if _matches(tagged, names)]
+                if work and work.platform:
+                    keys.append(f"platform:{work.platform}")
+                enough = PLAYED_S
+            else:
+                keys = [f"kind:{play.kind}"]
+                keys += [f"read:{k}" for k, names in BOOK_GENRES.items() if tagged & names]
+                if play.kind == "book" and tagged & COMICS:
+                    keys.append("kind:comics")
+                enough = READ_S
+            for key in keys:
+                if key in wanted:
+                    timed[(member, key)] += play.watched_s
+                    if timed[(member, key)] >= enough:
+                        tick(member, key, work_id, title, at)
             continue
         if play.kind not in ("movie", "episode") or (play.progress or 0.0) < FINISHED or work_id is None:
             continue

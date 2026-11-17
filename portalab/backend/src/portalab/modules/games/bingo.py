@@ -8,7 +8,7 @@ or a booster. A new card each month, in the economy's time zone."""
 
 import random
 from collections.abc import Mapping, Sequence
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any, cast
 from uuid import UUID
 
@@ -26,16 +26,20 @@ from portalab.modules.games.models import BingoCard, BingoDone
 
 GAME = "bingo"
 CARD = "card"
-# what a 4 x 4 card is made of, group by group; the square left goes to any group
+# what a 4 x 4 card is made of, group by group, the media balanced (issue 497): watching (genre, era,
+# country, series), reading, playing, live TV or the radio, the community; the squares left (2 on a full
+# card) go to any group. In this order a 3 x 3 card keeps the first ones.
 QUOTAS = (
-    ("genre", 5),
-    ("era", 2),
-    ("country", 2),
-    ("length", 1),
-    ("series", 1),
-    ("kind", 3),
+    ("genre", 3),
+    ("read", 3),
+    ("play", 3),
+    ("era", 1),
+    ("listen", 1),
     ("community", 1),
+    ("country", 1),
+    ("series", 1),
 )
+LATELY = timedelta(days=90)  # a reading, playing or listening square: that kind used on the portal lately
 
 
 class NoBingo(Unavailable):
@@ -54,9 +58,12 @@ def lines(size: int) -> list[tuple[str, tuple[int, ...]]]:
     return rows + cols + diagonals
 
 
-def draw(cells: Sequence[BingoCell], month: date) -> list[dict[str, str]]:
-    """The month's card from the squares the library can fill — the same whoever draws it first."""
+def draw(cells: Sequence[BingoCell], month: date, previous: Sequence[str] = ()) -> list[dict[str, str]]:
+    """The month's card from the squares the library can fill — the same whoever draws it first. Issue 497:
+    the squares of the month before come last in their group, so the card changes from one month to the next
+    (unless the library has nothing else)."""
     rng = random.Random(f"bingo:{month.isoformat()}")  # noqa: S311 — a game's draw, not a secret
+    seen = set(previous)
     size = 4 if len(cells) >= 16 else 3 if len(cells) >= 9 else 0
     if not size:
         return []
@@ -65,14 +72,28 @@ def draw(cells: Sequence[BingoCell], month: date) -> list[dict[str, str]]:
         groups.setdefault(cell.group, []).append(cell)
     for members in groups.values():
         rng.shuffle(members)
+        members.sort(key=lambda c: c.key in seen)  # stable: the fresh ones first, in their drawn order
     chosen: list[BingoCell] = []
     scale = size * size / 16
     for group, quota in QUOTAS:
         chosen += groups.get(group, [])[: max(1, round(quota * scale))]
     chosen = chosen[: size * size]
-    rest = [c for c in sorted(cells, key=lambda c: c.key) if c not in chosen]
-    rng.shuffle(rest)
-    chosen += rest[: size * size - len(chosen)]
+    # the squares left: one family after another (a family with many squares — the consoles — does not take
+    # them all), each family's fresh squares first
+    left: dict[str, list[BingoCell]] = {}
+    for cell in sorted(cells, key=lambda c: c.key):
+        if cell not in chosen:
+            left.setdefault(cell.group, []).append(cell)
+    for members in left.values():
+        rng.shuffle(members)
+        members.sort(key=lambda c: c.key in seen)
+    families = sorted(left)
+    rng.shuffle(families)
+    families.sort(key=lambda g: all(c.key in seen for c in left[g]))  # a family with fresh squares first
+    while len(chosen) < size * size and any(left.values()):
+        for group in families:
+            if left[group] and len(chosen) < size * size:
+                chosen.append(left[group].pop(0))
     rng.shuffle(chosen)
     return [{"key": c.key, "group": c.group} for c in chosen]
 
@@ -128,7 +149,12 @@ class Bingo:
         async with self.database.session() as session:
             card = await session.get(BingoCard, first)
         if card is None:
-            cells = draw(await self._sources().bingo_cells(year=first.year), first)
+            before = date(first.year - (first.month == 1), (first.month - 2) % 12 + 1, 1)
+            async with self.database.session() as session:
+                last = await session.get(BingoCard, before)
+            previous = [str(cell.get("key")) for cell in (last.cells if last else [])]
+            offered = await self._sources().bingo_cells(year=first.year, lately=start - LATELY)
+            cells = draw(offered, first, previous)
             if not cells:
                 raise NoBingo("Not enough titles of different kinds for a bingo card.")
             async with self.database.unit_of_work() as uow:

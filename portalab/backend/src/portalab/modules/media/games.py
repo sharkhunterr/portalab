@@ -161,9 +161,10 @@ class MediaGameSources:
                 out[who] = max(out.get(who, 0.0), float(share))
         return out
 
-    async def bingo_cells(self, *, year: int) -> Sequence[BingoCell]:
-        """Issue 356: the squares this library can fill (``year``: the month's)."""
-        return await bingo.cells(self.database, year=year)
+    async def bingo_cells(self, *, year: int, lately: datetime | None = None) -> Sequence[BingoCell]:
+        """Issue 356: the squares this library can fill (``year``: the month's; issue 497: ``lately``, since
+        when a kind must have been used for its reading, playing or listening squares)."""
+        return await bingo.cells(self.database, year=year, lately=lately)
 
     async def bingo_ticks(
         self, keys: Sequence[str], since: datetime, until: datetime, *, user: UUID | None = None

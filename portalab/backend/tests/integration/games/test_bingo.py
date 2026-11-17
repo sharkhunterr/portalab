@@ -23,7 +23,13 @@ CELLS = [
     *(BingoCell(f"country:{c}", "country") for c in ("FR", "JP", "GB")),
     BingoCell("length:long", "length"),
     BingoCell("series:pilot", "series"),
-    *(BingoCell(f"kind:{k}", "kind") for k in ("book", "audiobook", "game", "live")),
+    *(BingoCell(key, "read") for key in ("kind:book", "kind:audiobook", "kind:comics", "read:fantasy")),
+    *(
+        BingoCell(key, "play")
+        for key in ("kind:game", "play:shooter", "platform:Game Boy", "platform:Nintendo 64")
+    ),
+    BingoCell("kind:live", "listen"),
+    BingoCell("kind:radio", "listen"),
     BingoCell("review", "community"),
     BingoCell("later", "community"),
 ]
@@ -35,11 +41,27 @@ def test_a_month_s_card_is_drawn_the_same_for_everyone() -> None:
     assert card == draw(list(reversed(CELLS)), month) and len(card) == 16
     assert len({c["key"] for c in card}) == 16
     groups = [c["group"] for c in card]
-    assert groups.count("genre") >= 5 and groups.count("community") >= 1 and groups.count("kind") >= 3
+    # issue 497: the media balanced — watching no longer takes most of the card
+    assert groups.count("genre") >= 3 and groups.count("read") >= 3 and groups.count("play") >= 3
+    assert groups.count("listen") >= 1 and groups.count("community") >= 1 and groups.count("era") >= 1
+    assert sum(groups.count(g) for g in ("genre", "era", "country", "length", "series")) <= 8
     assert draw(CELLS, date(2026, 12, 1)) != card  # a new card each month
     assert len(draw(CELLS[:10], month)) == 9  # a small library: 3 x 3
     assert draw(CELLS[:8], month) == []
     assert len(lines(4)) == 10 and lines(3)[-1] == ("diag:1", (2, 4, 6))
+
+
+def test_a_new_month_draws_other_squares_than_the_month_before() -> None:
+    """Issue 497: the squares of the month before come last in the draw — the card changes every month. With
+    26 squares and 16 a card, two cards share 6 at least: the draw stays at that floor, or one above it."""
+    floor = 16 + 16 - len(CELLS)
+    for month in range(1, 13):
+        before = date(2026, month, 1)
+        after = date(2026 + (month == 12), month % 12 + 1, 1)
+        kept = {c["key"] for c in draw(CELLS, before)}
+        fresh = {c["key"] for c in draw(CELLS, after, sorted(kept))}
+        blind = {c["key"] for c in draw(CELLS, after)}
+        assert len(fresh & kept) <= floor + 1 < len(blind & kept) + 1, month
 
 
 def test_the_full_card_s_booster_is_its_genre_else_its_era() -> None:
@@ -56,7 +78,7 @@ async def test_the_month_s_bingo(database: Database) -> None:
     module, games, events, _ = _module(database, FixedClock(NOW))
     ticked: dict[UUID, dict[str, BingoTick]] = {}
 
-    async def cells(*, year: int) -> list[BingoCell]:
+    async def cells(*, year: int, lately: datetime | None = None) -> list[BingoCell]:
         assert year == NOW.year
         return CELLS
 
@@ -112,7 +134,7 @@ async def test_no_bingo_without_enough_squares_or_when_switched_off(database: Da
     (zoe,) = await _users(database, "zoe")
     module, games, _, _ = _module(database, FixedClock(datetime(2026, 9, 3, tzinfo=UTC)))
 
-    async def cells(*, year: int) -> list[BingoCell]:
+    async def cells(*, year: int, lately: datetime | None = None) -> list[BingoCell]:
         return CELLS[:5]
 
     games.bingo_cells = cells  # type: ignore[attr-defined]

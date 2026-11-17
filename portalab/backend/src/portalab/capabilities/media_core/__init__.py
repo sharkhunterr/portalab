@@ -387,8 +387,9 @@ class TechnicalSheets(Protocol):
 @dataclass(frozen=True, slots=True)
 class BingoCell:
     """Issue 356: a square a month's media bingo may hold — its ``key`` (``genre:horror``, ``era:1980``,
-    ``country:JP``, ``kind:audiobook``, ``review``…) and its ``group`` (genre, era, country, length, series,
-    kind, community), the library having what it takes to tick it."""
+    ``country:JP``, ``kind:audiobook``, ``read:fantasy``, ``platform:Game Boy``, ``review``…) and its
+    ``group`` (genre, era, country, length, series, read, play, listen, community — ``kind`` on cards drawn
+    before issue 497), the library having what it takes to tick it."""
 
     key: str
     group: str
@@ -432,9 +433,10 @@ class GameSources(Protocol):
         """The works a member watched, read or played, the latest first (what their services tell)."""
         ...
 
-    async def bingo_cells(self, *, year: int) -> Sequence[BingoCell]:
+    async def bingo_cells(self, *, year: int, lately: datetime | None = None) -> Sequence[BingoCell]:
         """Issue 356: every square this library can fill (enough titles of the genre, the era, the country…);
-        ``year`` is the month's (« a title out this year or last »)."""
+        ``year`` is the month's (« a title out this year or last »); ``lately``: since when a kind must have
+        been used on the portal for its reading, playing or listening squares (issue 497)."""
         ...
 
     async def bingo_ticks(
