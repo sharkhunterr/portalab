@@ -3,6 +3,39 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.7.0](https://github.com/sharkhunterr/portalab/compare/v1.6.0...v1.7.0) (2026-11-17)
+
+
+### Features
+
+* **household:** a master holds one profile to other countries' age ratings too, by default as the portal ([de0985d](https://github.com/sharkhunterr/portalab/commit/de0985d13e183845283b40605a92a4e45bd7563f))
+* **household:** request shelves rated and filled for a profile, one age limit at a time, the portal's policy told ([d1c93b2](https://github.com/sharkhunterr/portalab/commit/d1c93b281bced240618304a486834f0ea3198434))
+* **household:** strictest-of-every-country reading, banned TMDB keywords, average recommended ([7cc2353](https://github.com/sharkhunterr/portalab/commit/7cc23535e9d4e439d5be79765e1a2ccd33249de5))
+* **household:** warnings to avoid and the average reading per profile, a clearer classification section ([85df0fb](https://github.com/sharkhunterr/portalab/commit/85df0fbddb1a1155b869de07a002fcbe6549abf6))
+* **media:** a game's PEGI rating as its mark in its production block ([b4ed81c](https://github.com/sharkhunterr/portalab/commit/b4ed81c9207b90cac0316fac3c7548f294b594a7))
+* **media:** a title's classification in full — every release's rating, the CNC's decision, the order the administrator chooses ([d79607c](https://github.com/sharkhunterr/portalab/commit/d79607c0117fb2df9bac21015d190360f3278413))
+* **media:** activity chart by kind or by person for the household and the server ([8a9bb49](https://github.com/sharkhunterr/portalab/commit/8a9bb49efd407cdfc15e18ad16a9f1b95525abc3))
+* **media:** classification block shows the portal's country, folds the others ([444e471](https://github.com/sharkhunterr/portalab/commit/444e4719494a48e9f43c11b1d7e84fbd267a163e))
+* **media:** the administrator picks other countries whose ratings count too — the strictest wins ([5b5615e](https://github.com/sharkhunterr/portalab/commit/5b5615eaffef5c2af0221b975bb8a536dd3f2c87))
+* **media:** the official PEGI mark on a game's page ([0a4b111](https://github.com/sharkhunterr/portalab/commit/0a4b11152fcdad85b78b92d74f7d5a2d6368f188))
+* **media:** trailers, featurettes and picture galleries on a title's page ([c6621a2](https://github.com/sharkhunterr/portalab/commit/c6621a2918c63bd792c29bfe107288c0a2a5af57))
+* **statistics:** My media look for Community and My activity, member-attributed personal figures, drop duplicates ([e4d840d](https://github.com/sharkhunterr/portalab/commit/e4d840da7496f1099f36c43788ee4ce4c4a0ff5e))
+* **statistics:** previous period drawn in grey on every chart ([5c85f36](https://github.com/sharkhunterr/portalab/commit/5c85f364535f50a62365b57f17e0e982c20c93d0))
+
+
+### Bug Fixes
+
+* **a11y:** touch targets, contrast and the drawer button's state, found by the nightly matrix ([143f51a](https://github.com/sharkhunterr/portalab/commit/143f51a1334358f4f50f27d6136e24070fbfcabb))
+* **charts:** series told apart under every palette — picked from the accent, not the second accent ([c61038b](https://github.com/sharkhunterr/portalab/commit/c61038b55984bba44137c6c036ba0dc2a0f26d98))
+* **dashboard:** a widget loading, unavailable or failed shows it in the middle of its block, not pressed into its corner ([7c05817](https://github.com/sharkhunterr/portalab/commit/7c05817eb365f709a9860f2a18ec4ab8ad71c567))
+* **media:** a film not out yet stays « waiting for its release » while Radarr already searches it ([6ee8ab5](https://github.com/sharkhunterr/portalab/commit/6ee8ab5d0f322d932eff3248ac32752292332172))
+* **media:** a game's page laid out like a film's, its details above its videos and pictures ([aee5f27](https://github.com/sharkhunterr/portalab/commit/aee5f270715c19d3e7d707f0d00d30a360e50003))
+* **media:** a household profile's shelves fill past the titles it hides; « Recently requested » on the media home ([16ca7f4](https://github.com/sharkhunterr/portalab/commit/16ca7f4fe4167f38fc81ff548889d81d110891ce))
+* **media:** the classification a block among a film's details, after its production; no ratings in the title's head ([19256d8](https://github.com/sharkhunterr/portalab/commit/19256d874fef44e99695bc26d68282389ab78176))
+* **retro:** a save's picture is the game's own frame, not half the stage ([5b3634c](https://github.com/sharkhunterr/portalab/commit/5b3634c3dbc270f2ea681cf66cbb7bd00d3241a5))
+* **search:** offer sources and destinations without auditing refusals, probe as the system ([e515b1e](https://github.com/sharkhunterr/portalab/commit/e515b1ea2018287e138edbfbcb998da98d798c17))
+* **statistics:** honest community trends — distinct achievements, manual XP apart, no comparison before coverage, builtin pack fixes run ([15b266a](https://github.com/sharkhunterr/portalab/commit/15b266ade0adbd0bef5e49226a7e0d0ae54e4e0c))
+
 ## [1.6.0](https://github.com/sharkhunterr/portalab/compare/v1.5.0...v1.6.0) (2026-11-15)
 
 
