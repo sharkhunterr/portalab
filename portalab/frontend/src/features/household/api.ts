@@ -73,6 +73,19 @@ export function useRatingPolicy() {
   });
 }
 
+/** Issue 478: the library's metadata keywords (TMDB's) containing what a master types — 2 letters at least. */
+export function useKeywordSuggestions(typed: string) {
+  const q = typed.trim();
+  return useQuery({
+    queryKey: ["household", "keywords", q.toLowerCase()],
+    enabled: q.length >= 2,
+    staleTime: 60_000,
+    queryFn: async () =>
+      ((await api.GET("/api/v1/media/keywords", { params: { query: { q } } })).data?.keywords ??
+        []) as string[],
+  });
+}
+
 function useRefresh() {
   const client = useQueryClient();
   return () => {

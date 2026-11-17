@@ -182,7 +182,8 @@ class PagedDiscovery:
 
 
 class Briefs:
-    """What TMDB says of each film: one in five « tous publics », the others -16 (one with a warning)."""
+    """What TMDB says of each film: one in five « tous publics », the others -16 (one with a warning, one
+    about a serial killer)."""
 
     async def brief(self, kind: str, ids: dict[str, str], title: str, year: int | None) -> dict[str, Any]:
         n = int(ids["tmdb"]) % 100
@@ -190,7 +191,8 @@ class Briefs:
         releases = [{"country": "FR", "type": "cinema", "certification": "TP" if family else "16"}]
         if n == 5:
             releases[0]["descriptors"] = ["violence"]
-        return {"poster": None, "rated": {"releases": releases, "genres": []}}
+        keywords = ["serial killer", "investigation"] if n == 10 else ["friendship"]
+        return {"poster": None, "rated": {"releases": releases, "genres": [], "keywords": keywords}}
 
 
 async def test_a_childs_request_shelf_is_rated_and_fills_from_the_next_pages(
@@ -210,7 +212,7 @@ async def test_a_childs_request_shelf_is_rated_and_fills_from_the_next_pages(
         Principal(user_id=master),
         lea,
         restrictions=RestrictionSettings(
-            max_age=12, allow_unrated=False, genres=[], avoid_warnings=["violence"]
+            max_age=12, allow_unrated=False, genres=[], avoid_warnings=["violence"], keywords=["Killer"]
         ),
     )
     shelf = (await client.get("/api/v1/media/discover/shelves/popular_movies")).json()["items"]
@@ -221,7 +223,7 @@ async def test_a_childs_request_shelf_is_rated_and_fills_from_the_next_pages(
     shelf = (await client.get("/api/v1/media/discover/shelves/popular_movies")).json()["items"]
     titles = [i["title"] for i in shelf]
     # rated on TMDB instead of left out as unrated: the « tous publics » ones of five pages, but « Film n-5 »
-    # (its violence kept away)
-    assert titles and all(int(t.split("-")[1]) % 5 == 0 and not t.endswith("-5") for t in titles)
+    # (its violence kept away) and « Film n-10 » (its serial killer: a keyword kept away)
+    assert titles and all(int(t.split("-")[1]) % 5 == 0 and not t.endswith(("-5", "-10")) for t in titles)
     assert discovery.pages == [2, 3, 4, 5]  # the next pages, looked for to fill the shelf
-    assert len(titles) == 3 * 5
+    assert len(titles) == 2 * 5

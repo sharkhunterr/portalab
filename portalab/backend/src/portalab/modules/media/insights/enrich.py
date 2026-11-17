@@ -286,6 +286,7 @@ class MetadataEnricher:
                         "certifications": dict(record.certifications),
                         "releases": [dict(release) for release in record.releases],
                         "genres": list(record.genres),
+                        "keywords": list(record.keywords),
                         "release_date": record.release_date,
                         "title": record.title,
                         "original_title": getattr(record, "original_title", None),

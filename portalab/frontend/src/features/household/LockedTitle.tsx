@@ -11,7 +11,7 @@ import "./household.css";
 
 /** The problem code of a title a household profile's age rating keeps from it (spec 032). */
 export const RESTRICTED = "household.restricted";
-const REASONS = ["age", "unrated", "genre", "type", "title", "warning"];
+const REASONS = ["age", "unrated", "genre", "keyword", "type", "title", "warning"];
 
 /** Issue 478: the warnings a title is kept for (reason « warning »), named. */
 function Warnings({ warnings }: { warnings: unknown }) {

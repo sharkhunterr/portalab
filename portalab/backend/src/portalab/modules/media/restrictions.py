@@ -17,14 +17,21 @@ from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Uuid, all_, and_, any_, delete, func, literal, select
+from sqlalchemy import Uuid, all_, and_, any_, delete, func, literal, literal_column, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import aliased
 
 from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.household import CAPABILITY as HOUSEHOLD
-from portalab.capabilities.household import Household, Restrictions, age_of, genre_key, strictest_age
+from portalab.capabilities.household import (
+    Household,
+    Restrictions,
+    age_of,
+    genre_key,
+    keyword_hit,
+    strictest_age,
+)
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
@@ -52,6 +59,7 @@ ASKABLE = (
     "age",
     "unrated",
     "genre",
+    "keyword",
     "warning",
 )  # what an access request may open (not the master's own choices)
 IDS = ("id", "object_id", "media_id", "work_id")
@@ -253,11 +261,12 @@ def title_age(
     438 rated it (``local_age``). The other countries the administrator chose (``also``) count too: the
     strictest of them wins (Resident Evil, -12 in France, R in the United States: 17) — a country that does
     not rate the title does not count. A household profile may be read by the average of every country's
-    rating instead (``blend="average"``, its master's choice), rounded to the nearest year."""
-    if blend == "average":
+    rating instead (``blend="average"``, its master's choice), rounded to the nearest year, or by the
+    strictest of every country's (``blend="highest"``)."""
+    if blend in ("average", "highest"):
         ages = list(_ages_by_country(data, server, country, order).values())
         if ages:
-            return int(sum(ages) / len(ages) + 0.5)
+            return max(ages) if blend == "highest" else int(sum(ages) / len(ages) + 0.5)
     own = country_age(data, server, country, order) if country else None
     base = own if own is not None else local_age(labelled(data, server), country)
     found = [base] if base is not None else []
@@ -426,6 +435,8 @@ class TitleGate:
                     not restrictions.allows_age(title_age(data, server, country, order, also, blend))
                     # issue 478: a warning its master keeps it from, whatever its age
                     or bool(avoid and avoid & self._warnings(data, cnc))
+                    # issue 478: or one of the metadata's keywords it is kept from
+                    or keyword_hit((data or {}).get("keywords"), restrictions.keywords)
                 )
             }
             if restrictions.genres:  # kept out whatever their rating (horror…)
@@ -788,8 +799,8 @@ class TitleGate:
     async def _rate_outside(self, restrictions: Restrictions, items: list[dict[str, Any]]) -> dict[int, bool]:
         """Issue 478: titles outside the library (the request service's shelves and search) rated as the
         library's are — their ratings looked up once on the metadata provider (TMDB), then held to the
-        profile's age, countries, reading and warnings, and its kept-out genres. ``id(item)`` → kept; a title
-        the provider does not know is left out of the answer (unrated: as before)."""
+        profile's age, countries, reading and warnings, and its kept-out genres and keywords. ``id(item)`` →
+        kept; a title the provider does not know is left out of the answer (unrated: as before)."""
         briefs = self.briefs
         if briefs is None or not items:
             return {}
@@ -820,10 +831,36 @@ class TitleGate:
             kept = not restrictions.allows_age(age) or bool(avoid and avoid & self._warnings(data, cnc))
             if not kept and restrictions.genres:
                 kept = any(genre_key(str(g)) in restrictions.genres for g in data.get("genres") or [])
+            if not kept and restrictions.keywords:
+                kept = keyword_hit(data.get("keywords"), restrictions.keywords)
             return id(item), kept
 
         rated = await asyncio.gather(*(rate(item) for item in items))
         return {key: kept for key, kept in rated if kept is not None}
+
+    async def keywords(self, typed: str, limit: int = 20) -> list[str]:
+        """Issue 478: the library's metadata keywords containing what a master types (« drug » → « drug
+        abuse », « drug addiction »…), the most used first — to keep a profile from them."""
+        wanted = typed.strip().casefold()[:60]
+        if len(wanted) < 2:
+            return []
+        item = func.jsonb_array_elements_text(ObjectMetadata.data["keywords"]).alias("item")
+        value: Any = literal_column("item")
+        async with self.database.session() as session:
+            rows = await session.execute(
+                select(func.min(value), func.count())
+                .select_from(ObjectMetadata)
+                .join(item, literal(True))
+                .where(
+                    ObjectMetadata.status == "found",
+                    func.jsonb_typeof(ObjectMetadata.data["keywords"]) == "array",
+                    func.lower(value).contains(wanted, autoescape=True),
+                )
+                .group_by(func.lower(value))
+                .order_by(func.count().desc(), func.min(value))
+                .limit(max(1, min(limit, 50)))
+            )
+            return [str(word) for word, _ in rows.all()]
 
     def forget(self) -> None:
         self._cache.clear()
@@ -877,7 +914,8 @@ class TitleGate:
         }
 
     async def _reason(self, object_id: UUID, restrictions: Restrictions | None, age: int | None) -> str:
-        """Why a title is kept from a profile: ``title``, ``type``, ``genre``, ``unrated`` or ``age``."""
+        """Why a title is kept from a profile: ``title``, ``type``, ``genre``, ``keyword``, ``unrated`` or
+        ``age``."""
         if restrictions is None:
             return "age"
         async with self.database.session() as session:
@@ -907,6 +945,15 @@ class TitleGate:
                 )
                 if any(genre_key(str(tag)) in restrictions.genres for tag in tags):
                     return "genre"
+            if restrictions.keywords:  # issue 478: one of its keywords kept from the profile
+                found_keywords = await session.scalars(
+                    select(ObjectMetadata.data["keywords"]).where(
+                        ObjectMetadata.object_id.in_([found for found, _ in chain]),
+                        ObjectMetadata.status == "found",
+                    )
+                )
+                if any(keyword_hit(words, restrictions.keywords) for words in found_keywords):
+                    return "keyword"
         return "unrated" if age is None else "age"
 
     async def _rating(self, object_id: UUID) -> str | None:
@@ -1023,11 +1070,18 @@ class TitleGate:
                 }
         if blend == "average":  # issue 478: its master reads it by the average of every country's rating
             basis, abroad = "average", None
+        elif blend == "highest":  # or by the strictest of every country's: the country that sets it
+            ages = _ages_by_country(data, server, country, await self.rating_order())
+            if ages:
+                top = max(ages.values())
+                local = (country or "").upper()
+                basis = "highest"
+                abroad = local if ages.get(local) == top else next(c for c, a in ages.items() if a == top)
         warnings = warnings_of(data)
         if cnc is not None and cnc["warning"]:
             warnings.add("cnc")
         return {
-            "basis": basis if listed or abroad or blend == "average" else None,
+            "basis": basis if listed or abroad or blend in ("average", "highest") else None,
             "basis_country": abroad,
             "releases": listed,
             "cnc": cnc,

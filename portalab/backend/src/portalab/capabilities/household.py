@@ -10,6 +10,7 @@ Nothing here changes a connected service."""
 
 import hashlib
 import re
+import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time
@@ -56,6 +57,26 @@ def genre_key(value: str) -> str:
     ``science fiction``)."""
     known = genre_of(value)
     return known if known is not None else " ".join(_WORD.findall(value.casefold()))[:60]
+
+
+def keyword_key(value: str) -> str:
+    """Issue 478: a keyword a profile is kept from, as the metadata provider's keywords are matched — its
+    words, lowercased, accents folded (« Drogue » → ``drogue``, « Serial-Killer » → ``serial killer``)."""
+    folded = unicodedata.normalize("NFKD", value.casefold())
+    return " ".join(_WORD.findall("".join(c for c in folded if not unicodedata.combining(c))))[:60]
+
+
+def keyword_hit(keywords: Any, banned: frozenset[str]) -> bool:
+    """Issue 478: whether one of a title's keywords (TMDB's: « serial killer », « drug abuse »…) says one of
+    the banned ones — the keyword itself or its whole words (« drug » finds « drug abuse », not
+    « drugstore »)."""
+    if not banned or not isinstance(keywords, (list, tuple)):
+        return False
+    for keyword in keywords:
+        words = f" {keyword_key(str(keyword))} "
+        if any(f" {ban} " in words for ban in banned):
+            return True
+    return False
 
 
 def genre_of(tag: str) -> str | None:
@@ -125,9 +146,11 @@ class Restrictions:
     # master's choice; ``None``: as the portal's administrator set it
     rating_countries: tuple[str, ...] | None = None
     # issue 478: the warnings its master keeps it from (the CNC's « avertissement », violence, fear…) and
-    # how its age is read — the strictest of its countries' ratings, or the average of every country's
+    # how its age is read — the strictest of its countries' ratings, the strictest or the average of every
+    # country's
     avoid_warnings: frozenset[str] = frozenset()
     rating_blend: str = "strictest"
+    keywords: frozenset[str] = frozenset()  # issue 478: the metadata keywords keeping a title from it
 
     def slots_on(self, weekday: int) -> tuple[Slot, ...]:
         return tuple(sorted((s for s in self.slots if s.day == weekday), key=lambda s: s.start))
@@ -170,7 +193,7 @@ class Restrictions:
         return (
             self.max_age is not None
             or not self.allow_unrated
-            or bool(self.genres or self.types or self.titles or self.avoid_warnings)
+            or bool(self.genres or self.types or self.titles or self.avoid_warnings or self.keywords)
         )
 
     @property

@@ -1101,6 +1101,21 @@ async def rating_policy(principal: Reader, module: Module) -> RatingPolicyOut:
     )
 
 
+class KeywordsOut(BaseModel):
+    keywords: list[str]  # issue 478: the library's metadata keywords matching what was typed
+
+
+@router.get("/media/keywords", response_model=KeywordsOut)
+async def media_keywords(
+    principal: Reader, module: Module, q: Annotated[str, Query(max_length=60)] = ""
+) -> KeywordsOut:
+    """Issue 478: the metadata keywords a master may keep a profile from (TMDB's, in the library) — none for
+    a household profile (the keywords of titles kept from it are not its to read)."""
+    if principal.profile_of is not None:
+        return KeywordsOut(keywords=[])
+    return KeywordsOut(keywords=await module.gate.keywords(q))
+
+
 @router.get("/media/ages", response_model=MediaAgesOut)
 async def media_ages(
     principal: Reader, module: Module, ids: Annotated[str, Query(max_length=4000)] = ""

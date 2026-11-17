@@ -1505,6 +1505,7 @@
   "widget.upcoming.description": "Films and episodes expected in the coming weeks.",
   "widget.upcoming.title": "Upcoming releases",
   "ratings.warnings": "Warnings",
+  "ratings.basis.highest": "following the strictest of every country ({country})",
   "ratings.basis.average": "following the average of every country's rating",
   "ratings.warning.cnc": "CNC warning",
   "ratings.warning.violence": "Violence",

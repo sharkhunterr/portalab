@@ -10187,6 +10187,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/media/keywords": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Media Keywords
+         * @description Issue 478: the metadata keywords a master may keep a profile from (TMDB's, in the library) — none for
+         *     a household profile (the keywords of titles kept from it are not its to read).
+         */
+        get: operations["media_keywords_api_v1_media_keywords_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/listen/{ticket}/position": {
         parameters: {
             query?: never;
@@ -17100,6 +17121,11 @@ export interface components {
              */
             title: string;
         };
+        /** KeywordsOut */
+        KeywordsOut: {
+            /** Keywords */
+            keywords: string[];
+        };
         /** Layout */
         Layout: {
             /** Group Order */
@@ -20401,6 +20427,8 @@ export interface components {
             hours_from?: string | null;
             /** Hours To */
             hours_to?: string | null;
+            /** Keywords */
+            keywords?: string[];
             /** Max Age */
             max_age?: number | null;
             /**
@@ -20414,7 +20442,7 @@ export interface components {
              * @default strictest
              * @enum {string}
              */
-            rating_blend: "strictest" | "average";
+            rating_blend: "strictest" | "highest" | "average";
             /** Rating Countries */
             rating_countries?: ("FR" | "DE" | "GB" | "US" | "ES" | "IT" | "BE" | "CH" | "NL" | "CA" | "AU")[] | null;
             /**
@@ -42142,6 +42170,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    media_keywords_api_v1_media_keywords_get: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordsOut"];
                 };
             };
             /** @description Validation Error */

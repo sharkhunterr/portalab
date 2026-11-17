@@ -17,6 +17,7 @@ from portalab.capabilities.household import (
     Restrictions,
     Slot,
     genre_key,
+    keyword_key,
 )
 from portalab.core.errors import BadRequest, Conflict, Forbidden
 
@@ -25,6 +26,7 @@ HOUR = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d")
 END = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d|24:00")
 MAX_SLOTS = 42  # six spans a day
 MAX_GENRES = 40
+MAX_KEYWORDS = 60
 DAY_MINUTES = 24 * 60
 COLOR = re.compile(r"#[0-9a-fA-F]{6}")
 COLORS = ("#6366f1", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#8b5cf6", "#ef4444", "#84cc16")
@@ -98,9 +100,18 @@ class RestrictionSettings(BaseModel):
     # administrator set it (none by default), a list: its master's own choice (empty: the portal's country)
     rating_countries: list[RatingCountry] | None = None
     # issue 478: titles carrying one of these warnings are kept from it; its age read as the strictest of
-    # its countries' ratings, or the average of every country's
+    # its countries' ratings, the strictest of every country's, or the average of every country's
     avoid_warnings: list[WarningKind] = Field(default_factory=list, max_length=9)
-    rating_blend: Literal["strictest", "average"] = "strictest"
+    rating_blend: Literal["strictest", "highest", "average"] = "strictest"
+    # issue 478: the metadata provider's keywords (TMDB: « serial killer », « drug abuse »…) that keep a
+    # title from it whatever its rating
+    keywords: list[str] = Field(default_factory=list, max_length=MAX_KEYWORDS)
+
+    @field_validator("keywords")
+    @classmethod
+    def _keywords(cls, value: list[str]) -> list[str]:
+        """Kept as their words, lowercased, accents folded — each once."""
+        return sorted({key for key in (keyword_key(word) for word in value) if key})
 
     @field_validator("slots")
     @classmethod
@@ -216,6 +227,7 @@ class RestrictionSettings(BaseModel):
             tuple(self.rating_countries) if self.rating_countries is not None else None,
             frozenset(self.avoid_warnings),
             self.rating_blend,
+            frozenset(self.keywords),
         )
 
 

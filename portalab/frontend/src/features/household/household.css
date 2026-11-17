@@ -1789,3 +1789,15 @@ button.screen-cal__max:focus-visible {
   grid-column: 1 / -1;
   margin: 0;
 }
+/* issue 478: the reading the portal recommends, told on its card */
+.household-editor__recommended {
+  display: inline-block;
+  margin-inline-start: var(--space-2);
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  vertical-align: middle;
+}

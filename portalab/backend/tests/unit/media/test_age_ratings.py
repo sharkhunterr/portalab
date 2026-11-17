@@ -135,6 +135,39 @@ def test_the_average_of_every_country() -> None:
     assert title_age({}, None, "FR", blend="average") is None  # nothing rated: unrated still
 
 
+def test_the_strictest_of_every_country() -> None:
+    data = {
+        "releases": [
+            {"country": "FR", "type": "tv", "certification": "12"},
+            {"country": "US", "type": "cinema", "certification": "R"},
+            {"country": "GB", "type": "cinema", "certification": "15"},
+        ]
+    }
+    assert (
+        title_age(data, None, "FR", blend="highest") == 17
+    )  # the United States' R, whatever the portal adds
+    assert title_age(data, None, "FR", also=("GB",)) == 15  # its countries only: France and Great Britain
+    assert title_age({}, None, "FR", blend="highest") is None  # nothing rated: unrated still
+
+
+def test_banned_keywords_match_whole_words() -> None:
+    from portalab.capabilities.household import keyword_hit, keyword_key
+    from portalab.modules.household.rules import RestrictionSettings
+
+    assert keyword_key(" Serial-Killer ") == "serial killer"
+    assert keyword_key("Drogue dure") == "drogue dure"
+    assert keyword_key("Évasion") == "evasion"
+    banned = frozenset({"drug", "serial killer"})
+    assert keyword_hit(["drug abuse"], banned)
+    assert keyword_hit(["Serial Killer"], banned)
+    assert not keyword_hit(["drugstore", "killer whale"], banned)
+    assert not keyword_hit(None, banned) and not keyword_hit(["drug"], frozenset())
+    settings = RestrictionSettings(keywords=["Drug", "drug", " ", "Serial-Killer"])
+    assert settings.keywords == ["drug", "serial killer"]
+    assert settings.restrictions().keywords == frozenset({"drug", "serial killer"})
+    assert settings.restrictions().limits_titles
+
+
 def test_warnings_are_read_by_family() -> None:
     data = {
         "releases": [

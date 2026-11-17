@@ -153,6 +153,7 @@ async def test_everyone_sees_the_household_the_master_manages_it(
         "rating_countries": None,  # issue 478: as the portal's administrator chose
         "avoid_warnings": [],  # issue 478: no warning kept away by default
         "rating_blend": "strictest",
+        "keywords": [],  # issue 478: no keyword kept away by default
     }
     assert child["community_visible"] is False and child["has_pin"] is True
 

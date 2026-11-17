@@ -20,6 +20,7 @@ import {
   useCreateProfile,
   useDeleteProfile,
   useHousehold,
+  useKeywordSuggestions,
   useRatingPolicy,
   useSetPin,
   useUpdateProfile,
@@ -309,6 +310,11 @@ export function ProfileEditor({
           onChange={(genres) => setRestrictions((r) => ({ ...r, genres }))}
         />
 
+        <KeywordsField
+          keywords={restrictions.keywords ?? []}
+          onChange={(keywords) => setRestrictions((r) => ({ ...r, keywords }))}
+        />
+
         <fieldset className="household-editor__section">
           <legend>{t("household:editor.titles")}</legend>
           {(restrictions.titles ?? []).length === 0 ? (
@@ -552,6 +558,83 @@ function GenresField({ genres, onChange }: { genres: string[]; onChange: (genres
   );
 }
 
+/** Issue 478: a keyword as the portal matches it — its words, lowercased, accents folded (as the server). */
+function keywordKey(value: string): string {
+  const folded = value.toLowerCase().normalize("NFKD").replace(/\p{M}/gu, "");
+  return (folded.match(/[\p{L}]+/gu) ?? []).join(" ").slice(0, 60);
+}
+
+/**
+ * Issue 478: the metadata provider's keywords (TMDB's: « serial killer », « drug abuse »…) that keep a title
+ * from the profile whatever its rating — typed freely, the library's own offered as one types.
+ */
+function KeywordsField({
+  keywords,
+  onChange,
+}: {
+  keywords: string[];
+  onChange: (keywords: string[]) => void;
+}) {
+  const t = useT();
+  const listId = useId();
+  const [typed, setTyped] = useState("");
+  const offered = (useKeywordSuggestions(typed).data ?? []).filter(
+    (word) => !keywords.includes(keywordKey(word)),
+  );
+  const add = () => {
+    const key = keywordKey(typed);
+    if (key && !keywords.includes(key)) onChange([...keywords, key].sort());
+    setTyped("");
+  };
+  return (
+    <fieldset className="household-editor__section">
+      <legend>{t("household:editor.keywords")}</legend>
+      <p className="household-editor__hint">{t("household:editor.keywordsHint")}</p>
+      {keywords.length ? (
+        <ul className="household-genres" aria-label={t("household:editor.keywords")}>
+          {keywords.map((word) => (
+            <li key={word}>
+              <span>{word}</span>
+              <button
+                type="button"
+                aria-label={t("household:editor.keywordsRemove", { keyword: word })}
+                onClick={() => onChange(keywords.filter((k) => k !== word))}
+              >
+                <Icon name="close" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <div className="household-genres__add">
+        <TextField
+          label={t("household:editor.keywordsAdd")}
+          hint={t("household:editor.keywordsAddHint")}
+          value={typed}
+          maxLength={60}
+          list={listId}
+          onChange={(event) => setTyped(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              add();
+            }
+          }}
+        />
+        <datalist id={listId}>
+          {offered.map((word) => (
+            <option key={word} value={word} />
+          ))}
+        </datalist>
+        <Button variant="secondary" type="button" disabled={!keywordKey(typed)} onClick={add}>
+          <Icon name="plus" size={16} />
+          {t("household:editor.genresAddButton")}
+        </Button>
+      </div>
+    </fieldset>
+  );
+}
+
 /** Issue 478: the countries whose age ratings the portal keeps — those a profile may also be held to. */
 const RATING_COUNTRIES = ["DE", "GB", "US", "ES", "IT", "BE", "CH", "NL", "CA", "AU", "FR"] as const;
 type RatingCountry = (typeof RATING_COUNTRIES)[number];
@@ -659,13 +742,21 @@ const WARNINGS = [
   "mature",
 ] as const;
 type WarningKind = (typeof WARNINGS)[number];
-const READINGS = ["portal", "countries", "average"] as const;
+const READINGS = ["portal", "countries", "highest", "average"] as const;
 type Reading = (typeof READINGS)[number];
-const READING_ICONS: Record<Reading, string> = { portal: "globe", countries: "flag", average: "scale" };
+/** the reading the portal recommends: the average of every country, neither lax nor too strict */
+const RECOMMENDED_READING: Reading = "average";
+const READING_ICONS: Record<Reading, string> = {
+  portal: "globe",
+  countries: "flag",
+  highest: "arrow-up",
+  average: "scale",
+};
 
 /**
  * Issue 478 — a profile's classification, in its own section: how a title's age is read (as the portal does,
- * by countries its master picks — the strictest wins —, or by the average of every country), then the
+ * by countries its master picks — the strictest wins —, by the strictest of every country, or by the average
+ * of every country), then the
  * warnings that keep a title from the profile even when it is of its age.
  */
 function ClassificationField({
@@ -685,14 +776,15 @@ function ClassificationField({
     (RATING_COUNTRIES as readonly string[]).includes(c),
   );
   const countries = restrictions.rating_countries ?? null;
+  const blend = restrictions.rating_blend;
   const reading: Reading =
-    restrictions.rating_blend === "average" ? "average" : countries !== null ? "countries" : "portal";
+    blend === "average" || blend === "highest" ? blend : countries !== null ? "countries" : "portal";
   const avoid = restrictions.avoid_warnings ?? [];
   const names = (codes: readonly string[]) => codes.map((code) => regionName(locale, code)).join(", ");
   const choose = (next: Reading) =>
     onChange(
-      next === "average"
-        ? { rating_blend: "average", rating_countries: null }
+      next === "average" || next === "highest"
+        ? { rating_blend: next, rating_countries: null }
         : next === "countries"
           ? { rating_blend: "strictest", rating_countries: countries ?? [...portal] }
           : { rating_blend: "strictest", rating_countries: null },
@@ -726,7 +818,12 @@ function ClassificationField({
             />
             <Icon name={READING_ICONS[mode]} size={18} />
             <span>
-              <strong>{t(`household:editor.read_${mode}`)}</strong>
+              <strong>
+                {t(`household:editor.read_${mode}`)}
+                {mode === RECOMMENDED_READING ? (
+                  <span className="household-editor__recommended">{t("household:editor.recommended")}</span>
+                ) : null}
+              </strong>
               <small>{hint(mode)}</small>
             </span>
           </label>

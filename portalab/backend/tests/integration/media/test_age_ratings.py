@@ -51,6 +51,7 @@ async def _film(media: MediaHarness) -> UUID:
                     "certification": "TP",
                     "certifications": {"FR": "TP", "US": "R"},
                     "releases": RELEASES,
+                    "keywords": ["post-apocalyptic future", "car chase"],
                     "_v": 4,
                 },
                 fetched_at=datetime(2026, 11, 16, tzinfo=UTC),
@@ -213,3 +214,46 @@ async def test_a_master_reads_a_profiles_ages_by_the_average(
     assert rating["age"] == 15 and rating["basis"] == "average"
     assert film in await media.module.gate.blocked(lea)
     assert (await media.module.gate.rating(film))["age"] == 12  # the portal's own reading unchanged
+
+
+async def test_a_master_reads_a_profiles_ages_by_the_strictest_of_every_country(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    film = await _film(media)
+    owner, lea_id, service = await _lea(app, media)
+    lea = Principal(user_id=lea_id, profile_of=owner.user_id)
+    settings = RestrictionSettings(max_age=16, allow_unrated=True, genres=[], rating_blend="highest")
+    await service.change(owner, lea_id, restrictions=settings)
+    media.module.gate.forget()
+    rating = await media.module.gate.rating(film, lea)
+    # France's 12 (the TV's), the United States' R: 17 — the strictest of them, though the portal adds none
+    assert rating["age"] == 17 and rating["basis"] == "highest" and rating["basis_country"] == "US"
+    assert film in await media.module.gate.blocked(lea)
+    assert (await media.module.gate.rating(film))["age"] == 12  # the portal's own reading unchanged
+
+
+async def test_a_master_keeps_titles_by_their_keywords_from_a_profile(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    film = await _film(media)
+    owner, lea_id, service = await _lea(app, media)
+    lea = Principal(user_id=lea_id, profile_of=owner.user_id)
+    settings = RestrictionSettings(max_age=16, allow_unrated=True, genres=[])
+    await service.change(owner, lea_id, restrictions=settings.model_copy(update={"keywords": ["chase"]}))
+    media.module.gate.forget()
+    assert film in await media.module.gate.blocked(lea)  # « car chase »: a whole word of it
+    kept = await media.module.gate.kept(lea, film)
+    assert kept is not None and kept["reason"] == "keyword" and kept["can_ask"] is True
+    await service.change(owner, lea_id, restrictions=settings.model_copy(update={"keywords": ["car c"]}))
+    media.module.gate.forget()
+    assert film not in await media.module.gate.blocked(lea)  # not a word of it
+    # what a master types, found among the library's keywords
+    await login(client, "zoe")
+    found = await client.get("/api/v1/media/keywords", params={"q": "CHA"})
+    assert found.status_code == 200 and found.json() == {"keywords": ["car chase"]}
+    assert (await client.get("/api/v1/media/keywords", params={"q": "c"})).json() == {"keywords": []}
+    assert (await client.get("/api/v1/media/keywords", params={"q": "x" * 61})).status_code == 422
+    # a profile reads none (the keywords of titles kept from it are not its to read)
+    switched = await client.post("/api/v1/household/switch", json={"user_id": str(lea_id)})
+    assert switched.status_code == 200
+    assert (await client.get("/api/v1/media/keywords", params={"q": "cha"})).json() == {"keywords": []}

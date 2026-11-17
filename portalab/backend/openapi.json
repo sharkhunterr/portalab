@@ -10808,6 +10808,22 @@
         "title": "KeptTitle",
         "type": "object"
       },
+      "KeywordsOut": {
+        "properties": {
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Keywords",
+            "type": "array"
+          }
+        },
+        "required": [
+          "keywords"
+        ],
+        "title": "KeywordsOut",
+        "type": "object"
+      },
       "Layout": {
         "additionalProperties": false,
         "properties": {
@@ -20312,6 +20328,14 @@
             ],
             "title": "Hours To"
           },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 60,
+            "title": "Keywords",
+            "type": "array"
+          },
           "max_age": {
             "anyOf": [
               {
@@ -20337,6 +20361,7 @@
             "default": "strictest",
             "enum": [
               "strictest",
+              "highest",
               "average"
             ],
             "title": "Rating Blend",
@@ -55863,6 +55888,51 @@
           }
         },
         "summary": "Insights Section",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/keywords": {
+      "get": {
+        "description": "Issue 478: the metadata keywords a master may keep a profile from (TMDB's, in the library) \u2014 none for\na household profile (the keywords of titles kept from it are not its to read).",
+        "operationId": "media_keywords_api_v1_media_keywords_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 60,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Media Keywords",
         "tags": [
           "media"
         ]

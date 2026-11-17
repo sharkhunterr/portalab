@@ -414,7 +414,8 @@ describe("my household", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
     fireEvent.change(within(editor).getByLabelText(/Add a genre/), { target: { value: "Science-Fiction" } });
-    fireEvent.click(within(editor).getByRole("button", { name: "Add" }));
+    const kept = within(editor).getByRole("group", { name: "Genres kept out" });
+    fireEvent.click(within(kept).getByRole("button", { name: "Add" }));
     expect(within(editor).getByRole("button", { name: "Remove science fiction" })).toBeTruthy();
     fireEvent.click(within(editor).getByRole("button", { name: "Remove science fiction" }));
     expect(within(editor).queryByRole("button", { name: "Remove science fiction" })).toBeNull();
@@ -819,7 +820,11 @@ describe("a profile's classification (issue 478)", () => {
     editing(saved);
     fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
     const section = screen.getByRole("group", { name: "Age ratings" });
-    fireEvent.click(within(section).getByRole("radio", { name: /Average of every country/ }));
+    // the portal's recommended reading, told on its card only
+    const average = within(section).getByRole("radio", { name: /Average of every country/ });
+    expect(within(average.closest("label") as HTMLElement).getByText("Recommended")).toBeTruthy();
+    expect(within(section).getAllByText("Recommended")).toHaveLength(1);
+    fireEvent.click(average);
     expect(within(section).queryByRole("checkbox", { name: "Germany" })).toBeNull();
     const warnings = within(section).getByRole("group", { name: "Warnings to avoid" });
     fireEvent.click(within(warnings).getByRole("checkbox", { name: "Violence" }));
@@ -828,5 +833,52 @@ describe("a profile's classification (issue 478)", () => {
     expect(restrictions.rating_blend).toBe("average");
     expect(restrictions.rating_countries ?? null).toBeNull();
     expect(restrictions.avoid_warnings).toEqual(["cnc", "violence"]); // in the list's order
+  });
+
+  it("reads by the strictest of every country", async () => {
+    const saved: Array<Record<string, unknown>> = [];
+    editing(saved);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const section = screen.getByRole("group", { name: "Age ratings" });
+    fireEvent.click(within(section).getByRole("radio", { name: /Strictest of every country/ }));
+    expect(within(section).getByRole("radio", { name: /Strictest of every country/ })).toBeChecked();
+    expect(within(section).queryByRole("checkbox", { name: "Germany" })).toBeNull();
+    const restrictions = await restrictionsOf(saved);
+    expect(restrictions.rating_blend).toBe("highest");
+    expect(restrictions.rating_countries ?? null).toBeNull();
+  });
+
+  it("keeps out titles by TMDB keywords, the library's offered as one types", async () => {
+    const saved: Array<Record<string, unknown>> = [];
+    const asked: string[] = [];
+    fake.handler = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/household") return json(200, HOUSEHOLD);
+      if (url.pathname === "/api/v1/household/requests") return json(200, []);
+      if (url.pathname === "/api/v1/media/keywords") {
+        asked.push(url.searchParams.get("q") ?? "");
+        return json(200, { keywords: ["serial killer", "killer whale"] });
+      }
+      if (request.method === "PATCH" || request.method === "PUT") {
+        saved.push((await request.json()) as Record<string, unknown>);
+        return json(200, {});
+      }
+      return json(404, {});
+    };
+    show(<HouseholdPage view="profiles" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Léa" }));
+    const editor = await screen.findByRole("dialog", { name: "Edit Léa" });
+    const field = within(editor).getByRole("group", { name: "Banned keywords" });
+    const input = within(field).getByLabelText(/Add a keyword/);
+    fireEvent.change(input, { target: { value: "kil" } });
+    await waitFor(() => expect(asked).toContain("kil"));
+    await waitFor(() => expect(field.querySelectorAll("datalist option")).toHaveLength(2));
+    fireEvent.change(input, { target: { value: "Serial-Killer" } });
+    fireEvent.click(within(field).getByRole("button", { name: "Add" }));
+    expect(within(field).getByRole("button", { name: "Remove serial killer" })).toBeTruthy();
+    fireEvent.change(input, { target: { value: "drug" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    const restrictions = (await restrictionsOf(saved)) as { keywords?: string[] };
+    expect(restrictions.keywords).toEqual(["drug", "serial killer"]);
   });
 });
