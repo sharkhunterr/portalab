@@ -55,6 +55,110 @@
 
 ---
 
+# v1.7.0
+
+## Portalab v1.7.0 — every age rating a title has, trailers and galleries, statistics you can trust
+
+**A title's classification, in full**: every release's rating (cinema, TV, platforms, discs), France's CNC
+decision and its warning, and the countries the administrator adds, so a household profile follows the
+rules you choose. **Title pages gain trailers, featurettes and picture galleries.** **The statistics were
+checked against their sources**: they now give honest figures, show the previous period in grey on every
+chart, and use My media's look.
+
+### Highlights
+
+- **Age ratings, every one of them** — a title's page has a *Classification* block: the age a profile is
+  held to and why, the CNC's decision with its warning, then each country's releases, folded under the
+  portal's own country. The administrator picks the order ratings count in and other countries whose
+  ratings count too.
+- **A profile's rules, as fine as you want** — per profile:
+  - read ratings as the portal does, as the strictest of every country, or as their average (recommended);
+  - add other countries;
+  - avoid titles carrying a warning (violence, fear, language, drugs, sex…);
+  - ban TMDB keywords.
+
+  Request shelves, search and « Recently requested » are rated the same way. A profile's shelves now fill
+  past the titles it may not see.
+- **Trailers, featurettes and galleries** — a film's, a series' or a game's page shows its videos and
+  pictures, gathered from TMDB, fanart.tv, TheTVDB, Radarr, Plex, IGDB and RomM, in the member's language
+  first. They open in a full-screen viewer. A YouTube video loads only when clicked, in its
+  privacy-enhanced player.
+- **Games** — a game's page shows its official PEGI mark and is laid out like a film's.
+- **« Recently requested »** — a new row on the media home: what members asked for last through the
+  portal's request tools, with nobody named.
+- **Statistics you can trust**:
+  - Community trends are checked against their sources. Achievements are counted once per member, XP
+    granted by hand is a figure of its own, and no comparison is made with a period the statistic did not
+    cover yet.
+  - Personal figures (tickets, games played) count the member an event is about.
+  - Duplicates of My media are gone.
+  - The page uses My media's tiles, badges and sections.
+- **The previous period in grey** — every statistics chart draws the previous period behind the current
+  one, day by day.
+- **My media's activity chart by person** — for the household and the server, a switch splits the bars
+  by kind or by person. On the server, a member who does not manage media sees only « You » and « Other
+  members ».
+- **Charts readable under every palette** — a chart's series are now picked to stay apart from the
+  palette's accent. Films and series were the same colour under many palettes.
+
+### Closed issues
+
+#### Security
+
+- `security` The player could play any media server item through a title the member may watch; an item
+  played through a title must now be the title itself, one of its episodes or one of its extras
+
+#### Fixed
+
+- `bug` A household profile's shelves came out nearly empty past the titles its age rating hides, and
+  « Leaving soon » ignored the profile; both follow it, with each card's age badge
+- `bug` A film not out yet showed « Released » while Radarr was already searching it; it stays « waiting
+  for its release »
+- `bug` A game's page was not laid out like a film's, with its videos and pictures above its summary
+- `bug` On a phone, a retro save's picture showed half the game over a black band
+- `bug` A dashboard widget's loading, unavailable or failed state sat in its top-left corner instead of its
+  middle
+- `bug` Too-small touch targets, text under the contrast limit on some interfaces, and a navigation drawer
+  button that did not say whether it was open
+- `bug` Community statistics disagreed with their sources: achievements counted twice, hand-granted XP
+  mixed with XP earned, comparisons with a period the statistic did not cover
+- `bug` Personal statistics (tickets, games played) were empty, and some repeated My media
+- `bug` Two chart series shared a colour under many palettes (films and series, for one)
+- `bug` Searching and the search health check filled the audit log with refused permissions (about
+  70,000 a day)
+
+#### New
+
+- `feat` Every age rating a title has (cinema, TV, platforms, discs, France's CNC decision and warning),
+  shown on its page, with the portal's country first
+- `feat` Household profiles:
+  - ratings read as the strictest of every country or as their average;
+  - other countries added per profile;
+  - warnings to avoid;
+  - banned TMDB keywords.
+- `feat` Trailers, featurettes and picture galleries on a title's page (films, series, games)
+- `feat` A game's PEGI rating shown with its official mark
+- `feat` A « Recently requested » row on the media home
+- `feat` The previous period drawn in grey on every statistics chart
+- `feat` My media's activity chart split by kind or by person, for the household and the server
+
+#### Documentation and tooling
+
+- `doc` A nightly regression suite checks, for each item the shop sells: its effect, readability, fit on
+  screen and smoothness, on a phone, a tablet and a computer
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts).
+- Titles are looked up again on TMDB for their full ratings, a batch at a time, in the background. Ages may
+  shift slightly while this runs.
+- With France as the portal's country, the CNC's visa list is imported once a week. The first import runs
+  shortly after the upgrade.
+- The built-in statistics are rebuilt at the first start. Statistics no longer shipped (the reading pack,
+  « What I finished ») are retired.
+
+---
+
 # v1.6.0
 
 ## Portalab v1.6.0 — the member guide built into the wiki, and guided tours for the newest features
