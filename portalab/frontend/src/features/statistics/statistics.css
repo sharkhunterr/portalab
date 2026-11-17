@@ -1,24 +1,44 @@
 /* Statistics (spec 017): cards in a responsive grid; charts use theme tokens; the data table is always one
    click away; logical properties for RTL. */
-.statistics-grid {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+/* issue 481: My media's look — tiles (admin-stats) and sections (admin-section); a tile's hide button sits
+   in its corner */
+.stat-tile {
+  position: relative;
 }
-
+.stat-tile .stat-hide {
+  position: absolute;
+  inset-block-start: var(--space-1);
+  inset-inline-end: var(--space-1);
+  opacity: 0.6;
+}
+.stat-tile .stat-hide:hover,
+.stat-tile .stat-hide:focus-visible {
+  opacity: 1;
+}
 .stat-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
-  padding: var(--space-4);
   min-inline-size: 0;
 }
 
-.stat-card__header {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-2);
-  align-items: baseline;
+/* a change versus the previous period, as My media tells it: an arrow, green up, red down */
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+.stat-trend[data-trend="up"],
+.stat-trend[data-trend="new"] {
+  color: var(--state-available-fg);
+}
+.stat-trend[data-trend="down"] {
+  color: var(--state-error-fg);
+}
+
+.statistics-shown {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-1) var(--space-4);
 }
 
 .stat-chart {
@@ -26,13 +46,20 @@
 }
 
 .stat-chart__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
   margin: 0;
   font-size: var(--font-size-xl);
   font-weight: 700;
 }
-
-.stat-chart__trend {
-  color: var(--color-text-muted);
+.stat-chart__summary .stat-trend {
+  font-weight: var(--font-weight-normal, 400);
+}
+.stat-chart__toggle {
+  margin-block-start: var(--space-2);
+  font-size: var(--font-size-sm);
 }
 
 .stat-chart__table {

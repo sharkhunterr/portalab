@@ -232,7 +232,29 @@ class StatisticsModule:
                 installed += 1
             except Exception:
                 log.warning("statistic pack definition skipped", extra={"stat": definition.key})
+        await self._retire_dropped({d.key for d, owner, _ in self.packs.definitions() if owner == OWNER})
         return installed
+
+    async def _retire_dropped(self, shipped: set[str]) -> None:
+        """Issue 481: a built-in statistic a release no longer ships (a figure told elsewhere) is retired —
+        unless an administrator runs their own version of it."""
+        if not shipped:
+            return  # no built-in pack registered (tests, a stripped install): nothing to compare with
+        async with self.database.session() as session:
+            rows = (
+                await session.execute(
+                    select(DefinitionStatus.key)
+                    .join(
+                        Definition,
+                        (Definition.key == DefinitionStatus.key)
+                        & (Definition.version == DefinitionStatus.active_version),
+                    )
+                    .where(DefinitionStatus.status == "active", Definition.source == "builtin")
+                )
+            ).scalars()
+            dropped = sorted(set(rows) - shipped)
+        for key in dropped:
+            await self.definitions.retire(Principal(channel="system"), key)
 
     async def start(self) -> None:
         await self.refresh_config()

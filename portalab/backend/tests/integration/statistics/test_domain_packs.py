@@ -214,3 +214,68 @@ async def test_a_builtin_pack_change_replaces_the_running_version(stats: StatsHa
     stats.module.packs.register("fixed", [{**base, "viz": {"type": "pie"}}], owner=OWNER)
     await stats.module.install_packs()
     assert await running() == own  # the administrator's version stays
+
+
+async def test_personal_figures_count_the_member_an_event_is_about(stats: StatsHarness) -> None:
+    """Issue 481: a ticket, a game launched on a media server — about a member without being acted by them —
+    count in that member's own figures (they stayed empty)."""
+    await install(stats, "support", "gaming", "activity")
+    alex, sam = await members(stats, 2)
+    await stats.publish(
+        "ticket.created",
+        {"ticket": str(uuid4()), "seq": 1, "state": "new", "type": "bug", "priority": "normal"},
+        at=NOW - timedelta(days=1),
+        about=alex,
+    )
+    for kind in ("game", "game", "movie"):
+        await stats.publish(
+            "media.playback_started",
+            {
+                "kind": kind,
+                "service": "s",
+                "session": str(uuid4()),
+                "state_seq": 0,
+                "position_s": 0.0,
+                "occurred_at": (NOW - timedelta(days=2)).isoformat(),
+            },
+            at=NOW - timedelta(days=2),
+            about=alex,
+        )
+    await stats.dispatch()
+    get = stats.module.provider.get
+    assert (await get("support.my_tickets", viewer=Principal(user_id=alex), period=MONTH)).value == 1
+    assert (await get("gaming.my_games_started", viewer=Principal(user_id=alex), period=MONTH)).value == 2
+    assert (
+        await get("support.my_tickets", viewer=Principal(user_id=sam), period=MONTH)
+    ).value == 0  # not theirs
+
+
+async def test_a_builtin_statistic_no_longer_shipped_is_retired(stats: StatsHarness) -> None:
+    """Issue 481: a figure a release stops shipping (told elsewhere) leaves the catalog — not an
+    administrator's own version."""
+    from portalab.modules.statistics.models import DefinitionStatus
+    from portalab.modules.statistics.packs.registry import OWNER
+
+    base = {
+        "title_key": "statistics:stat.trends_requests.title",
+        "domain": "trends",
+        "scope": "community",
+        "event_types": ["media.request_created"],
+        "measure": {"kind": "count"},
+        "required_permission": "statistics.read",
+    }
+    await install(stats, "trends")
+    stats.module.packs.register(
+        "old", [{**base, "key": "trends.kept"}, {**base, "key": "trends.gone"}], owner=OWNER
+    )
+    await stats.module.install_packs()
+    own = await stats.module.definitions.save(None, {**base, "key": "trends.mine"}, source="admin")
+    await stats.module.activate(Principal(channel="system"), "trends.mine", own)
+    stats.module.packs.register("old", [{**base, "key": "trends.kept"}], owner=OWNER)
+    await stats.module.install_packs()
+    async with stats.database.session() as session:
+        states = {
+            k: (await session.get(DefinitionStatus, k)).status
+            for k in ("trends.kept", "trends.gone", "trends.mine")
+        }  # type: ignore[union-attr]
+    assert states == {"trends.kept": "active", "trends.gone": "retired", "trends.mine": "active"}

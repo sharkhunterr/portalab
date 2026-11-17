@@ -5,6 +5,7 @@ import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
 import { useAchievements } from "../../gamification/api";
 import type { StatResult } from "../api";
+import { TrendBadge } from "../cards/look";
 
 type Cell = StatResult["breakdown"][number];
 
@@ -81,26 +82,8 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
         <p className="stat-chart__summary">
           <span aria-hidden="true">{result.value === null ? "—" : format.number(result.value)}</span>
           <span className="visually-hidden">{summary}</span>
+          <TrendBadge result={result} />
         </p>
-        {result.trend ? (
-          <p className="stat-chart__trend" data-direction={result.trend.direction}>
-            {/* issue 479: the direction says up or down — the figures without their sign (never « down -26 »);
-                nothing before: « new », not a percentage */}
-            {result.trend.direction === "up" && result.trend.percent === null
-              ? t("statistics:trend.new")
-              : t(`statistics:trend.${result.trend.direction}`, {
-                  delta: format.number(Math.abs(result.trend.delta)),
-                  percent:
-                    result.trend.percent === null
-                      ? "—"
-                      : format.percent(Math.abs(result.trend.percent) / 100),
-                })}
-          </p>
-        ) : result.value !== null ? (
-          <p className="stat-chart__trend" data-direction="none">
-            {t("statistics:trend.none")}
-          </p>
-        ) : null}
       </figcaption>
       {viz !== "number" && series.length ? (
         <div className="stat-chart__plot" aria-hidden="true">
@@ -132,7 +115,8 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
         <Breakdown cells={result.breakdown} total={Number(result.value ?? 0)} names={names} />
       ) : null}
       <Button
-        variant="secondary"
+        variant="ghost"
+        className="stat-chart__toggle"
         aria-expanded={table}
         aria-controls={tableId}
         onClick={() => setTable((v) => !v)}

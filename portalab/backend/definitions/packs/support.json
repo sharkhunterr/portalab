@@ -59,7 +59,8 @@
         "type": "bar"
       },
       "required_permission": "tickets.create",
-      "hideable": true
+      "hideable": true,
+      "attribution": "member"
     },
     {
       "key": "support.feedback_received",

@@ -86,7 +86,8 @@
         "type": "bar"
       },
       "required_permission": "statistics.read",
-      "hideable": true
+      "hideable": true,
+      "attribution": "member"
     }
   ]
 }

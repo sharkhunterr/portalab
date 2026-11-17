@@ -21,6 +21,7 @@ from portalab.capabilities.service_events import STATUS_CHANGED_TYPE
 from portalab.capabilities.statistics import PackRegistry
 from portalab.core.authz_port import Principal
 from portalab.core.db import Database
+from portalab.core.event_port import SubjectRef
 from portalab.core.time import FixedClock
 from portalab.modules.statistics.module import StatisticsModule
 from tests.events_fixtures import EventsHarness, make_events
@@ -48,8 +49,15 @@ class StatsHarness:
         return self.ev.full.database
 
     async def publish(
-        self, event_type: str, payload: Mapping[str, Any], *, at: datetime, actor: UUID | None = None
+        self,
+        event_type: str,
+        payload: Mapping[str, Any],
+        *,
+        at: datetime,
+        actor: UUID | None = None,
+        about: UUID | None = None,
     ) -> None:
+        """``about``: the member the event is about (its subject), without being its actor (issue 481)."""
         async with self.database.unit_of_work() as uow:
             await self.ev.publisher.publish(
                 uow.session,
@@ -57,6 +65,7 @@ class StatsHarness:
                 dict(payload),
                 occurred_at=at,
                 actor=Principal(user_id=actor) if actor else None,
+                subject=SubjectRef("user", str(about)) if about else None,
                 source="test",
             )
 

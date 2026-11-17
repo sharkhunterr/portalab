@@ -24,7 +24,8 @@
           "op": "eq",
           "value": "game"
         }
-      ]
+      ],
+      "attribution": "member"
     }
   ]
 }

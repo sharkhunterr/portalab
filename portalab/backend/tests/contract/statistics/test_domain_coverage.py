@@ -12,7 +12,7 @@ EXPECTED = {
     "activity": "007",
     "media": "024",
     "playback": "024",
-    "reading": "024",
+    # "reading" (024): its only figure, the books finished, is told by My media (issue 481)
     "gaming": "024",
     "community": "012",
     "gamification": "013",

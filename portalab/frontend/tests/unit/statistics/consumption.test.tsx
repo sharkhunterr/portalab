@@ -116,6 +116,27 @@ describe("statistics page", () => {
     expect(screen.queryByText(/create|query builder/i)).toBeNull();
   });
 
+  it("shows single figures as tiles with their trend badge (issue 481)", async () => {
+    fake.handler = async (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/statistics/catalog")
+        return json(200, [entry("trends.requests", { viz: "number", domain: "trends" })]);
+      if (url.pathname === "/api/v1/me/statistics/preferences") return json(200, { hidden: [] });
+      return json(200, result("trends.requests", { value: 26, trend: null }));
+    };
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <AnnounceProvider>
+          <RouterProvider router={createMemoryRouter([{ path: "/", element: <StatisticsPage /> }])} />
+        </AnnounceProvider>
+      </QueryClientProvider>,
+    );
+    const tiles = await screen.findByRole("list", { name: "Key figures" });
+    await waitFor(() => expect(within(tiles).getByText("26")).toBeTruthy());
+    expect(within(tiles).getByText("No comparison")).toBeTruthy();
+  });
+
   it("changes the period in place and hides only hideable statistics", async () => {
     const { requests, saved } = setup();
     await screen.findAllByText("media.minutes: 42");
@@ -123,8 +144,13 @@ describe("statistics page", () => {
     await waitFor(() =>
       expect(requests.some((r) => r.includes("/statistics/media.minutes?period=week"))).toBe(true),
     );
-    expect(within(card("media.mandatory")).queryByRole("button", { name: "Hide" })).toBeNull();
-    fireEvent.click(within(card("media.minutes")).getByRole("button", { name: "Hide" }));
+    expect(within(card("media.mandatory")).queryByRole("button", { name: /Hide/ })).toBeNull();
+    fireEvent.click(within(card("media.minutes")).getByRole("button", { name: "Hide “media.minutes”" }));
     await waitFor(() => expect(saved).toEqual([{ hidden: ["media.minutes"] }]));
+    // issue 481: every hideable statistic listed with a switch, the mandatory one not
+    const shown = screen.getByRole("checkbox", { name: "media.small" });
+    expect(screen.queryByRole("checkbox", { name: "media.mandatory" })).toBeNull();
+    fireEvent.click(shown);
+    await waitFor(() => expect(saved.length).toBe(2));
   });
 });

@@ -95,6 +95,10 @@ class StatisticDefinition(BaseModel):
     min_cohort_size: int | None = Field(default=None, ge=1, le=1000)
     unlock: Unlock | None = None
     sources: tuple[str, ...] = ()  # service ids the statistic depends on (partial/stale states)
+    # issue 481: whose figure an event counts for — its actor, or the member it is about (its subject when
+    # that is a member, else its actor): a play the portal saw on a media server, a ticket, are about a
+    # member without being acted by them
+    attribution: Literal["actor", "member"] = "actor"
     stale_after_s: int | None = Field(default=None, ge=60, le=7 * 86400)
     schema_version: Literal[1] = 1
 

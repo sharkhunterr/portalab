@@ -36,8 +36,10 @@ const show = (stat: StatResult) =>
 
 describe("a statistic's trend (issue 479)", () => {
   it("says down without a double minus", () => {
-    show(result({ delta: -26, direction: "down", previous_value: 77, percent: -33.8 }));
+    const { container } = show(result({ delta: -26, direction: "down", previous_value: 77, percent: -33.8 }));
     expect(screen.getByText(/^Down 26 \(34%\) versus the previous period$/)).toBeTruthy();
+    // the badge, as My media tells it: an arrow, red, the share of change
+    expect(container.querySelector('[data-trend="down"]')?.textContent).toContain("34% vs previous period");
   });
 
   it("says new when nothing came before", () => {
@@ -46,9 +48,10 @@ describe("a statistic's trend (issue 479)", () => {
   });
 
   it("tells there is no comparison when the statistic did not cover the previous period", () => {
-    show(result(null, 26));
-    expect(
-      screen.getByText("No comparison: this statistic does not cover the previous period yet"),
-    ).toBeTruthy();
+    const { container } = show(result(null, 26));
+    expect(screen.getByText("No comparison")).toBeTruthy();
+    expect(container.querySelector('[data-trend="none"]')?.getAttribute("title")).toBe(
+      "No comparison: this statistic does not cover the previous period yet",
+    );
   });
 });

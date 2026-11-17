@@ -50,7 +50,7 @@ def pack_definitions() -> list[dict]:
 
     packs = Path(__file__).resolve().parents[3] / "definitions" / "packs"
     out: list[dict] = []
-    for name in ("media", "playback", "reading", "gaming"):
+    for name in ("media", "playback", "gaming"):  # issue 481: reading told by My media (no pack of its own)
         out.extend(json.loads((packs / f"{name}.json").read_text())["definitions"])
     return out
 

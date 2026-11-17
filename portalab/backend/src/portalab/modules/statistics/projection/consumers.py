@@ -49,6 +49,17 @@ def field_value(envelope: Envelope, name: str) -> Any:
     return envelope.payload.get(name)
 
 
+def who(definition: StatisticDefinition, envelope: Envelope) -> UUID | None:
+    """Issue 481: the member an event counts for — its actor, or (``attribution: member``) the member it is
+    about when its subject is one."""
+    if definition.attribution == "member" and envelope.subject_type == "user" and envelope.subject_id:
+        try:
+            return UUID(envelope.subject_id)
+        except ValueError:
+            pass
+    return envelope.actor_user_id
+
+
 def _number(value: Any) -> float | None:
     if isinstance(value, bool):
         return float(value)
@@ -134,7 +145,7 @@ class Projection:
         if not matches(definition, envelope):
             return False
         personal = definition.scope == "personal"
-        actor = envelope.actor_user_id
+        actor = who(definition, envelope)
         if personal and actor is None:
             return False
         scope_type = "personal" if personal else "community"
