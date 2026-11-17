@@ -1,7 +1,6 @@
 """Navigation destinations provider (T015): the 004 navigation entries the principal may open, matched on
 their localized label and keywords. Each entry keeps its own required permission."""
 
-import asyncio
 import time
 from collections.abc import Sequence
 
@@ -12,6 +11,7 @@ from portalab.capabilities.search import FacetDef, ParsedQuery, ProviderResult, 
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor, snippet
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.modules.search.permissions import SEARCH_USE
+from portalab.modules.search.permits import held
 from portalab.modules.search.providers.common import Labels
 
 
@@ -35,10 +35,9 @@ class NavigationProvider:
 
     async def _entries(self, principal: Principal) -> list[NavigationContribution]:
         entries = [c for c in self.registry.all() if c.kind == "entry" and c.route]
-        allowed = await asyncio.gather(
-            *(self.authorizer.is_allowed(principal, entry.required_permission) for entry in entries)
-        )
-        return [entry for entry, ok in zip(entries, allowed, strict=True) if ok]
+        # issue 480: what it may open, in one unaudited batch (an admin page offered is not an action)
+        allowed = await held(self.authorizer, principal, (entry.required_permission for entry in entries))
+        return [entry for entry in entries if entry.required_permission in allowed]
 
     def _item(
         self, entry: NavigationContribution, ctx: LocaleContext, query: ParsedQuery, score: float

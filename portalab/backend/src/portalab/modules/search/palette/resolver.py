@@ -24,6 +24,7 @@ from portalab.capabilities.search import ASSISTANT, ActionDef, ObjectRef, Search
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.modules.search.coordinator.coordinator import SearchCoordinator
 from portalab.modules.search.observability import log
+from portalab.modules.search.permits import held
 from portalab.modules.search.providers.common import Labels
 
 URI = re.compile(r"^portalab://([a-z][a-z0-9_:.-]{0,95})/([A-Za-z0-9_.:-]{1,128})$")
@@ -111,15 +112,7 @@ class PaletteResolver:
     async def _held(self, principal: Principal, permissions: list[str]) -> set[str]:
         """Issue 404: the permissions held among ``permissions`` — one batch, not audited, when the engine
         offers it (what the palette shows, not what is done); else one check each."""
-        visible = getattr(self.authorizer, "visible", None)
-        if visible is not None:
-            try:
-                return set(await visible(principal, permissions))
-            except Exception:
-                return set()
-        unique = sorted(set(permissions))
-        allowed = await asyncio.gather(*(self._allowed(principal, p) for p in unique))
-        return {p for p, ok in zip(unique, allowed, strict=True) if ok}
+        return await held(self.authorizer, principal, permissions)
 
     async def _allowed(self, principal: Principal, permission: str) -> bool:
         try:

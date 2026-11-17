@@ -29,6 +29,7 @@ from portalab.capabilities.search import (
 from portalab.core.authz_port import Authorizer, Principal
 from portalab.modules.search.observability import log, metric_part, metrics
 from portalab.modules.search.parser.parser import InvalidFilter
+from portalab.modules.search.permits import held
 from portalab.modules.search.settings import SearchConfig
 
 SemanticState = Literal["ok", "unavailable", "off"]
@@ -94,16 +95,9 @@ class SearchCoordinator:
         self, principal: Principal, kinds: Sequence[str] | None = None
     ) -> list[SearchProvider]:
         providers = self.registry.providers(kinds)
-        allowed = await asyncio.gather(
-            *(self._allowed(principal, provider.required_permission) for provider in providers)
-        )
-        return [provider for provider, ok in zip(providers, allowed, strict=True) if ok]
-
-    async def _allowed(self, principal: Principal, permission: str) -> bool:
-        try:
-            return await self.authorizer.is_allowed(principal, permission)
-        except Exception:
-            return False  # fail closed
+        # issue 480: the sources it may search, in one unaudited batch (not one sensitive check per source)
+        allowed = await held(self.authorizer, principal, (p.required_permission for p in providers))
+        return [provider for provider in providers if provider.required_permission in allowed]
 
     async def search(
         self, query: ParsedQuery, principal: Principal, ctx: LocaleContext, *, cursor: str | None = None

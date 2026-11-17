@@ -99,3 +99,29 @@ async def test_suggest(app: FastAPI, client: httpx.AsyncClient, search: SearchHa
     items = (await client.get("/api/v1/search/suggest", params={"q": "jelly"})).json()["items"]
     assert [i["title"] for i in items] == ["Jellyfin Media"]
     assert (await client.get("/api/v1/search/suggest")).json()["items"] == []
+
+
+async def _denials(search: SearchHarness) -> int:
+    """The refusals audited (each also published as ``permission.denied`` on the platform)."""
+    from sqlalchemy import text
+
+    async with search.full.database.session() as session:
+        return int(
+            await session.scalar(text("SELECT count(*) FROM audit.audit_entries WHERE decision = 'deny'"))
+            or 0
+        )
+
+
+async def test_searching_and_probing_audit_no_refusal(
+    app: FastAPI, client: httpx.AsyncClient, search: SearchHarness
+) -> None:
+    """Issue 480: what search offers (an admin page among the destinations, the sources) is not an action —
+    a member's search and the health probe audit no refusal, nor publish ``permission.denied`` (they ran at
+    ~70k a day)."""
+    await signed_in(app, client)
+    before = await _denials(search)
+    body = (await client.post("/api/v1/search", json={"q": "audit"})).json()
+    destinations = next(g for g in body["groups"] if g["kind"] == "navigation")
+    assert all(i["url_ref"] != "/admin/audit" for i in destinations["items"])  # still not offered
+    assert (await search.module.probe()).state == "ok"  # every source still answers
+    assert await _denials(search) == before

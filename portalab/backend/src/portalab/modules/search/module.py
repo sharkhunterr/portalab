@@ -10,7 +10,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
-from uuid import UUID
 
 from portalab.capabilities.events import EventTypeRegistry, default_event_types
 from portalab.capabilities.i18n import RESOLVER, LocaleContext
@@ -336,7 +335,8 @@ class SearchModule:
 
     async def probe(self) -> CheckResult:
         """Functional check (025): every provider answers a representative query within its budget."""
-        system = Principal(user_id=UUID(int=0))
+        # issue 480: the portal itself — refused quietly (no user: no sensitive refusal audited at each probe)
+        system = Principal(channel="system")
         query = QueryParser().parse("portalab", LocaleContext(), now=utc_now(self.clock), mode="exact")
         failing = []
         for provider in self.registry.providers():
