@@ -199,6 +199,10 @@ class Provider:
         before_ok = (
             d.scope == "personal" or before["contributors"] >= threshold or before["contributors"] == 0
         )
+        # issue 479: no comparison with a period the statistic did not cover yet (its events did not exist,
+        # « +6 » against an empty past) nor with one kept back for privacy (not a zero either)
+        covered = await self._covered_from(active)
+        comparable = before_ok and covered is not None and covered <= before_start
         state: StatState
         state, sources = await self._source_state(active)
         as_of = await self._as_of(active)
@@ -218,7 +222,7 @@ class Provider:
             value=current["value"],
             series=current["series"],
             breakdown=breakdown,
-            trend=trend(current["value"], before["value"] if before_ok else None),
+            trend=trend(current["value"], before["value"]) if comparable else None,
             source_states=sources,
             period_start=start,
             period_end=end,
@@ -251,6 +255,17 @@ class Provider:
             period_start=start,
             period_end=end,
         )
+
+    async def _covered_from(self, active: ActiveDefinition) -> date | None:
+        """Issue 479: the first day the statistic holds anything (whatever its scope) — its history starts
+        there."""
+        async with self.database.session() as session:
+            first = await session.scalar(
+                select(func.min(Bucket.bucket_day)).where(
+                    Bucket.stat_key == active.definition.key, Bucket.def_version.in_(active.lineage)
+                )
+            )
+        return first if isinstance(first, date) else None
 
     async def _compute(
         self, active: ActiveDefinition, scope_id: UUID, start: date, end: date, filters: Mapping[str, str]

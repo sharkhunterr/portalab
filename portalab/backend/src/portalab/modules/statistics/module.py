@@ -43,7 +43,7 @@ from portalab.core.visibility_port import VisibilityFilter
 from portalab.modules.statistics import permissions as _permissions  # noqa: F401 — declares permissions
 from portalab.modules.statistics.definitions.service import DefinitionService
 from portalab.modules.statistics.events import register_event_types
-from portalab.modules.statistics.models import DefinitionStatus, ProjectionState
+from portalab.modules.statistics.models import Definition, DefinitionStatus, ProjectionState
 from portalab.modules.statistics.observability import log
 from portalab.modules.statistics.packs.registry import register_builtin
 from portalab.modules.statistics.participant import StatisticsParticipant
@@ -206,13 +206,28 @@ class StatisticsModule:
         (plugin packs stay inactive until the Admin enables them)."""
         installed = 0
         for definition, owner, active in self.packs.definitions():
+            source = "builtin" if owner == OWNER else owner
             async with self.database.session() as session:
                 known = await session.get(DefinitionStatus, definition.key)
-            try:
-                version = await self.definitions.save(
-                    None, definition, source="builtin" if owner == OWNER else owner
+                # issue 479: the version running is the pack's own (no administrator's version over it)
+                running = (
+                    await session.get(Definition, (definition.key, known.active_version))
+                    if known is not None and known.active_version is not None
+                    else None
                 )
-                if known is None and active:
+            try:
+                # a pack's change recomputes the statistic from the event history (its numbers were wrong)
+                version = await self.definitions.save(
+                    None, definition, source=source, change_policy="rebuild"
+                )
+                upgraded = (
+                    known is not None
+                    and known.status == "active"
+                    and running is not None
+                    and running.source == source
+                    and version != known.active_version
+                )
+                if active and (known is None or upgraded):
                     await self.definitions.activate(None, definition.key, version)
                 installed += 1
             except Exception:

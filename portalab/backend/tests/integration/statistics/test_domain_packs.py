@@ -107,7 +107,7 @@ async def test_community_values_need_enough_members(stats: StatsHarness) -> None
 async def test_requests_by_kind_and_trend(stats: StatsHarness) -> None:
     await install(stats, "requests", "trends")
     viewer = (await members(stats, 1))[0]
-    for kind, days in (("movie", 1), ("movie", 2), ("tv", 3), ("movie", 9)):
+    for kind, days in (("movie", 1), ("movie", 2), ("tv", 3), ("movie", 9), ("tv", 13)):
         payload = {"request": str(uuid4()), "object": None, "kind": kind, "state": "pending"}
         await stats.publish("media.request_created", payload, at=NOW - timedelta(days=days))
     await stats.publish(
@@ -119,12 +119,98 @@ async def test_requests_by_kind_and_trend(stats: StatsHarness) -> None:
     get = stats.module.provider.get
 
     made = await get("requests.created", viewer=Principal(user_id=viewer), period=MONTH)
-    assert made.value == 4
-    assert {b["dims"]["kind"]: b["value"] for b in made.breakdown} == {"movie": 3, "tv": 1}
+    assert made.value == 5
+    assert {b["dims"]["kind"]: b["value"] for b in made.breakdown} == {"movie": 3, "tv": 2}
     fulfilled = await get("requests.fulfilled", viewer=Principal(user_id=viewer), period=MONTH)
     assert fulfilled.value == 1
     week = await get(
         "trends.requests", viewer=Principal(user_id=viewer), period=Period("last_n_days", days=7)
     )
     assert week.value == 3 and week.trend is not None
-    assert week.trend.previous_value == 1 and week.trend.direction == "up"
+    assert week.trend.previous_value == 2 and week.trend.direction == "up"
+    # issue 479: a previous period the statistic did not cover yet (its first event inside it) — no trend
+    short = await get(
+        "trends.requests", viewer=Principal(user_id=viewer), period=Period("last_n_days", days=10)
+    )
+    assert short.value == 4 and short.trend is None
+
+
+async def test_achievements_count_once_per_member_and_manual_xp_apart(stats: StatsHarness) -> None:
+    """Issue 479: an achievement a member unlocks again counts once; the XP administrators add by hand is
+    told apart from the XP the community earns."""
+    await install(stats, "trends")
+    people = await members(stats, 5)
+    for who in people:
+        await stats.publish(
+            "achievement.unlocked", {"achievement": "regular"}, at=NOW - timedelta(days=1), actor=who
+        )
+        await stats.publish(
+            "reward.granted",
+            {"value": "xp", "amount": 10, "source": "daily"},
+            at=NOW - timedelta(days=1),
+            actor=who,
+        )
+        await stats.publish(
+            "reward.granted",
+            {"value": "xp", "amount": 1000, "source": "manual"},
+            at=NOW - timedelta(days=1),
+            actor=who,
+        )
+    alex = people[0]
+    # alex's progress reset then earned again, and one more achievement of theirs
+    await stats.publish(
+        "achievement.unlocked", {"achievement": "regular"}, at=NOW - timedelta(days=2), actor=alex
+    )
+    await stats.publish(
+        "achievement.unlocked", {"achievement": "saver"}, at=NOW - timedelta(days=3), actor=alex
+    )
+    await stats.dispatch()
+    get = stats.module.provider.get
+    viewer = Principal(user_id=alex)
+    assert (await get("trends.achievements_unlocked", viewer=viewer, period=MONTH)).value == 6  # not 7
+    assert (await get("trends.xp_earned", viewer=viewer, period=MONTH)).value == 50  # without the manual XP
+    assert (await get("trends.xp_granted", viewer=viewer, period=MONTH)).value == 5000  # told apart
+
+
+async def test_a_builtin_pack_change_replaces_the_running_version(stats: StatsHarness) -> None:
+    """Issue 479: a built-in pack fixed in a release runs at once, recomputed from the history — unless an
+    administrator runs their own version of it."""
+    from portalab.modules.statistics.models import DefinitionStatus
+    from portalab.modules.statistics.packs.registry import OWNER
+
+    await install(stats, "trends")
+    for days in (1, 2):
+        await stats.publish(
+            "media.request_created",
+            {"request": str(uuid4()), "object": None, "kind": "movie", "state": "pending"},
+            at=NOW - timedelta(days=days),
+        )
+    await stats.dispatch()
+    base = {
+        "key": "trends.fixed",
+        "title_key": "statistics:stat.trends_requests.title",
+        "domain": "trends",
+        "scope": "community",
+        "event_types": ["media.request_created"],
+        "measure": {"kind": "count"},
+        "required_permission": "statistics.read",
+    }
+
+    async def running() -> int | None:
+        async with stats.database.session() as session:
+            status = await session.get(DefinitionStatus, "trends.fixed")
+            return status.active_version if status is not None else None
+
+    stats.module.packs.register("fixed", [base], owner=OWNER)
+    await stats.module.install_packs()
+    assert await running() == 1
+    stats.module.packs.register("fixed", [{**base, "viz": {"type": "bar"}}], owner=OWNER)
+    await stats.module.install_packs()
+    assert await running() == 2  # the release's fix runs
+    await stats.module.install_packs()
+    assert await running() == 2  # unchanged: no new version
+    own = await stats.module.definitions.save(None, {**base, "viz": {"type": "area"}}, source="admin")
+    await stats.module.activate(Principal(channel="system"), "trends.fixed", own)
+    stats.module.packs.register("fixed", [{**base, "viz": {"type": "pie"}}], owner=OWNER)
+    await stats.module.install_packs()
+    assert await running() == own  # the administrator's version stays

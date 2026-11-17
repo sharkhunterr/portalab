@@ -189,6 +189,8 @@ class Projection:
                 members.append(self.member("c", str(actor)))  # contributors (privacy threshold)
             if measure.kind == "distinct_count":
                 distinct = field_value(envelope, measure.field or "actor")
+                if distinct is not None and measure.per_actor:  # issue 479: once per member
+                    distinct = f"{actor}:{distinct}" if actor is not None else None
                 if distinct is not None:
                     members.append(self.member("d", str(distinct)))
             for member in members:

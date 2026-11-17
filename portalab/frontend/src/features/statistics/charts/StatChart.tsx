@@ -84,10 +84,21 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
         </p>
         {result.trend ? (
           <p className="stat-chart__trend" data-direction={result.trend.direction}>
-            {t(`statistics:trend.${result.trend.direction}`, {
-              delta: format.number(result.trend.delta),
-              percent: result.trend.percent === null ? "—" : format.percent(result.trend.percent / 100),
-            })}
+            {/* issue 479: the direction says up or down — the figures without their sign (never « down -26 »);
+                nothing before: « new », not a percentage */}
+            {result.trend.direction === "up" && result.trend.percent === null
+              ? t("statistics:trend.new")
+              : t(`statistics:trend.${result.trend.direction}`, {
+                  delta: format.number(Math.abs(result.trend.delta)),
+                  percent:
+                    result.trend.percent === null
+                      ? "—"
+                      : format.percent(Math.abs(result.trend.percent) / 100),
+                })}
+          </p>
+        ) : result.value !== null ? (
+          <p className="stat-chart__trend" data-direction="none">
+            {t("statistics:trend.none")}
           </p>
         ) : null}
       </figcaption>

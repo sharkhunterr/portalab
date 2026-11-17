@@ -108,6 +108,8 @@ class DefinitionService:
             errors.append(f"measure {measure.kind} needs a numeric event field")
         if measure.kind == "count" and measure.field is not None:
             errors.append("a count measure takes no field")
+        if measure.per_actor and measure.kind != "distinct_count":
+            errors.append("per_actor applies to a distinct_count measure only")
         floor = max(1, self.config().default_min_cohort_size)
         if (
             definition.scope != "personal"
@@ -121,6 +123,14 @@ class DefinitionService:
             raise InvalidDefinition(
                 "This statistic definition is not valid.", extensions={"errors": errors[:10]}
             )
+
+    def _same(self, stored: Mapping[str, Any], definition: StatisticDefinition) -> bool:
+        """Issue 479: the same document — read back through the model, so that a field the schema gained
+        since (with its default) is no change."""
+        try:
+            return StatisticDefinition.model_validate(stored) == definition
+        except ValidationError:
+            return False
 
     # --- versions ------------------------------------------------------------------------------------
     async def save(
@@ -147,11 +157,7 @@ class DefinitionService:
             )
             if latest:
                 current = await session.get(Definition, (definition.key, latest))
-                if (
-                    not force
-                    and current is not None
-                    and current.definition == definition.model_dump(mode="json")
-                ):
+                if not force and current is not None and self._same(current.definition, definition):
                     return latest  # unchanged: no new version
             version = latest + 1
             session.add(

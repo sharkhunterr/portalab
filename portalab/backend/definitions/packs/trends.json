@@ -97,6 +97,48 @@
           "field": "value",
           "op": "eq",
           "value": "xp"
+        },
+        {
+          "field": "source",
+          "op": "ne",
+          "value": "manual"
+        }
+      ],
+      "period_options": [
+        "week",
+        "month",
+        "quarter",
+        "year"
+      ]
+    },
+    {
+      "key": "trends.xp_granted",
+      "title_key": "statistics:stat.trends_xp_granted.title",
+      "description_key": "statistics:stat.trends_xp_granted.description",
+      "domain": "trends",
+      "scope": "community",
+      "event_types": [
+        "reward.granted"
+      ],
+      "measure": {
+        "kind": "sum",
+        "field": "amount"
+      },
+      "viz": {
+        "type": "number"
+      },
+      "required_permission": "statistics.read",
+      "hideable": true,
+      "filter": [
+        {
+          "field": "value",
+          "op": "eq",
+          "value": "xp"
+        },
+        {
+          "field": "source",
+          "op": "eq",
+          "value": "manual"
         }
       ],
       "period_options": [
@@ -116,7 +158,9 @@
         "achievement.unlocked"
       ],
       "measure": {
-        "kind": "count"
+        "kind": "distinct_count",
+        "field": "achievement",
+        "per_actor": true
       },
       "viz": {
         "type": "number"

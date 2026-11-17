@@ -145,7 +145,8 @@ async def test_same_value_everywhere_and_cross_service(
         Principal(user_id=alex), {"stat_key": "media.mine", "days": 30}, LocaleContext()
     )  # type: ignore[union-attr]
     assert api["value"] == direct.value == ai.value == widget.data["value"] == 13  # type: ignore[index]
-    assert api["trend"]["previous_value"] == 0 and api["trend"]["percent"] is None
+    # issue 479: nothing before its first event — no comparison with a period it did not cover
+    assert api["trend"] is None
     assert api["state"] == "partial" and api["source_states"] == {"s1": "unknown", "s2": "unknown"}
 
     class Health:

@@ -42,6 +42,9 @@ class Measure(BaseModel):
     field: str | None = Field(
         default=None, pattern=_FIELD
     )  # sum/avg/min/max: numeric field; distinct: subject
+    # issue 479: distinct_count of the field *per member* — an achievement counted once per member who holds
+    # it (a member unlocking it again counts once), not once for the whole community
+    per_actor: bool = False
 
 
 class FilterClause(BaseModel):
