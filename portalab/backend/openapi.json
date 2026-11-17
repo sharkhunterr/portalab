@@ -23021,6 +23021,15 @@
             ],
             "title": "Period Start"
           },
+          "previous_series": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Previous Series",
+            "type": "array"
+          },
           "series": {
             "items": {
               "additionalProperties": true,

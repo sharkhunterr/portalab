@@ -79,6 +79,7 @@ class StatResultOut(BaseModel):
     source_states: dict[str, str]
     period_start: str | None
     period_end: str | None
+    previous_series: list[dict[str, Any]] = []  # issue 482: the previous period's days, same order
 
 
 class StatisticsPreferencesIn(BaseModel):
@@ -122,6 +123,7 @@ def _result(result: StatResult) -> StatResultOut:
         source_states=dict(result.source_states),
         period_start=result.period_start.isoformat() if result.period_start else None,
         period_end=result.period_end.isoformat() if result.period_end else None,
+        previous_series=list(data["previous_series"]),
     )
 
 

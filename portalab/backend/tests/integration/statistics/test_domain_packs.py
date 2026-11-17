@@ -128,11 +128,22 @@ async def test_requests_by_kind_and_trend(stats: StatsHarness) -> None:
     )
     assert week.value == 3 and week.trend is not None
     assert week.trend.previous_value == 2 and week.trend.direction == "up"
+    # issue 482: the previous week's days laid on this week's, drawn in grey under them
+    assert len(week.previous_series) == 7
+    assert [p["day"] for p in week.previous_series] == [
+        str(week.period_start + timedelta(days=i)) for i in range(7)
+    ]
+    by_then = {p["previous_day"]: p["value"] for p in week.previous_series}
+    assert (
+        by_then[str((NOW - timedelta(days=9)).date())] == 1
+        and by_then[str((NOW - timedelta(days=13)).date())] == 1
+    )
+    assert sum(p["value"] for p in week.previous_series) == 2
     # issue 479: a previous period the statistic did not cover yet (its first event inside it) — no trend
     short = await get(
         "trends.requests", viewer=Principal(user_id=viewer), period=Period("last_n_days", days=10)
     )
-    assert short.value == 4 and short.trend is None
+    assert short.value == 4 and short.trend is None and not short.previous_series  # nothing to draw
 
 
 async def test_achievements_count_once_per_member_and_manual_xp_apart(stats: StatsHarness) -> None:

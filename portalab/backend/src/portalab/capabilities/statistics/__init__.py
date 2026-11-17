@@ -154,6 +154,9 @@ class StatResult:
     source_states: Mapping[str, str] = field(default_factory=dict)
     period_start: date | None = None
     period_end: date | None = None
+    # issue 482: the previous period's days, in the same order (its first day matches the period's first) —
+    # drawn in grey under the period's; empty when there is no comparison (issue 479)
+    previous_series: Sequence[Mapping[str, Any]] = ()
 
 
 @dataclass(frozen=True, slots=True)

@@ -21328,6 +21328,13 @@ export interface components {
             period_end: string | null;
             /** Period Start */
             period_start: string | null;
+            /**
+             * Previous Series
+             * @default []
+             */
+            previous_series: {
+                [key: string]: unknown;
+            }[];
             /** Series */
             series: {
                 [key: string]: unknown;

@@ -61,6 +61,33 @@ class InvalidFilter(ValidationFailed):
     default_title = "Invalid statistic filter"
 
 
+def _aligned(
+    series: Sequence[Mapping[str, Any]],
+    start: date,
+    end: date,
+    before_start: date,
+    before_end: date,
+    kind: str,
+) -> list[dict[str, Any]]:
+    """Issue 482: the previous period's values laid on the period's days — its first day on the period's
+    first (``previous_day`` tells which day it was); a day without events is 0 for an additive measure."""
+    known = {str(point["day"]): point["value"] for point in series}
+    empty = 0.0 if kind in ("count", "sum", "distinct_count") else None
+    out: list[dict[str, Any]] = []
+    for offset in range((end - start).days + 1):
+        then = before_start + timedelta(days=offset)
+        if then > before_end:
+            break  # a shorter previous period (a month of 30 days before one of 31)
+        out.append(
+            {
+                "day": (start + timedelta(days=offset)).isoformat(),
+                "previous_day": then.isoformat(),
+                "value": known.get(then.isoformat(), empty),
+            }
+        )
+    return out
+
+
 def _merge(kind: str) -> Callable[[float, float], float]:
     if kind == "min":
         return min
@@ -223,6 +250,9 @@ class Provider:
             series=current["series"],
             breakdown=breakdown,
             trend=trend(current["value"], before["value"]) if comparable else None,
+            previous_series=_aligned(before["series"], start, end, before_start, before_end, d.measure.kind)
+            if comparable
+            else (),
             source_states=sources,
             period_start=start,
             period_end=end,

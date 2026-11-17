@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 // Issue 479 — a statistic's change told plainly: the direction in words and the figures without their sign
@@ -53,5 +53,29 @@ describe("a statistic's trend (issue 479)", () => {
     expect(container.querySelector('[data-trend="none"]')?.getAttribute("title")).toBe(
       "No comparison: this statistic does not cover the previous period yet",
     );
+  });
+
+  it("gives the previous period's values next to the period's (issue 482)", () => {
+    const stat = {
+      ...result({ delta: 1, direction: "up", previous_value: 2, percent: 50 }, 3),
+      series: [{ day: "2026-11-02", value: 3 }],
+      previous_series: [
+        { day: "2026-11-01", previous_day: "2026-10-25", value: 2 },
+        { day: "2026-11-02", previous_day: "2026-10-26", value: 0 },
+      ],
+    } as unknown as StatResult;
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <StatChart result={stat} viz="bar" title="Requests" />
+      </QueryClientProvider>,
+    );
+    const table = screen.getAllByRole("table", { hidden: true })[0] as HTMLElement;
+    expect(within(table).getByRole("columnheader", { name: "Previous period", hidden: true })).toBeTruthy();
+    const rows = within(table).getAllByRole("row", { hidden: true }).slice(1);
+    // every day of the period, the empty one at 0, each with the previous period's value on the same rank
+    expect(rows.map((row) => [...row.querySelectorAll("td")].map((cell) => cell.textContent))).toEqual([
+      ["0", "2"],
+      ["3", "0"],
+    ]);
   });
 });

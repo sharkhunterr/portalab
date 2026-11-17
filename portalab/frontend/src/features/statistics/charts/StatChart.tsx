@@ -52,6 +52,9 @@ function Breakdown({ cells, total, names }: { cells: Cell[]; total: number; name
   );
 }
 
+/** issue 482: the previous period, in grey behind the period's colour */
+const PREVIOUS = "color-mix(in srgb, var(--color-text-muted) 55%, transparent)";
+
 /**
  * Accessible chart (spec 017 T016; R12): an SVG chart (Recharts, theme tokens) **plus** a text summary and
  * a data table alternative — the meaning never depends on color alone; patterns via stroke dashes.
@@ -61,7 +64,26 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
   const format = useFormat();
   const tableId = useId();
   const [table, setTable] = useState(false);
-  const series = result.series.map((point) => ({ day: String(point.day), value: Number(point.value ?? 0) }));
+  // issue 482: the period's days, each with the previous period's value on the same rank (drawn in grey);
+  // a day without events is 0
+  const previous = new Map(
+    (result.previous_series ?? []).map((point) => [String(point.day), Number(point.value ?? 0)]),
+  );
+  const current = new Map(result.series.map((point) => [String(point.day), Number(point.value ?? 0)]));
+  const days = previous.size
+    ? [...new Set([...previous.keys(), ...current.keys()])].sort()
+    : [...current.keys()].sort();
+  const series = days.map((key) => ({
+    day: key,
+    value: current.get(key) ?? 0,
+    ...(previous.size ? { previous: previous.get(key) ?? null } : {}),
+  }));
+  const drawn = [
+    ...(previous.size
+      ? [{ key: "previous", label: t("statistics:previousPeriod"), color: PREVIOUS, dashed: true }]
+      : []),
+    { key: "value", label: title, color: "var(--color-accent)" },
+  ];
   // issue 298: the days as the language writes them (« 5 oct. »), not as ISO dates
   const day = (value: string) => {
     const leaf = format.dayMonth(value);
@@ -93,9 +115,9 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
               x="day"
               xFormat={day}
               height={220}
-              legend={false}
+              legend={drawn.length > 1}
               format={(value) => format.number(value)}
-              series={[{ key: "value", label: title, color: "var(--color-accent)" }]}
+              series={drawn}
             />
           ) : (
             <LinesChart
@@ -104,9 +126,9 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
               xFormat={day}
               area
               height={220}
-              legend={false}
+              legend={drawn.length > 1}
               format={(value) => format.number(value)}
-              series={[{ key: "value", label: title, color: "var(--color-accent)" }]}
+              series={drawn}
             />
           )}
         </div>
@@ -130,6 +152,7 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
             <tr>
               <th scope="col">{t("statistics:table.day")}</th>
               <th scope="col">{t("statistics:table.value")}</th>
+              {previous.size ? <th scope="col">{t("statistics:previousPeriod")}</th> : null}
             </tr>
           </thead>
           <tbody>
@@ -137,6 +160,13 @@ export function StatChart({ result, viz, title }: { result: StatResult; viz: str
               <tr key={point.day}>
                 <th scope="row">{format.date(point.day)}</th>
                 <td>{format.number(point.value)}</td>
+                {previous.size ? (
+                  <td>
+                    {point.previous === null || point.previous === undefined
+                      ? "—"
+                      : format.number(point.previous)}
+                  </td>
+                ) : null}
               </tr>
             ))}
           </tbody>
