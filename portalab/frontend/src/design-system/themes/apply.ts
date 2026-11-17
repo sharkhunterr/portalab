@@ -15,6 +15,7 @@ import { BUILTIN_THEMES, builtinTheme, DEFAULT_THEME_KEY } from "./builtin";
 import { floorReport } from "./floor";
 import { paletteFor } from "./palettes";
 import { FUNCTIONAL_STATES, presentationOf, RARITIES, type ThemeDefinition } from "./schema";
+import { chartSeries } from "./series";
 
 /**
  * Resolve and apply the effective presentation: theme (allowed + available, else the policy default,
@@ -228,6 +229,14 @@ export function applyToDocument(
     root.style.setProperty("--color-accent", palette.accent);
     root.style.setProperty("--color-accent-alt", palette.accentAlt);
     root.style.setProperty("--color-accent-contrast", palette.contrast);
+  }
+  // issue 483: the chart series, told apart whatever the palette (its two accents may be nearly one colour)
+  const series = chartSeries(
+    palette?.accent ?? theme.colors.accent,
+    theme.colorScheme === "light" ? "light" : "dark",
+  );
+  for (const [index, colour] of series.entries()) {
+    root.style.setProperty(`--chart-${index + 1}`, colour);
   }
   // issue 132: a theme without rarity colours gets distinct ones for its scheme — never its accent for all four
   const fallback = theme.colorScheme === "light" ? RARITY_FALLBACK.light : RARITY_FALLBACK.dark;

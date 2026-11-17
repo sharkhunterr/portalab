@@ -250,8 +250,8 @@ function Genres({ data }: { data: RequestInsights }) {
         <Radar
           name={t("media:myRequests.watchedGenres")}
           dataKey="watched"
-          stroke="var(--color-accent-alt)"
-          fill="var(--color-accent-alt)"
+          stroke="var(--chart-2)"
+          fill="var(--chart-2)"
           fillOpacity={0.2}
           isAnimationActive={false}
         />

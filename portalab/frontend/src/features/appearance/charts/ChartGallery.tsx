@@ -171,7 +171,7 @@ export default function ChartGallery() {
                 <Sparkline
                   values={values as number[]}
                   label={String(name)}
-                  color={["var(--color-accent)", "var(--color-accent-alt)", "var(--rarity-epic)"][index]}
+                  color={["var(--color-accent)", "var(--chart-2)", "var(--rarity-epic)"][index]}
                 />
               </div>
             ))}
@@ -217,7 +217,7 @@ export default function ChartGallery() {
           <PolarWheel
             values={[4, 3, 5, 4, 7, 12, 10]}
             labels={DAYS}
-            color="var(--color-accent-alt)"
+            color="var(--chart-2)"
             label={t("admin:charts.kind.week.title")}
           />,
         )}
@@ -276,11 +276,7 @@ export default function ChartGallery() {
           "waffle",
           <div className="chart-gallery__waffles">
             <WaffleChart value={68} label={t("admin:charts.sample.finished")} />
-            <WaffleChart
-              value={23}
-              label={t("admin:charts.sample.requested")}
-              color="var(--color-accent-alt)"
-            />
+            <WaffleChart value={23} label={t("admin:charts.sample.requested")} color="var(--chart-2)" />
           </div>,
         )}
         {card(

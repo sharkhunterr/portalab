@@ -586,10 +586,10 @@ interface ChartData {
 
 const COLORS: Record<string, string> = {
   cpu: "var(--color-accent)",
-  ram: "var(--color-accent-alt)",
+  ram: "var(--chart-2)",
   temperature: "var(--rarity-legendary)",
   network: "var(--color-accent)",
-  storage: "var(--color-accent-alt)",
+  storage: "var(--chart-2)",
 };
 const RANGE_MS: Record<string, number> = {
   "15m": 15 * 60_000,

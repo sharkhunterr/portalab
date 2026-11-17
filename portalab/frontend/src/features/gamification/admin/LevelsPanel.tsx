@@ -123,7 +123,7 @@ export function LevelsPanel({ detailed = true }: { detailed?: boolean }) {
                       x={tier.level}
                       y={threshold(base, exponent, tier.level)}
                       r={5}
-                      fill="var(--color-accent-alt)"
+                      fill="var(--chart-2)"
                       stroke="var(--color-surface)"
                     />
                   ))}

@@ -144,7 +144,7 @@ export function Overview({ onMember }: { onMember: (id: string) => void }) {
                 {
                   key: "boosters",
                   label: t("marketplace:shopadmin.chart.boosters"),
-                  color: "var(--color-accent-alt)",
+                  color: "var(--chart-2)",
                 },
                 {
                   key: "grants",
@@ -171,7 +171,7 @@ export function Overview({ onMember }: { onMember: (id: string) => void }) {
                 {
                   key: "spent",
                   label: t("marketplace:shopadmin.chart.spent"),
-                  color: "var(--color-accent-alt)",
+                  color: "var(--chart-2)",
                 },
               ]}
             />

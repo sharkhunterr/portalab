@@ -145,7 +145,7 @@ export function AudienceDepth({ data }: { data: Depth }) {
               <Bar
                 dataKey="plays"
                 name={t("media:myRequests.audience.plays")}
-                fill="var(--color-accent-alt)"
+                fill="var(--chart-2)"
                 radius={[4, 4, 0, 0]}
                 isAnimationActive={false}
               />

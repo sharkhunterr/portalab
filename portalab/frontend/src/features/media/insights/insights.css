@@ -1,34 +1,24 @@
 /* media statistics (027): one color per kind, derived from the theme's tokens */
 .admin-page {
-  --kind-movie: var(--color-accent);
-  --kind-episode: var(--color-accent-alt);
-  --kind-live: color-mix(in oklab, var(--color-accent) 45%, var(--state-error-fg));
-  --kind-track: color-mix(in oklab, var(--color-accent-alt) 50%, var(--state-available-fg));
-  --kind-book: var(--state-available-fg);
-  --kind-audiobook: color-mix(in oklab, var(--state-available-fg) 55%, var(--color-accent-alt));
-  --kind-radio: color-mix(in oklab, var(--color-accent-alt) 60%, var(--state-error-fg)); /* issue 283 */
-  --kind-game: color-mix(in oklab, var(--color-accent) 50%, var(--state-available-fg)); /* issue 283 */
+  /* issue 483: one colour per kind from the chart series (told apart whatever the palette) */
+  --kind-movie: var(--chart-1);
+  --kind-episode: var(--chart-2);
+  --kind-live: var(--chart-3);
+  --kind-track: var(--chart-4);
+  --kind-book: var(--chart-5);
+  --kind-audiobook: var(--chart-6);
+  --kind-radio: var(--chart-7); /* issue 283 */
+  --kind-game: var(--chart-8); /* issue 283 */
   --kind-other: var(--color-text-muted);
-  /* 027: the statistics in depth — a palette, the previous period, streams and resolutions */
-  --chart-1: var(--color-accent);
-  --chart-2: var(
-    --color-accent-alt,
-    color-mix(in oklab, var(--color-accent) 50%, var(--state-maintenance-fg))
-  );
-  --chart-3: var(--state-available-fg);
-  --chart-4: var(--state-partial-fg);
-  --chart-5: var(--state-error-fg);
-  --chart-6: var(--state-syncing-fg);
-  --chart-7: color-mix(in oklab, var(--color-accent) 50%, var(--state-available-fg));
-  --chart-8: color-mix(in oklab, var(--state-error-fg) 55%, var(--state-partial-fg));
+  /* 027: the statistics in depth — the chart series (global), the previous period, streams and resolutions */
   --chart-other: color-mix(in oklab, var(--color-text-muted) 70%, transparent);
   --chart-previous: color-mix(in oklab, var(--color-text-muted) 45%, transparent);
   --stream-direct: var(--state-available-fg);
   --stream-copy: var(--state-syncing-fg);
   --stream-transcode: var(--state-error-fg);
-  --quality-4k: var(--color-accent-alt, var(--state-maintenance-fg));
+  --quality-4k: var(--chart-2);
   --quality-1080: var(--state-partial-fg);
-  --quality-720: var(--color-accent);
+  --quality-720: var(--chart-1);
   --quality-sd: var(--color-text-muted);
 }
 
