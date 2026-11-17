@@ -166,6 +166,7 @@ class InsightsQuery:
         manager: bool,
         tz: str = "UTC",
         top: int = TOP,
+        by_member: bool = False,
     ) -> dict[str, Any]:
         now = utc_now(self.clock)
         win = window(period, now)
@@ -231,7 +232,7 @@ class InsightsQuery:
                     )
                 ).all()
             ]
-            timeline = await self._timeline(session, win, kinds, user)
+            timeline = await self._timeline(session, win, kinds, user, by_member=by_member)
             heatmap = await self._heatmap(session, win, kinds, user, zone)
             top_works = await self._top_works(session, win, kinds, user, show_members=user is None, limit=top)
             genres = await self._tags(session, win, kinds, user, "genre")
@@ -281,7 +282,9 @@ class InsightsQuery:
             "unattributed": int(unattributed) if unattributed is not None else None,
         }
 
-    async def _timeline(self, session: Any, win: Window, kinds: Sequence[str], user: Whose) -> dict[str, Any]:
+    async def _timeline(
+        self, session: Any, win: Window, kinds: Sequence[str], user: Whose, *, by_member: bool = False
+    ) -> dict[str, Any]:
         days = win.days
         if days is None:
             first = await session.scalar(self._daily(win, kinds, user, func.min(ActivityDaily.day)))
@@ -309,6 +312,24 @@ class InsightsQuery:
             point["seconds"][kind] = float(seconds)
             point["plays"] += int(plays)
             point["plays_by_kind"][kind] = int(plays)  # 027: the activity chart counts plays too
+        if by_member:  # issue 484: the same chart split by member (a household's, the server's)
+            for at, key, seconds, plays in (
+                await session.execute(
+                    self._daily(
+                        win,
+                        kinds,
+                        user,
+                        bucket.label("bucket"),
+                        ActivityDaily.user_key,
+                        func.sum(ActivityDaily.seconds),
+                        func.sum(ActivityDaily.plays),
+                    )
+                    .group_by(bucket, ActivityDaily.user_key)
+                    .order_by(bucket)
+                )
+            ).all():
+                point = points.setdefault(at.date().isoformat(), _point(at.date()))
+                point.setdefault("members", {})[str(key)] = {"seconds": float(seconds), "plays": int(plays)}
         if win.start is not None and unit == "day":  # days without activity are part of the story
             day = win.start
             while day < win.end:

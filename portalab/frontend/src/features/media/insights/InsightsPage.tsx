@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import {
   AdminEmpty,
@@ -77,50 +77,107 @@ function Timeline({ data }: { data: Insights }) {
   const t = useT();
   const format = useFormat();
   const measures = useMeasures();
-  // 027: the same chart in time spent or in plays
+  // 027: the same chart in time spent or in plays; issue 484: by kind or (a household, the server) by member
   const [metric, setMetric] = useState<"time" | "plays">("time");
-  const pointValue = (p: Insights["timeline"]["points"][number], kind: string) =>
-    metric === "time"
-      ? Math.round(((p.seconds[kind] ?? 0) / 3600) * 10) / 10
-      : (p.plays_by_kind?.[kind] ?? 0);
-  const kinds = KIND_ORDER.filter((k) => data.timeline.points.some((p) => pointValue(p, k)));
+  const people = data.timeline.members ?? [];
+  const [split, setSplit] = useState<"kind" | "member">("kind");
+  const byMember = split === "member" && people.length > 0;
+  type Point = Insights["timeline"]["points"][number];
+  const amount = (seconds: number, plays: number) =>
+    metric === "time" ? Math.round((seconds / 3600) * 10) / 10 : plays;
+  const pointValue = (p: Point, key: string) =>
+    byMember
+      ? amount(p.members?.[key]?.seconds ?? 0, p.members?.[key]?.plays ?? 0)
+      : amount(p.seconds[key] ?? 0, p.plays_by_kind?.[key] ?? 0);
+  const memberName = (m: (typeof people)[number]) =>
+    m.key === "me" || m.key === "others" || m.key === "unattributed"
+      ? t(`media:insights.member.${m.key}`)
+      : (m.name ?? t("media:insights.member.unknown"));
+  const series = byMember
+    ? people.map((m, index) => ({
+        key: m.key,
+        label: memberName(m),
+        color: `var(--chart-${(index % 10) + 1})`,
+      }))
+    : KIND_ORDER.map((kind) => ({
+        key: kind,
+        label: t(`media:insights.kind.${kind}`),
+        color: `var(--kind-${kind})`,
+      }));
+  const shown = series.filter((s) => data.timeline.points.some((p) => pointValue(p, s.key)));
   const rows = data.timeline.points.map((p) => ({
     label: p.date,
-    ...Object.fromEntries(kinds.map((k) => [k, pointValue(p, k)])),
+    ...Object.fromEntries(shown.map((s) => [s.key, pointValue(p, s.key)])),
   }));
   const label = (iso: string) =>
     data.timeline.unit === "month"
       ? new Date(iso).toLocaleDateString(uiLocale(), { month: "short", year: "2-digit" })
       : format.date(iso, "short");
-  const toggle = (
+  const group = <T extends string>(
+    name: string,
+    legend: string,
+    value: T,
+    options: Array<{ key: T; icon: string; label: string }>,
+    onChange: (next: T) => void,
+  ) => (
     <fieldset className="insights-toggle">
-      <legend className="visually-hidden">{t("media:insights.chartMetric")}</legend>
-      {(["time", "plays"] as const).map((key) => (
-        <label key={key} className="insights-toggle__item" data-checked={metric === key || undefined}>
+      <legend className="visually-hidden">{legend}</legend>
+      {options.map((option) => (
+        <label
+          key={option.key}
+          className="insights-toggle__item"
+          data-checked={value === option.key || undefined}
+        >
           <input
             type="radio"
-            name="insights-metric"
-            value={key}
-            checked={metric === key}
-            onChange={() => setMetric(key)}
+            name={name}
+            value={option.key}
+            checked={value === option.key}
+            onChange={() => onChange(option.key)}
           />
-          <Icon name={key === "time" ? "clock" : "play"} size={14} />
-          {t(`media:insights.metric.${key}`)}
+          <Icon name={option.icon} size={14} />
+          {option.label}
         </label>
       ))}
     </fieldset>
   );
-  if (!rows.some((r) => kinds.some((k) => (r as Record<string, number | string>)[k]))) {
+  const toolbar = (
+    <div className="insights-toolbar">
+      {group(
+        "insights-metric",
+        t("media:insights.chartMetric"),
+        metric,
+        [
+          { key: "time", icon: "clock", label: t("media:insights.metric.time") },
+          { key: "plays", icon: "play", label: t("media:insights.metric.plays") },
+        ],
+        setMetric,
+      )}
+      {people.length
+        ? group(
+            "insights-split",
+            t("media:insights.chartSplit"),
+            split,
+            [
+              { key: "kind", icon: "layers", label: t("media:insights.split.kind") },
+              { key: "member", icon: "users", label: t("media:insights.split.member") },
+            ],
+            setSplit,
+          )
+        : null}
+    </div>
+  );
+  if (!shown.length) {
     return (
       <>
-        {toggle}
+        {toolbar}
         <AdminEmpty icon="chart" title={t("media:insights.none")} />
       </>
     );
   }
   return (
     <figure className="insights-chart">
-      {toggle}
+      {toolbar}
       <BarsChart
         data={rows}
         x="label"
@@ -133,16 +190,17 @@ function Timeline({ data }: { data: Insights }) {
             ? measures.duration(value * 3600)
             : t("media:insights.playsCount", { count: value })
         }
-        series={kinds.map((kind) => ({
-          key: kind,
-          label: t(`media:insights.kind.${kind}`),
-          color: `var(--kind-${kind})`,
-        }))}
+        series={shown}
       />
       <figcaption className="insights-legend">
-        {kinds.map((kind) => (
-          <span key={kind} className="insights-legend__item" data-kind={kind}>
-            {t(`media:insights.kind.${kind}`)}
+        {shown.map((s) => (
+          <span
+            key={s.key}
+            className="insights-legend__item"
+            {...(byMember ? { "data-member": "" } : { "data-kind": s.key })}
+            style={byMember ? ({ "--legend": s.color } as CSSProperties) : undefined}
+          >
+            {s.label}
           </span>
         ))}
       </figcaption>

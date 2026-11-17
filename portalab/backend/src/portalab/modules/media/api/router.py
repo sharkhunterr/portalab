@@ -16,6 +16,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.i18n import DEFAULT_CONTEXT
+from portalab.capabilities.identity_directory import CAPABILITY as IDENTITY_DIRECTORY
 from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
 from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
@@ -28,6 +29,7 @@ from portalab.modules.media.discovery.shelves import SHELVES
 from portalab.modules.media.fields.resolver import ADMIN, FIELDS
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.images.service import CONTENT_TYPE
+from portalab.modules.media.insights.aggregate import NIL
 from portalab.modules.media.insights.continuing import in_progress, recently, resume_item
 from portalab.modules.media.insights.deep import portraits
 from portalab.modules.media.insights.enrich import KINDS as ENRICHED_KINDS
@@ -753,6 +755,55 @@ async def _scoped(module: Any, principal: Principal, scope: str) -> UUID | froze
     return me
 
 
+TIMELINE_MEMBERS = 8  # issue 484: the most active ones, the rest together
+
+
+async def _timeline_members(module: Any, principal: Principal, data: dict[str, Any], *, named: bool) -> None:
+    """Issue 484: the activity chart by member — a household's members and a media manager's server by name,
+    the server for a member as « you » and « the other members » (no one else told apart); the most active
+    first, past eight the others together, the plays nobody is linked to apart."""
+    points = data["timeline"]["points"]
+    me = str(_me(principal))
+    total: dict[str, float] = {}
+    for point in points:
+        for key, value in (point.get("members") or {}).items():
+            total[key] = total.get(key, 0.0) + value["seconds"]
+
+    def group(key: str) -> str:
+        if key == NIL:
+            return "unattributed"
+        if not named:
+            return "me" if key == me else "others"
+        return key
+
+    ranked = sorted((k for k in total if group(k) not in ("unattributed", "others")), key=lambda k: -total[k])
+    kept = set(ranked[:TIMELINE_MEMBERS])
+    for point in points:
+        merged: dict[str, dict[str, float]] = {}
+        for key, value in (point.pop("members", None) or {}).items():
+            into = group(key)
+            if into not in ("me", "unattributed", "others") and into not in kept:
+                into = "others"
+            slot = merged.setdefault(into, {"seconds": 0.0, "plays": 0})
+            slot["seconds"] += value["seconds"]
+            slot["plays"] += value["plays"]
+        point["members"] = merged
+    names: dict[str, str] = {}
+    directory = module.capabilities.system_providers(IDENTITY_DIRECTORY) if named and kept else []
+    for key in sorted(kept):
+        try:
+            summary = await directory[0].provider.get_user_summary(UUID(key)) if directory else None
+        except Exception:
+            summary = None
+        if summary is not None and summary.display_name:
+            names[key] = summary.display_name  # a household profile too (its name, never its login)
+    present = {key for point in points for key in point["members"]}
+    order = [k for k in ranked if k in kept] + ["me", "others", "unattributed"]
+    data["timeline"]["members"] = [
+        {"key": key, "name": names.get(key), "me": key in (me, "me")} for key in order if key in present
+    ]
+
+
 async def _pot(module: Any, owner: UUID) -> bool:
     """Issue 443: the master's household economy is a common pot (the default)."""
     household = module.gate._household()
@@ -918,7 +969,10 @@ async def insights(
         user=await _scoped(module, principal, scope),
         manager=manager,
         tz=_zone(tz),
+        by_member=scope in ("household", "all"),
     )
+    if scope in ("household", "all"):
+        await _timeline_members(module, principal, data, named=scope == "household" or manager)
     locked = await _locked_insights(module, principal)
     for name in locked:
         key, empty = LOCKABLE_INSIGHTS[name]

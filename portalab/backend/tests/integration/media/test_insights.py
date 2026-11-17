@@ -212,6 +212,11 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
         server["manager"] and server["totals"]["plays"] == 6 and server["totals"]["members"] == 1
     )  # with Arrival (#24)
     assert server["members"][0]["name"] == "zoe" and server["unattributed"] == 1  # the « 777 » account
+    # issue 484: the activity chart by member — by name for a media manager, the unlinked plays apart
+    by_member = server["timeline"]["members"]
+    assert [(m["key"], m["name"]) for m in by_member] == [(str(people["zoe"]), "zoe"), ("unattributed", None)]
+    split = [p["members"] for p in server["timeline"]["points"] if p.get("members")]
+    assert sum(v["plays"] for day in split for v in day.values()) == 6
     ran = await client.post("/api/v1/admin/media/insights/run", json={"what": "metadata"})
     assert ran.status_code == 202 and ran.json() == {"state": "scheduled"}
     assert (await client.post("/api/v1/admin/media/insights/run", json={"what": "x"})).status_code == 422
@@ -238,6 +243,12 @@ async def test_history_is_ingested_deduplicated_attributed_and_served(
     assert movies["totals"]["plays"] == 3 and movies["requests"] is None
     anonymous = (await client.get("/api/v1/media/insights", params={"scope": "all"})).json()
     assert anonymous["members"] is None and anonymous["recent"] is None and anonymous["platforms"] is None
+    # issue 484: for a member, the server by member is « you » and the others, no one told apart
+    assert [(m["key"], m["name"], m["me"]) for m in anonymous["timeline"]["members"]] == [
+        ("me", None, True),
+        ("unattributed", None, False),
+    ]
+    assert "members" not in mine["timeline"]  # their own figures: nothing to split
     assert (await client.get("/api/v1/media/insights", params={"tz": "Mars/Base"})).status_code == 422
     assert (await client.get("/api/v1/admin/media/insights/sources")).status_code == 403
     assert (

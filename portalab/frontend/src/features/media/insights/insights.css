@@ -80,6 +80,17 @@
 .insights-legend__item[data-kind="game"]::before {
   background: var(--kind-game);
 }
+/* issue 484: a member's colour, given by the chart */
+.insights-legend__item[data-member]::before {
+  background: var(--legend, var(--kind-other));
+}
+/* the chart's switches: what it measures, then (household, server) by kind or by member, at the end */
+.insights-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
 
 /* weekday x hour */
 .insights-heatmap {

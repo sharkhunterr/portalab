@@ -73,7 +73,11 @@ export interface Insights {
       plays: number;
       /** 027: plays per kind (stacked like the time) */
       plays_by_kind?: Record<string, number>;
+      /** issue 484: the household's or the server's activity by member (key of ``members``) */
+      members?: Record<string, { seconds: number; plays: number }>;
     }>;
+    /** issue 484: who the chart can be split by — a member (``name``), or « me », « others », « unattributed » */
+    members?: Array<{ key: string; name: string | null; me: boolean }>;
   };
   heatmap: Array<{ weekday: number; hour: number; plays: number; seconds: number }>;
   top_works: Work[];
