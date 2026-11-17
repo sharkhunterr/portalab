@@ -43,9 +43,19 @@ interface Drag {
   startY: number;
   origin: Cell;
   target: Cell;
-  /** Pointer travel in pixels: the widget follows it, the placeholder snaps to the cells. */
+}
+
+/**
+ * The gesture between two cells, outside React (old phones lagged: every pointer move re-rendered every widget):
+ * the grid's steps measured once, the moved widget's element following the pointer frame by frame.
+ */
+interface Gesture {
+  colStep: number;
+  rowStep: number;
+  element: HTMLElement | null;
   dx: number;
   dy: number;
+  frame: number;
 }
 
 function metrics(grid: HTMLElement, columns: number) {
@@ -103,6 +113,7 @@ export function DashboardGrid({
   const announce = useAnnounce();
   const grid = useRef<HTMLOListElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
+  const gesture = useRef<Gesture | null>(null);
   const [grabbed, setGrabbed] = useState<string | null>(null);
   const byKey = new Map(instances.map((i) => [keyOf(i), i]));
 
@@ -140,22 +151,42 @@ export function DashboardGrid({
     if (!cell || !grid.current) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    setDrag({
-      key,
-      mode,
-      startX: event.clientX,
-      startY: event.clientY,
-      origin: cell,
-      target: cell,
+    gesture.current = {
+      ...metrics(grid.current, columns),
+      element: mode === "move" ? event.currentTarget.closest<HTMLElement>(".dashboard-grid__cell") : null,
       dx: 0,
       dy: 0,
+      frame: 0,
+    };
+    setDrag({ key, mode, startX: event.clientX, startY: event.clientY, origin: cell, target: cell });
+  };
+  /** The moved widget follows the pointer once a frame, straight on its element. */
+  const follow = (now: Gesture) => {
+    if (now.frame) return;
+    now.frame = requestAnimationFrame(() => {
+      now.frame = 0;
+      if (now.element) now.element.style.transform = `translate(${now.dx}px, ${now.dy}px)`;
     });
   };
+  const release = () => {
+    const now = gesture.current;
+    gesture.current = null;
+    if (!now) return;
+    if (now.frame) cancelAnimationFrame(now.frame);
+    if (now.element) now.element.style.transform = "";
+  };
+  const cancel = () => {
+    release();
+    setDrag(null);
+  };
   const track = (event: PointerEvent<HTMLElement>) => {
-    if (!drag || !grid.current) return;
-    const { colStep, rowStep } = metrics(grid.current, columns);
-    const dx = Math.round((event.clientX - drag.startX) / colStep);
-    const dy = Math.round((event.clientY - drag.startY) / rowStep);
+    const now = gesture.current;
+    if (!drag || !now) return;
+    now.dx = event.clientX - drag.startX;
+    now.dy = event.clientY - drag.startY;
+    follow(now);
+    const dx = Math.round(now.dx / now.colStep);
+    const dy = Math.round(now.dy / now.rowStep);
     const { origin, mode } = drag;
     const target =
       mode === "move"
@@ -169,9 +200,13 @@ export function DashboardGrid({
             w: mode === "south" ? origin.w : Math.max(1, Math.min(columns - origin.x, origin.w + dx)),
             h: mode === "east" ? origin.h : Math.max(1, origin.h + dy),
           };
-    setDrag({ ...drag, target, dx: event.clientX - drag.startX, dy: event.clientY - drag.startY });
+    // the grid (the placeholder, the neighbours making room) renders again only when the cell changes
+    const { target: was } = drag;
+    if (target.x !== was.x || target.y !== was.y || target.w !== was.w || target.h !== was.h)
+      setDrag({ ...drag, target });
   };
   const end = () => {
+    release();
     if (!drag || !arranger) return;
     const { key, mode, target } = drag;
     setDrag(null);
@@ -235,7 +270,7 @@ export function DashboardGrid({
       onPointerDown={(event) => begin(event, key, mode)}
       onPointerMove={track}
       onPointerUp={end}
-      onPointerCancel={() => setDrag(null)}
+      onPointerCancel={cancel}
     />
   );
 
@@ -285,7 +320,7 @@ export function DashboardGrid({
                   onPointerDown={(event) => (movable ? begin(event, item.id, "move") : undefined)}
                   onPointerMove={track}
                   onPointerUp={end}
-                  onPointerCancel={() => setDrag(null)}
+                  onPointerCancel={cancel}
                   onKeyDown={(event) => onKey(event, item.id)}
                 >
                   <Icon name="grip" size={18} />
@@ -311,9 +346,8 @@ export function DashboardGrid({
               style={{
                 gridColumn: `${at.x + 1} / span ${at.w}`,
                 gridRow: `${at.y + 1} / span ${at.h}`,
-                ...(following && drag
-                  ? { transform: `translate(${drag.dx}px, ${drag.dy}px)`, zIndex: 5 }
-                  : {}),
+                // the pointer's travel is set on the element itself while it moves (see ``follow``)
+                ...(following ? { zIndex: 5 } : {}),
               }}
             >
               {render(instance, handles, at)}

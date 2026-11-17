@@ -42,6 +42,8 @@
 
 .dashboard-grid__cell[data-dragging] {
   transition: none;
+  /* its own layer while it follows the pointer: moving it repaints nothing else */
+  will-change: transform;
 }
 .dashboard-grid[data-editing] {
   user-select: none;
