@@ -23,11 +23,13 @@ LABEL org.opencontainers.image.title="Portalab" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.source="https://github.com/sharkhunterr/portalab" \
       org.opencontainers.image.documentation="https://github.com/sharkhunterr/portalab#readme"
-# issue 410: the build shown on the Version page
+# issue 410: the build shown on the Version page; issue 495: two malloc arenas, not one per thread (the
+# worker held 735 MB for 92 MB of live Python objects)
 ENV PORTALAB_BUILD_REF="${VCS_REF}" \
     PORTALAB_BUILD_DATE="${BUILD_DATE}" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    MALLOC_ARENA_MAX=2 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never \

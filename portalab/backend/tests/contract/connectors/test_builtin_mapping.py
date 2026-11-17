@@ -128,6 +128,21 @@ async def test_seerr_requests_and_submit() -> None:
         await requests.submit({"imdb": "tt1"}, "movie", "?", None)
 
 
+async def test_seerr_names_a_title_once_across_syncs() -> None:
+    """Issue 486: a request's title is asked of Seerr once, not again at every hourly sync."""
+    seen: list[httpx.Request] = []
+    connector, handle = SeerrConnector(), handle_for("seerr", seen=seen)
+
+    def details() -> int:
+        return sum(1 for r in seen if r.url.path.startswith(("/api/v1/movie/", "/api/v1/tv/")))
+
+    first = [r async for r in connector.sync(_Ctx(handle, REQUESTS), None) if isinstance(r, SourceRecord)]
+    asked = details()
+    again = [r async for r in connector.sync(_Ctx(handle, REQUESTS), None) if isinstance(r, SourceRecord)]
+    assert asked >= 1 and details() == asked
+    assert [r.payload["title"] for r in again] == [r.payload["title"] for r in first] == ["Dune", "Andor"]
+
+
 async def test_romm_both_page_shapes() -> None:
     found = await records(RommConnector(), "romm")
     assert [r.payload["title"] for r in found] == ["Super Metroid", "Unknown Game"]

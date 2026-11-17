@@ -103,3 +103,34 @@ async def test_filtered_consumer_follows_the_head(ev: EventsHarness) -> None:
     await ev.module.dispatcher.run_once()
     snapshot = await ev.module.stats.snapshot()
     assert snapshot.lag_by_consumer["quiet"] == 0
+
+
+async def test_a_round_leaves_the_consumers_at_the_head_alone(ev: EventsHarness, monkeypatch) -> None:
+    """Issue 492: once every consumer is at the head, a round reads the head and the offsets once and runs
+    none of them (it opened four transactions per consumer every second); a new event wakes them."""
+    ev.types.register(EventType("demo.happened", "t"))
+    seen: list[int] = []
+
+    async def good(event: Envelope, ctx: ConsumerContext) -> None:
+        seen.append(int(event.payload["n"]))
+
+    ev.consumers.register(Consumer("good", frozenset({"demo.happened"}), good, "t"))
+    ev.consumers.register(Consumer("other", frozenset({"demo.other"}), good, "t"))  # filtered: never fed
+    await _publish(ev, 2)
+    await ev.module.dispatcher.run_once()
+    assert seen == [0, 1]
+
+    ran: list[str] = []
+    real = ev.module.dispatcher.run_consumer
+
+    async def counting(consumer: Consumer):
+        ran.append(consumer.name)
+        return await real(consumer)
+
+    monkeypatch.setattr(ev.module.dispatcher, "run_consumer", counting)
+    runs = await ev.module.dispatcher.run_once()
+    assert ran == [] and {run.consumer for run in runs} >= {"good", "other"}
+
+    await _publish(ev, 1)
+    await ev.module.dispatcher.run_once()
+    assert seen == [0, 1, 0] and "good" in ran

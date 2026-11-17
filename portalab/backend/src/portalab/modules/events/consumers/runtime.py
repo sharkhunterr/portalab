@@ -98,9 +98,24 @@ class Dispatcher:
         self.config = config or EventsConfig()
         self.clock = clock
 
+    async def _caught_up(self) -> tuple[int | None, dict[str, int]]:
+        """Issue 492: the head and every consumer's offset, read once a round (one transaction, not four per
+        consumer every second)."""
+        async with self.database.session() as session:
+            head = await session.scalar(select(Event.seq).order_by(Event.seq.desc()).limit(1))
+            rows = (await session.execute(select(ConsumerOffset.consumer, ConsumerOffset.last_seq))).all()
+        return head, {str(name): int(seq) for name, seq in rows}
+
     async def run_once(self) -> list[ConsumerRun]:
         runs = []
+        head, offsets = await self._caught_up()
         for consumer in self.consumers.all():
+            # at the head already: nothing new for it (a failing delivery keeps its offset below its event)
+            known = offsets.get(consumer.name)
+            if known is not None and (head is None or known >= head):
+                metrics.gauge(f"events.consumer.lag.{metric_part(consumer.name)}", 0)
+                runs.append(ConsumerRun(consumer.name, 0, 0, 0))
+                continue
             try:
                 runs.append(await self.run_consumer(consumer))
             except Exception:
@@ -152,7 +167,12 @@ class Dispatcher:
                 break  # keep order: retry this event first
             delivered += outcome == "succeeded"
             dead += outcome == "dead"
-        if newest is not None and not failed and len(rows) < self.config.dispatch_batch_size:
+        if (
+            newest is not None
+            and newest > offset
+            and not failed
+            and len(rows) < self.config.dispatch_batch_size
+        ):
             # caught up: the events in between are of types this consumer ignores, so its offset moves to
             # the head (027 T094) — otherwise a filtered consumer looks thousands of events behind
             await self._advance(consumer.name, newest)

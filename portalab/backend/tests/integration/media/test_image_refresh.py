@@ -57,3 +57,23 @@ async def test_a_changed_poster_is_fetched_again(
     assert fresh.status_code == 200 and fresh.headers["etag"] != first.headers["etag"]
     with PILImage.open(io.BytesIO(fresh.content)) as poster:
         assert poster.size == (2, 3)
+
+
+async def test_a_missing_cover_is_tried_again_once_a_day(media: MediaHarness) -> None:
+    """Issue 487: the covers left missing (their source has none) are queued again once a day each, the ones
+    not tried yet today first — they were asked for again every hour or two, forever."""
+    from portalab.core.jobs.models import Job
+
+    one = media.service(1)
+    await media.module.library.upsert(
+        [library_record(str(n), title=f"Livre {n}", image=f"{n}:1") for n in (101, 102, 103)], one
+    )
+    images = media.module.images
+    assert await images.backfill(limit=2) == 2
+    assert await images.backfill(limit=2) == 1  # the one not tried today, not the same two again
+    assert await images.backfill(limit=2) == 0
+    async with media.database.session() as session:
+        keys = (
+            await session.execute(select(Job.dedup_key).where(Job.dedup_key.like("%:backfill:%")))
+        ).scalars()
+        assert len(set(keys)) == 3

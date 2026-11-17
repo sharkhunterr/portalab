@@ -28,6 +28,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import load_only
 
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.capabilities.visuals import (
@@ -1431,6 +1432,18 @@ class VisualPacks:
                         .join(Element, Element.version_id == PackVersion.id)
                         .where(Pack.state == "enabled")
                         .order_by(Pack.id, Element.folder)
+                        # issue 491: the version once per element — its review (report, outcomes, measures…,
+                        # up to 300 kB of JSON each) decoded for every element held ~400 MB at start
+                        .options(
+                            load_only(
+                                PackVersion.id,
+                                PackVersion.pack_id,
+                                PackVersion.version,
+                                PackVersion.sha256,
+                                PackVersion.folder,
+                                raiseload=True,
+                            )
+                        )
                     )
                 ).all()
                 claims = list((await session.execute(select(LookClaim))).scalars())

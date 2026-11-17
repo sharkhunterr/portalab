@@ -33,6 +33,11 @@ class Job(CoreBase):
             "locked_until",
             postgresql_where=text("status = 'running'"),
         ),
+        Index(  # issue 494: the health check counts these without reading the whole table
+            "ix_job_failures",
+            "status",
+            postgresql_where=text("status IN ('failed', 'dead')"),
+        ),
         Index(
             "uq_job_queue_dedup_key",
             "queue",

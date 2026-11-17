@@ -172,6 +172,10 @@ def configure_logging(level: str = "INFO", *, stream: IO[str] | None = None) -> 
     log_tap.setLevel(logging.DEBUG if level.upper() == "DEBUG" else logging.INFO)
     root.addHandler(log_tap)
     root.setLevel(level.upper())
+    # issue 489: one « HTTP Request: GET … 200 OK » line per outbound call made 85% of the journal (the calls
+    # are counted by the metrics); their warnings and errors still come through, every line when debugging
+    for chatty in ("httpx", "httpcore"):
+        logging.getLogger(chatty).setLevel(logging.DEBUG if level.upper() == "DEBUG" else logging.WARNING)
 
 
 def get_logger(name: str) -> logging.Logger:

@@ -91,3 +91,18 @@ def test_level_filtering() -> None:
     configure_logging("WARNING", stream=buffer)
     logging.getLogger("portalab.test").info("hidden")
     assert buffer.getvalue() == ""
+
+
+def test_outbound_request_lines_stay_out_of_the_journal() -> None:
+    """Issue 489: httpx's one line per request (85% of the journal) is kept at warnings, but for debugging."""
+    import io
+    import logging
+
+    from portalab.core.logging import configure_logging
+
+    configure_logging("INFO", stream=io.StringIO())
+    assert logging.getLogger("httpx").getEffectiveLevel() == logging.WARNING
+    assert logging.getLogger("httpcore").getEffectiveLevel() == logging.WARNING
+    configure_logging("DEBUG", stream=io.StringIO())
+    assert logging.getLogger("httpx").getEffectiveLevel() == logging.DEBUG
+    configure_logging("INFO", stream=io.StringIO())

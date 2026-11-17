@@ -57,6 +57,7 @@ from portalab.connectors.http_base import HttpConnector, _Probe, binding, parse_
 from portalab.connectors.tmdb.people import IMAGE_PATH, map_person, same_name, snake
 
 PAGE = 100
+KNOWN_TITLES = 50_000  # issue 486: titles named across syncs, at most (forgotten all at once past it)
 # request.status: 1 pending, 2 approved, 3 declined (4 failed, 5 completed in recent versions);
 # media.status: 1 unknown, 2 pending, 3 processing, 4 partially available, 5 available (6 blacklisted).
 REQUEST_STATES: dict[int, RequestState] = {
@@ -335,9 +336,21 @@ class SeerrConnector(HttpConnector):
     async def _title(self, service: ServiceHandle, kind: str, tmdb: Any, cache: dict[str, str]) -> str:
         key = f"{kind}:{tmdb}"
         if key not in cache:
+            # issue 486: a title's name kept from one sync to the next — every request's title was asked of
+            # Seerr again each hour (1,200 films, 28,000 calls a day for names that do not change)
+            known: dict[tuple[str, str], str] = self.__dict__.setdefault("_known_titles", {})
+            remembered = known.get((str(service.service_id), key))
+            if remembered is not None:
+                cache[key] = remembered
+                return remembered
             try:
                 details = await self.get_json(service, f"/api/v1/{kind}/{safe_id(tmdb)}")
-                cache[key] = str((details or {}).get("title") or (details or {}).get("name") or key)
+                name = (details or {}).get("title") or (details or {}).get("name")
+                cache[key] = str(name or key)
+                if name:
+                    if len(known) >= KNOWN_TITLES:
+                        known.clear()
+                    known[(str(service.service_id), key)] = cache[key]
             except (ConnectionError, InvalidPayload):
                 cache[key] = key
         return cache[key]

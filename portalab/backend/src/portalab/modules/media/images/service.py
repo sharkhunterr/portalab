@@ -12,7 +12,7 @@ from uuid import UUID
 
 from PIL import Image as PILImage
 from PIL import UnidentifiedImageError
-from sqlalchemy import select
+from sqlalchemy import String, cast, func, literal, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +20,7 @@ from portalab.capabilities.media import LIBRARY, SourceUnavailable, unwrap
 from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.blobstore import BlobStore
 from portalab.core.db import Database
+from portalab.core.jobs.models import Job
 from portalab.core.jobs.queue import BULK_QUEUE, enqueue
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import payload_hash
@@ -205,7 +206,19 @@ class ImageService:
         return True
 
     async def backfill(self, limit: int = 300) -> int:
-        """027: titles with an image reference but no stored image (a failed fetch) are queued again."""
+        """027: titles with an image reference but no stored image (a failed fetch) are queued again — issue
+        487: once a day each (a cover its source does not have was asked for again every hour or two), the
+        ones not tried yet today first."""
+        now = utc_now(self.clock)
+        day = now.strftime("%Y%m%d")
+        tried_today = (
+            select(literal(1))
+            .where(
+                Job.queue == BULK_QUEUE,
+                Job.dedup_key == func.concat(f"{JOB}:", cast(MediaObject.id, String), f":backfill:{day}"),
+            )
+            .exists()
+        )
         async with self.database.unit_of_work() as uow:
             missing = (
                 (
@@ -216,6 +229,7 @@ class ImageService:
                             Image.id.is_(None),
                             MediaObject.status == "active",
                             MediaObject.effective["image"].astext.is_not(None),
+                            ~tried_today,
                         )
                         .limit(limit)
                     )
@@ -223,8 +237,6 @@ class ImageService:
                 .scalars()
                 .all()
             )
-            now = utc_now(self.clock)
-            day = now.strftime("%Y%m%d%H")
             for index, object_id in enumerate(missing):
                 await enqueue(
                     uow.session,
