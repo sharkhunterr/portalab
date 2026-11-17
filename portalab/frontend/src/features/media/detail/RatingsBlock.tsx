@@ -23,7 +23,8 @@ function regionName(locale: string, code: string): string {
  * Issue 478 — a title's classification in full: the age a household profile is held to and what it follows
  * (the TV's rating first, then the platforms', then the cinema's), the CNC's decision for a film (« tous
  * publics avec avertissement »), and every release's rating, country by country — the cinema, the TV, each
- * platform, with its note (« Netflix », « Visa CNC 142250 ») and its descriptors.
+ * platform, with its note (« Netflix », « Visa CNC 142250 ») and its descriptors: the portal's country
+ * shown, the others folded under « N other countries ».
  */
 export function RatingsBlock({
   rating,
@@ -40,11 +41,38 @@ export function RatingsBlock({
   const cnc = rating?.cnc;
   if (!rating || (!releases.length && !cnc)) return null;
   const own = rating.country ?? null;
-  const countries = [...new Set(releases.map((r) => r.country))].sort((a, b) =>
-    a === own ? -1 : b === own ? 1 : a.localeCompare(b),
+  // the portal's country (its administrator's choice) shown, every other one folded away
+  const mine = releases.filter((r) => r.country === own);
+  const others = [...new Set(releases.map((r) => r.country))]
+    .filter((country) => country !== own)
+    .sort((a, b) => regionName(locale, a).localeCompare(regionName(locale, b), locale));
+  const list = (items: Release[]) => (
+    <dl className="media-enriched__pairs">
+      {[...items]
+        .sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type))
+        .map((release, index) => (
+          <div key={`${release.type}-${release.certification}-${release.note ?? index}`}>
+            <dt>{t(`media:ratings.type.${release.type}`)}</dt>
+            <dd>
+              <span className="media-ratings__value">{release.certification}</span>
+              {release.note || release.date ? (
+                <span className="media-ratings__note">
+                  {[
+                    release.note,
+                    release.date ? format.date(`${release.date.slice(0, 10)}T12:00:00Z`, "medium") : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              ) : null}
+              {release.descriptors?.length ? (
+                <span className="media-ratings__note">{release.descriptors.join(", ")}</span>
+              ) : null}
+            </dd>
+          </div>
+        ))}
+    </dl>
   );
-  const ordered = (list: Release[]) =>
-    [...list].sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
   const block = (
     <div className="media-enriched__block media-ratings">
       <h3>{t("media:ratings.title")}</h3>
@@ -88,34 +116,23 @@ export function RatingsBlock({
           </div>
         ) : null}
       </dl>
-      {countries.map((country) => (
-        <div key={country} className="media-ratings__country">
-          <h4>{regionName(locale, country)}</h4>
-          <dl className="media-enriched__pairs">
-            {ordered(releases.filter((r) => r.country === country)).map((release, index) => (
-              <div key={`${release.type}-${release.certification}-${release.note ?? index}`}>
-                <dt>{t(`media:ratings.type.${release.type}`)}</dt>
-                <dd>
-                  <span className="media-ratings__value">{release.certification}</span>
-                  {release.note || release.date ? (
-                    <span className="media-ratings__note">
-                      {[
-                        release.note,
-                        release.date ? format.date(`${release.date.slice(0, 10)}T12:00:00Z`, "medium") : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  ) : null}
-                  {release.descriptors?.length ? (
-                    <span className="media-ratings__note">{release.descriptors.join(", ")}</span>
-                  ) : null}
-                </dd>
-              </div>
-            ))}
-          </dl>
+      {mine.length ? (
+        <div className="media-ratings__country">
+          <h4>{regionName(locale, own as string)}</h4>
+          {list(mine)}
         </div>
-      ))}
+      ) : null}
+      {others.length ? (
+        <details className="media-ratings__others">
+          <summary>{t("media:ratings.others", { count: others.length })}</summary>
+          {others.map((country) => (
+            <div key={country} className="media-ratings__country">
+              <h4>{regionName(locale, country)}</h4>
+              {list(releases.filter((r) => r.country === country))}
+            </div>
+          ))}
+        </details>
+      ) : null}
     </div>
   );
   if (inGrid) return block;

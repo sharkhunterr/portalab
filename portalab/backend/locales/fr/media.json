@@ -1185,6 +1185,7 @@
   "ratings.basis.other": "d'après les classifications des autres pays",
   "ratings.cnc": "CNC",
   "ratings.cncWarning": "Tous publics avec avertissement",
+  "ratings.others": "{count, plural, one {# autre pays} other {# autres pays}}",
   "ratings.visa": "visa {visa}",
   "ratings.type.tv": "Télévision",
   "ratings.type.digital": "Vidéo à la demande",

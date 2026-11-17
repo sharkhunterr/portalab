@@ -1916,3 +1916,23 @@ a.media-person__row:hover {
   align-items: center;
   gap: 0.25rem;
 }
+/* issue 478: the other countries' ratings, folded away under the portal's own */
+.media-ratings__others {
+  margin-block-start: var(--space-3);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid var(--color-border);
+}
+.media-ratings__others > summary {
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+.media-ratings__others > summary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+.media-ratings__others .media-ratings__country:first-of-type {
+  border-block-start: 0;
+}
