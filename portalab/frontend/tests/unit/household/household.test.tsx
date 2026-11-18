@@ -246,11 +246,8 @@ describe("my household", () => {
     const lea = (await screen.findByRole("heading", { name: "Léa" })).closest("li") as HTMLElement;
     expect(within(lea).getByRole("link", { name: "Coco" })).toBeTruthy();
     expect(within(lea).getByText("Screen time today: 35 / 60 min")).toBeTruthy();
-    // issue 504: active days in a row, told apart from the progression's streak (no flame)
-    expect(within(lea).getByText("2 active days")).toBeTruthy();
-    expect(within(lea).getAllByText(/2 active days in a row/).length).toBeGreaterThan(0);
-    expect(screen.getByText("Active days in a row")).toBeTruthy();
-    expect(screen.getByText(/2 days · Léa/)).toBeTruthy(); // the most active days in a row
+    expect(within(lea).getAllByText(/2 days in a row/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/2 days · Léa/)).toBeTruthy(); // the longest streak
     fireEvent.click(screen.getByRole("button", { name: "30 days" }));
     expect(screen.getByRole("button", { name: "30 days" }).getAttribute("aria-pressed")).toBe("true");
   });

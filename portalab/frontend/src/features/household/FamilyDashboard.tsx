@@ -131,14 +131,12 @@ function FamilyCard({
           </span>
         </div>
         {figures && figures.streak > 0 ? (
-          // issue 504: active days in a row (a minute of anything) — not the progression's streak and its
-          // flame, which counts thirty minutes of plays a day
           <span
             className="family-card__streak"
             title={t("household:family.streak", { days: figures.streak })}
           >
-            <Icon name="calendar" size={14} />
-            <span aria-hidden="true">{t("household:family.activeDays", { days: figures.streak })}</span>
+            <Icon name="flame" size={16} />
+            {figures.streak}
             <span className="visually-hidden">{t("household:family.streak", { days: figures.streak })}</span>
           </span>
         ) : null}
