@@ -88,7 +88,7 @@
   "editor.unrated": "Allow unrated titles",
   "error": "Something went wrong. Try again.",
   "family.answer": "Answer",
-  "family.bestStreak": "Longest streak",
+  "family.bestStreak": "Active days in a row",
   "family.byDay": "Minutes day by day",
   "family.coins": "{coins} coins",
   "family.dayMinutes": "{ago, select, 0 {Today} other {{ago} days ago}}: {minutes} min",
@@ -100,7 +100,7 @@
   "family.period": "Period",
   "family.plays": "Sittings",
   "family.screenFree": "No screen-time limit right now",
-  "family.streak": "{days, plural, one {# day} other {# days}} in a row with something watched",
+  "family.streak": "{days, plural, one {# active day} other {# active days}} in a row: at least a minute watched, read, listened to or played each day (not the « My progress » streak)",
   "family.streakOf": "{days, plural, one {# day} other {# days}} · {name}",
   "family.time": "Time",
   "family.title": "The family lately",
@@ -372,5 +372,6 @@
   "editor.order.home,cinema,tv": "video and streaming, then cinema, then TV",
   "editor.order.cinema,tv,home": "cinema, then TV, then video and streaming",
   "editor.order.cinema,home,tv": "cinema, then video and streaming, then TV",
-  "editor.order.strictest": "the strictest of all its ratings"
+  "editor.order.strictest": "the strictest of all its ratings",
+  "family.activeDays": "{days, plural, one {# active day} other {# active days}}"
 }

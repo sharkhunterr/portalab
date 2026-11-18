@@ -1393,15 +1393,18 @@ button.screen-cal__max:focus-visible {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm, 0.875rem);
 }
+/* issue 504: active days in a row — neutral, apart from the progression streak's orange flame */
 .family-card__streak {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-pill, 999px);
-  background: color-mix(in srgb, var(--state-partial-fg) 20%, transparent);
-  color: var(--state-partial-fg);
-  font-weight: 800;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .family-card__figures {
   display: grid;
