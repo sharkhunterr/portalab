@@ -54,6 +54,22 @@ export function GameExtras({ gameRef, title }: { gameRef: string; title: string 
   return <ExtrasView extras={extras.data} title={title} />;
 }
 
+/** Issue 503: a film or a series the library lacks — its videos and pictures by its TMDB id. */
+export function DiscoverExtras({ kind, tmdb, title }: { kind: string; tmdb: string; title: string }) {
+  const extras = useQuery({
+    queryKey: ["media", "discover-extras", kind, tmdb],
+    retry: false,
+    staleTime: 30 * 60_000,
+    queryFn: async (): Promise<MediaExtras> => {
+      const { data } = await api.GET("/api/v1/media/discover-extras", {
+        params: { query: { kind, tmdb } },
+      });
+      return data ?? { videos: [], images: [] };
+    },
+  });
+  return <ExtrasView extras={extras.data} title={title} />;
+}
+
 function ExtrasView({ extras, title }: { extras: MediaExtras | undefined; title: string }) {
   if (!extras || (!extras.videos?.length && !extras.images?.length)) return null;
   return (

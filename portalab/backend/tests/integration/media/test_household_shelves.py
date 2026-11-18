@@ -227,3 +227,74 @@ async def test_a_childs_request_shelf_is_rated_and_fills_from_the_next_pages(
     assert titles and all(int(t.split("-")[1]) % 5 == 0 and not t.endswith(("-5", "-10")) for t in titles)
     assert discovery.pages == [2, 3, 4, 5]  # the next pages, looked for to fill the shelf
     assert len(titles) == 2 * 5
+
+
+class TmdbExtras:
+    """TMDB's videos and pictures of a film, by its id."""
+
+    def __init__(self) -> None:
+        self.asked: list[tuple[str, dict[str, str]]] = []
+
+    async def extras(self, kind: str, ids: dict[str, str], external_id: str | None, language: str) -> Any:
+        from portalab.capabilities.media import ExtraImage, ExtraVideo, MediaExtras
+
+        self.asked.append((kind, dict(ids)))
+        return MediaExtras(
+            videos=[ExtraVideo(site="youtube", key="abcdefghijk", name="Bande-annonce", kind="trailer")],
+            images=[ExtraImage(kind="backdrop", ref="/b1.jpg"), ExtraImage(kind="still", ref="/s2.jpg")],
+        )
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        from portalab.capabilities.media.testkit import PNG_1PX
+
+        return PNG_1PX
+
+
+async def test_a_film_the_library_lacks_shows_its_videos_and_pictures_as_its_profile_allows(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 503: a film's page before asking for it has its videos and pictures as a library title's, by
+    its TMDB id — and a household profile its age rating keeps from the film gets nothing of them."""
+    from portalab.capabilities.media import EXTRAS
+    from portalab.modules.household.rules import RestrictionSettings
+
+    await media.configure("i18n.defaultLanguage", "fr")  # rated as in France
+    told = TmdbExtras()
+    media.provide(EXTRAS, media.service(9, "tmdb"), told)
+    media.module.gate.briefs = Briefs()
+    master, lea = await _child(app, client, media)
+    extras = (
+        await client.get("/api/v1/media/discover-extras", params={"kind": "movie", "tmdb": "101"})
+    ).json()
+    assert told.asked == [("movie", {"tmdb": "101"})]
+    assert [(v["youtube"], v["kind"], v["play"]) for v in extras["videos"]] == [
+        ("abcdefghijk", "trailer", None)
+    ]
+    assert extras["images"][0]["preview"] == (
+        "/api/v1/media/discover-extras/images/0?kind=movie&tmdb=101&preview=true"
+    )
+    picture = await client.get(extras["images"][1]["full"])
+    assert picture.status_code == 200 and picture.headers["content-type"] == "image/jpeg"
+    assert (await client.get(extras["videos"][0]["picture"])).status_code in (200, 503)
+    bad = await client.get("/api/v1/media/discover-extras", params={"kind": "book", "tmdb": "101"})
+    assert bad.status_code == 422
+    assert (
+        await client.get("/api/v1/media/discover-extras", params={"kind": "movie", "tmdb": "../x"})
+    ).status_code == 422
+
+    await households(app).change(
+        Principal(user_id=master),
+        lea,
+        restrictions=RestrictionSettings(
+            max_age=12, allow_unrated=False, genres=[], avoid_warnings=[], keywords=[]
+        ),
+    )
+    await client.post("/api/v1/household/switch", json={"user_id": str(lea)})
+    kept = await client.get("/api/v1/media/discover-extras", params={"kind": "movie", "tmdb": "101"})
+    assert kept.status_code == 404  # rated 16: nothing of it for a 12-year-old's profile
+    hidden = await client.get(
+        "/api/v1/media/discover-extras/images/0", params={"kind": "movie", "tmdb": "101"}
+    )
+    assert hidden.status_code == 404
+    family = await client.get("/api/v1/media/discover-extras", params={"kind": "movie", "tmdb": "100"})
+    assert family.status_code == 200 and len(family.json()["images"]) == 2  # « tous publics »

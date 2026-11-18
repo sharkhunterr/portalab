@@ -6,6 +6,7 @@ import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
 import { EnrichedView, metadataImage, normalize } from "../detail/Enrichment";
+import { DiscoverExtras } from "../detail/Extras";
 import { TitleHero } from "../detail/TitleHero";
 import { QuotaLine } from "../requests/QuotaSummary";
 import { useDiscoverTitle } from "./api";
@@ -104,6 +105,8 @@ export function DiscoverTitlePage() {
       </TitleHero>
       {/* the same rich details as a library title: facts, cast and crew, the saga, money, production */}
       <EnrichedView data={normalize({ ...data.metadata, title: data.title })} />
+      {/* issue 503: its videos and pictures in carousels, with the viewer, as on a library title's page */}
+      <DiscoverExtras kind={data.kind} tmdb={String(data.tmdb_id)} title={data.title} />
       {data.seasons.length ? (
         <section className="media-enriched discover-title__seasons" aria-label={t("media:discover.seasons")}>
           <div className="media-enriched__block">

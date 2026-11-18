@@ -87,6 +87,52 @@ async def game_extra_video_picture(
     return await _picture(module.extras.video_picture_of(extras, index))
 
 
+TMDB_ID = Annotated[str, Query(min_length=1, max_length=12, pattern=r"^[0-9]+$")]
+SCREEN_KIND = Annotated[str, Query(pattern=r"^(movie|series)$")]
+
+
+async def _discovered(principal: Reader, module: Module, kind: str, tmdb: str) -> TitleExtras:
+    """Issue 503: a film's, a series' extras before asking for it (TMDB's id) — kept from a household
+    profile as its page's title is on the shelves (032: one it may not open shows nothing more)."""
+    kept = await module.gate.requestable(principal, [{"kind": kind, "tmdb_id": tmdb}])
+    if not kept or kept[0].get("locked"):
+        raise NotFound("No such title.", code="media.extra_not_found")
+    return await module.extras.of_title(kind, {"tmdb": tmdb}, await module.member_language(principal))
+
+
+@router.get("/media/discover-extras", response_model=MediaExtrasOut)
+async def discover_extras(
+    principal: Reader, module: Module, kind: SCREEN_KIND, tmdb: TMDB_ID
+) -> MediaExtrasOut:
+    """Issue 503: a film or a series the library lacks — its videos and pictures as on a library title's
+    page, by its TMDB id."""
+    extras = await _discovered(principal, module, kind, tmdb)
+    return _out(extras, "/api/v1/media/discover-extras", f"kind={kind}&tmdb={tmdb}", None)
+
+
+@router.get("/media/discover-extras/images/{index}")
+async def discover_extra_image(
+    principal: Reader,
+    index: INDEX,
+    module: Module,
+    kind: SCREEN_KIND,
+    tmdb: TMDB_ID,
+    preview: Annotated[bool, Query()] = False,
+) -> Response:
+    """Issue 503: one of its pictures, small (``preview``) or large."""
+    extras = await _discovered(principal, module, kind, tmdb)
+    return await _picture(module.extras.image_of(extras, index, preview=preview))
+
+
+@router.get("/media/discover-extras/videos/{index}/picture")
+async def discover_extra_video_picture(
+    principal: Reader, index: INDEX, module: Module, kind: SCREEN_KIND, tmdb: TMDB_ID
+) -> Response:
+    """Issue 503: one of its videos' picture, fetched by the portal."""
+    extras = await _discovered(principal, module, kind, tmdb)
+    return await _picture(module.extras.video_picture_of(extras, index))
+
+
 async def _picture(fetch: Awaitable[bytes]) -> Response:
     try:
         data = await fetch

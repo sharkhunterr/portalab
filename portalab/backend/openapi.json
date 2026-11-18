@@ -55280,6 +55280,202 @@
         ]
       }
     },
+    "/api/v1/media/discover-extras": {
+      "get": {
+        "description": "Issue 503: a film or a series the library lacks \u2014 its videos and pictures as on a library title's\npage, by its TMDB id.",
+        "operationId": "discover_extras_api_v1_media_discover_extras_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "pattern": "^(movie|series)$",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tmdb",
+            "required": true,
+            "schema": {
+              "maxLength": 12,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Tmdb",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaExtrasOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Extras",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover-extras/images/{index}": {
+      "get": {
+        "description": "Issue 503: one of its pictures, small (``preview``) or large.",
+        "operationId": "discover_extra_image_api_v1_media_discover_extras_images__index__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "pattern": "^(movie|series)$",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tmdb",
+            "required": true,
+            "schema": {
+              "maxLength": 12,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Tmdb",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "preview",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Preview",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Extra Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/discover-extras/videos/{index}/picture": {
+      "get": {
+        "description": "Issue 503: one of its videos' picture, fetched by the portal.",
+        "operationId": "discover_extra_video_picture_api_v1_media_discover_extras_videos__index__picture_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "pattern": "^(movie|series)$",
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tmdb",
+            "required": true,
+            "schema": {
+              "maxLength": 12,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Tmdb",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover Extra Video Picture",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/discover/search": {
       "get": {
         "description": "#4: films and series one can ask for (the request service's search, over TMDB), each with its\npage in the catalog when it is there and the open request for it (mine, or a member's).",
