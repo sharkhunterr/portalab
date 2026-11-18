@@ -16,6 +16,8 @@
   --wheel-pointer: var(--color-text);
   --wheel-hub: var(--color-surface);
   --wheel-hub-ink: var(--color-text);
+  /* issue 505: room left around the wheel for its rim's shadow and its pointer (never cut by the block) */
+  --wheel-room: 0.9rem;
   /* issue 505: by default (a small block) the wheel alone, as large as its room allows, its hub the button;
      the words come beside it when the block is wide, under it when it is tall (the container queries below) */
   display: grid;
@@ -39,17 +41,22 @@
   position: relative;
   aspect-ratio: 1;
   /* room kept under it for the result's line once spun */
-  inline-size: min(100cqw, calc(100cqh - 2.5rem), 17rem);
+  --wheel-size: min(calc(100cqw - var(--wheel-room)), calc(100cqh - 2.5rem - var(--wheel-room)), 17rem);
+  /* issue 505: its rim inside its size (a padding in % followed the block's width: a wide, low block cut
+     the wheel) */
+  box-sizing: border-box;
+  inline-size: var(--wheel-size);
+  block-size: var(--wheel-size);
   justify-self: center;
   border-radius: 50%;
-  padding: 5%;
+  padding: calc(var(--wheel-size) * 0.05);
   background: radial-gradient(circle, var(--wheel-rim) 62%, var(--wheel-rim-edge) 100%);
   box-shadow:
     0 0.4rem 1.2rem color-mix(in srgb, var(--color-text) 18%, transparent),
     inset 0 0 0 2px var(--wheel-rim-edge);
 }
 .wheel[data-compact] .wheel__stage {
-  inline-size: min(100cqh, 4.5rem);
+  --wheel-size: min(calc(100cqh - var(--wheel-room)), 4.5rem);
 }
 
 .wheel__spinner {
@@ -214,7 +221,12 @@
 
 .wheel:not([data-compact])[data-phase="idle"] .wheel__stage,
 .wheel:not([data-compact])[data-phase="spinning"] .wheel__stage {
-  inline-size: min(100cqw, 100cqh, 17rem); /* nothing under it yet */
+  /* nothing under it yet: the gap kept for its line counts too */
+  --wheel-size: min(
+    calc(100cqw - var(--wheel-room)),
+    calc(100cqh - var(--space-2) - var(--wheel-room)),
+    17rem
+  );
 }
 .wheel__side {
   display: grid;
@@ -291,7 +303,7 @@
   }
   .wheel:not([data-compact]) .wheel__stage,
   .wheel:not([data-compact])[data-phase] .wheel__stage {
-    inline-size: min(100cqh, 50cqw, 17rem);
+    --wheel-size: min(calc(100cqh - var(--wheel-room)), 50cqw, 17rem);
   }
   .wheel:not([data-compact]) .wheel__side {
     justify-items: start;
@@ -318,7 +330,7 @@
 /* issue 505: narrow but tall (a phone's column) — the next turn under the result */
 @container (max-width: 22rem) and (min-height: 16rem) {
   .wheel:not([data-compact])[data-phase="done"] .wheel__stage {
-    inline-size: min(100cqw, calc(100cqh - 3.75rem), 17rem);
+    --wheel-size: min(calc(100cqw - var(--wheel-room)), calc(100cqh - 3.75rem - var(--wheel-room)), 17rem);
   }
   .wheel:not([data-compact]) .wheel__next {
     display: inline-flex;
