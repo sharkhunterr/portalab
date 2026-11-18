@@ -5,6 +5,7 @@ grants, Coins destruction at deletion and progression read APIs."""
 from dataclasses import replace
 from datetime import timedelta
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import delete
 
@@ -187,6 +188,7 @@ class GamificationModule:
         self.pipeline.quests = self.quests
         self.progression = ProgressionService(database, self.levels, self.achievements.unlock_shares)
         self.streaks = Streaks(database, config)
+        self.progression.streak_of = self._streak_of
         self.streaks.pot = lambda user: pot_master(capabilities, user)  # issue 444
         self.pipeline.streaks = self.streaks
         self.pace = Pace(config)
@@ -200,6 +202,11 @@ class GamificationModule:
         self.leaderboards = LeaderboardService(
             database, self.levels, self.visibility, capabilities, config, clock=clock
         )
+
+    async def _streak_of(self, user: UUID) -> int:
+        """Issue 504: a member's play streak now, as their « My progress » page shows it."""
+        state = await self.streaks.current(user, utc_now(self.clock))
+        return int(state["days"]) if state["enabled"] else 0
 
     def _household(self) -> Household | None:
         providers = self.capabilities.system_providers(HOUSEHOLD)

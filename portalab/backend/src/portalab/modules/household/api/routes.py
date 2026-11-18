@@ -57,6 +57,7 @@ class HouseholdFigures(BaseModel):
     level: int
     coins: int
     contribution: int
+    streak: int = 0  # issue 504: the play streak, as « My progress » tells it
 
 
 class HouseholdMemberOut(HouseholdMemberTile):

@@ -16866,6 +16866,11 @@ export interface components {
             contribution: number;
             /** Level */
             level: number;
+            /**
+             * Streak
+             * @default 0
+             */
+            streak: number;
             /** Xp */
             xp: number;
         };

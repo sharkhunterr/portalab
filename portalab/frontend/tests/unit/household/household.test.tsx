@@ -203,7 +203,14 @@ describe("my household", () => {
   it("shows the family's dashboard: the wallet, each member's watching, the requests waiting", async () => {
     fake.handler = async (request) => {
       const path = new URL(request.url).pathname;
-      if (path === "/api/v1/household") return json(200, HOUSEHOLD);
+      // issue 504: Léa's play streak as « My progress » tells it (2), not her days with a minute of anything
+      if (path === "/api/v1/household")
+        return json(200, {
+          ...HOUSEHOLD,
+          members: HOUSEHOLD.members.map((m) =>
+            m.id === LEA ? { ...m, progress: { ...m.progress, streak: 2 } } : m,
+          ),
+        });
       if (path === "/api/v1/household/requests") return json(200, [REQUEST]);
       if (path === "/api/v1/me/media/household")
         return json(200, {
@@ -225,7 +232,7 @@ describe("my household", () => {
               finished: 1,
               kinds: { movie: 60, book: 35 },
               series: [0, 0, 10, 20, 0, 30, 35],
-              streak: 2,
+              streak: 4,
               last: {
                 title: "Coco",
                 kind: "movie",
@@ -246,7 +253,8 @@ describe("my household", () => {
     const lea = (await screen.findByRole("heading", { name: "Léa" })).closest("li") as HTMLElement;
     expect(within(lea).getByRole("link", { name: "Coco" })).toBeTruthy();
     expect(within(lea).getByText("Screen time today: 35 / 60 min")).toBeTruthy();
-    expect(within(lea).getAllByText(/2 days in a row/).length).toBeGreaterThan(0);
+    expect(within(lea).getAllByText(/2 days in a row, as in « My progress »/).length).toBeGreaterThan(0);
+    expect(lea.querySelector(".family-card__streak")?.textContent?.startsWith("2")).toBe(true);
     expect(screen.getByText(/2 days · Léa/)).toBeTruthy(); // the longest streak
     fireEvent.click(screen.getByRole("button", { name: "30 days" }));
     expect(screen.getByRole("button", { name: "30 days" }).getAttribute("aria-pressed")).toBe("true");

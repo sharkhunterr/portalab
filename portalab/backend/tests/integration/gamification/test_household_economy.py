@@ -295,3 +295,38 @@ async def test_an_erased_profile_leaves_every_admin_screen(
             select(func.count()).select_from(LedgerTransaction).where(LedgerTransaction.user_id == lea)
         )
     assert kept and kept > 0
+
+
+async def test_the_household_cards_show_each_ones_progress_streak(
+    gm: GamHarness, app: FastAPI, client: httpx.AsyncClient
+) -> None:
+    """Issue 504: the household's cards show each member's play streak as « My progress » tells it (its
+    counted days), not another count of their own — none while streaks are off."""
+    from dataclasses import replace
+    from datetime import timedelta
+
+    owner = gm.people["ursula"]
+    lea = await _child(gm, app, owner)
+    gm.module.config = replace(
+        gm.module.config,
+        streak={
+            "enabled": True,
+            "event_types": ["media.played"],
+            "values": ["xp"],
+            "tiers": [{"days": 2, "multiplier": 1.5}],
+        },
+    )
+    now = gm.clock.now()
+    await gm.emit(lea, at=now - timedelta(days=1))
+    await gm.emit(lea, at=now)
+    expected = (await gm.module.streaks.current(lea, now))["days"]
+    assert expected == 2
+    await login(client, "ursula")
+
+    def streaks(body: dict[str, Any]) -> dict[str, int]:
+        return {m["id"]: m["progress"]["streak"] for m in body["members"]}
+
+    assert streaks((await client.get("/api/v1/household")).json())[str(lea)] == expected
+
+    gm.module.config = replace(gm.module.config, streak={**gm.module.config.streak, "enabled": False})
+    assert set(streaks((await client.get("/api/v1/household")).json()).values()) == {0}

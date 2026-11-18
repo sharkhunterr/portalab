@@ -9713,6 +9713,11 @@
             "title": "Level",
             "type": "integer"
           },
+          "streak": {
+            "default": 0,
+            "title": "Streak",
+            "type": "integer"
+          },
           "xp": {
             "title": "Xp",
             "type": "integer"

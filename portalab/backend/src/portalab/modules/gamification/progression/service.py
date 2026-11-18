@@ -23,6 +23,13 @@ class ProgressionService:
         self.database = database
         self.levels = levels
         self.shares = shares  # #46: each achievement's unlock share, for its rarity on profiles
+        # issue 504: today's play streak (yesterday's, still alive) — set by the module (``Streaks``)
+        self.streak_of: Callable[[UUID], Awaitable[int]] | None = None
+
+    async def streak(self, user: UUID) -> int:
+        """Issue 504: the member's play streak as « My progress » tells it (0 when streaks are off), for the
+        household's cards — one number everywhere, under the same flame."""
+        return await self.streak_of(user) if self.streak_of is not None else 0
 
     async def progress(self, user: UUID) -> Progress:
         async with self.database.session() as session:

@@ -30,7 +30,10 @@ export function FamilyDashboard({ household }: { household: Household }) {
     }),
     { minutes: 0, plays: 0, finished: 0 },
   );
-  const best = [...(activity.data?.members ?? [])].sort((a, b) => b.streak - a.streak)[0];
+  // issue 504: the play streak, as each one's « My progress » tells it — one number everywhere
+  const best = [...household.members]
+    .map((m) => ({ user_id: m.id, streak: m.progress.streak ?? 0 }))
+    .sort((a, b) => b.streak - a.streak)[0];
   const nameOf = (id: string) => household.members.find((m) => m.id === id)?.display_name ?? "";
   return (
     <section className="family" aria-labelledby="family-title">
@@ -107,6 +110,7 @@ function FamilyCard({
 }) {
   const t = useT();
   const format = useFormat();
+  const streak = member.progress.streak ?? 0; // issue 504: the play streak, as « My progress » tells it
   const measures = useMeasures();
   const series = figures?.series ?? [];
   const peak = Math.max(1, ...series);
@@ -130,14 +134,11 @@ function FamilyCard({
             {t("household:family.xp", { xp: format.number(member.progress.xp) })}
           </span>
         </div>
-        {figures && figures.streak > 0 ? (
-          <span
-            className="family-card__streak"
-            title={t("household:family.streak", { days: figures.streak })}
-          >
+        {streak > 0 ? (
+          <span className="family-card__streak" title={t("household:family.streak", { days: streak })}>
             <Icon name="flame" size={16} />
-            {figures.streak}
-            <span className="visually-hidden">{t("household:family.streak", { days: figures.streak })}</span>
+            {streak}
+            <span className="visually-hidden">{t("household:family.streak", { days: streak })}</span>
           </span>
         ) : null}
       </div>

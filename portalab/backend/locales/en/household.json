@@ -100,7 +100,7 @@
   "family.period": "Period",
   "family.plays": "Sittings",
   "family.screenFree": "No screen-time limit right now",
-  "family.streak": "{days, plural, one {# day} other {# days}} in a row with something watched",
+  "family.streak": "{days, plural, one {# day} other {# days}} in a row, as in « My progress »",
   "family.streakOf": "{days, plural, one {# day} other {# days}} · {name}",
   "family.time": "Time",
   "family.title": "The family lately",

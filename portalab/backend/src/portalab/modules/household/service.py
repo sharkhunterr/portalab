@@ -451,7 +451,7 @@ class HouseholdService:
         }
 
     async def _progress(self, user: UUID) -> dict[str, int]:
-        empty = {"xp": 0, "level": 0, "coins": 0, "contribution": 0}
+        empty = {"xp": 0, "level": 0, "coins": 0, "contribution": 0, "streak": 0}
         providers = self.capabilities.system_providers(PROGRESSION)
         if not providers or not hasattr(providers[0].provider, "progress"):
             return empty
@@ -464,7 +464,19 @@ class HouseholdService:
             "level": int(progress.level),
             "coins": int(progress.coins),
             "contribution": int(progress.contribution),
+            "streak": await self._streak(providers[0].provider, user),
         }
+
+    @staticmethod
+    async def _streak(provider: object, user: UUID) -> int:
+        """Issue 504: the member's play streak as « My progress » tells it (the cards' flame)."""
+        streak = getattr(provider, "streak", None)
+        if streak is None:
+            return 0
+        try:
+            return int(await streak(user))
+        except Exception:
+            return 0
 
     # --- management (the master only) ----------------------------------------------------------------
     @staticmethod
