@@ -56,6 +56,15 @@ function renderSheet(sheet: Record<string, unknown>, mine: Record<string, unknow
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/game") return json(200, sheet);
     if (path === "/api/v1/me/media/requests/list") return json(200, { items: mine });
+    if (path === "/api/v1/media/game-extras")
+      return json(200, {
+        videos: [{ index: 0, site: "youtube", youtube: "abcdefghijk", name: "Trailer", kind: "trailer" }],
+        images: [
+          { index: 0, kind: "screenshot", preview: "/p0", full: "/f0" },
+          { index: 1, kind: "artwork", preview: "/p1", full: "/f1" },
+        ],
+      });
+    if (path === "/api/v1/me/media/follows") return json(200, { items: [] });
     if (path === "/api/v1/me/media/requests/r9/journey")
       return json(200, {
         kind: "game",
@@ -178,6 +187,16 @@ describe("a game's sheet", () => {
     renderSheet({ ...SHEET, age_rating: "PEGI 7", age: 7 });
     await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
     expect(document.querySelector(".age-badge")?.textContent).toContain("7+");
+  });
+
+  it("is laid out as a library game's page: production, videos, pictures, follow (issue 501)", async () => {
+    renderSheet(SHEET);
+    await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
+    expect(screen.getByRole("heading", { name: "Production" })).toBeTruthy();
+    expect(screen.getByText("Nintendo R&D4")).toBeTruthy(); // its studio in the production block
+    expect(await screen.findByRole("list", { name: "Pictures" })).toBeTruthy();
+    expect(screen.getByRole("list", { name: "Videos" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Follow" })).toBeTruthy();
   });
 
   it("opens the library's page when the library has it", async () => {

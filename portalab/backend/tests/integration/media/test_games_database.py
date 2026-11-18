@@ -13,10 +13,21 @@ from fastapi import FastAPI
 from sqlalchemy import select
 
 from portalab.capabilities.isolation import IsolationPolicy, ProviderGuard
-from portalab.capabilities.media import GAME_DATABASE, GameDatabase, GameDetails, GameFranchise, PersonCredit
+from portalab.capabilities.media import (
+    EXTRAS,
+    GAME_DATABASE,
+    ExtraImage,
+    ExtraVideo,
+    GameDatabase,
+    GameDetails,
+    GameFranchise,
+    MediaExtras,
+    PersonCredit,
+)
 from portalab.capabilities.media.testkit import library_record
 from portalab.capabilities.search import ParsedQuery
 from portalab.core.authz_port import Principal
+from portalab.core.time import FixedClock
 from portalab.modules.connectors.breaker.breaker import CircuitBreaker
 from portalab.modules.connectors.services.providers import guarded_provider
 from portalab.modules.media.models import ExternalId, MediaObject
@@ -188,3 +199,79 @@ async def test_a_slow_database_answers_the_next_keystroke(app: FastAPI, media: M
     await asyncio.sleep(0.5)  # the answer arrives meanwhile
     again = (await provider.search(query, Principal(user_id=leo), None, limit=10, cursor=None)).items  # type: ignore[arg-type]
     assert [i.title for i in again] == ["Zelda II: The Adventure of Link (1987)"]
+
+
+class _IgdbExtras:
+    """IGDB's videos and pictures of a game, by its id."""
+
+    def __init__(self) -> None:
+        self.asked: list[tuple[str, dict[str, str]]] = []
+
+    async def extras(
+        self, kind: str, ids: dict[str, str], external_id: str | None, language: str
+    ) -> MediaExtras:
+        self.asked.append((kind, dict(ids)))
+        if ids.get("igdb") != "1025":
+            return MediaExtras()
+        return MediaExtras(
+            videos=[ExtraVideo(site="youtube", key="abcdefghijk", name="Trailer", kind="trailer")],
+            images=[ExtraImage(kind="screenshot", ref="s:sc1"), ExtraImage(kind="artwork", ref="a:ar2")],
+        )
+
+    async def extra_image(self, ref: str, preview: bool = False) -> bytes:
+        return b""
+
+
+async def test_a_game_the_library_lacks_shows_its_videos_and_pictures(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness
+) -> None:
+    """Issue 501: a game's sheet has its videos and pictures as a library game's page, by its IGDB id."""
+    await _library(app, media)
+    told = _IgdbExtras()
+    media.provide(EXTRAS, media.service(11, "igdb"), told)
+    await login(client, "zoe")
+    extras = (await client.get("/api/v1/media/game-extras", params={"ref": "1025"})).json()
+    assert told.asked == [("game", {"igdb": "1025"})]
+    assert [(v["youtube"], v["kind"], v["play"]) for v in extras["videos"]] == [
+        ("abcdefghijk", "trailer", None)
+    ]
+    assert extras["videos"][0]["picture"] == "/api/v1/media/game-extras/videos/0/picture?ref=1025"
+    assert [i["preview"] for i in extras["images"]] == [
+        "/api/v1/media/game-extras/images/0?ref=1025&preview=true",
+        "/api/v1/media/game-extras/images/1?ref=1025&preview=true",
+    ]
+    assert extras["images"][1]["full"] == "/api/v1/media/game-extras/images/1?ref=1025"
+    assert (await client.get("/api/v1/media/game-extras", params={"ref": "../x"})).status_code == 422
+    missing = await client.get("/api/v1/media/game-extras/images/9", params={"ref": "1025"})
+    assert missing.status_code == 404
+
+
+async def test_a_game_the_library_lacks_is_followed_until_it_arrives(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, clock: FixedClock
+) -> None:
+    """Issue 501: following a game from its sheet (named as its database names it); once the library has it
+    (by its IGDB id), its arrival is in « My feed »."""
+    from datetime import timedelta
+
+    _, service = await _library(app, media)
+    await login(client, "zoe")
+    sheet = f"/media/game?service={service}&ref=1025"
+    followed = await client.put("/api/v1/me/media/follows", json={"kind": "title", "ref": sheet})
+    assert followed.status_code == 200 and followed.json()["label"] == "Zelda II: The Adventure of Link"
+    unknown = await client.put(
+        "/api/v1/me/media/follows", json={"kind": "title", "ref": f"/media/game?service={service}&ref=99"}
+    )
+    assert unknown.status_code == 422  # nothing the game database knows
+    assert (await client.get("/api/v1/me/media/feed")).json()["items"] == []
+
+    clock.advance(timedelta(hours=2))
+    romm = media.service(3, "romm")
+    await media.module.library.upsert(
+        [library_record("g3", kind="game", title="Zelda II", platform="NES", ids={"igdb": "1025"})], romm
+    )
+    feed = (await client.get("/api/v1/me/media/feed")).json()["items"]
+    assert [(i["title"], [b["label"] for b in i["because"]]) for i in feed] == [
+        ("Zelda II", ["Zelda II: The Adventure of Link"])
+    ]
+    follows = (await client.get("/api/v1/me/media/follows")).json()["items"]
+    assert [(f["kind"], f["ref"]) for f in follows] == [("title", sheet)]

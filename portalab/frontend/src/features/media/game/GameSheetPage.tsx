@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useId } from "react";
-import { Link, Navigate, useSearchParams } from "react-router";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router";
 import { api } from "../../../api/client";
 import { Icon } from "../../../design-system/components/Icon";
 import { PageHeader } from "../../../design-system/components/PageHeader";
@@ -12,9 +12,11 @@ import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import type { AskStart } from "../../requests/RequestsPage";
 import { AgeBadge } from "../AgeBadge";
-import { AgeRating, GameFacts } from "../detail/GameView";
+import { GameExtras } from "../detail/Extras";
+import { GameDetails } from "../detail/GameView";
 import { RequestJourney } from "../detail/Journey";
 import { TitleHero } from "../detail/TitleHero";
+import { FollowButton } from "../feed/FollowButton";
 import { SheetRequestBadge, useSheetRequests } from "../requests/SheetRequest";
 import "../media.css";
 import "../book/book.css";
@@ -91,6 +93,8 @@ export function GameSheetPage() {
   const sheet = useGameSheet(service, ref);
   const asks = useAskOptions();
   const requests = useSheetRequests(); // issue 498: asked already from this sheet
+  const location = useLocation();
+  const here = `${location.pathname}${location.search}`; // issue 501: what following it keeps
   if (sheet.isPending && service && ref) return <FunctionalState state="loading" />;
   if (!sheet.data) {
     const missing = !service || !ref || (sheet.error instanceof ApiError && sheet.error.status === 404);
@@ -109,7 +113,7 @@ export function GameSheetPage() {
   // one page per title: the library's (same look, with playing it) when it has it
   if (game.library) return <Navigate to={`/media/${game.library}`} replace />;
   const canAsk = Boolean(asks.data?.kinds.includes("game")) && !requests.asked("game");
-  const others = Object.values(game.names).filter((name) => name !== game.title);
+  const others = [...new Set(Object.values(game.names))].filter((name) => name !== game.title);
   return (
     <article aria-labelledby={headingId} className="media-detail media-game">
       <TitleHero
@@ -158,27 +162,29 @@ export function GameSheetPage() {
             </a>
           ) : undefined
         }
-      />
+      >
+        {/* issue 501: the same small actions as a library game's — following it brings its arrival */}
+        <div className="media-actions">
+          <FollowButton kind="title" value={here} name={game.title} />
+        </div>
+      </TitleHero>
       {requests.latest ? <RequestJourney requestId={requests.latest.request_id} title={game.title} /> : null}
-      <section className="media-enriched" aria-label={t("media:detail.section.info")}>
-        {others.length ? <p className="media-enriched__tagline">{others.join(" · ")}</p> : null}
-        {game.summary ? <p className="media-enriched__overview">{game.summary}</p> : null}
-        {game.storyline ? <p>{game.storyline}</p> : null}
-        <GameFacts
-          data={{
-            publisher: game.publishers[0] ?? null,
-            people: [...game.developers, ...game.publishers],
-            released: game.release_date,
-            year: game.year,
-            tags: [...game.genres, ...game.themes, ...game.modes],
-          }}
-        />
-      </section>
-      {game.age_rating ? (
-        <p className="media-enriched">
-          <AgeRating rating={game.age_rating} />
-        </p>
-      ) : null}
+      {/* issue 501: laid out as a library game's page — its facts as chips, summary, genres, production */}
+      <GameDetails
+        data={{
+          title: game.title,
+          overview: [game.summary, game.storyline].filter(Boolean).join("\n\n") || null,
+          released: game.release_date,
+          year: game.year,
+          publisher: game.publishers[0] ?? null,
+          people: [...game.developers, ...game.publishers],
+          content_rating: game.age_rating ?? null,
+          tags: [...game.themes, ...game.modes],
+        }}
+        genres={game.genres}
+      />
+      {/* issue 501: its videos and pictures, as on a library game's page (a carousel, the viewer) */}
+      <GameExtras gameRef={game.ref} title={game.title} />
       {game.franchises.length ? (
         <section className="media-enriched" aria-label={t("media:game.franchises")}>
           <div className="media-enriched__block">
@@ -218,19 +224,11 @@ export function GameSheetPage() {
           </div>
         </section>
       ) : null}
-      {game.images.length ? (
-        <section className="media-enriched" aria-label={t("media:game.images")}>
-          <div className="media-enriched__block">
-            <h3>{t("media:game.images")}</h3>
-            <ul className="media-game__images">
-              {game.images.map((src) => (
-                <li key={src}>
-                  <img src={src} alt="" loading="lazy" />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+      {others.length ? (
+        <details className="media-enriched media-game__names">
+          <summary>{t("media:game.otherNames")}</summary>
+          <p>{others.join(" · ")}</p>
+        </details>
       ) : null}
       <p className="media-book__source">
         {t("media:game.source")}

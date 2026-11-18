@@ -37,7 +37,24 @@ export function useExtras(objectId: string, enabled = true) {
  * gameplay) and its pictures (backdrops, stills, screenshots, artworks), when a service knows some.
  */
 export function Extras({ objectId, title }: { objectId: string; title: string }) {
-  const extras = useExtras(objectId).data;
+  return <ExtrasView extras={useExtras(objectId).data} title={title} />;
+}
+
+/** Issue 501: a game the library lacks — its videos and pictures by its id in the game database. */
+export function GameExtras({ gameRef, title }: { gameRef: string; title: string }) {
+  const extras = useQuery({
+    queryKey: ["media", "game-extras", gameRef],
+    retry: false,
+    staleTime: 30 * 60_000,
+    queryFn: async (): Promise<MediaExtras> => {
+      const { data } = await api.GET("/api/v1/media/game-extras", { params: { query: { ref: gameRef } } });
+      return data ?? { videos: [], images: [] };
+    },
+  });
+  return <ExtrasView extras={extras.data} title={title} />;
+}
+
+function ExtrasView({ extras, title }: { extras: MediaExtras | undefined; title: string }) {
   if (!extras || (!extras.videos?.length && !extras.images?.length)) return null;
   return (
     <>

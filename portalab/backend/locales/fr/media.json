@@ -1537,5 +1537,6 @@
   "journey.asked.reason": "Le mot de l'équipe",
   "journey.open": "Ouvrir sa page dans la médiathèque",
   "myRequests.stage.with_team": "En recherche",
-  "moderation.note": "Son mot : « {note} »"
+  "moderation.note": "Son mot : « {note} »",
+  "game.otherNames": "Autres titres"
 }

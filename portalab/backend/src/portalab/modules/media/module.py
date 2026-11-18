@@ -5,6 +5,7 @@ import os
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from datetime import timedelta
+from functools import partial
 from typing import Any
 from uuid import UUID
 
@@ -87,7 +88,7 @@ from portalab.modules.media.databases import DatabaseTitles
 from portalab.modules.media.discovery.shelves import Discovery
 from portalab.modules.media.events import register_event_types
 from portalab.modules.media.extras import MediaExtrasService
-from portalab.modules.media.feed import Feed
+from portalab.modules.media.feed import Feed, game_title
 from portalab.modules.media.fields.resolver import FieldResolver
 from portalab.modules.media.games import MediaGameSources
 from portalab.modules.media.history.projection import HistoryProjection
@@ -301,7 +302,8 @@ class MediaModule:
         self.taste = TasteService(database, capabilities, clock=clock)
         # #355: members' reviews of what they watched, read, listened to or played
         self.reviews = ReviewService(database, events, capabilities, visibility=visibility, clock=clock)
-        self.feed = Feed(database, self.people, clock=clock)  # #299: « Mon fil »
+        # #299: « Mon fil »; issue 501: a game the library lacks followed by its sheet
+        self.feed = Feed(database, self.people, clock=clock, sheet_title=partial(game_title, capabilities))
         self.recommender = TasteRecommender(self.taste)
         self.history_reader = HistoryReader(database, visibility)
         # 027: Telemetra-style statistics, metadata enrichment and release calendars

@@ -27,7 +27,8 @@ const KIND_ICONS: Record<FollowKind, string> = { person: "user", title: "bookmar
 /** Where a followed subject lives: a person's page, a title's (issue 499: any work), or the library by genre. */
 function followRoute(follow: Follow): string {
   if (follow.kind === "person") return personPath(follow.label);
-  if (follow.kind === "title") return `/media/${follow.ref}`;
+  // issue 501: a title the library lacks is followed by its sheet's address
+  if (follow.kind === "title") return follow.ref.startsWith("/media/") ? follow.ref : `/media/${follow.ref}`;
   return `/media/browse?genre=${encodeURIComponent(follow.ref)}`;
 }
 

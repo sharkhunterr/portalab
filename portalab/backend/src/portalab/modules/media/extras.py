@@ -146,7 +146,7 @@ class MediaExtrasService:
         self.capabilities = capabilities
         self.blobs = blobs
         self.now = now
-        self._titles: OrderedDict[tuple[UUID, str], tuple[float, TitleExtras]] = OrderedDict()
+        self._titles: OrderedDict[tuple[UUID | str, str], tuple[float, TitleExtras]] = OrderedDict()
         self._pictures: OrderedDict[tuple[str, ...], str] = OrderedDict()
         self.youtube = ConnectorHttpClient(
             YOUTUBE_PICTURES, timeout_seconds=15, max_response_bytes=2 * 1024 * 1024, retries=1
@@ -193,7 +193,38 @@ class MediaExtrasService:
                 )
             ).all():
                 held.setdefault(str(service_id), external_id)
-        kind = obj.kind
+        return await self._ask(registrations, obj.kind, ids, held, language, str(object_id))
+
+    async def of_title(self, kind: str, ids: dict[str, str], language: str) -> TitleExtras:
+        """Issue 501: a title the library lacks (a game's sheet), by its ids in the databases that know it."""
+        key = ("|".join([kind, *(f"{k}={v}" for k, v in sorted(ids.items()))]), language)
+        kept = self._titles.get(key)
+        if kept is not None and kept[0] > self.now():
+            self._titles.move_to_end(key)
+            return kept[1]
+        try:
+            registrations = list(self.capabilities.system_providers(EXTRAS))
+        except Exception:
+            registrations = []
+        extras, complete = (
+            await self._ask(registrations, kind, ids, {}, language, key[0])
+            if registrations and kind in KINDS
+            else (TitleExtras(), True)
+        )
+        self._titles[key] = (self.now() + (KEPT_S if complete else KEPT_AFTER_FAILURE_S), extras)
+        while len(self._titles) > KEPT_TITLES:
+            self._titles.popitem(last=False)
+        return extras
+
+    async def _ask(
+        self,
+        registrations: list[Any],
+        kind: str,
+        ids: dict[str, str],
+        held: dict[str, str],
+        language: str,
+        label: str,
+    ) -> tuple[TitleExtras, bool]:
         complete = True
 
         async def ask(registration: Any) -> tuple[str, MediaExtras] | None:
@@ -205,7 +236,7 @@ class MediaExtrasService:
             except Exception as exc:
                 complete = False
                 metrics.increment("media.extras.error")
-                log.info("extras of %s from %s failed: %s", object_id, service, type(exc).__name__)
+                log.info("extras of %s from %s failed: %s", label, service, type(exc).__name__)
                 return None
             return (service, told) if isinstance(told, MediaExtras) else None
 
@@ -230,7 +261,10 @@ class MediaExtrasService:
         raise ExtraNotFound("the service telling it is gone")
 
     async def image(self, object_id: UUID, index: int, language: str, *, preview: bool) -> bytes:
-        extras = await self.of(object_id, language)
+        return await self.image_of(await self.of(object_id, language), index, preview=preview)
+
+    async def image_of(self, extras: TitleExtras, index: int, *, preview: bool) -> bytes:
+        """One of these extras' pictures (a library title's, a sheet's)."""
         if not 0 <= index < len(extras.images):
             raise ExtraNotFound("no such picture")
         picture = extras.images[index]
@@ -241,7 +275,10 @@ class MediaExtrasService:
         )
 
     async def video_picture(self, object_id: UUID, index: int, language: str) -> bytes:
-        extras = await self.of(object_id, language)
+        return await self.video_picture_of(await self.of(object_id, language), index)
+
+    async def video_picture_of(self, extras: TitleExtras, index: int) -> bytes:
+        """One of these extras' video pictures (a library title's, a sheet's)."""
         if not 0 <= index < len(extras.videos):
             raise ExtraNotFound("no such video")
         found = extras.videos[index]

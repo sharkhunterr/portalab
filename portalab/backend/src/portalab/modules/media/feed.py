@@ -4,21 +4,26 @@ they follow (a film, a book, a game…) arrived in the library (#499), a work of
 the library itself (when each object was first seen), nothing copied per member; what arrived since they last
 opened their feed is unread."""
 
-from collections.abc import Sequence
+import asyncio
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Literal
+from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 
 from sqlalchemy import case, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import aliased
 
+from portalab.capabilities.media import GAME_DATABASE, unwrap
 from portalab.capabilities.notifications import CommunicationRequest, Notifications, Users
+from portalab.capabilities.registry import CapabilityRegistry
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.models import (
     Credit,
+    ExternalId,
     FeedNotified,
     FeedSeen,
     Follow,
@@ -35,6 +40,43 @@ LIMIT = 60
 GENRE_LIMIT = 30  # a genre brings much: its latest only
 MAX_FOLLOWS = 200
 CATEGORY = "media.feed"  # the notices of « Mon fil » (each member chooses where they go)
+
+
+# issue 501: a title the library lacks, followed by its sheet (« /media/game?service=…&ref=… »): the scheme
+# of the database that knows it, by which the library's title is found once it arrives
+SHEETS = {"/media/game": "igdb"}
+
+
+def sheet_ref(ref: str) -> tuple[str, str, str] | None:
+    """A sheet's database service, the identifier scheme and the title's id there — ``None``: not a sheet."""
+    address = urlsplit(ref)
+    query = parse_qs(address.query)
+    service, value = (query.get("service") or [""])[0], (query.get("ref") or [""])[0]
+    scheme = SHEETS.get(address.path)
+    if scheme is None or not service or not value.isdigit() or len(ref) > 200:
+        return None
+    return service, scheme, value
+
+
+async def game_title(capabilities: CapabilityRegistry, service: str, ref: str) -> str | None:
+    """Issue 501: a game's name as the game database (that service) tells it; ``None``: unknown."""
+    for registration in capabilities.system_providers(GAME_DATABASE):
+        if str(registration.instance_ref) == service:
+            try:
+                game = unwrap(await asyncio.wait_for(registration.provider.game(ref), timeout=15))
+            except Exception:
+                return None
+            title = getattr(game, "title", None)
+            return str(title) if title else None
+    return None
+
+
+def _is_object(ref: str) -> bool:
+    try:
+        UUID(ref)
+    except ValueError:
+        return False
+    return True
 
 
 class FollowRefused(ValueError):
@@ -61,10 +103,19 @@ class Arrival:
 
 
 class Feed:
-    def __init__(self, database: Database, people: People, *, clock: Clock | None = None):
+    def __init__(
+        self,
+        database: Database,
+        people: People,
+        *,
+        clock: Clock | None = None,
+        sheet_title: Callable[[str, str], Awaitable[str | None]] | None = None,
+    ):
         self.database = database
         self.people = people
         self.clock = clock
+        # issue 501: a game's name as its database tells it (service, id) — and proof it knows it
+        self.sheet_title = sheet_title
 
     # --- what I follow --------------------------------------------------------------------------------
     async def follows(self, user: UUID) -> list[Followed]:
@@ -83,6 +134,12 @@ class Feed:
             if page is None:
                 raise FollowRefused("nobody by that name in the library")
             return page.name
+        if kind == "title" and not _is_object(ref):
+            found = sheet_ref(ref)
+            title = await self.sheet_title(found[0], found[2]) if found and self.sheet_title else None
+            if not title:
+                raise FollowRefused("not a title the game database knows")
+            return title[:200]
         async with self.database.session() as session:
             if kind == "title":
                 try:
@@ -140,7 +197,8 @@ class Feed:
                 arrival.units.append(unit)
 
         people = {f.ref: f.label for f in follows if f.kind == "person"}
-        titles = {UUID(f.ref): f.label for f in follows if f.kind == "title"}
+        titles = {UUID(f.ref): f.label for f in follows if f.kind == "title" and _is_object(f.ref)}
+        sheets = {f.ref: f for f in follows if f.kind == "title" and not _is_object(f.ref)}
         genres = {f.ref: f.label for f in follows if f.kind == "genre"}
         async with self.database.session() as session:
             if people:
@@ -168,6 +226,33 @@ class Feed:
                         )
                     ).all():
                         add(row.id, row.first_seen_at, "person", people.get(ids[row.id], ids[row.id]))
+            # issue 501: a title followed by its sheet — the library's title carrying its id, once there
+            waited: dict[UUID, Followed] = {}
+            for follow in sheets.values():
+                sheet = sheet_ref(follow.ref)
+                if sheet is None:
+                    continue
+                object_id = await session.scalar(
+                    select(ExternalId.object_id).where(
+                        ExternalId.scheme == sheet[1], ExternalId.value == sheet[2]
+                    )
+                )
+                if object_id is not None:
+                    waited[object_id] = follow
+            if waited:
+                for here in (
+                    await session.execute(
+                        select(MediaObject.id, MediaObject.available_at).where(
+                            MediaObject.id.in_(waited),
+                            MediaObject.status == "active",
+                            MediaObject.available.is_(True),
+                            MediaObject.available_at >= since,
+                        )
+                    )
+                ).all():
+                    follow = waited[here.id]
+                    if here.available_at > follow.created_at:
+                        add(here.id, here.available_at, "title", follow.label)
             if titles:
                 season = aliased(MediaObject)
                 units = (
@@ -203,7 +288,9 @@ class Feed:
                     add(new.work, new.first_seen_at, "title", titles[new.work], code)
                 # #499: a film, a book, a game… followed before it was here — its arrival in the library,
                 # whatever its kind
-                followed_at = {UUID(f.ref): f.created_at for f in follows if f.kind == "title"}
+                followed_at = {
+                    UUID(f.ref): f.created_at for f in follows if f.kind == "title" and _is_object(f.ref)
+                }
                 for here in (
                     await session.execute(
                         select(MediaObject.id, MediaObject.available_at).where(

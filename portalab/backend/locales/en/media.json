@@ -1537,5 +1537,6 @@
   "journey.asked.reason": "The team's word",
   "journey.open": "Open its page in the library",
   "myRequests.stage.with_team": "Being looked for",
-  "moderation.note": "Their word: « {note} »"
+  "moderation.note": "Their word: « {note} »",
+  "game.otherNames": "Other titles"
 }

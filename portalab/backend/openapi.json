@@ -55657,6 +55657,172 @@
         ]
       }
     },
+    "/api/v1/media/game-extras": {
+      "get": {
+        "description": "Issue 501: a game the library lacks \u2014 its videos and pictures as on a library game's page, by its id\nin the game database (IGDB).",
+        "operationId": "game_extras_api_v1_media_game_extras_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaExtrasOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Extras",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/game-extras/images/{index}": {
+      "get": {
+        "description": "Issue 501: one of a game's pictures (a game the library lacks), small (``preview``) or large.",
+        "operationId": "game_extra_image_api_v1_media_game_extras_images__index__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "preview",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Preview",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Extra Image",
+        "tags": [
+          "media"
+        ]
+      }
+    },
+    "/api/v1/media/game-extras/videos/{index}/picture": {
+      "get": {
+        "description": "Issue 501: a game's video's picture (a game the library lacks), fetched by the portal.",
+        "operationId": "game_extra_video_picture_api_v1_media_game_extras_videos__index__picture_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "index",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 0,
+              "title": "Index",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 1,
+              "pattern": "^[0-9]+$",
+              "title": "Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Extra Video Picture",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/media/game-images": {
       "get": {
         "description": "#368: a game's cover, screenshot or artwork from the game database, through the portal.",
