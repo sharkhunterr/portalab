@@ -6,6 +6,7 @@ import asyncio
 import re
 from datetime import datetime, timedelta
 from typing import Annotated, Any, Literal
+from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -15,9 +16,18 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.household import age_of
 from portalab.capabilities.i18n import DEFAULT_CONTEXT
 from portalab.capabilities.identity_directory import CAPABILITY as IDENTITY_DIRECTORY
-from portalab.capabilities.media import ACTIVITY_HISTORY, LIBRARY, RADIO, REQUESTS, QuotaLimits
+from portalab.capabilities.media import (
+    ACTIVITY_HISTORY,
+    GAME_DATABASE,
+    LIBRARY,
+    RADIO,
+    REQUESTS,
+    QuotaLimits,
+    unwrap,
+)
 from portalab.capabilities.themes import COSMETICS
 from portalab.core.audit_port import AuditRecord
 from portalab.core.authorization import require
@@ -618,7 +628,42 @@ async def recent_requests(principal: Reader, module: Module) -> dict[str, Any]:
         if key not in seen:
             seen.add(key)
             out.append(item)
+    # issue 500: a game outside the library rated as its game database rates it (a library title's age is
+    # read by its own page's address)
+    ages = await _game_ages(module, [str(i["sheet"]) for i in out if not i.get("id") and i.get("sheet")])
+    for item in out:
+        label = ages.get(str(item.get("sheet") or ""))
+        if not item.get("id") and item.get("sheet"):
+            item["age_rating"], item["age"] = label, age_of(label)
     return {"items": out}
+
+
+async def _game_ages(module: MediaModule, sheets: list[str]) -> dict[str, str | None]:
+    """Issue 500: the age rating of each game sheet (``/media/game?service=…&ref=…``) as its game database
+    tells it — cached by the database's connector; ``None``: unrated, or the database unreachable."""
+    wanted: dict[str, tuple[str, str]] = {}
+    for sheet in sheets:
+        address = urlsplit(sheet)
+        query = parse_qs(address.query)
+        service, ref = (query.get("service") or [""])[0], (query.get("ref") or [""])[0]
+        if address.path == "/media/game" and service and ref.isdigit():
+            wanted[sheet] = (service, ref)
+    if not wanted:
+        return {}
+    providers = {r.instance_ref: r.provider for r in module.capabilities.system_providers(GAME_DATABASE)}
+
+    async def one(service: str, ref: str) -> str | None:
+        provider = providers.get(service)
+        if provider is None:
+            return None
+        try:
+            game = unwrap(await asyncio.wait_for(provider.game(ref), timeout=10))
+        except Exception:
+            return None
+        return getattr(game, "age_rating", None)
+
+    labels = await asyncio.gather(*(one(*pair) for pair in wanted.values()))
+    return dict(zip(wanted, labels, strict=True))
 
 
 @router.get("/me/media/requests/quota")

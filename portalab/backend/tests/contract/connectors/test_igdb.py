@@ -7,7 +7,7 @@ import httpx
 from portalab.capabilities.connector_http import ConnectorHttpClient
 from portalab.capabilities.connector_sdk import ServiceHandle
 from portalab.capabilities.media import GAME_DATABASE
-from portalab.connectors.igdb import IgdbConnector, image_ref, quoted
+from portalab.connectors.igdb import IgdbConnector, age_rating, image_ref, quoted
 from tests.contract.connectors.builtin_fixtures import handle_for
 
 
@@ -51,6 +51,7 @@ async def test_a_game_s_sheet() -> None:
     assert game.images == ["ar5s3", "sc6lvu"]  # a reference that is not an image id left out
     assert game.trailer == "zw47_q9wbBE" and game.franchises == ["The Legend of Zelda"]
     assert game.names == {"ja-JP": "ゼルダの伝説", "Acronym": "Zelda BOTW"}
+    assert game.age_rating == "PEGI 12"  # issue 500: Europe's board first
     assert await provider.game("1") is None and await provider.game("../x") is None
 
 
@@ -71,3 +72,25 @@ async def test_games_found_by_words() -> None:
 def test_queries_and_images_stay_ours() -> None:
     assert quoted('Zelda"; fields *') == '"Zelda fields *"' and quoted("a\\b") == '"a b"'
     assert image_ref({"image_id": "co1uii"}) == "co1uii" and image_ref("../x") is None
+
+
+def test_a_game_s_age_rating_issue_500() -> None:
+    assert age_rating({"age_ratings": []}) is None  # most old games: unrated
+    assert (
+        age_rating(
+            {"age_ratings": [{"organization": {"name": "PEGI"}, "rating_category": {"rating": "Three"}}]}
+        )
+        == "PEGI 3"
+    )
+    both = [
+        {"organization": {"name": "PEGI"}, "rating_category": {"rating": "Twelve"}},
+        {"organization": {"name": "GRAC"}, "rating_category": {"rating": "19+"}},
+        {"organization": {"name": "ACB"}, "rating_category": {"rating": "M"}},
+    ]
+    assert age_rating({"age_ratings": both}) == "PEGI 12"  # PEGI when it rated it, not Korea's 19
+    assert age_rating({"age_ratings": both[1:]}) == "GRAC 19+"  # else the strictest
+    assert age_rating({"age_ratings": "nonsense"}) is None and age_rating(None) is None
+    assert (
+        age_rating({"age_ratings": [{"organization": {"name": "ESRB"}, "rating_category": {"rating": "RP"}}]})
+        is None
+    )

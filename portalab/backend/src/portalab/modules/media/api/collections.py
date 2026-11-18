@@ -19,6 +19,7 @@ from fastapi import APIRouter, Query, Response
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
+from portalab.capabilities.household import age_of
 from portalab.capabilities.media import (
     BOOK_SERIES,
     GAME_DATABASE,
@@ -441,6 +442,9 @@ class GameSheetOut(BaseModel):
     votes: int = 0
     trailer: str | None = None
     library: str | None = None  # the library's title's id
+    # issue 500: its strictest age rating (« PEGI 12 ») and the age it stands for; ``None``: unrated
+    age_rating: str | None = None
+    age: int | None = None
 
 
 @router.get("/media/game", response_model=GameSheetOut)
@@ -507,6 +511,8 @@ async def game_sheet(
         votes=game.votes,
         trailer=game.trailer,
         library=str(held["game"].object_id) if "game" in held else None,
+        age_rating=game.age_rating,
+        age=age_of(game.age_rating),
     )
 
 

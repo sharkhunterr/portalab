@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field
 from portalab.capabilities.connector_http import ConnectorHttpClient, ConnectorHttpError
 from portalab.capabilities.connector_sdk import CapabilityBinding, ServiceHandle
 from portalab.capabilities.health import HEALTH_PROBE
+from portalab.capabilities.household import RATING_WORDS, age_of
 from portalab.capabilities.media import (
     EXTRAS,
     GAME_DATABASE,
@@ -41,6 +42,7 @@ from portalab.capabilities.media import (
 )
 from portalab.capabilities.results import InvalidPayload, ProviderAuthError, ProviderNotFound
 from portalab.connectors.http_base import BaseConfig, HttpConnector, _Probe, binding
+from portalab.core.logging import get_logger
 
 API = "/v4/"
 AUTH_HOST = "https://id.twitch.tv"
@@ -82,6 +84,10 @@ _GAME = (
     " alternative_names.name, alternative_names.comment, game_localizations.name,"
     " game_localizations.region.identifier; where id = {id};"
 )
+
+log = get_logger("portalab.connectors.igdb")
+# issue 500: a game's age ratings, asked apart — a board or field IGDB no longer knows never costs the sheet
+_AGES = "fields age_ratings.organization.name, age_ratings.rating_category.rating; where id = {id};"
 
 _TOKENS: dict[tuple[str, str], tuple[float, str]] = {}  # (address, client id) → (expires, token)
 _KEPT: dict[tuple[Any, str], tuple[float, Any]] = {}
@@ -213,6 +219,28 @@ def map_details(game: Any) -> GameDetails | None:
         screenshots=list(dict.fromkeys(screenshots))[:IMAGES],
         artworks=list(dict.fromkeys(artworks))[:IMAGES],
     )
+
+
+def age_rating(game: Any) -> str | None:
+    """Issue 500: a game's age rating as IGDB's boards give it, as its label (« PEGI 12 », « ESRB T »):
+    Europe's PEGI when it rated the game, else the strictest of the others (ESRB, USK, ACB…); ``None``:
+    unrated (most games older than the rating boards)."""
+    found: list[tuple[int, str]] = []
+    ratings = game.get("age_ratings") if isinstance(game, Mapping) else None
+    for item in ratings if isinstance(ratings, list) else []:
+        board = item.get("organization") if isinstance(item, Mapping) else None
+        category = item.get("rating_category") if isinstance(item, Mapping) else None
+        name = board.get("name") if isinstance(board, Mapping) else None
+        rating = category.get("rating") if isinstance(category, Mapping) else None
+        if not name or not rating:
+            continue  # a bare rating (« T », « M ») says nothing without its board
+        words = f"{str(name)[:20]} {str(rating)[:20]}".split()
+        label = " ".join(RATING_WORDS.get(w.upper(), w) for w in words)
+        age = age_of(label)
+        if age is not None:
+            found.append((age, label))
+    pegi = [rated for rated in found if rated[1].upper().startswith("PEGI ")]
+    return max(pegi or found)[1] if found else None
 
 
 def video_kind(name: str) -> ExtraVideoKind:
@@ -447,7 +475,16 @@ class _Games:
 
     async def _game(self, ref: str) -> GameDetails | None:
         answer = await self.connector.query(self.service, "games", _GAME.format(id=int(ref)))
-        return map_details(answer[0]) if isinstance(answer, list) and answer else None
+        found = map_details(answer[0]) if isinstance(answer, list) and answer else None
+        if found is None:
+            return None
+        try:
+            ages = await self.connector.query(self.service, "games", _AGES.format(id=int(ref)))
+        except Exception as exc:  # issue 500: unrated rather than no sheet
+            log.info("igdb age ratings unavailable", extra={"fields": {"error": type(exc).__name__}})
+            return found
+        rating = age_rating(ages[0]) if isinstance(ages, list) and ages else None
+        return replace(found, age_rating=rating) if rating else found
 
     async def extras(
         self, kind: str, ids: Mapping[str, str], external_id: str | None, language: str

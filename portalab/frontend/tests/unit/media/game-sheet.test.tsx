@@ -164,14 +164,20 @@ describe("a game's sheet", () => {
       },
     ]);
     await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
-    expect(await screen.findByText("With the team", { selector: ".media-badge" })).toBeTruthy();
-    expect((await screen.findAllByText("The team is getting it", { exact: false })).length).toBeGreaterThan(
-      0,
-    );
+    expect(await screen.findByText("Being looked for", { selector: ".media-badge" })).toBeTruthy();
+    expect(
+      (await screen.findAllByText("The team is looking for it", { exact: false })).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText("NES", { selector: "dd" })).toBeTruthy();
     expect(screen.getByText("« Je cherche »")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Ask for it" })).toBeNull();
     expect(screen.queryByRole("button", { name: /Ask for it on/ })).toBeNull();
+  });
+
+  it("says the age its game database gives it (issue 500)", async () => {
+    renderSheet({ ...SHEET, age_rating: "PEGI 7", age: 7 });
+    await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
+    expect(document.querySelector(".age-badge")?.textContent).toContain("7+");
   });
 
   it("opens the library's page when the library has it", async () => {

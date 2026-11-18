@@ -912,6 +912,19 @@ def _igdb_games(request: httpx.Request) -> Any:
             },
             {"id": 9000, "name": "Breath of the Wild - DLC", "parent_game": 7346, "game_type": 1},
         ]
+    if body.startswith("fields age_ratings"):  # issue 500: a game's age ratings, asked apart
+        if "where id = 7346;" not in body:
+            return [{"id": 1}]
+        return [
+            {
+                "id": 7346,
+                "age_ratings": [
+                    {"organization": {"name": "PEGI"}, "rating_category": {"rating": "Twelve"}},
+                    {"organization": {"name": "ESRB"}, "rating_category": {"rating": "E10"}},
+                    {"rating_category": {"rating": "T"}},  # no board: says nothing
+                ],
+            }
+        ]
     if "summary" not in body:  # a franchise's games
         return [
             {

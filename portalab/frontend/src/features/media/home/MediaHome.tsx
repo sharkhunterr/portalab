@@ -30,6 +30,10 @@ interface JournalItem {
   image_id?: string | null;
   poster_ref?: string | null;
   route?: string | null;
+  /** issue 500: a book's, a game's cover and sheet while the library lacks it, and its age rating */
+  cover?: string | null;
+  sheet?: string | null;
+  age?: number | null;
 }
 
 function useJournal() {
@@ -61,12 +65,19 @@ function JournalRail({
   return (
     <ul className="media-rail" aria-label={label}>
       {items.map((item) => {
-        const src = imageUrl(item.image_id) ?? metadataImage(item.poster_ref, "w342");
+        const src = imageUrl(item.image_id) ?? metadataImage(item.poster_ref, "w342") ?? item.cover ?? null;
+        // issue 500: its page, else the sheet of the database that knows it
+        const to = item.id ? `/media/${item.id}` : (item.route ?? item.sheet ?? null);
         const percent = item.progress === null ? null : Math.round(item.progress * 100);
         const body = (
           <>
             <span className="media-card__frame">
-              <Poster src={src} kind={item.kind} mediaId={item.id} />
+              <Poster
+                src={src}
+                kind={item.kind}
+                mediaId={item.id}
+                age={item.id ? undefined : item.sheet ? (item.age ?? -1) : undefined}
+              />
               <PosterTickets mediaId={item.id} />
               <span className="media-card__kind" title={t(`media:kind.${item.kind}`)}>
                 <Icon name={KIND_ICONS[item.kind] ?? "film"} size={12} />
@@ -90,8 +101,8 @@ function JournalRail({
         );
         return (
           <li key={`${item.kind}:${item.id ?? item.title}:${item.subtitle ?? ""}`} className="media-card">
-            {item.id ? (
-              <Link to={`/media/${item.id}`} className="media-card__link">
+            {to ? (
+              <Link to={to} className="media-card__link">
                 {body}
               </Link>
             ) : (

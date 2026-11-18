@@ -70,3 +70,58 @@ describe("the media home's kinds", () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe("recently requested on the media home (issue 500)", () => {
+  it("shows a game or a book the library lacks with its cover, its age and a way to its sheet", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ ages: {} }), { status: 200 })),
+    );
+    fake.handler = (request) => {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/v1/media/requests/recent")
+        return json(200, {
+          items: [
+            {
+              id: null,
+              kind: "game",
+              title: "Paper Mario",
+              state: "approved",
+              image_id: null,
+              cover: "/api/v1/media/game-images?service=s&ref=co25us&size=cover",
+              sheet: "/media/game?service=s&ref=3349",
+              age_rating: "PEGI 7",
+              age: 7,
+            },
+            {
+              id: null,
+              kind: "book",
+              title: "Assassin's Apprentice",
+              state: "pending",
+              image_id: null,
+              cover: "/api/v1/media/book-covers?service=s&ref=c",
+              sheet: "/media/book?service=s&ref=917",
+              age: null,
+            },
+          ],
+        });
+      return json(404, {});
+    };
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter>
+          <MediaHome />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    const game = (await screen.findByText("Paper Mario")).closest("a") as HTMLAnchorElement;
+    expect(game.getAttribute("href")).toBe("/media/game?service=s&ref=3349");
+    expect(game.querySelector("img")?.getAttribute("src")).toContain("/api/v1/media/game-images");
+    expect(game.querySelector(".age-badge")?.textContent).toContain("7+");
+    const book = screen.getByText("Assassin's Apprentice").closest("a") as HTMLAnchorElement;
+    expect(book.getAttribute("href")).toBe("/media/book?service=s&ref=917");
+    expect(book.querySelector(".age-badge")?.textContent?.startsWith("?")).toBe(true); // unrated, as a library title
+    vi.unstubAllGlobals();
+  });
+});

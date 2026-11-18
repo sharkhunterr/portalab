@@ -9132,6 +9132,28 @@
       "GameSheetOut": {
         "description": "#368: a game the library may lack, as the game database tells it \u2014 and the library's title when it\nhas it (by its id there, else its title).",
         "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "age_rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Rating"
+          },
           "backdrop": {
             "anyOf": [
               {

@@ -11,7 +11,8 @@ import { ApiError } from "../../../state/regions";
 import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import type { AskStart } from "../../requests/RequestsPage";
-import { GameFacts } from "../detail/GameView";
+import { AgeBadge } from "../AgeBadge";
+import { AgeRating, GameFacts } from "../detail/GameView";
 import { RequestJourney } from "../detail/Journey";
 import { TitleHero } from "../detail/TitleHero";
 import { SheetRequestBadge, useSheetRequests } from "../requests/SheetRequest";
@@ -49,6 +50,9 @@ interface Sheet {
   votes: number;
   trailer: string | null;
   library: string | null;
+  /** issue 500: its strictest age rating (« PEGI 12 ») and the age it stands for */
+  age_rating?: string | null;
+  age?: number | null;
 }
 
 function useGameSheet(service: string, ref: string) {
@@ -120,6 +124,7 @@ export function GameSheetPage() {
           t("media:kind.game"),
           game.rating !== null ? `★ ${format.number(game.rating)}` : null,
         ]}
+        rating={<AgeBadge age={game.age ?? -1} sources={game.age_rating ?? null} />}
         badges={
           requests.latest ? (
             <SheetRequestBadge card={requests.latest} />
@@ -169,6 +174,11 @@ export function GameSheetPage() {
           }}
         />
       </section>
+      {game.age_rating ? (
+        <p className="media-enriched">
+          <AgeRating rating={game.age_rating} />
+        </p>
+      ) : null}
       {game.franchises.length ? (
         <section className="media-enriched" aria-label={t("media:game.franchises")}>
           <div className="media-enriched__block">

@@ -61,6 +61,7 @@ class _Igdb:
                 platforms=["NES", "Game Boy Advance"],
                 developers=["Nintendo R&D4"],
                 franchises=[ZELDA, "Unknown Saga"],
+                age_rating="PEGI 7",
             )
         if ref == "7346":
             return GameDetails(ref="7346", title="The Legend of Zelda: Breath of the Wild")
@@ -138,6 +139,7 @@ async def test_a_game_s_sheet(app: FastAPI, client: httpx.AsyncClient, media: Me
     await login(client, "zoe")
     sheet = (await client.get("/api/v1/media/game", params={"service": service, "ref": "1025"})).json()
     assert sheet["title"] == "Zelda II: The Adventure of Link" and sheet["library"] is None
+    assert (sheet["age_rating"], sheet["age"]) == ("PEGI 7", 7)  # issue 500
     assert sheet["platforms"] == ["NES", "Game Boy Advance"] and sheet["developers"] == ["Nintendo R&D4"]
     assert [(f["name"], f["route"] is not None) for f in sheet["franchises"]] == [
         (ZELDA, True),

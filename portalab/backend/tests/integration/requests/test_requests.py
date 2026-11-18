@@ -20,6 +20,7 @@ from portalab.modules.requests.module import RequestsModule
 from portalab.modules.requests.service import TEAM
 from tests.integration.identity.helpers import login
 from tests.integration.media.conftest import MediaHarness, users
+from tests.integration.media.test_games_database import _library
 
 pytestmark = pytest.mark.integration
 
@@ -357,3 +358,29 @@ async def test_a_requested_book_shows_in_the_newsletters_with_its_cover_and_shee
     assert item.picture and item.picture.startswith("b-")
     assert await edition.picture(item.picture) == b"\xff\xd8cover"
     assert await edition.picture("b-bm90IGEgY292ZXI") is None  # not a book database's cover
+
+
+async def test_a_game_asked_shows_on_the_media_home_with_its_cover_sheet_and_age(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, team: RequestsModule
+) -> None:
+    """Issue 500: « Recently requested » shows a game the library lacks as its sheet tells it — its cover,
+    a way to its sheet, the age its game database gives it."""
+    _, service = await _library(app, media)
+    await login(client, "zoe")
+    sheet = f"/media/game?service={service}&ref=1025"
+    cover = f"/api/v1/media/game-images?service={service}&ref=co2zii&size=cover"
+    asked = await client.post(
+        "/api/v1/media/requests",
+        json={
+            "kind": "game",
+            "title": "Zelda II: The Adventure of Link",
+            "details": {"platform": "NES"},
+            "ids": {"igdb": "1025"},
+            "cover": cover,
+            "sheet": sheet,
+        },
+    )
+    assert asked.status_code == 201
+    [item] = (await client.get("/api/v1/media/requests/recent")).json()["items"]
+    assert (item["id"], item["cover"], item["sheet"]) == (None, cover, sheet)
+    assert (item["age_rating"], item["age"]) == ("PEGI 7", 7)

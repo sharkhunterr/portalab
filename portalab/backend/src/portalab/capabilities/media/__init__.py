@@ -1063,6 +1063,8 @@ class GameDetails:
     videos: Sequence[ExtraVideo] = ()
     screenshots: Sequence[str] = ()
     artworks: Sequence[str] = ()
+    # issue 500: its strictest age rating among the boards' (« PEGI 12 », « ESRB T »); ``None``: unrated
+    age_rating: str | None = None
 
 
 @runtime_checkable

@@ -16516,6 +16516,10 @@ export interface components {
          *     has it (by its id there, else its title).
          */
         GameSheetOut: {
+            /** Age */
+            age?: number | null;
+            /** Age Rating */
+            age_rating?: string | null;
             /** Backdrop */
             backdrop?: string | null;
             /** Cover */

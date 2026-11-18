@@ -47,6 +47,9 @@ interface Card {
   /** 027: the metadata provider's poster when the library has none (requests, upcoming releases). */
   poster_ref?: string | null;
   route: string | null;
+  /** issue 500: a book's, a game's cover and sheet while the library lacks it */
+  cover?: string | null;
+  sheet?: string | null;
 }
 
 /** Issue 354: the library title a card stands for — its id, else the one its route names. */
@@ -63,8 +66,8 @@ function strip(items: Card[]) {
   return items.map((card, index) => ({
     key: `${card.id ?? card.title}-${index}`,
     title: card.title,
-    src: poster(card.image_id) ?? metadataImage(card.poster_ref, "w342"),
-    to: card.route,
+    src: poster(card.image_id) ?? metadataImage(card.poster_ref, "w342") ?? card.cover ?? null,
+    to: card.route ?? card.sheet ?? null,
   }));
 }
 
@@ -116,7 +119,8 @@ function Posters({ payload, compact }: WidgetProps) {
       {more}
       <ul className="widget-posters">
         {items.map((card, index) => {
-          const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342");
+          const src = poster(card.image_id) ?? metadataImage(card.poster_ref, "w342") ?? card.cover ?? null;
+          const to = card.route ?? card.sheet ?? null; // issue 500: else the sheet of the database
           const body = (
             <>
               <span className="widget-posters__art">
@@ -132,7 +136,7 @@ function Posters({ payload, compact }: WidgetProps) {
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: releases of one title may share their id
             <li key={`${card.id ?? card.title}-${index}`}>
-              {card.route ? <Link to={card.route}>{body}</Link> : <span>{body}</span>}
+              {to ? <Link to={to}>{body}</Link> : <span>{body}</span>}
             </li>
           );
         })}

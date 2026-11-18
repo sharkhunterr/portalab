@@ -44,6 +44,7 @@ from portalab.modules.media.requests.insights import (
     kind_of,
     lookup_of,
     tmdb_of,
+    told,
 )
 from portalab.modules.media.restrictions import excluded
 
@@ -532,6 +533,7 @@ class RecentlyRequestedWidget(_Base):
                 "at": r.requested_at.isoformat(),
                 "_lookup": lookup_of(r),
                 "tmdb_id": tmdb_of(r),  # issue 478: rated on TMDB for a household profile
+                **told(r),  # issue 500: a book's, a game's cover and sheet, as the request keeps them
             }
             for r in rows
         ]

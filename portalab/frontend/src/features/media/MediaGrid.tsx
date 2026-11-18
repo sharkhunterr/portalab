@@ -50,7 +50,8 @@ export function Poster({
           <Icon name={KIND_ICONS[kind] ?? "film"} size={34} />
         </span>
       )}
-      {shown && mediaId ? <AgeBadge age={rating} compact /> : null}
+      {/* issue 500: a title outside the library says the age it is given (« ? » when unrated) */}
+      {shown && (mediaId || age !== undefined) ? <AgeBadge age={rating} compact /> : null}
     </>
   );
 }
