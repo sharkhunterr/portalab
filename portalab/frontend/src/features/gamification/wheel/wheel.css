@@ -16,12 +16,17 @@
   --wheel-pointer: var(--color-text);
   --wheel-hub: var(--color-surface);
   --wheel-hub-ink: var(--color-text);
+  /* issue 505: by default (a small block) the wheel alone, as large as its room allows, its hub the button;
+     the words come beside it when the block is wide, under it when it is tall (the container queries below) */
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
   block-size: 100%;
   min-block-size: 0;
+  overflow: hidden;
 }
 /* sized by the room it has: its height as much as its width (a block of one row: a small wheel) */
 .wheel-host {
@@ -29,15 +34,12 @@
   block-size: 100%;
   min-block-size: 4.5rem;
 }
-.wheel[data-compact] {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
 .wheel__stage {
   container-type: size;
   position: relative;
   aspect-ratio: 1;
-  inline-size: min(100cqh, 56cqw, 17rem);
+  /* room kept under it for the result's line once spun */
+  inline-size: min(100cqw, calc(100cqh - 2.5rem), 17rem);
   justify-self: center;
   border-radius: 50%;
   padding: 5%;
@@ -174,14 +176,17 @@
   inset-inline-start: 50%;
   display: grid;
   place-items: center;
-  inline-size: 24cqi;
-  block-size: 24cqi;
+  /* issue 505: a touch target even on a small wheel, its word on one line */
+  inline-size: max(24cqi, 2.75rem);
+  block-size: max(24cqi, 2.75rem);
+  padding: 0;
+  white-space: nowrap;
   border: 3px solid var(--wheel-rim-edge);
   border-radius: 50%;
   background: var(--wheel-hub);
   color: var(--wheel-hub-ink);
   font: inherit;
-  font-size: clamp(0.65rem, 6cqi, 0.95rem);
+  font-size: clamp(0.6rem, 6cqi, 0.95rem);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   cursor: pointer;
@@ -207,37 +212,53 @@
   }
 }
 
+.wheel:not([data-compact])[data-phase="idle"] .wheel__stage,
+.wheel:not([data-compact])[data-phase="spinning"] .wheel__stage {
+  inline-size: min(100cqw, 100cqh, 17rem); /* nothing under it yet */
+}
 .wheel__side {
   display: grid;
   gap: var(--space-2);
   align-content: center;
+  justify-items: center;
   min-inline-size: 0;
+  max-inline-size: 100%;
+  text-align: center;
+}
+/* a small block: only the result, on one line — the hub is the button, the rest waits for room */
+.wheel__status,
+.wheel__go,
+.wheel__next {
+  display: none;
 }
 .wheel__status {
   margin: 0;
   font-weight: var(--font-weight-bold);
 }
-.wheel__hint,
 .wheel__next {
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
 .wheel__next {
-  display: inline-flex;
   align-items: center;
   gap: var(--space-1);
 }
-.wheel__go {
-  justify-self: start;
-}
 .wheel__outcome {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 100%;
   margin: 0;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   animation: wheel-reveal 0.45s ease-out;
+}
+.wheel__won {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .wheel__outcome > svg {
   flex: none;
@@ -260,21 +281,55 @@
   }
 }
 
-/* narrow and tall (a phone): the wheel above, its words under it */
-@container (max-width: 20rem) and (min-height: 22rem) {
+/* issue 505: a wide block — the words beside the wheel: where it stands, the button, the next turn */
+@container (min-width: 22rem) {
   .wheel:not([data-compact]) {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    align-content: center;
-    justify-items: center;
-    text-align: center;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    justify-items: start;
+    gap: var(--space-4);
   }
-  .wheel:not([data-compact]) .wheel__stage {
-    inline-size: min(100cqw, 60cqh, 17rem);
+  .wheel:not([data-compact]) .wheel__stage,
+  .wheel:not([data-compact])[data-phase] .wheel__stage {
+    inline-size: min(100cqh, 50cqw, 17rem);
+  }
+  .wheel:not([data-compact]) .wheel__side {
+    justify-items: start;
+    text-align: start;
+  }
+  .wheel:not([data-compact]) .wheel__status {
+    display: block;
   }
   .wheel:not([data-compact]) .wheel__go {
-    justify-self: center;
+    display: inline-flex;
   }
+  .wheel:not([data-compact]) .wheel__next {
+    display: inline-flex;
+  }
+  .wheel:not([data-compact]) .wheel__outcome {
+    align-items: flex-start;
+    font-size: inherit;
+  }
+  .wheel:not([data-compact]) .wheel__won {
+    white-space: normal;
+  }
+}
+
+/* issue 505: narrow but tall (a phone's column) — the next turn under the result */
+@container (max-width: 22rem) and (min-height: 16rem) {
+  .wheel:not([data-compact])[data-phase="done"] .wheel__stage {
+    inline-size: min(100cqw, calc(100cqh - 3.75rem), 17rem);
+  }
+  .wheel:not([data-compact]) .wheel__next {
+    display: inline-flex;
+  }
+}
+
+/* a block of one row (compact): the small wheel and its line beside it */
+.wheel[data-compact] {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  justify-items: start;
 }
 
 @media (prefers-reduced-motion: reduce) {

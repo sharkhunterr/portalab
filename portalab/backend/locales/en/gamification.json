@@ -998,7 +998,6 @@
   "value.xp": "XP",
   "wheel.failed": "The wheel could not turn. Try again in a moment.",
   "wheel.go": "Go!",
-  "wheel.hint": "Coins, XP, a discovery booster… and never anything to lose. One spin a day.",
   "wheel.history.lost": "Lost on the spin of the day",
   "wheel.history.won": "Won on the spin of the day",
   "wheel.next": "Next spin in {time}",

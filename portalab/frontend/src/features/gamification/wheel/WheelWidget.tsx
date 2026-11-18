@@ -143,7 +143,7 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
     return spin.given ? (
       <p className="wheel__outcome" data-tone="product">
         <Icon name="gift" size={18} />
-        <span>
+        <span className="wheel__won">
           {t("gamification:wheel.won.product", { name })}{" "}
           <Link to="/marketplace/reserve">{t("gamification:wheel.reserve")}</Link>
         </span>
@@ -151,7 +151,9 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
     ) : (
       <p className="wheel__outcome" data-tone="coins">
         <Icon name="coins" size={18} />
-        <span>{t("gamification:wheel.won.fallback", { name, amount: format.number(spin.delta) })}</span>
+        <span className="wheel__won">
+          {t("gamification:wheel.won.fallback", { name, amount: format.number(spin.delta) })}
+        </span>
       </p>
     );
   }
@@ -159,7 +161,7 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
     return (
       <p className="wheel__outcome" data-tone="nothing">
         <Icon name="cloud" size={18} />
-        <span>{t("gamification:wheel.won.nothing")}</span>
+        <span className="wheel__won">{t("gamification:wheel.won.nothing")}</span>
       </p>
     );
   }
@@ -167,7 +169,9 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
     return (
       <p className="wheel__outcome" data-tone="xp">
         <Icon name="sparkles" size={18} />
-        <span>{t("gamification:wheel.won.xp", { amount: format.number(spin.delta) })}</span>
+        <span className="wheel__won">
+          {t("gamification:wheel.won.xp", { amount: format.number(spin.delta) })}
+        </span>
       </p>
     );
   }
@@ -175,7 +179,7 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
     return (
       <p className="wheel__outcome" data-tone="lose">
         <Icon name="thumbs-down" size={18} />
-        <span>
+        <span className="wheel__won">
           {spin.delta < 0
             ? t("gamification:wheel.won.lose", { amount: format.number(-spin.delta) })
             : t("gamification:wheel.won.spared", { amount: format.number(-spin.amount) })}
@@ -186,7 +190,7 @@ function Outcome({ spin, segment }: { spin: WheelSpin; segment: WheelSegment | u
   return (
     <p className="wheel__outcome" data-tone="coins">
       <Icon name="coins" size={18} />
-      <span>
+      <span className="wheel__won">
         {t("gamification:wheel.won.coins", { amount: format.number(spin.delta) })} <CurrencyShort />
       </span>
     </p>
@@ -325,7 +329,6 @@ export function WheelWidget({ payload, compact }: WidgetProps) {
           ) : (
             <>
               <p className="wheel__status">{t("gamification:wheel.ready")}</p>
-              {compact ? null : <p className="wheel__hint">{t("gamification:wheel.hint")}</p>}
               <button type="button" className="ds-button wheel__go" disabled={!canSpin} onClick={go}>
                 <Icon name="ferris-wheel" size={16} />
                 {t("gamification:wheel.spin")}

@@ -998,7 +998,6 @@
   "value.xp": "XP",
   "wheel.failed": "La roue n’a pas pu tourner. Réessayez dans un instant.",
   "wheel.go": "Go !",
-  "wheel.hint": "Des coins, de l’XP, un booster découverte… et jamais rien à perdre. Un tour par jour.",
   "wheel.history.lost": "Perdu au tour du jour",
   "wheel.history.won": "Gagné au tour du jour",
   "wheel.next": "Prochain tour dans {time}",
