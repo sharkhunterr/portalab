@@ -33,8 +33,10 @@ from portalab.core.authz_port import Principal
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
 from portalab.modules.media.common import strong_ids
-from portalab.modules.media.models import MediaRequest, ObjectMetadata
+from portalab.modules.media.identity.resolver import MediaNotFound
+from portalab.modules.media.models import MediaObject, MediaRequest, ObjectMetadata
 from portalab.modules.media.observability import log
+from portalab.modules.media.requests.insights import asked, kind_of
 
 SEARCH_TTL = 30 * 60
 SERIES = ("series", "season", "episode")
@@ -402,6 +404,62 @@ class RequestJourney:
             "search": {"at": cached[1], "releases": cached[2]}
             if cached and time.time() - cached[0] < SEARCH_TTL
             else None,
+        }
+
+    async def of_request(self, viewer: Principal, request_id: UUID) -> dict[str, Any]:
+        """#498: a request of the viewer's own, followed — a film's or a series' through its title's journey
+        once it is in the catalog; a book's, a game's… (the team gets it, no download manager follows it):
+        asked, approved, with the team, in the library — with what the member asked and the team's word."""
+        user = viewer.acting_for or viewer.user_id
+        async with self.database.session() as session:
+            row = await session.get(MediaRequest, request_id)
+            here = bool(
+                row is not None
+                and row.object_id is not None
+                and await session.scalar(select(MediaObject.available).where(MediaObject.id == row.object_id))
+            )
+        if row is None or user is None or row.requester_user_id != user:
+            raise MediaNotFound("This request does not exist.")  # another's request: never told
+        kind = kind_of(row)
+        if kind in ("movie", "series") and row.object_id is not None:
+            return await self.journey(viewer, row.object_id)
+        ref = row.external_ref or {}
+        found = ref.get("decision")
+        decision: dict[str, Any] = found if isinstance(found, dict) else {}
+        available = row.state == "available" or here
+        steps = [_step("requested", "done", at=_iso(row.requested_at), by={"me": True})]
+        if row.state in ("declined", "cancelled", "failed"):
+            steps.append(_step("approved", "failed", detail=row.state, at=_iso(row.updated_at)))
+        elif row.state == "pending" and not available:
+            steps.append(_step("approved", "waiting", detail="pending"))
+            steps.append(_step("team", "upcoming"))
+            steps.append(_step("available", "upcoming"))
+        else:
+            steps.append(_step("approved", "done", at=decision.get("at") or _iso(row.updated_at)))
+            if available:
+                steps.append(_step("team", "done"))
+                steps.append(_step("available", "done", at=ref.get("available_at") or _iso(row.updated_at)))
+            else:
+                steps.append(_step("team", "current", at=decision.get("at") or _iso(row.updated_at)))
+                steps.append(_step("available", "upcoming"))
+        return {
+            "kind": kind,
+            "available": available,
+            "request": {
+                "state": row.state,
+                "source_state": row.source_state,
+                "requested_at": _iso(row.requested_at),
+                "updated_at": _iso(row.updated_at),
+                "by": {"me": True},
+            },
+            "manager": None,
+            "history": [],
+            "steps": steps,
+            "can_search": False,
+            "search": None,
+            # what the member asked (platform, edition, language, note) and the team's word
+            "asked": {**asked(row), "reason": decision.get("reason") or None},
+            "route": f"/media/{row.object_id}" if row.object_id is not None and available else None,
         }
 
     async def search(self, viewer: Principal, object_id: UUID) -> dict[str, Any]:

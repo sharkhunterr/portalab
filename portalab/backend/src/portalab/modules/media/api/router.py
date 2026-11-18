@@ -56,7 +56,7 @@ from portalab.modules.media.permissions import (
     SELF,
 )
 from portalab.modules.media.providers.insight_widgets import posters, with_posters
-from portalab.modules.media.requests.insights import kind_of, lookup_of, told
+from portalab.modules.media.requests.insights import asked, kind_of, lookup_of, told
 from portalab.modules.media.sections.service import SECTIONS
 
 SHELF_FILL, SHELF_PAGES = 20, 5  # issue 478: a profile's request shelf, filled from up to five pages
@@ -1369,10 +1369,22 @@ async def my_requests_list(principal: Requester, module: Module) -> dict[str, An
             **stages.get(r.id, {}),
             "_lookup": lookup_of(r),
             **told(r),
+            **asked(r),  # 498: the platform, edition… the member gave
         }
         for r in rows
     ]
     return {"items": await with_posters(module.database, module.enricher, items, lookups=60)}
+
+
+@router.get("/me/media/requests/{request_id}/journey")
+async def my_request_journey(principal: Requester, request_id: UUID, module: Module) -> dict[str, Any]:
+    """498: where a request of mine stands — a book's, a game's the team gets (asked, approved, with the
+    team, in the library) with what I asked (platform, edition, language, note) and the team's word; a
+    film's or a series' title once it is in the catalog."""
+    body = await module.journey.of_request(principal, request_id)
+    if body.get("can_search") and not await module.authorizer.is_allowed(principal, MEDIA_RELEASE_SEARCH):
+        body["can_search"], body["search"] = False, None
+    return body
 
 
 @router.get("/me/media/requests/soon")

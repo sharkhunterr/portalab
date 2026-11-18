@@ -55,6 +55,9 @@ export interface AskStart {
   year?: number | null | undefined;
   language?: string | null | undefined;
   edition?: string | null | undefined;
+  /** issue 498: a game's platform — the one asked on, else to choose among the game's */
+  platform?: string | null | undefined;
+  platforms?: string[] | undefined;
   ids?: Record<string, string[]> | undefined;
   /** issue 378: the cover and the sheet of the database that knows it (the portal's own addresses) */
   cover?: string | null | undefined;
@@ -75,6 +78,7 @@ function startOf(params: URLSearchParams): AskStart {
     year: year && /^\d{1,4}$/.test(year) ? Number(year) : null,
     language: params.get("language"),
     edition: params.get("edition"),
+    platform: params.get("platform"),
     ids,
   };
 }
@@ -96,12 +100,19 @@ export function AskForm({
   const [year, setYear] = useState(start.year ? String(start.year) : "");
   const [language, setLanguage] = useState(start.language ?? "");
   const [edition, setEdition] = useState(start.edition ?? "");
+  // issue 498: the platform matters most for a game — asked on one, or the game has only one
+  const platforms = start.platforms ?? [];
+  const [platform, setPlatform] = useState(
+    start.platform ?? (platforms.length === 1 ? (platforms[0] as string) : ""),
+  );
+  const needsPlatform = kind === "game" && !platform.trim();
   const [note, setNote] = useState("");
   const ask = useAsk();
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (!title.trim() || !kind) return;
+    if (!title.trim() || !kind || needsPlatform) return;
     const details: Record<string, string> = {};
+    if (kind === "game" && platform.trim()) details.platform = platform.trim();
     if (language.trim()) details.language = language.trim();
     if (edition.trim()) details.edition = edition.trim();
     // one identifier per scheme, as every request carries them
@@ -138,6 +149,36 @@ export function AskForm({
         maxLength={300}
         required
       />
+      {kind === "game" ? (
+        platforms.length ? (
+          <SelectField
+            label={t("media:ask.form.platform")}
+            hint={t("media:ask.form.platformHint")}
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value)}
+            required
+          >
+            <option value="" disabled>
+              {t("media:ask.form.platformChoose")}
+            </option>
+            {/* a platform asked on that the game's database no longer lists stays a choice */}
+            {[...(platform && !platforms.includes(platform) ? [platform] : []), ...platforms].map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </SelectField>
+        ) : (
+          <TextField
+            label={t("media:ask.form.platform")}
+            hint={t("media:ask.form.platformHint")}
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value)}
+            maxLength={120}
+            required
+          />
+        )
+      ) : null}
       <TextField
         label={t("media:ask.form.creators")}
         hint={t("media:ask.form.creatorsHint")}
@@ -173,7 +214,7 @@ export function AskForm({
         rows={3}
       />
       <div className="asks-form__actions">
-        <Button type="submit" disabled={ask.isPending || ask.isSuccess || !title.trim()}>
+        <Button type="submit" disabled={ask.isPending || ask.isSuccess || !title.trim() || needsPlatform}>
           {t("media:ask.form.send")}
         </Button>
       </div>

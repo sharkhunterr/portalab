@@ -16,6 +16,9 @@ export interface RequestCard {
   cover?: string | null;
   /** issue 378: its sheet, while the library does not have it */
   sheet?: string | null;
+  /** issue 498: what the member said of a book, a game — its platform, edition, language — and a note */
+  details?: Record<string, string>;
+  note?: string;
   route: string | null;
   /** 027: where it stands, in the words of the title's journey */
   stage?: string;

@@ -65,11 +65,12 @@ const SHEET = {
 
 const posted: unknown[] = [];
 
-function renderSheet(sheet: Record<string, unknown>) {
+function renderSheet(sheet: Record<string, unknown>, mine: Record<string, unknown>[] = []) {
   posted.length = 0;
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/book") return json(200, sheet);
+    if (path === "/api/v1/me/media/requests/list") return json(200, { items: mine });
     if (path === "/api/v1/media/requests" && request.method === "POST") {
       posted.push(await request.json());
       return json(201, { id: "r1", title: "asked", supporters: 1 });
@@ -137,6 +138,29 @@ describe("a book's sheet", () => {
   it("opens the library's page when the library has the book", async () => {
     renderSheet({ ...SHEET, library: { book: "0190f0a0-0000-7000-8000-0000000000b2" } });
     expect(await screen.findByText("The library's page")).toBeTruthy();
+  });
+
+  it("says where the book asked for stands, the audiobook still to ask for (issue 498)", async () => {
+    renderSheet(SHEET, [
+      {
+        request_id: "r9",
+        id: null,
+        title: "Le Fou et l'Assassin, Intégrale 2",
+        kind: "book",
+        state: "pending",
+        stage: "pending",
+        requested_at: "2026-11-17T23:00:00Z",
+        image_id: null,
+        route: null,
+        sheet: "/media/book?service=s1&ref=458644",
+      },
+    ]);
+    expect(await screen.findByText("Waiting for approval", { selector: ".media-badge" })).toBeTruthy();
+    expect(screen.queryByText("Not in the library")).toBeNull();
+    const editions = screen.getByRole("list", { name: "Editions" });
+    // the book is asked: only the audiobook edition is left to ask for
+    expect(within(editions).getAllByRole("button", { name: /Ask for it/ })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: /Ask for it/ })).toHaveLength(1); // none at the top
   });
 
   it("leaves the book to ask for when the library has it as an audiobook only", async () => {

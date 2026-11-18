@@ -12,7 +12,9 @@ import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import type { AskStart } from "../../requests/RequestsPage";
 import { GameFacts } from "../detail/GameView";
+import { RequestJourney } from "../detail/Journey";
 import { TitleHero } from "../detail/TitleHero";
+import { SheetRequestBadge, useSheetRequests } from "../requests/SheetRequest";
 import "../media.css";
 import "../book/book.css";
 import "./game.css";
@@ -69,7 +71,8 @@ function askStart(game: Sheet, platform?: string): AskStart {
     sheet: `${window.location.pathname}${window.location.search}`, // issue 378: back to this sheet
     creator: game.developers[0] ?? game.publishers[0],
     year: game.year,
-    edition: platform ?? null,
+    platform: platform ?? null, // issue 498: asked on this platform, else chosen among the game's
+    platforms: game.platforms,
     ids: { igdb: [game.ref] },
   };
 }
@@ -83,6 +86,7 @@ export function GameSheetPage() {
   const ref = params.get("ref") ?? "";
   const sheet = useGameSheet(service, ref);
   const asks = useAskOptions();
+  const requests = useSheetRequests(); // issue 498: asked already from this sheet
   if (sheet.isPending && service && ref) return <FunctionalState state="loading" />;
   if (!sheet.data) {
     const missing = !service || !ref || (sheet.error instanceof ApiError && sheet.error.status === 404);
@@ -100,7 +104,7 @@ export function GameSheetPage() {
   const game = sheet.data;
   // one page per title: the library's (same look, with playing it) when it has it
   if (game.library) return <Navigate to={`/media/${game.library}`} replace />;
-  const canAsk = Boolean(asks.data?.kinds.includes("game"));
+  const canAsk = Boolean(asks.data?.kinds.includes("game")) && !requests.asked("game");
   const others = Object.values(game.names).filter((name) => name !== game.title);
   return (
     <article aria-labelledby={headingId} className="media-detail media-game">
@@ -116,7 +120,13 @@ export function GameSheetPage() {
           t("media:kind.game"),
           game.rating !== null ? `★ ${format.number(game.rating)}` : null,
         ]}
-        badges={<span className="media-person__absent">{t("media:game.absent")}</span>}
+        badges={
+          requests.latest ? (
+            <SheetRequestBadge card={requests.latest} />
+          ) : (
+            <span className="media-person__absent">{t("media:game.absent")}</span>
+          )
+        }
         primary={
           canAsk ? (
             <AskDialog
@@ -144,6 +154,7 @@ export function GameSheetPage() {
           ) : undefined
         }
       />
+      {requests.latest ? <RequestJourney requestId={requests.latest.request_id} title={game.title} /> : null}
       <section className="media-enriched" aria-label={t("media:detail.section.info")}>
         {others.length ? <p className="media-enriched__tagline">{others.join(" · ")}</p> : null}
         {game.summary ? <p className="media-enriched__overview">{game.summary}</p> : null}

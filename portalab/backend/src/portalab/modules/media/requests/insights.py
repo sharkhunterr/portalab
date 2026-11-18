@@ -90,6 +90,21 @@ def told(row: MediaRequest) -> dict[str, Any]:
     return {key: ref[key] for key in ("cover", "sheet", "creators") if ref.get(key)}
 
 
+def asked(row: MediaRequest) -> dict[str, Any]:
+    """#498: what the member said of a book, a game… — its platform, edition, language, a note — for the
+    member and the team (never in the figures other members see)."""
+    ref = row.external_ref or {}
+    out: dict[str, Any] = {}
+    details = ref.get("details")
+    if isinstance(details, dict) and details:
+        out["details"] = {str(k): str(v) for k, v in details.items()}
+    if ref.get("note"):
+        out["note"] = str(ref["note"])
+    if isinstance(ref.get("year"), int):
+        out["year"] = ref["year"]
+    return out
+
+
 def ids_of(row: MediaRequest) -> set[tuple[str, str]]:
     return set(strong_ids((row.external_ref or {}).get("ids") or {}).items())
 
@@ -735,6 +750,10 @@ class RequestInsights:
                 continue
             if row.state == "available" or (row.object_id in available):
                 out[row.id] = {"stage": "available"}
+                continue
+            if kind_of(row) not in ("movie", "series"):
+                # #498: a book, a game… the team gets itself — no download manager follows it
+                out[row.id] = {"stage": "with_team"}
                 continue
             ids = ids_of(row)
             same = ("movie",) if kind_of(row) == "movie" else ("episode", "series", "season")

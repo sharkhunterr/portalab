@@ -440,8 +440,14 @@ function RequestRow({ card }: { card: RequestCard }) {
       <span className="requests-row__main">
         <strong>{card.title}</strong>
         <span className="admin-muted">
-          {t(`media:kind.${card.kind}`)} ·{" "}
-          {t("media:myRequests.requestedOn", { date: format.date(card.requested_at) })}
+          {/* issue 498: the platform (else the edition) asked for */}
+          {[
+            t(`media:kind.${card.kind}`),
+            card.details?.platform ?? card.details?.edition,
+            t("media:myRequests.requestedOn", { date: format.date(card.requested_at) }),
+          ]
+            .filter(Boolean)
+            .join(" · ")}
           {card.state === "available" && card.updated_at
             ? ` · ${t("media:myRequests.availableOn", { date: format.date(card.updated_at) })}`
             : ""}

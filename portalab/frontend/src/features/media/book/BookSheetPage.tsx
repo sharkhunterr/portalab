@@ -13,8 +13,10 @@ import { AskDialog } from "../../requests/AskDialog";
 import { useAskOptions } from "../../requests/api";
 import type { AskStart } from "../../requests/RequestsPage";
 import { BookFacts } from "../detail/BookView";
+import { RequestJourney } from "../detail/Journey";
 import { TitleHero } from "../detail/TitleHero";
 import { Poster } from "../MediaGrid";
+import { SheetRequestBadge, useSheetRequests } from "../requests/SheetRequest";
 import "../media.css";
 import "./book.css";
 
@@ -103,6 +105,7 @@ export function BookSheetPage() {
   const ref = params.get("ref") ?? "";
   const sheet = useBookSheet(service, ref);
   const asks = useAskOptions();
+  const requests = useSheetRequests(); // issue 498: asked already from this sheet
   if (sheet.isPending && service && ref) return <FunctionalState state="loading" />;
   if (!sheet.data) {
     const missing = !service || !ref || (sheet.error instanceof ApiError && sheet.error.status === 404);
@@ -128,7 +131,8 @@ export function BookSheetPage() {
   );
   const mine = editions.find((e) => e.language === language && !e.audio);
   const title = mine?.title ?? book.title;
-  const canAsk = (kind: string) => Boolean(asks.data?.kinds.includes(kind)) && !book.library[kind];
+  const canAsk = (kind: string) =>
+    Boolean(asks.data?.kinds.includes(kind)) && !book.library[kind] && !requests.asked(kind);
   return (
     <article aria-labelledby={headingId} className="media-detail media-book">
       {/* issue 370: the same head and book page as a title of the library */}
@@ -151,6 +155,8 @@ export function BookSheetPage() {
               <Icon name="headphones" size={14} />
               {t("media:book.listened")}
             </Link>
+          ) : requests.latest ? (
+            <SheetRequestBadge card={requests.latest} />
           ) : (
             <span className="media-person__absent">{t("media:book.absent")}</span>
           )
@@ -169,6 +175,7 @@ export function BookSheetPage() {
           ) : null
         }
       />
+      {requests.latest ? <RequestJourney requestId={requests.latest.request_id} title={title} /> : null}
       <BookFacts
         data={{
           title,

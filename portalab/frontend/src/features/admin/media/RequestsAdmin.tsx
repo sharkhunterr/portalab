@@ -37,6 +37,10 @@ interface QueueItem {
   poster_ref?: string | null;
   cover?: string | null; // issue 378: a book's, a game's
   sheet?: string | null;
+  /** issue 498: what the member said of a book, a game — the platform to get first */
+  details?: Record<string, string>;
+  note?: string;
+  year?: number;
 }
 
 const TABS = ["pending", "open", "all"] as const;
@@ -208,6 +212,10 @@ export function MediaRequestsList({ tab, userId }: { tab: (typeof TABS)[number];
                       ? t("media:moderation.allSeasons")
                       : null,
                   item.is4k ? "4K" : null,
+                  item.details?.platform ?? null,
+                  item.year ? String(item.year) : null,
+                  item.details?.edition ?? null,
+                  item.details?.language ?? null,
                 ]
                   .filter(Boolean)
                   .join(" · ")}
@@ -218,6 +226,9 @@ export function MediaRequestsList({ tab, userId }: { tab: (typeof TABS)[number];
                   when: format.relative((Date.parse(item.requested_at) - Date.now()) / 1000),
                 })}
               </p>
+              {item.note ? (
+                <p className="moderation-item__reason">{t("media:moderation.note", { note: item.note })}</p>
+              ) : null}
               {item.decision?.reason ? (
                 <p className="moderation-item__reason">« {item.decision.reason} »</p>
               ) : null}

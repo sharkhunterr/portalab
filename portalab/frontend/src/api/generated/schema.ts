@@ -8740,6 +8740,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/media/requests/{request_id}/journey": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Request Journey
+         * @description 498: where a request of mine stands — a book's, a game's the team gets (asked, approved, with the
+         *     team, in the library) with what I asked (platform, edition, language, note) and the team's word; a
+         *     film's or a series' title once it is in the catalog.
+         */
+        get: operations["my_request_journey_api_v1_me_media_requests__request_id__journey_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/media/screen-time": {
         parameters: {
             query?: never;
@@ -39697,6 +39719,39 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    my_request_journey_api_v1_me_media_requests__request_id__journey_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

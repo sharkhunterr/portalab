@@ -22,7 +22,7 @@ from portalab.core.time import utc_now
 from portalab.modules.media.identity.resolver import MediaNotFound
 from portalab.modules.media.models import MediaRequest
 from portalab.modules.media.observability import log
-from portalab.modules.media.requests.insights import kind_of, lookup_of, told
+from portalab.modules.media.requests.insights import asked, kind_of, lookup_of, told
 from portalab.modules.media.requests.service import Requests, RequestServiceUnavailable
 
 OPEN = ("pending", "approved", "processing")
@@ -77,6 +77,7 @@ class RequestModeration:
                     "decision": decision,
                     "_lookup": lookup_of(row),
                     **told(row),
+                    **asked(row),  # 498: the platform, edition… the team must get
                 }
             )
         return out

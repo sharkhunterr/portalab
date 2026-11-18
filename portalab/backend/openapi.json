@@ -52017,6 +52017,52 @@
         ]
       }
     },
+    "/api/v1/me/media/requests/{request_id}/journey": {
+      "get": {
+        "description": "498: where a request of mine stands \u2014 a book's, a game's the team gets (asked, approved, with the\nteam, in the library) with what I asked (platform, edition, language, note) and the team's word; a\nfilm's or a series' title once it is in the catalog.",
+        "operationId": "my_request_journey_api_v1_me_media_requests__request_id__journey_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response My Request Journey Api V1 Me Media Requests  Request Id  Journey Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Request Journey",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/api/v1/me/media/screen-time": {
       "get": {
         "description": "032: a household profile's screen time today \u2014 mine, or (its master) one of my profiles'.",

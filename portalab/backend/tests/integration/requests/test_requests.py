@@ -161,6 +161,81 @@ async def test_a_declined_request_and_the_figures(
     assert stats["by_kind"]["game"] == 1 and stats["summary"]["total"] == 1  # the same figures as a film's
 
 
+async def test_a_game_asked_on_a_platform_is_followed_like_a_film(
+    app: FastAPI, client: httpx.AsyncClient, media: MediaHarness, team: RequestsModule
+) -> None:
+    """#498: the platform asked for is told to the member and to the team; the request's journey —
+    asked, approved, with the team, in the library — is the member's alone."""
+    await users(app, media, "zoe", "leo", admin="ann")
+    await login(client, "zoe")
+    asked = (
+        await client.post(
+            "/api/v1/media/requests",
+            json={
+                "kind": "game",
+                "title": "Paper Mario: The Thousand-Year Door",
+                "creators": ["Intelligent Systems"],
+                "year": 2004,
+                "details": {"platform": "Nintendo GameCube"},
+                "ids": {"igdb": "3349"},
+                "note": "La version PAL",
+                "sheet": "/media/game?service=s&ref=3349",
+            },
+        )
+    ).json()
+    url = f"/api/v1/me/media/requests/{asked['id']}/journey"
+    mine = (await client.get("/api/v1/me/media/requests/list")).json()["items"][0]
+    assert mine["details"] == {"platform": "Nintendo GameCube"} and mine["note"] == "La version PAL"
+    assert mine["stage"] == "pending" and mine["sheet"] == "/media/game?service=s&ref=3349"
+    waiting = (await client.get(url)).json()
+    assert [(s["key"], s["status"]) for s in waiting["steps"]] == [
+        ("requested", "done"),
+        ("approved", "waiting"),
+        ("team", "upcoming"),
+        ("available", "upcoming"),
+    ]
+    assert waiting["asked"] == {
+        "details": {"platform": "Nintendo GameCube"},
+        "note": "La version PAL",
+        "year": 2004,
+        "reason": None,
+    }
+
+    # another member's request is never told
+    await login(client, "leo")
+    assert (await client.get(url)).status_code == 404
+
+    # the team sees the platform it must get, approves with a word
+    await login(client, "ann")
+    queue = (await client.get("/api/v1/admin/media/requests")).json()["items"]
+    item = next(i for i in queue if i["id"] == asked["id"])
+    assert item["details"] == {"platform": "Nintendo GameCube"} and item["note"] == "La version PAL"
+    await client.post(f"/api/v1/admin/media/requests/{asked['id']}/approve", json={"reason": "Je cherche"})
+
+    await login(client, "zoe")
+    assert (await client.get("/api/v1/me/media/requests/list")).json()["items"][0]["stage"] == "with_team"
+    approved = (await client.get(url)).json()
+    assert [(s["key"], s["status"]) for s in approved["steps"]] == [
+        ("requested", "done"),
+        ("approved", "done"),
+        ("team", "current"),
+        ("available", "upcoming"),
+    ]
+    assert approved["asked"]["reason"] == "Je cherche" and approved["route"] is None
+
+    # the library gets it: the journey ends on its page
+    one = media.service(1)
+    media.library(one)
+    game = library_record(
+        "g1", kind="game", title="Paper Mario: The Thousand-Year Door", people=["Intelligent Systems"]
+    )
+    await media.module.library.upsert([game], one)  # type: ignore[list-item]
+    assert await team.team.sweep() == 1
+    there = (await client.get(url)).json()
+    assert there["available"] and [s["status"] for s in there["steps"]] == ["done"] * 4
+    assert there["route"] == f"/media/{await _object(media, 'Paper Mario: The Thousand-Year Door')}"
+
+
 class _Books:
     """A book database: « Assassin's Apprentice » as a French member reads it."""
 

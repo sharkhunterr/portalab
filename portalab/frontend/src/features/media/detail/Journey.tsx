@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { api } from "../../../api/client";
 import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
@@ -75,11 +75,15 @@ interface Journey {
   steps: Step[];
   can_search: boolean;
   search: { at: string | null; releases: Release[] } | null;
+  /** issue 498: a book's, a game's request — what the member asked and the team's word; its page once here */
+  asked?: { details?: Record<string, string>; note?: string; year?: number; reason?: string | null };
+  route?: string | null;
 }
 
 const ICONS: Record<string, string> = {
   requested: "inbox",
   approved: "check",
+  team: "users",
   released: "clapperboard",
   searched: "search",
   downloading: "package",
@@ -93,9 +97,10 @@ function useSize(): (bytes: number | null | undefined) => string {
   return (bytes) => (bytes ? measures.bytes(bytes) : "");
 }
 
-export function useJourney(objectId: string) {
+export function useJourney(objectId: string, enabled = true) {
   return useQuery({
     queryKey: ["media", "journey", objectId],
+    enabled,
     queryFn: async () =>
       (await api.GET("/api/v1/media/{object_id}/journey", { params: { path: { object_id: objectId } } }))
         .data as unknown as Journey,
@@ -105,6 +110,20 @@ export function useJourney(objectId: string) {
       )
         ? 15_000
         : false,
+  });
+}
+
+/** issue 498: a request of mine with no title in the catalog yet — a book, a game the team gets. */
+export function useRequestJourney(requestId: string | null) {
+  return useQuery({
+    queryKey: ["media", "request-journey", requestId],
+    enabled: Boolean(requestId),
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/me/media/requests/{request_id}/journey", {
+          params: { path: { request_id: requestId as string } },
+        })
+      ).data as unknown as Journey,
   });
 }
 
@@ -268,6 +287,13 @@ function StepText({ step }: { step: Step }) {
       );
     case "imported":
       return <>{t(`media:journey.imported.${step.detail ?? step.status}`)}</>;
+    case "team":
+      return (
+        <>
+          {t(`media:journey.team.${step.status}`)}
+          {step.at && step.status === "current" ? ` · ${date(step.at)}` : ""}
+        </>
+      );
     case "available":
       return (
         <>
@@ -300,7 +326,55 @@ function StepText({ step }: { step: Step }) {
  * what the download manager says, the transfers (torrent state, speed, peers, time left), a manual import
  * to confirm, errors; and, on demand, what the indexers offer.
  */
-export function RequestJourney({ objectId, title }: { objectId: string; title?: string | undefined }) {
+/** issue 498: what a member asked of the team for a book, a game — its platform first — and the team's word. */
+function Asked({ asked }: { asked: NonNullable<Journey["asked"]> }) {
+  const t = useT();
+  const details = asked.details ?? {};
+  const facts: [string, string][] = [];
+  for (const key of ["platform", "edition", "language"]) {
+    if (details[key]) facts.push([t(`media:journey.asked.${key}`), details[key] as string]);
+  }
+  if (asked.note) facts.push([t("media:journey.asked.note"), `« ${asked.note} »`]);
+  if (asked.reason) facts.push([t("media:journey.asked.reason"), `« ${asked.reason} »`]);
+  if (!facts.length) return null;
+  return (
+    <dl className="journey-transfer__grid journey-asked">
+      {facts.map(([label, value]) => (
+        <div key={label}>
+          <dt>{label}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function RequestJourney({
+  objectId,
+  requestId,
+  title,
+}: {
+  objectId?: string | undefined;
+  /** issue 498: a request of mine no title of the catalog stands for yet (a book, a game asked of the team) */
+  requestId?: string | undefined;
+  title?: string | undefined;
+}) {
+  const byObject = useJourney(objectId ?? "", Boolean(objectId));
+  const byRequest = useRequestJourney(objectId ? null : (requestId ?? null));
+  const data = (objectId ? byObject : byRequest).data;
+  if (!data || !Array.isArray(data.steps) || !data.steps.length) return null;
+  return <JourneyView data={data} objectId={objectId} title={title} />;
+}
+
+function JourneyView({
+  data,
+  objectId,
+  title,
+}: {
+  data: Journey;
+  objectId?: string | undefined;
+  title?: string | undefined;
+}) {
   const size = useSize();
   const t = useT();
   const { ai } = useSlots(); // issue 171: « where does it stand? » asked to the assistant
@@ -308,19 +382,16 @@ export function RequestJourney({ objectId, title }: { objectId: string; title?: 
   const format = useFormat();
   const headingId = useId();
   const client = useQueryClient();
-  const journey = useJourney(objectId);
   const [open, setOpen] = useState(false);
   const search = useMutation({
     mutationFn: async () =>
       (
         await api.POST("/api/v1/media/{object_id}/journey/search", {
-          params: { path: { object_id: objectId } },
+          params: { path: { object_id: objectId as string } },
         })
       ).data as unknown as { at: string | null; releases: Release[] },
     onSuccess: () => client.invalidateQueries({ queryKey: ["media", "journey", objectId] }),
   });
-  const data = journey.data;
-  if (!data || !Array.isArray(data.steps) || !data.steps.length) return null;
   const releases = search.data?.releases ?? data.search?.releases ?? null;
   const active = data.steps.find((s) => ["current", "blocked", "failed", "waiting"].includes(s.status));
   const transfers = data.steps.flatMap((s) =>
@@ -422,6 +493,12 @@ export function RequestJourney({ objectId, title }: { objectId: string; title?: 
           ))}
         </ul>
       ) : null}
+      {data.route ? (
+        <p className="journey-now" data-status="done">
+          <Link to={data.route}>{t("media:journey.open")}</Link>
+        </p>
+      ) : null}
+      {data.asked ? <Asked asked={data.asked} /> : null}
       <details className="journey-details">
         <summary>{t("media:journey.details")}</summary>
         <ul className="journey-list">
@@ -432,7 +509,7 @@ export function RequestJourney({ objectId, title }: { objectId: string; title?: 
           ))}
         </ul>
       </details>
-      {data.can_search ? (
+      {data.can_search && objectId ? (
         <div className="journey-search">
           <Button variant="secondary" disabled={search.isPending} onClick={() => search.mutate()}>
             <Icon name={search.isPending ? "spinner" : "search"} size={16} />

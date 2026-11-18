@@ -5,7 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 // Issue 368 — a game the library lacks, as the game database tells it, laid out as a library game: its
 // summary and facts, its franchises, its platforms each to ask for (the platform and its IGDB id carried to
-// the request); the library's page instead when it has it.
+// the request); the library's page instead when it has it. Issue 498: the platform is asked for (chosen
+// among the game's, set when asked on one), and once asked the sheet follows the request instead.
 
 const fake = vi.hoisted(() => ({
   handler: (_: Request): Response | Promise<Response> => new Response(null),
@@ -49,11 +50,29 @@ const SHEET = {
 
 const posted: unknown[] = [];
 
-function renderSheet(sheet: Record<string, unknown>) {
+function renderSheet(sheet: Record<string, unknown>, mine: Record<string, unknown>[] = []) {
   posted.length = 0;
   fake.handler = async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/api/v1/media/game") return json(200, sheet);
+    if (path === "/api/v1/me/media/requests/list") return json(200, { items: mine });
+    if (path === "/api/v1/me/media/requests/r9/journey")
+      return json(200, {
+        kind: "game",
+        available: false,
+        request: { state: "approved", requested_at: "2026-11-17T23:00:00Z" },
+        manager: null,
+        steps: [
+          { key: "requested", status: "done", at: "2026-11-17T23:00:00Z", by: { me: true } },
+          { key: "approved", status: "done", at: "2026-11-17T23:04:00Z" },
+          { key: "team", status: "current", at: "2026-11-17T23:04:00Z" },
+          { key: "available", status: "upcoming" },
+        ],
+        can_search: false,
+        search: null,
+        asked: { details: { platform: "NES" }, reason: "Je cherche" },
+        route: null,
+      });
     if (path === "/api/v1/media/requests" && request.method === "POST") {
       posted.push(await request.json());
       return json(201, { id: "r1", title: "asked", supporters: 1 });
@@ -90,7 +109,7 @@ describe("a game's sheet", () => {
     // issue 377: asked in a dialog, on that platform
     fireEvent.click(within(platforms).getByRole("button", { name: /Ask for it on NES/ }));
     const dialog = await screen.findByRole("dialog");
-    expect((within(dialog).getByLabelText("Edition") as HTMLInputElement).value).toBe("NES");
+    expect((within(dialog).getByLabelText("Platform") as HTMLSelectElement).value).toBe("NES");
     fireEvent.click(within(dialog).getByRole("button", { name: "Send the request" }));
     await waitFor(() => expect(posted).toHaveLength(1));
     expect(posted[0]).toMatchObject({
@@ -98,9 +117,61 @@ describe("a game's sheet", () => {
       title: "Zelda II: The Adventure of Link",
       creators: ["Nintendo R&D4"],
       year: 1987,
-      details: { edition: "NES" },
+      details: { platform: "NES" },
       ids: { igdb: "1025" }, // issue 378: one per scheme, as every request's
     });
+  });
+
+  it("asks for the platform when asked from the top of the sheet (issue 498)", async () => {
+    renderSheet(SHEET);
+    await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
+    fireEvent.click(screen.getByRole("button", { name: "Ask for it" }));
+    const dialog = await screen.findByRole("dialog");
+    const platform = within(dialog).getByLabelText("Platform") as HTMLSelectElement;
+    expect(platform.value).toBe(""); // two platforms: the member chooses
+    expect([...platform.options].map((o) => o.value)).toEqual(["", "NES", "Game Boy Advance"]);
+    const send = within(dialog).getByRole("button", { name: "Send the request" }) as HTMLButtonElement;
+    expect(send.disabled).toBe(true);
+    fireEvent.change(platform, { target: { value: "Game Boy Advance" } });
+    expect(send.disabled).toBe(false);
+    fireEvent.click(send);
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toMatchObject({ details: { platform: "Game Boy Advance" } });
+  });
+
+  it("presets the only platform a game has (issue 498)", async () => {
+    renderSheet({ ...SHEET, platforms: ["Nintendo GameCube"] });
+    await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
+    fireEvent.click(screen.getByRole("button", { name: "Ask for it" }));
+    const dialog = await screen.findByRole("dialog");
+    expect((within(dialog).getByLabelText("Platform") as HTMLSelectElement).value).toBe("Nintendo GameCube");
+  });
+
+  it("follows the request once asked, with no second one (issue 498)", async () => {
+    renderSheet(SHEET, [
+      {
+        request_id: "r9",
+        id: null,
+        title: SHEET.title,
+        kind: "game",
+        state: "approved",
+        stage: "with_team",
+        requested_at: "2026-11-17T23:00:00Z",
+        image_id: null,
+        route: null,
+        sheet: "/media/game?service=s1&ref=1025",
+        details: { platform: "NES" },
+      },
+    ]);
+    await screen.findByRole("heading", { name: "Zelda II: The Adventure of Link" });
+    expect(await screen.findByText("With the team", { selector: ".media-badge" })).toBeTruthy();
+    expect((await screen.findAllByText("The team is getting it", { exact: false })).length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getByText("NES", { selector: "dd" })).toBeTruthy();
+    expect(screen.getByText("« Je cherche »")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Ask for it" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Ask for it on/ })).toBeNull();
   });
 
   it("opens the library's page when the library has it", async () => {
