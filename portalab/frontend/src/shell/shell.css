@@ -2043,6 +2043,23 @@ div.shell-status__item {
   background: color-mix(in srgb, var(--color-text) 10%, transparent);
   letter-spacing: 0;
 }
+/* issue 502: the count that opens all the titles of its type */
+.header-search__count[data-more] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 1.75rem;
+  padding-inline: 0.6rem 0.4rem;
+  border: 0;
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.header-search__count[data-more]:hover {
+  background: color-mix(in srgb, var(--color-accent) 26%, transparent);
+}
 .header-search__poster {
   inline-size: 2.1rem;
   block-size: 3.1rem;

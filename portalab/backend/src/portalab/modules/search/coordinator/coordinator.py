@@ -37,6 +37,7 @@ SemanticCandidates = Callable[
     [ParsedQuery, Sequence[str], int], Awaitable[Mapping[str, Sequence[str]] | None]
 ]
 FailureHook = Callable[[str, str], Awaitable[None]]
+SUGGESTED = 4  # issue 502: the first results a source without suggestions of its own gives the typeahead
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,6 +139,46 @@ class SearchCoordinator:
             metrics.increment("search.zero_results")
         metrics.gauge("search.latency_ms", took)
         return SearchOutcome(groups=results, took_ms=took, semantic=semantic_state, total=total)
+
+    async def suggest(self, query: ParsedQuery, principal: Principal, ctx: LocaleContext) -> SearchOutcome:
+        """Issue 502: the header's typeahead — a source with suggestions of its own (media: each type's
+        best) is asked for those alone, not for a page of results and then its suggestions: twice the work,
+        and the media source missed its time budget when every letter typed on a phone asked at once,
+        leaving « nothing found ». A slow source still yields its ``unavailable`` group, so the caller
+        knows the answer is partial."""
+        started = time.perf_counter()
+        config = self.config()
+        providers = [p for p in await self.permitted(principal) if _declares(p, query)]
+        timeout = max(0.05, config.provider_timeout_ms / 1000)
+        results = await asyncio.gather(
+            *(self._suggested(provider, query, principal, ctx, timeout) for provider in providers)
+        )
+        took = int((time.perf_counter() - started) * 1000)
+        return SearchOutcome(
+            groups=results, took_ms=took, semantic="off", total=sum(len(g.items) for g in results)
+        )
+
+    async def _suggested(
+        self,
+        provider: SearchProvider,
+        query: ParsedQuery,
+        principal: Principal,
+        ctx: LocaleContext,
+        budget: float,
+    ) -> Group:
+        suggestions = getattr(provider, "suggestions", None)
+        if suggestions is None:
+            return await self._run(provider, query, principal, ctx, SUGGESTED, None, budget, ())
+        try:
+            items = list(await asyncio.wait_for(suggestions(query, principal), timeout=budget))
+        except TimeoutError:
+            await self._failed(provider.kind, "timeout")
+            return Group(provider.kind, provider.label_key, "unavailable")
+        except Exception:
+            log.warning("search provider failed", extra={"kind": provider.kind})
+            await self._failed(provider.kind, "error")
+            return Group(provider.kind, provider.label_key, "unavailable")
+        return Group(provider.kind, provider.label_key, "ok", items=tuple(items))
 
     async def _semantic(
         self, query: ParsedQuery, kinds: Sequence[str], config: SearchConfig

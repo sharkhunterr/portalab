@@ -75,7 +75,10 @@ describe("the header's results", () => {
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "harry potter" } });
     const list = await screen.findByRole("listbox");
-    const texts = () => within(list).queryAllByRole("option").map((o) => o.textContent ?? "");
+    const texts = () =>
+      within(list)
+        .queryAllByRole("option")
+        .map((o) => o.textContent ?? "");
     await waitFor(() => expect(texts().some((t) => t.includes("Harry Potter 3"))).toBe(true));
     // the series stays, although its coming episodes open its page too
     expect(texts().some((t) => t.includes("Harry Potter (2026)"))).toBe(true);
@@ -89,12 +92,44 @@ describe("the header's results", () => {
     expect(line.textContent).toContain("2 more dates");
     expect(line.textContent).toContain("2026");
     expect(line.querySelector("img")?.getAttribute("src")).toBe("/api/v1/media/images/i1");
-    // the films: three shown of eight, the heading says eight, and « See all 8 films »
-    const headings = [...list.querySelectorAll(".header-search__group")].map((h) => h.textContent);
-    expect(headings).toContain("Films8");
-    const more = options.find((o) => o.textContent?.includes("See all 8"));
-    expect(more?.textContent).toContain("films");
-    fireEvent.click(more as HTMLElement);
+    // the films: three shown of eight — the heading's count opens all eight (no extra line)
+    expect(options.some((o) => o.textContent?.includes("See all"))).toBe(false);
+    const all = list.querySelector<HTMLButtonElement>(".header-search__count[data-more]");
+    expect(all?.textContent).toBe("8");
+    expect(all?.title).toBe("See all 8 films");
+    fireEvent.click(all as HTMLButtonElement);
     expect(input.value).toBe("");
+  });
+
+  it("asks again when a source did not answer in time, rather than keep « nothing »", async () => {
+    let asked = 0;
+    fake.handler = async (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/api/v1/search/suggest") {
+        asked += 1;
+        return asked === 1
+          ? json(200, { items: [], partial: true })
+          : json(200, { items: [film(1)], partial: false });
+      }
+      if (path === "/api/v1/palette/resolve")
+        return json(200, { destinations: [], actions: [], object: null });
+      return json(200, VIEW);
+    };
+    renderShell({ slots: { ai: { available: false, open: vi.fn() } } });
+    await screen.findByRole("link", { name: "Services" });
+    const input = screen.getAllByRole("combobox", { name: "Search" })[0] as HTMLInputElement;
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "harry" } });
+    const list = await screen.findByRole("listbox");
+    await waitFor(
+      () =>
+        expect(
+          within(list)
+            .queryAllByRole("option")
+            .some((o) => o.textContent?.includes("Harry Potter 1")),
+        ).toBe(true),
+      { timeout: 4000 },
+    );
+    expect(asked).toBe(2);
   });
 });

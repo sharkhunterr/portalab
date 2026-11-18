@@ -2,6 +2,7 @@
 exception stays isolated; stable group order; caps; ungranted kinds absent (not even a group); filters
 only reach providers that declare them; semantic candidates are re-hydrated and unknown ids dropped."""
 
+import asyncio
 import time
 from collections.abc import Mapping, Sequence
 
@@ -100,3 +101,34 @@ async def test_semantic_unavailable_is_reported() -> None:
     c = coordinator(FakeProvider("wiki"))
     outcome = await c.search(query("a", mode="semantic"), ME, LocaleContext())
     assert outcome.semantic == "unavailable" and outcome.groups[0].state == "ok"  # lexical continues
+
+
+class Suggesting(FakeProvider):
+    """A source with suggestions of its own (media: each type's best)."""
+
+    def __init__(self, kind: str, *, slow: bool = False) -> None:
+        super().__init__(kind)
+        self.slow = slow
+        self.suggested = 0
+
+    async def suggestions(self, query: ParsedQuery, principal: Principal) -> Sequence[object]:
+        self.suggested += 1
+        if self.slow:
+            await asyncio.sleep(1.0)
+        return [self._item(0), self._item(1)]
+
+
+async def test_the_typeahead_asks_only_for_suggestions_and_tells_a_slow_source() -> None:
+    """Issue 502: a source with suggestions is asked for those alone (no page of results beside them —
+    twice the work, which made the media source miss its budget while every letter asked); one without
+    gives its first results; a slow one is ``unavailable``, so the header knows the answer is partial."""
+    media, plain, slow = Suggesting("media"), FakeProvider("wiki"), Suggesting("slow", slow=True)
+    started = time.perf_counter()
+    outcome = await coordinator(media, plain, slow).suggest(query("a"), ME, LocaleContext())
+    assert time.perf_counter() - started < 0.8
+    assert (media.calls, media.suggested, plain.calls) == (0, 1, 1)
+    assert [(g.kind, g.state, len(g.items)) for g in outcome.groups] == [
+        ("media", "ok", 2),
+        ("slow", "unavailable", 0),
+        ("wiki", "ok", 2),
+    ]

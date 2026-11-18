@@ -125,3 +125,13 @@ async def test_searching_and_probing_audit_no_refusal(
     assert all(i["url_ref"] != "/admin/audit" for i in destinations["items"])  # still not offered
     assert (await search.module.probe()).state == "ok"  # every source still answers
     assert await _denials(search) == before
+
+
+async def test_suggest_says_whether_every_source_answered(
+    app: FastAPI, client: httpx.AsyncClient, search: SearchHarness
+) -> None:
+    """Issue 502: the typeahead tells a partial answer (a source too slow), for the header to ask again."""
+    await signed_in(app, client)
+    body = (await client.get("/api/v1/search/suggest", params={"q": "jelly"})).json()
+    assert body["partial"] is False
+    assert (await client.get("/api/v1/search/suggest")).json() == {"items": [], "partial": False}

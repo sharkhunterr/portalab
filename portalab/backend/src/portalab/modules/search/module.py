@@ -2,7 +2,6 @@
 index and administration."""
 
 import asyncio
-import contextlib
 import threading
 import time
 from collections import deque
@@ -240,21 +239,21 @@ class SearchModule:
         return outcome, request_id
 
     async def suggest(self, principal: Principal, q: str) -> list[dict[str, Any]]:
+        return (await self.suggested(principal, q))[0]
+
+    async def suggested(self, principal: Principal, q: str) -> tuple[list[dict[str, Any]], bool]:
         """Typeahead: the first matches of each permitted kind (same scoping as ``search``) — 027: with a
-        line of context and the item's facets, for the header's live results."""
-        outcome, _ = await self.search_without_side_effects(principal, q)
+        line of context and the item's facets, for the header's live results; #67: a source may suggest
+        across its types (media: each type's best). Issue 502: only the suggestions are asked for (no
+        page of results beside them), and whether a source did not answer in time (``partial``) — the
+        header then asks again rather than keep « nothing found »."""
+        self.limit(principal)
         ctx = await self.locale(principal)
         query = QueryParser(max_length=self.config.max_query_length).parse(
             q, ctx, now=utc_now(self.clock), mode="exact"
         )
-        chosen: dict[str, list[Any]] = {}
-        for group in outcome.groups:  # #67: a source may suggest across its types (media: each type's best)
-            provider = next(iter(self.registry.providers([group.kind])), None)
-            suggestions = getattr(provider, "suggestions", None)
-            if suggestions is not None and group.state == "ok":
-                with contextlib.suppress(Exception):  # the first page stays
-                    chosen[group.kind] = list(await suggestions(query, principal))
-        return [
+        outcome = await self.coordinator.suggest(query, principal, ctx)
+        items = [
             {
                 "kind": item.kind,
                 "id": item.id,
@@ -265,8 +264,9 @@ class SearchModule:
                 "group": group.label_key,  # the provider's own label for its kind
             }
             for group in outcome.groups
-            for item in _varied(chosen.get(group.kind) or group.items)
+            for item in _varied(group.items)
         ][:40]
+        return items, any(group.state == "unavailable" for group in outcome.groups)
 
     async def search_without_side_effects(self, principal: Principal, q: str) -> tuple[SearchOutcome, str]:
         self.limit(principal)

@@ -62,6 +62,14 @@ interface Option {
   type?: string | undefined;
   /** issue 502: the other dates of a calendar result opening the same page */
   more?: number | undefined;
+  /** issue 502: the first of its group — « See all N », from the count in the group's heading */
+  all?: { route: string; label: string } | undefined;
+}
+
+interface Suggested {
+  items: Suggestion[];
+  /** issue 502: a source did not answer in time — asked again rather than kept */
+  partial: boolean;
 }
 
 // issue 171: a query that reads as a question goes to the assistant first
@@ -85,7 +93,7 @@ export function focusHeaderSearch(query = ""): boolean {
   return true;
 }
 
-function useDebounced(value: string, delay = 180): string {
+function useDebounced(value: string, delay = 250): string {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
     const timer = window.setTimeout(() => setDebounced(value), delay);
@@ -109,17 +117,22 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
   const [expanded, setExpanded] = useState(false); // phone: the search covers the header
   const [active, setActive] = useState(-1);
   const text = useDebounced(query.trim());
-  const results = useQuery({
+  const results = useQuery<Suggested>({
     queryKey: ["search", "suggest", text],
     enabled: open && text.length > 0,
-    staleTime: 30_000,
+    // issue 502: an answer missing a source (too slow while every letter asked) is not kept: asked again
+    staleTime: (q) => (q.state.data?.partial ? 0 : 30_000),
+    refetchInterval: (q) => (q.state.data?.partial && q.state.dataUpdateCount < 3 ? 1200 : false),
     retry: false,
-    queryFn: async () =>
-      ((
-        (await api.GET("/api/v1/search/suggest", { params: { query: { q: text } } })).data as unknown as {
-          items?: Suggestion[];
-        }
-      )?.items ?? []) as Suggestion[],
+    queryFn: async ({ signal }): Promise<Suggested> => {
+      // issue 502: the letters already passed are given up (signal), not left to slow the last one
+      const answer = (await api.GET("/api/v1/search/suggest", { params: { query: { q: text } }, signal }))
+        .data as unknown as Partial<Suggested> | undefined;
+      return {
+        items: Array.isArray(answer?.items) ? answer.items : [],
+        partial: answer?.partial === true,
+      };
+    },
   });
   const resolution = useQuery({
     queryKey: ["search", "resolve", text],
@@ -200,13 +213,14 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
     // told apart from the titles, and the other dates of the same title folded into its first one
     const dates = new Map<string, Option>();
     const found: Option[] = [];
-    for (const item of Array.isArray(results.data) ? results.data : []) {
+    const suggested = results.data?.items ?? [];
+    for (const item of suggested) {
       if (!item.url_ref.startsWith("/")) continue;
       if (item.kind === "calendar") {
         const first = dates.get(item.url_ref);
         if (first) {
           first.more = (first.more ?? 0) + 1;
-          first.detail = calendarDetail(t, format.date, results.data ?? [], first);
+          first.detail = calendarDetail(t, format.date, suggested, first);
           continue;
         }
       } else if (seen.has(item.url_ref)) continue;
@@ -251,14 +265,10 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
       const first = members[0];
       const type = first?.type;
       if (first?.total && type && first.total > members.length) {
-        out.push({
-          id: `more:${type}`,
-          group,
-          icon: "arrow-right",
-          title: t("shell:searchMore", { count: first.total, kind: group.toLowerCase() }),
+        first.all = {
+          label: t("shell:searchMore", { count: first.total, kind: group.toLowerCase() }),
           route: `/search?q=${encodeURIComponent(q)}&type=media&f.subtype=${encodeURIComponent(type)}`,
-          more: -1,
-        });
+        };
       }
     }
     out.push({
@@ -413,9 +423,29 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                 <div className="header-search__group" aria-hidden="true">
                   <Icon name={option.groupIcon ?? "compass"} size={13} />
                   <span>{option.group}</span>
-                  <span className="header-search__count">
-                    {option.total ?? options.filter((o) => o.group === option.group && o.more !== -1).length}
-                  </span>
+                  {option.all ? (
+                    // issue 502: the count opens them all (a pointer's shortcut: « Search for » stays
+                    // the keyboard's way to every result)
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="header-search__count"
+                      data-more="true"
+                      title={option.all.label}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        const all = option.all;
+                        if (all) choose({ ...option, route: all.route, ask: undefined });
+                      }}
+                    >
+                      {option.total}
+                      <Icon name="chevron-right" size={12} />
+                    </button>
+                  ) : (
+                    <span className="header-search__count">
+                      {option.total ?? options.filter((o) => o.group === option.group).length}
+                    </span>
+                  )}
                 </div>
               ) : null;
             lastGroup = option.group || lastGroup;
@@ -428,7 +458,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                   tabIndex={-1}
                   aria-selected={index === active}
                   className="header-search__option"
-                  data-all={option.id === "all" || option.more === -1 || undefined}
+                  data-all={option.id === "all" || undefined}
                   onMouseDown={(e) => e.preventDefault()}
                   onMouseEnter={() => setActive(index)}
                   onClick={() => choose(option)}

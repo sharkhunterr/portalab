@@ -163,7 +163,10 @@ async def search(principal: Searcher, body: SearchIn, module: Module) -> SearchO
 async def suggest(
     principal: Searcher, module: Module, q: Annotated[str, Query(max_length=4096)] = ""
 ) -> dict[str, Any]:
-    return {"items": await module.suggest(principal, q) if q.strip() else []}
+    if not q.strip():
+        return {"items": [], "partial": False}
+    items, partial = await module.suggested(principal, q)
+    return {"items": items, "partial": partial}  # issue 502: a source did not answer in time
 
 
 @router.post("/search/assist", response_class=StreamingResponse)
