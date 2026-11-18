@@ -63,7 +63,14 @@ class CalendarSearchProvider:
             title=item.title,
             url_ref=route,
             snippet=snippet(item.title, query.terms),
-            facets={"source": item.source_kind, "status": item.status, "when": day},
+            facets={
+                "source": item.source_kind,
+                "status": item.status,
+                "when": day,
+                # issue 502: a media release tells its kind (a series, a film) and shows its poster
+                **({"category": item.category} if item.category else {}),
+                **({"image": item.image} if item.image and item.image.startswith("/api/") else {}),
+            },
         )
 
     async def search(

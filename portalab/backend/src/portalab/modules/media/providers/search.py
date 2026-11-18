@@ -40,6 +40,8 @@ from portalab.modules.media.permissions import MEDIA_READ, MEDIA_REQUEST
 
 # #67: among equally relevant titles, the order of the kinds (films and series before books and tracks)
 KIND_ORDER = ("movie", "series", "game", "book", "audiobook", "album", "live", "season", "episode", "track")
+# issue 502: a season, an episode, a track found beside its series or album suggested once, not three times
+PARTS = ("season", "episode", "track")
 
 ACTIONS = (
     ActionDef(
@@ -209,10 +211,12 @@ class MediaSearchProvider:
         return stmt
 
     async def suggestions(
-        self, query: ParsedQuery, principal: Principal, *, per_type: int = 2
+        self, query: ParsedQuery, principal: Principal, *, per_type: int = 3
     ) -> Sequence[SearchItem]:
         """#67: the header's suggestions — the most relevant titles of *each* type (films, games, books…),
-        not the first page alone (four games and six films filled it before any book)."""
+        not the first page alone (four games and six films filled it before any book). Issue 502: three of
+        each (one season, episode or track), each telling how many of its type match (``of``) so the header
+        offers them all."""
         query_words = words(query.text)
         if not query_words or not await self.authorizer.is_allowed(principal, MEDIA_READ):
             return []
@@ -220,6 +224,7 @@ class MediaSearchProvider:
         ranked = (
             select(
                 MediaObject.id.label("id"),
+                MediaObject.kind.label("kind"),
                 func.row_number().over(partition_by=MediaObject.kind, order_by=order).label("place"),
                 order[0].label("tier"),
             )
@@ -230,11 +235,23 @@ class MediaSearchProvider:
         async with self.query.database.session() as session:
             picked = (
                 await session.execute(
-                    select(ranked.c.id, ranked.c.tier, ranked.c.place).where(ranked.c.place <= per_type)
+                    select(ranked.c.id, ranked.c.tier, ranked.c.place).where(
+                        ranked.c.place <= case((ranked.c.kind.in_(PARTS), 1), else_=per_type)
+                    )
                 )
             ).all()
             if not picked:
                 return []
+            totals = {
+                str(kind): int(count)
+                for kind, count in (
+                    await session.execute(
+                        select(MediaObject.kind, func.count())
+                        .where(MediaObject.status == "active", matching(query_words))
+                        .group_by(MediaObject.kind)
+                    )
+                ).all()
+            }
             rows = {
                 row.id: row
                 for row in (
@@ -246,7 +263,10 @@ class MediaSearchProvider:
         best = sorted(picked, key=lambda p: (p.place, p.tier))  # each type's best first, by relevance
         objects = [rows[p.id] for p in best if p.id in rows]
         extras = await self._extras(objects, query_words)
-        return [self._item(row, query, 1.0, extras.get(row.id)) for row in objects]
+        return [
+            self._item(row, query, 1.0, {**extras.get(row.id, {}), "of": str(totals.get(row.kind, 0))})
+            for row in objects
+        ]
 
     @staticmethod
     def _relevance(query_words: Sequence[str], phrase: str = "") -> list[Any]:

@@ -249,5 +249,8 @@
   "crumb.aBook": "Un livre",
   "crumb.askTheTeam": "Demander à l'équipe",
   "crumb.collection": "Collection",
-  "crumb.myHousehold": "Mon foyer"
+  "crumb.myHousehold": "Mon foyer",
+  "searchMore": "{count, plural, one {Voir le # {kind}} other {Voir les # {kind}}}",
+  "searchMoreDates": "{count, plural, one {et # autre date} other {et # autres dates}}",
+  "searchOn": "Le {date}"
 }

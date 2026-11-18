@@ -120,4 +120,53 @@ async def test_suggestions_take_each_types_best(app: FastAPI, media: MediaHarnes
     )
     assert "book" not in {item.facets["type"] for item in page.items}  # the page alone missed it
     suggested = await provider.suggestions(query, Principal(user_id=people["zoe"]))
-    assert [item.facets["type"] for item in suggested] == ["game", "movie", "book", "game", "movie"]
+    assert [item.facets["type"] for item in suggested] == [
+        "game",
+        "movie",
+        "book",
+        "game",
+        "movie",
+        "game",
+        "movie",
+    ]
+    # issue 502: each tells how many of its type match, for the header to offer them all
+    assert {item.facets["type"]: item.facets["of"] for item in suggested} == {
+        "game": "4",
+        "movie": "6",
+        "book": "1",
+    }
+
+
+async def test_suggestions_give_three_titles_of_each_type_and_one_season(
+    app: FastAPI, media: MediaHarness
+) -> None:
+    """Issue 502: « Harry Potter » brought one film, one book, one audiobook although the library holds
+    several of each — three of each type now, a season (beside its series) once."""
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one)
+    records = [library_record(f"m{n}", title=f"Harry Potter {n}", year=2001 + n) for n in range(8)]
+    records += [library_record(f"b{n}", kind="book", title=f"Harry Potter tome {n}") for n in range(7)]
+    records += [
+        library_record(f"a{n}", kind="audiobook", title=f"Harry Potter livre audio {n}") for n in range(3)
+    ]
+    records += [library_record(f"s{n}", kind="season", title=f"Harry Potter — Season {n}") for n in range(3)]
+    await media.module.library.upsert(records, one)
+    provider = MediaSearchProvider(
+        CatalogQuery(media.database, media.module.authorizer), media.module.authorizer
+    )
+    query = ParsedQuery(text="harry potter", normalized="harry potter", terms=("harry", "potter"))
+    suggested = await provider.suggestions(query, Principal(user_id=people["zoe"]))
+    kinds = [item.facets["type"] for item in suggested]
+    assert {kind: kinds.count(kind) for kind in set(kinds)} == {
+        "movie": 3,
+        "book": 3,
+        "audiobook": 3,
+        "season": 1,
+    }
+    assert {item.facets["type"]: item.facets["of"] for item in suggested} == {
+        "movie": "8",
+        "book": "7",
+        "audiobook": "3",
+        "season": "3",
+    }

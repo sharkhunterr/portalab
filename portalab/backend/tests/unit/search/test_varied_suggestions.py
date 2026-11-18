@@ -13,7 +13,24 @@ def test_media_suggestions_mix_the_types() -> None:
     items = [_item("media", f"game {n}", "game") for n in range(4)] + [
         _item("media", f"film {n}", "movie") for n in range(6)
     ]
-    assert [i.title for i in _varied(items)] == ["game 0", "film 0", "game 1", "film 1", "game 2", "film 2"]
+    assert [i.title for i in _varied(items, media=6)] == [
+        "game 0",
+        "film 0",
+        "game 1",
+        "film 1",
+        "game 2",
+        "film 2",
+    ]
+
+
+def test_media_suggestions_leave_room_for_three_of_each_type() -> None:
+    """Issue 502: six places left one title of each type when six types matched."""
+    items = [
+        _item("media", f"{kind} {n}", kind)
+        for n in range(3)
+        for kind in ("movie", "book", "audiobook", "game", "series", "season")
+    ]
+    assert len(_varied(items)) == 18
 
 
 def test_other_sources_keep_their_first_four() -> None:

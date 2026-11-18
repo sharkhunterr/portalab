@@ -108,5 +108,6 @@
   "semanticUnavailable": "Meaning-based search is not available; showing exact matches.",
   "start": "Type something to search.",
   "submit": "Search",
-  "title": "Search"
+  "title": "Search",
+  "badge.scheduled": "Upcoming"
 }

@@ -88,6 +88,9 @@ export function badgesOf(t: ReturnType<typeof useT>, item: Faceted): Badge[] {
   const out: Badge[] = [];
   if ((item.kind === "media" || item.kind === "request") && facets.type)
     out.push({ label: t(`media:kind.${facets.type}`), tone: "neutral" });
+  // issue 502: a calendar date of a media release tells what comes — a series, a film, a book
+  if (item.kind === "calendar" && facets.category)
+    out.push({ label: t(`media:kind.${facets.category}`), tone: "neutral" });
   if ((item.kind === "product" || item.kind === "marketplace") && facets.type) {
     out.push({ label: t(`marketplace:type.${facets.type}`), tone: "neutral" });
   }

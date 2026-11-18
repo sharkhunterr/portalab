@@ -114,6 +114,7 @@ class CalendarItem:
     status: str = "scheduled"
     url_ref: str | None = None  # SPA route or ``portalab://`` ref
     category: str | None = None  # 027: a finer kind shown apart (a media release: movie, series, book)
+    image: str | None = None  # issue 502: a portal image route (a media release: its title's poster)
 
 
 @dataclass(frozen=True, slots=True)

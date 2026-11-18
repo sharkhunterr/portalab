@@ -15,6 +15,7 @@ import {
   ResultBadges,
   rolesOf,
 } from "../../features/search/presentation";
+import { useFormat } from "../../i18n";
 import { useT } from "../../i18n/hooks/useT";
 import { useNavigationView } from "../nav/NavigationProvider";
 import { fromNavigation, rank } from "../palette/CommandRegistry";
@@ -55,6 +56,12 @@ interface Option {
   round?: true | undefined;
   /** issue 171: a question for the assistant instead of a page */
   ask?: string | undefined;
+  /** issue 502: how many results its group has in all (a media type's), beyond those shown */
+  total?: number | undefined;
+  /** issue 502: a title's media type (movie, book…), to offer all those of its type */
+  type?: string | undefined;
+  /** issue 502: the other dates of a calendar result opening the same page */
+  more?: number | undefined;
 }
 
 // issue 171: a query that reads as a question goes to the assistant first
@@ -89,6 +96,7 @@ function useDebounced(value: string, delay = 180): string {
 
 export function HeaderSearch({ phone = false, floating = false }: { phone?: boolean; floating?: boolean }) {
   const t = useT();
+  const format = useFormat();
   const strings = useShellStrings();
   const navigate = useNavigate();
   const location = useLocation();
@@ -188,11 +196,23 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
       });
     }
     const seen = new Set(out.map((o) => o.route));
+    // issue 502: a calendar date opening a title's page never hides the title itself — the dates are
+    // told apart from the titles, and the other dates of the same title folded into its first one
+    const dates = new Map<string, Option>();
     const found: Option[] = [];
     for (const item of Array.isArray(results.data) ? results.data : []) {
-      if (!item.url_ref.startsWith("/") || seen.has(item.url_ref)) continue;
-      seen.add(item.url_ref);
+      if (!item.url_ref.startsWith("/")) continue;
+      if (item.kind === "calendar") {
+        const first = dates.get(item.url_ref);
+        if (first) {
+          first.more = (first.more ?? 0) + 1;
+          first.detail = calendarDetail(t, format.date, results.data ?? [], first);
+          continue;
+        }
+      } else if (seen.has(item.url_ref)) continue;
+      else seen.add(item.url_ref);
       const byType = item.kind === "media" ? mediaGroup(item.facets?.type) : null; // films, series, books…
+      const total = Number(item.facets?.of ?? 0);
       found.push({
         id: `result:${item.kind}:${item.id}`,
         group: byType
@@ -201,25 +221,46 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
         groupIcon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
         icon: byType?.icon ?? KIND_ICONS[item.kind] ?? "search",
         title: item.title,
-        detail: detailOf(t, item),
+        detail: detailOf(t, item, format.date),
         route: item.url_ref,
+        total: total || undefined,
+        type: item.kind === "media" ? item.facets?.type : undefined,
         image:
           item.kind === "media" && item.facets?.image
             ? `/api/v1/media/images/${item.facets.image}`
-            : item.kind === "request" && item.facets?.cover // issue 373: a book's, a game's, through the portal
-              ? item.facets.cover
-              : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
-                ? (metadataImage(item.facets.poster, "w92") ?? undefined)
-                : item.kind === "person" && item.facets?.portrait // #92: an actor's, an author's portrait
-                  ? (metadataImage(item.facets.portrait, "w92") ?? undefined)
-                  : undefined,
+            : item.kind === "calendar" && item.facets?.image?.startsWith("/api/") // issue 502: its poster
+              ? item.facets.image
+              : item.kind === "request" && item.facets?.cover // issue 373: a book's, a game's, through the portal
+                ? item.facets.cover
+                : item.kind === "request" && item.facets?.poster // #4: a title to ask for (TMDB's poster)
+                  ? (metadataImage(item.facets.poster, "w92") ?? undefined)
+                  : item.kind === "person" && item.facets?.portrait // #92: an actor's, an author's portrait
+                    ? (metadataImage(item.facets.portrait, "w92") ?? undefined)
+                    : undefined,
         round: item.kind === "person" || undefined,
         badges: badgesOf(t, item),
       });
+      if (item.kind === "calendar") dates.set(item.url_ref, found[found.length - 1] as Option);
     }
     // each group together, in the order the groups first appear
     const order = [...new Set(found.map((o) => o.group))];
-    out.push(...[...found].sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group)));
+    for (const group of order) {
+      const members = found.filter((o) => o.group === group);
+      out.push(...members);
+      // issue 502: a media type with more titles than shown offers them all, in the search filtered on it
+      const first = members[0];
+      const type = first?.type;
+      if (first?.total && type && first.total > members.length) {
+        out.push({
+          id: `more:${type}`,
+          group,
+          icon: "arrow-right",
+          title: t("shell:searchMore", { count: first.total, kind: group.toLowerCase() }),
+          route: `/search?q=${encodeURIComponent(q)}&type=media&f.subtype=${encodeURIComponent(type)}`,
+          more: -1,
+        });
+      }
+    }
     out.push({
       id: "all",
       group: "",
@@ -241,7 +282,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
       else out.push(ask);
     }
     return out;
-  }, [query, history.data, pages, results.data, resolution.data, t, ai?.available]);
+  }, [query, history.data, pages, results.data, resolution.data, t, format.date, ai?.available]);
 
   // while typing, the best match is ready for Enter; the count is announced
   const typed = query.trim().length > 0;
@@ -373,7 +414,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                   <Icon name={option.groupIcon ?? "compass"} size={13} />
                   <span>{option.group}</span>
                   <span className="header-search__count">
-                    {options.filter((o) => o.group === option.group).length}
+                    {option.total ?? options.filter((o) => o.group === option.group && o.more !== -1).length}
                   </span>
                 </div>
               ) : null;
@@ -387,7 +428,7 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
                   tabIndex={-1}
                   aria-selected={index === active}
                   className="header-search__option"
-                  data-all={option.id === "all" || undefined}
+                  data-all={option.id === "all" || option.more === -1 || undefined}
                   onMouseDown={(e) => e.preventDefault()}
                   onMouseEnter={() => setActive(index)}
                   onClick={() => choose(option)}
@@ -467,9 +508,30 @@ export function HeaderSearch({ phone = false, floating = false }: { phone?: bool
   );
 }
 
-function detailOf(t: ReturnType<typeof useT>, item: Suggestion): string | undefined {
+/** issue 502: a calendar result — its date, and its title's other dates folded into it. */
+type DateFormat = (value: string) => string;
+
+function calendarDetail(
+  t: ReturnType<typeof useT>,
+  date: DateFormat,
+  items: Suggestion[],
+  option: Option,
+): string | undefined {
+  const item = items.find((i) => `result:${i.kind}:${i.id}` === option.id);
+  if (!item) return option.detail;
+  const base = detailOf(t, item, date);
+  const more = option.more ? t("shell:searchMoreDates", { count: option.more }) : null;
+  return [base, more].filter(Boolean).join(" · ") || undefined;
+}
+
+function detailOf(t: ReturnType<typeof useT>, item: Suggestion, date: DateFormat): string | undefined {
   const facets = item.facets ?? {};
   if (item.kind === "person") return rolesOf(t, item) || undefined; // #92: « Réalisation · 12 titres »
+  if (item.kind === "calendar" && facets.when) {
+    // issue 502: when it comes — « Le 25 déc. 2026 » — rather than its title said again (a day: midday UTC)
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(facets.when) ? `${facets.when}T12:00:00Z` : facets.when;
+    if (!Number.isNaN(new Date(day).getTime())) return t("shell:searchOn", { date: date(day) });
+  }
   if (item.kind === "media") {
     const credit = facets.person // #92: whom the query found — « De Robin Hobb »
       ? t(`search:credit.${facets.role ?? "credit"}`, { name: facets.person })

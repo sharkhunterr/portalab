@@ -91,9 +91,10 @@ class SearchRequest:
     cursor: str | None = None
 
 
-def _varied(items: Sequence[Any], each: int = 4, media: int = 6) -> list[Any]:
+def _varied(items: Sequence[Any], each: int = 4, media: int = 20) -> list[Any]:
     """#67: a source's first suggestions — for media, taken in turn from each type (films, series, books,
-    games…) in their relevance order, so one type never fills every place."""
+    games…) in their relevance order, so one type never fills every place. Issue 502: room for three of
+    each type (six places left one film, one book, one audiobook when six types matched)."""
     if not items or items[0].kind != "media":
         return list(items[:each])
     by_type: dict[str, list[Any]] = {}
@@ -265,7 +266,7 @@ class SearchModule:
             }
             for group in outcome.groups
             for item in _varied(chosen.get(group.kind) or group.items)
-        ][:20]
+        ][:40]
 
     async def search_without_side_effects(self, principal: Principal, q: str) -> tuple[SearchOutcome, str]:
         self.limit(principal)

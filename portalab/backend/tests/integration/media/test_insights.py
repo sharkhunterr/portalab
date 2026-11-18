@@ -848,3 +848,65 @@ async def test_a_play_the_portal_recorded_is_not_its_accounts_too(
     assert going == ["Golden Sun"] and lately == ["Golden Sun"]
     theirs = [item["title"] for item in await in_progress(media.database, people["arthur"], now)]
     assert theirs == ["Flight of the Falcon"]
+
+
+class _Episodes:
+    async def upcoming(self, start: Any, end: Any) -> list[SourceRelease]:
+        return [
+            SourceRelease(
+                f"episode:{n}",
+                "episode",
+                f"Chapter {n}",
+                start + timedelta(days=3 + 7 * n),
+                "air",
+                parent_title="Harry Potter",
+                season=1,
+                episode=n,
+                ids={"tvdb": "4242"},
+            )
+            for n in (1, 2)
+        ]
+
+
+async def test_a_coming_episode_tells_its_series_and_shows_its_poster(
+    app: FastAPI, media: MediaHarness, clock: FixedClock
+) -> None:
+    """Issue 502: the calendar's coming episodes, as the search finds them, tell their kind (a series),
+    their day and show their series' poster — not a bare « Harry Potter S01E01 »."""
+    from portalab.capabilities.i18n import LocaleContext
+    from portalab.capabilities.search import ParsedQuery
+    from portalab.core.authz_port import Principal
+    from portalab.modules.calendar.search import CalendarSearchProvider
+    from portalab.modules.media.insights.calendar_source import MediaReleaseCalendarSource
+
+    people = await users(app, media, "zoe")
+    one = media.service(1)
+    media.library(one).images["p"] = PNG_1PX
+    await media.module.library.upsert(
+        [library_record("7", kind="series", title="Harry Potter", ids={"tvdb": "4242"}, image="p")], one
+    )
+    media.provide(CALENDAR, media.service(4, "sonarr"), _Episodes())
+    source = MediaReleaseCalendarSource(media.module.upcoming)
+    now = clock.now()
+    seen = await source.items(
+        now - timedelta(days=1), now + timedelta(days=30), Principal(user_id=people["zoe"]), LocaleContext()
+    )
+    assert [(i.title, i.category) for i in seen.items] == [
+        ("Harry Potter S01E01", "series"),
+        ("Harry Potter S01E02", "series"),
+    ]
+    async with media.database.session() as session:
+        series = await session.scalar(select(MediaObject.id).where(MediaObject.title == "Harry Potter"))
+    assert seen.items[0].image is None  # no poster downloaded yet: the release is still told
+    assert series is not None and await media.module.images.fetch(series)
+    seen = await source.items(
+        now - timedelta(days=1), now + timedelta(days=30), Principal(user_id=people["zoe"]), LocaleContext()
+    )
+    first = seen.items[0]
+    assert first.url_ref == f"/media/{series}"
+    assert first.image is not None and first.image.startswith("/api/v1/media/images/")
+    assert (await source.item(first.source_id, Principal(user_id=people["zoe"]))) == first
+    provider = CalendarSearchProvider(None, None, None)  # type: ignore[arg-type]
+    found = provider._item(first, ParsedQuery(text="harry", normalized="harry", terms=("harry",)))
+    assert found.facets["category"] == "series" and found.facets["image"] == first.image
+    assert first.date is not None and found.facets["when"] == first.date.isoformat()

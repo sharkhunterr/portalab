@@ -108,5 +108,6 @@
   "semanticUnavailable": "La recherche par le sens n’est pas disponible ; correspondances exactes affichées.",
   "start": "Saisissez un texte à rechercher.",
   "submit": "Rechercher",
-  "title": "Recherche"
+  "title": "Recherche",
+  "badge.scheduled": "À venir"
 }
