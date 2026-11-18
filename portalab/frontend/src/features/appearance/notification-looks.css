@@ -61,10 +61,17 @@
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
-.looks__preview.ds-notifications {
+/* issue 506: a pack's style places the live notifications on the screen (the island: a width of the
+   screen's, centred) — its preview stays inside its card whatever the style says */
+.looks__preview.ds-notifications,
+.looks__preview.ds-notifications[data-style] {
   position: static;
+  inset: auto;
   z-index: auto; /* #79: a preview, not the live notifications — never over a menu or a dialog */
   inline-size: 100%;
+  max-inline-size: 100%;
+  margin: 0;
+  transform: none;
   padding: var(--space-2);
   border-radius: var(--radius-sm, 0.3rem);
   background: linear-gradient(

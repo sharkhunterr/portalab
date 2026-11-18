@@ -93,6 +93,25 @@
 .shell-header__end {
   margin-inline-start: auto;
 }
+/* issue 506: a phone's header always fits its width (a few pixels too many — the coins' figure, a font
+   still loading — widened the whole page): closer buttons, narrower edges, and its end may shrink */
+@media (max-width: 400px) {
+  .shell-header {
+    gap: var(--space-2);
+    padding-inline: var(--space-2);
+  }
+  .shell-header__start,
+  .shell-header__end {
+    gap: var(--space-1);
+  }
+  .shell-header__end {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+  }
+  .shell-header__end > .ds-button--icon {
+    min-inline-size: 2rem; /* still a finger's room */
+  }
+}
 .shell-header__search {
   flex: 1 1 auto;
   display: flex;

@@ -1,7 +1,7 @@
 /**
  * #68: a full-screen fragment shader drawn on a canvas, made to stay light — drawn at the screen's
- * resolution (lowered on its own when the device struggles), at 30 frames a second at most, the resolution lowered on its
- * own when frames come late, and nothing at all while the tab is hidden. Returns ``null`` when WebGL is not
+ * resolution, at 30 frames a second at most; when frames come late, fewer frames first, then a little
+ * resolution (``STEPS``); nothing at all while the tab is hidden. Returns ``null`` when WebGL is not
  * there (the caller falls back to the CSS ambience) and a ``stop`` function otherwise. ``uniforms`` (#88), when
  * given, is asked each frame for the scene's own numbers (``u_<name>``).
  */
@@ -13,8 +13,21 @@ import { frameInterval, stillFor } from "../../motion/budget";
 const VERTEX = `attribute vec2 a_pos;
 void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 
-// of the device pixels (density capped at 1.5): sharp by default, lowered while frames come late
-const SCALES = [1, 0.8, 0.62, 0.48, 0.36];
+/**
+ * What a struggling device gives up, step by step while frames come late (issue 506): first the frames — an
+ * ambience drifts slowly, fewer frames hardly show — then a little sharpness, never below 62 % of the
+ * device pixels (0.36 before: a blurred picture on older phones); still behind at the last step, the CSS
+ * ambience stands in. ``scale``: of the device pixels (density capped at 1.5); ``fps``: frames a second
+ * at most (the motion budget's own cap still holds).
+ */
+export const STEPS: ReadonlyArray<{ scale: number; fps: number }> = [
+  { scale: 1, fps: 30 },
+  { scale: 1, fps: 20 },
+  { scale: 1, fps: 15 },
+  { scale: 0.8, fps: 15 },
+  { scale: 0.62, fps: 12 },
+];
+const LAST = STEPS[STEPS.length - 1] as { scale: number; fps: number };
 const DENSITY = Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 1.5);
 
 function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
@@ -78,7 +91,7 @@ export function runShader(
   let last = 0;
   const started = performance.now();
   const size = () => {
-    const scale = (SCALES[level] ?? 0.36) * DENSITY;
+    const scale = (STEPS[level] ?? LAST).scale * DENSITY;
     const width = Math.max(1, Math.round(canvas.clientWidth * scale));
     const height = Math.max(1, Math.round(canvas.clientHeight * scale));
     if (canvas.width !== width || canvas.height !== height) {
@@ -93,17 +106,17 @@ export function runShader(
     if (document.hidden) return;
     // #29: half the frames when saving, one still frame when motion is « none »
     if (held && stillFor(canvas)) return;
-    const interval = frameInterval();
+    const interval = Math.max(frameInterval(), 1000 / (STEPS[level] ?? LAST).fps);
     const gap = now - last;
-    if (gap < interval - 2) return; // 30 frames a second at most
+    if (gap < interval - 2) return; // its step's frames a second at most (30 at best)
     last = now;
     held = stillFor(canvas);
     // a frame much later than asked, often: the device is struggling — fewer pixels
     frames += 1;
     if (gap > interval * 1.6 && gap < 1000) late += 1;
     if (frames >= 60) {
-      if (late > 20 && level < SCALES.length - 1) level += 1;
-      else if (guarded && late > 30 && level === SCALES.length - 1) {
+      if (late > 20 && level < STEPS.length - 1) level += 1;
+      else if (guarded && late > 30 && level === STEPS.length - 1) {
         // already at its fewest pixels and still far behind: it is given up, the page breathes again
         cancelAnimationFrame(frame);
         canvas.dispatchEvent(new Event("webglcontextlost", { bubbles: true, cancelable: true }));

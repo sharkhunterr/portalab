@@ -90,10 +90,17 @@
 
 html {
   font-size: calc(100% * var(--text-scale));
+  /* issue 506: with the body's below — both are needed: one alone, a phone's browser still widens its layout
+     past an element too wide */
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
+  /* issue 506: nothing widens the page sideways (a preview past its card, a header a little too full made a
+     phone's browser widen its layout, then centre the sheets and dialogs on that wider page) — each scrolling
+     row scrolls on its own */
+  overflow-x: clip;
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-sans);
