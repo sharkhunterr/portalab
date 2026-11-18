@@ -123,3 +123,40 @@ async def test_my_feed_tells_me_once_what_arrived(
     assert await media.module.feed.notify_due(outbox) == 1
     later = outbox.sent[-1].params  # only what came since
     assert later["count"] == 1 and later["list"] == "• Blade Runner 2049 — Denis Villeneuve"
+
+
+async def test_a_film_a_book_a_game_followed_brings_its_arrival(
+    app: FastAPI, media: MediaHarness, client: httpx.AsyncClient, clock: FixedClock
+) -> None:
+    """#499: any title is followed — not only a series; one followed while it is not in the library is in the
+    feed (and told) once it arrives; one already there brings nothing until something comes with it."""
+    await users(app, media, "zoe")
+    library = media.service(1, "fake")
+    media.library(library)
+    await media.module.library.upsert(
+        [
+            # known to the library, its file not there yet
+            library_record("m1", title="Dune", year=2021, ids={"tmdb": "438631"}, available=False),
+            library_record("g1", kind="game", title="Paper Mario", year=2004),
+        ],
+        library,
+    )
+    async with media.database.session() as session:
+        ids = dict((await session.execute(select(MediaObject.title, MediaObject.id))).tuples().all())
+    await login(client, "zoe")
+    for title in ("Dune", "Paper Mario"):
+        body = {"kind": "title", "ref": str(ids[title])}
+        assert (await client.put("/api/v1/me/media/follows", json=body)).status_code == 200
+    assert (await client.get("/api/v1/me/media/feed")).json()["items"] == []  # Paper Mario was here already
+
+    clock.advance(timedelta(hours=3))
+    await media.module.library.upsert(
+        [library_record("m1", title="Dune", year=2021, ids={"tmdb": "438631"}, available=True)], library
+    )
+    feed = (await client.get("/api/v1/me/media/feed")).json()["items"]
+    assert [(i["title"], [(b["kind"], b["label"]) for b in i["because"]]) for i in feed] == [
+        ("Dune", [("title", "Dune")])
+    ]
+    outbox = Outbox()
+    assert await media.module.feed.notify_due(outbox) == 1
+    assert outbox.sent[0].params["list"] == "• Dune — Dune"

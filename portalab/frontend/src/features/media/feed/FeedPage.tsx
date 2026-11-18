@@ -22,9 +22,9 @@ import {
 import { Timeline } from "./Timeline";
 import "./feed.css";
 
-const KIND_ICONS: Record<FollowKind, string> = { person: "user", title: "tv", genre: "tag" };
+const KIND_ICONS: Record<FollowKind, string> = { person: "user", title: "bookmark", genre: "tag" };
 
-/** Where a followed subject lives: a person's page, a series', or the library by genre. */
+/** Where a followed subject lives: a person's page, a title's (issue 499: any work), or the library by genre. */
 function followRoute(follow: Follow): string {
   if (follow.kind === "person") return personPath(follow.label);
   if (follow.kind === "title") return `/media/${follow.ref}`;

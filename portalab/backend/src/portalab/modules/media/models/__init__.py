@@ -62,6 +62,8 @@ class MediaObject(MediaBase):
     status: Mapped[str] = mapped_column(String(10), nullable=False)
     merged_into: Mapped[UUID | None] = mapped_column(ForeignKey("media.objects.id"))
     first_seen_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    # #499: when the library last made it available (none while it never was) — a followed title's arrival
+    available_at: Mapped[datetime | None] = mapped_column(TZDateTime)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
 

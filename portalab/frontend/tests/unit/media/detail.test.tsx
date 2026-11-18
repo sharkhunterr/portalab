@@ -119,6 +119,8 @@ describe("media detail", () => {
     expect(screen.queryByRole("heading", { name: "Requests" })).toBeNull();
     // #4: a film with its TMDB id is asked for here, through the shared form (seasons, 4K, quota)
     expect(await screen.findByRole("button", { name: "Request" })).toBeTruthy();
+    // issue 499: a film is followed as a series is — its arrival, the news about it
+    expect(screen.getByRole("button", { name: "Follow" }).getAttribute("aria-pressed")).toBe("false");
     expect(posts).toEqual([]);
   });
 });

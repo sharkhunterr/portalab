@@ -1,7 +1,8 @@
 """#299 — « Mon fil »: what a member follows (people, titles, genres — private) and what the library brought
-them lately: a work with a person they follow, a new season or new episodes of a title they follow, a work of
-a genre they follow. Read from the library itself (when each object was first seen), nothing copied per
-member; what arrived since they last opened their feed is unread."""
+them lately: a work with a person they follow, a new season or new episodes of a title they follow, a title
+they follow (a film, a book, a game…) arrived in the library (#499), a work of a genre they follow. Read from
+the library itself (when each object was first seen), nothing copied per member; what arrived since they last
+opened their feed is unread."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -16,7 +17,14 @@ from sqlalchemy.orm import aliased
 from portalab.capabilities.notifications import CommunicationRequest, Notifications, Users
 from portalab.core.db import Database
 from portalab.core.time import Clock, utc_now
-from portalab.modules.media.models import Credit, FeedNotified, FeedSeen, Follow, MediaObject, ObjectTag
+from portalab.modules.media.models import (
+    Credit,
+    FeedNotified,
+    FeedSeen,
+    Follow,
+    MediaObject,
+    ObjectTag,
+)
 from portalab.modules.media.people import WORK, People, _credited
 
 Kind = Literal["person", "title", "genre"]
@@ -193,6 +201,21 @@ class Feed:
                     elif new.kind == "season" and new.position is not None:
                         code = f"S{new.position:02d}"
                     add(new.work, new.first_seen_at, "title", titles[new.work], code)
+                # #499: a film, a book, a game… followed before it was here — its arrival in the library,
+                # whatever its kind
+                followed_at = {UUID(f.ref): f.created_at for f in follows if f.kind == "title"}
+                for here in (
+                    await session.execute(
+                        select(MediaObject.id, MediaObject.available_at).where(
+                            MediaObject.id.in_(titles),
+                            MediaObject.status == "active",
+                            MediaObject.available.is_(True),
+                            MediaObject.available_at >= since,
+                        )
+                    )
+                ).all():
+                    if here.available_at > followed_at[here.id]:
+                        add(here.id, here.available_at, "title", titles[here.id])
             for genre, label in genres.items():
                 latest = (
                     await session.execute(

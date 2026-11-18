@@ -78,6 +78,8 @@ class CatalogWriter:
         if row.available != (available > 0):
             row.available = available > 0
             row.updated_at = now
+            if row.available:
+                row.available_at = now  # #499: a followed title's arrival
             await self.publish(
                 session,
                 "media.availability_changed",

@@ -56,6 +56,8 @@ import { TitleHero } from "./TitleHero";
  */
 // 027 (#22): « viewing » (my plays and how many watched it) replaces progress, history and statistics
 const EXTRA_KINDS = ["movie", "series", "game"]; // issue 465: titles with videos and pictures told
+// issue 499: the titles one follows — every work, not its seasons or episodes
+const FOLLOWABLE = ["movie", "series", "book", "audiobook", "game", "album"];
 const SECTIONS = ["info", "sources", "viewing", "requests", "people", "events", "links", "blocks"];
 type Data = Record<string, unknown>;
 
@@ -1000,8 +1002,11 @@ export function DetailPage() {
           <ReviewButton objectId={media.id} title={media.title} poster={shownPoster} facts={dialogFacts} />
           {/* 032: the master keeps this title out of one profile or another */}
           <TitleRestrictions objectId={media.id} title={media.title} />
-          {/* issue 299: a series followed brings its new episodes into « Mon fil » */}
-          {media.kind === "series" ? <FollowButton kind="title" value={media.id} name={media.title} /> : null}
+          {/* issue 299: a series followed brings its new episodes into « Mon fil »; issue 499: any title — its
+              arrival, the news about it */}
+          {FOLLOWABLE.includes(media.kind) ? (
+            <FollowButton kind="title" value={media.id} name={media.title} />
+          ) : null}
           {/* 030: what plugins add to a title's page (« + Playlist »…), drawn by Portalab */}
           <PluginSlot name="media.actions" params={{ item: media.id }} />
           {/* issue 354: a problem with it (subtitles, language, a cut file…) — a ticket about this media */}
