@@ -544,5 +544,13 @@
   "history.via.ai": "by the assistant",
   "history.via.plugin": "by a plugin",
   "history.via.system": "by the portal",
-  "history.assignedTeam": "Assigned to the team"
+  "history.assignedTeam": "Assigned to the team",
+  "notify.attachment": "New attachment on ticket T-{number}",
+  "notify.attachment.body": "« {name} » was added to « {title} ».",
+  "ticket.openedBy": "Opened by {name} · {when}",
+  "ticket.opened": "Opened {when}",
+  "ticket.assignedTo": "Assigned to {name}",
+  "ticket.assignedSomeone": "Assigned",
+  "ticket.notAssigned": "Unassigned",
+  "queue.stateCount": "{count, plural, one {# ticket} other {# tickets}}"
 }

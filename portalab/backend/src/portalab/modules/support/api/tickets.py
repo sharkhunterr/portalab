@@ -99,6 +99,10 @@ class TicketCard(BaseModel):
     service_id: str | None
     updated_at: datetime
     media_id: UUID | None = None
+    # issue 512: when it was opened; in the team's queue, who opened it and who handles it
+    created_at: datetime | None = None
+    requester_name: str | None = None
+    assignee_name: str | None = None
 
 
 class TicketCommentOut(BaseModel):
@@ -221,6 +225,7 @@ def card(t: Ticket) -> TicketCard:
         service_id=t.service_id,
         updated_at=t.updated_at,
         media_id=t.media_id,
+        created_at=t.created_at,
     )
 
 
@@ -540,7 +545,22 @@ async def queue(
         q=q,
         cursor=cursor,
     )
-    return TicketQueueOut(items=[card(r) for r in rows], next_cursor=next_cursor)
+    items = [card(r) for r in rows]
+    names = await _names(module, {u for i in items for u in (i.requester_id, i.assignee_id) if u})
+    for item in items:  # issue 512: the queue tells who opened each ticket and who handles it
+        item.requester_name = names.get(str(item.requester_id)) if item.requester_id else None
+        item.assignee_name = names.get(str(item.assignee_id)) if item.assignee_id else None
+    return TicketQueueOut(items=items, next_cursor=next_cursor)
+
+
+class TicketCountsOut(BaseModel):
+    states: dict[str, int]
+
+
+@router.get("/support/tickets/counts", response_model=TicketCountsOut)
+async def queue_counts(principal: Staff, module: Module, unassigned: bool = False) -> TicketCountsOut:
+    """Issue 512: how many tickets each state holds — the queue's tabs carry them as badges."""
+    return TicketCountsOut(states=await module.tickets.counts(principal, unassigned=unassigned))
 
 
 @router.post("/tickets/{ticket_id}/assign", response_model=TicketDetail)

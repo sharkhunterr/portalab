@@ -544,5 +544,13 @@
   "history.via.ai": "par l’assistant",
   "history.via.plugin": "par une extension",
   "history.via.system": "par le portail",
-  "history.assignedTeam": "Assigné à l’équipe"
+  "history.assignedTeam": "Assigné à l’équipe",
+  "notify.attachment": "Nouvelle pièce jointe sur le ticket T-{number}",
+  "notify.attachment.body": "« {name} » a été ajouté à « {title} ».",
+  "ticket.openedBy": "Ouvert par {name} · {when}",
+  "ticket.opened": "Ouvert le {when}",
+  "ticket.assignedTo": "Assigné à {name}",
+  "ticket.assignedSomeone": "Assigné",
+  "ticket.notAssigned": "Non assigné",
+  "queue.stateCount": "{count, plural, one {# ticket} other {# tickets}}"
 }

@@ -124,6 +124,15 @@
     justify-content: flex-end;
   }
 }
+/* issue 512: who handles a ticket, in the team's queue */
+.support-assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.support-assignee[data-unassigned] {
+  color: var(--color-text-muted);
+}
 .support-state {
   --tone: var(--color-accent);
   background: color-mix(in srgb, var(--tone) 18%, transparent);

@@ -12322,6 +12322,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/tickets/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Queue Counts
+         * @description Issue 512: how many tickets each state holds — the queue's tabs carry them as badges.
+         */
+        get: operations["queue_counts_api_v1_support_tickets_counts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/terms": {
         parameters: {
             query?: never;
@@ -22209,6 +22229,10 @@ export interface components {
         TicketCard: {
             /** Assignee Id */
             assignee_id: string | null;
+            /** Assignee Name */
+            assignee_name?: string | null;
+            /** Created At */
+            created_at?: string | null;
             /**
              * Id
              * Format: uuid
@@ -22226,6 +22250,8 @@ export interface components {
             reference: string;
             /** Requester Id */
             requester_id: string | null;
+            /** Requester Name */
+            requester_name?: string | null;
             /** Service Id */
             service_id: string | null;
             /** State */
@@ -22264,6 +22290,13 @@ export interface components {
             /** Internal */
             internal: boolean;
         };
+        /** TicketCountsOut */
+        TicketCountsOut: {
+            /** States */
+            states: {
+                [key: string]: number;
+            };
+        };
         /** TicketCreateIn */
         TicketCreateIn: {
             /**
@@ -22298,10 +22331,14 @@ export interface components {
         TicketDetail: {
             /** Assignee Id */
             assignee_id: string | null;
+            /** Assignee Name */
+            assignee_name?: string | null;
             /** Attachments */
             attachments: components["schemas"]["TicketAttachmentOut"][];
             /** Comments */
             comments: components["schemas"]["TicketCommentOut"][];
+            /** Created At */
+            created_at?: string | null;
             /** Description */
             description: string;
             /** Feedback */
@@ -22341,6 +22378,8 @@ export interface components {
             reference: string;
             /** Requester Id */
             requester_id: string | null;
+            /** Requester Name */
+            requester_name?: string | null;
             /** Service Id */
             service_id: string | null;
             /** Source */
@@ -46310,6 +46349,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TicketQueueOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    queue_counts_api_v1_support_tickets_counts_get: {
+        parameters: {
+            query?: {
+                unassigned?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketCountsOut"];
                 };
             };
             /** @description Validation Error */

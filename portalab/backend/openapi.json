@@ -25000,6 +25000,29 @@
             ],
             "title": "Assignee Id"
           },
+          "assignee_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee Name"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -25052,6 +25075,17 @@
               }
             ],
             "title": "Requester Id"
+          },
+          "requester_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requester Name"
           },
           "service_id": {
             "anyOf": [
@@ -25156,6 +25190,22 @@
           "created_at"
         ],
         "title": "TicketCommentOut",
+        "type": "object"
+      },
+      "TicketCountsOut": {
+        "properties": {
+          "states": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "States",
+            "type": "object"
+          }
+        },
+        "required": [
+          "states"
+        ],
+        "title": "TicketCountsOut",
         "type": "object"
       },
       "TicketCreateIn": {
@@ -25264,6 +25314,17 @@
             ],
             "title": "Assignee Id"
           },
+          "assignee_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee Name"
+          },
           "attachments": {
             "items": {
               "$ref": "#/components/schemas/TicketAttachmentOut"
@@ -25277,6 +25338,18 @@
             },
             "title": "Comments",
             "type": "array"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
           },
           "description": {
             "title": "Description",
@@ -25384,6 +25457,17 @@
               }
             ],
             "title": "Requester Id"
+          },
+          "requester_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requester Name"
           },
           "service_id": {
             "anyOf": [
@@ -62086,6 +62170,50 @@
           }
         },
         "summary": "Queue",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/tickets/counts": {
+      "get": {
+        "description": "Issue 512: how many tickets each state holds \u2014 the queue's tabs carry them as badges.",
+        "operationId": "queue_counts_api_v1_support_tickets_counts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "unassigned",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unassigned",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketCountsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Queue Counts",
         "tags": [
           "support"
         ]

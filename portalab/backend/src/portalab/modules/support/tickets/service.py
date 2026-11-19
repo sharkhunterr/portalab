@@ -447,6 +447,16 @@ class TicketService:
                 .all()
             )
 
+    async def counts(self, viewer: Principal, *, unassigned: bool = False) -> dict[str, int]:
+        """Issue 512: tickets per state, for the queue's tabs (staff only)."""
+        if not await self.allowed(viewer, TICKETS_MANAGE):
+            raise Forbidden("You cannot see the support queue.")
+        stmt = select(Ticket.state, func.count()).group_by(Ticket.state)
+        if unassigned:
+            stmt = stmt.where(Ticket.assignee_id.is_(None))
+        async with self.database.session() as session:
+            return {str(state): int(n) for state, n in (await session.execute(stmt)).all()}
+
     async def queue(
         self,
         viewer: Principal,
@@ -543,19 +553,48 @@ class TicketService:
             await self._event(session, ticket, "ticket.updated", seq)
             requester, assignee, number = ticket.requester_id, ticket.assignee_id, ticket.number
             title = ticket.title
-        if not internal:
-            author = self.user_of(principal)
-            target = requester if author != requester else assignee
+        author = self.user_of(principal)
+        # issue 398: which ticket, and the reply's first lines (the rest is in the portal)
+        told = {"number": number, "title": title, "quote": excerpt(text_body)}
+        if not internal and requester != author:
             await self.notifier.send(
                 STATUS,
                 "support:notify.comment",
-                target,
+                requester,
                 f"ticket:{ticket_id}:{seq}:comment",
-                # issue 398: which ticket, and the reply's first lines (the rest is in the portal)
-                {"number": number, "title": title, "quote": excerpt(text_body)},
+                told,
                 f"/support/tickets/{ticket_id}",
             )
+        # issue 512: the assignee hears of every message on their ticket, internal notes included
+        await self.tell_assignee(
+            principal, ticket_id, assignee, "support:notify.comment", seq, "comment", told, besides=requester
+        )
         return comment
+
+    async def tell_assignee(
+        self,
+        principal: Principal,
+        ticket_id: UUID,
+        assignee: UUID | None,
+        template: str,
+        seq: int,
+        what: str,
+        params: dict[str, Any],
+        *,
+        besides: UUID | None = None,
+    ) -> None:
+        """Issue 512: whatever happens on a ticket reaches the one handling it — unless they did it, or the
+        same notice already went to them as its requester."""
+        if assignee is None or assignee == self.user_of(principal) or assignee == besides:
+            return
+        await self.notifier.send(
+            ASSIGNMENT,
+            template,
+            assignee,
+            f"ticket:{ticket_id}:{seq}:{what}:assignee",
+            params,
+            f"/support/queue/{ticket_id}",
+        )
 
     async def transition(
         self,
@@ -619,22 +658,27 @@ class TicketService:
                     session, principal, "ticket.closed_for_requester", ticket, {"state": ticket.state}
                 )
             requester, number, state = ticket.requester_id, ticket.number, ticket.state
+            assignee = ticket.assignee_id
             title, was = ticket.title, getattr(workflow.state(previous), "label", previous)
+        told = {
+            "number": number,
+            "state": move.target.label,
+            "title": title,
+            "previous": was,
+            "quote": excerpt(comment or ""),
+        }
         if self.user_of(principal) != requester:
             await self.notifier.send(
                 STATUS,
                 "support:notify.state",
                 requester,
                 f"ticket:{ticket_id}:{seq}:state",
-                {
-                    "number": number,
-                    "state": move.target.label,
-                    "title": title,
-                    "previous": was,
-                    "quote": excerpt(comment or ""),
-                },
+                told,
                 f"/support/tickets/{ticket_id}",
             )
+        await self.tell_assignee(
+            principal, ticket_id, assignee, "support:notify.state", seq, "state", told, besides=requester
+        )
         del state
         return ticket
 
@@ -667,7 +711,8 @@ class TicketService:
                     {"to": str(assignee) if assignee else None},
                 )
             number, title, priority = ticket.number, ticket.title, ticket.priority
-        if assignee is not None and assignee != self.user_of(principal):
+        # issue 512: a ticket an automation hands to its own author is news to them too
+        if assignee is not None and (assignee != self.user_of(principal) or principal.channel != "user"):
             await self.notifier.send(
                 ASSIGNMENT,
                 "support:notify.assigned",

@@ -40,6 +40,7 @@ export function TicketList({
 }) {
   const t = useT();
   const format = useFormat();
+  const team = base === "/support/queue"; // issue 512: the team's queue tells who handles each ticket
   return (
     <ul className="support-list" aria-label={label}>
       {items.map((ticket) => (
@@ -56,6 +57,17 @@ export function TicketList({
             <Link to={`${base}/${ticket.id}`} className="support-card__title">
               {ticket.title}
             </Link>
+            {ticket.created_at ? (
+              // issue 512: when it was opened — and, in the team's queue, by whom
+              <span className="support-meta">
+                {ticket.requester_name
+                  ? t("support:ticket.openedBy", {
+                      name: ticket.requester_name,
+                      when: format.dateTime(ticket.created_at),
+                    })
+                  : t("support:ticket.opened", { when: format.dateTime(ticket.created_at) })}
+              </span>
+            ) : null}
             <span className="support-meta">
               {t("support:ticket.updated", {
                 when: format.relative((Date.parse(ticket.updated_at) - Date.now()) / 1000),
@@ -65,6 +77,22 @@ export function TicketList({
           <span className="support-card__badges">
             <StateBadge state={ticket.state} />
             {ticket.priority !== "normal" ? <PriorityBadge priority={ticket.priority} /> : null}
+            {team ? (
+              <span
+                className="ds-badge support-assignee"
+                data-unassigned={ticket.assignee_id ? undefined : true}
+                title={
+                  ticket.assignee_name
+                    ? t("support:ticket.assignedTo", { name: ticket.assignee_name })
+                    : undefined
+                }
+              >
+                <Icon name="user" size={12} />
+                {ticket.assignee_id
+                  ? (ticket.assignee_name ?? t("support:ticket.assignedSomeone"))
+                  : t("support:ticket.notAssigned")}
+              </span>
+            ) : null}
           </span>
         </li>
       ))}

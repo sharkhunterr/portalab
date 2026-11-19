@@ -137,7 +137,18 @@ class AttachmentService:
                 {"attachment": str(row.id), "private": private},
             )
             await self.tickets._event(session, locked, "ticket.updated", seq)
-            return row
+            assignee, number, title = locked.assignee_id, locked.number, locked.title
+        # issue 512: a file added to a ticket reaches the one handling it
+        await self.tickets.tell_assignee(
+            principal,
+            ticket_id,
+            assignee,
+            "support:notify.attachment",
+            seq,
+            "attachment",
+            {"number": number, "title": title, "name": clean.filename},
+        )
+        return row
 
     async def read(self, principal: Principal, attachment_id: UUID) -> AttachmentFile:
         async with self.tickets.database.session() as session:

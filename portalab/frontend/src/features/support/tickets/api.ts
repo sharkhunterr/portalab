@@ -56,6 +56,20 @@ export function useTicket(id: string) {
   });
 }
 
+/** Issue 512: tickets per state, the queue's tabs carry them as badges. */
+export function useQueueCounts(unassigned: boolean) {
+  return useQuery({
+    queryKey: [...KEY, "queue-counts", unassigned],
+    retry: false,
+    queryFn: async () =>
+      (
+        await api.GET("/api/v1/support/tickets/counts", {
+          params: { query: unassigned ? { unassigned: true } : {} },
+        })
+      ).data?.states ?? {},
+  });
+}
+
 export function useQueue(filters: { state?: string; unassigned?: boolean; q?: string; requester?: string }) {
   return useQuery({
     queryKey: [...KEY, "queue", filters],

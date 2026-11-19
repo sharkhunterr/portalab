@@ -1,16 +1,19 @@
 import { useState } from "react";
 import "../support.css";
 import { AdminPage } from "../../../design-system/admin/AdminKit";
+import { CountBadge } from "../../../design-system/components/CountBadge";
 import { Icon } from "../../../design-system/components/Icon";
 import { EmptyState } from "../../../design-system/components/Placeholders";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { useQueue } from "../tickets/api";
+import { useQueue, useQueueCounts } from "../tickets/api";
 import { TicketList } from "../tickets/MyTickets";
 import { stateLabel } from "../tickets/TicketBadges";
 
 /** Support queue (spec 016 T025, 027 T095, staff): state chips, "unassigned" toggle and a text search. */
 const STATES = ["open", "in_progress", "waiting_user", "resolved", "closed", "cancelled"];
+// issue 512: the states still to handle carry their count as a badge (the finished ones would only grow)
+const COUNTED = new Set(["open", "in_progress", "waiting_user"]);
 
 export function Queue() {
   const t = useT();
@@ -19,6 +22,7 @@ export function Queue() {
   const [q, setQ] = useState("");
   const queue = useQueue({ state, unassigned, q });
   const items = queue.data?.items ?? [];
+  const counts = useQueueCounts(unassigned).data ?? {};
   return (
     <AdminPage icon="inbox" title={t("support:queue.title")} description={t("support:queue.subtitle")}>
       <search className="support-toolbar">
@@ -29,6 +33,12 @@ export function Queue() {
           {STATES.map((s) => (
             <button key={s} type="button" aria-pressed={state === s} onClick={() => setState(s)}>
               {s === "waiting_user" ? t("support:queue.waitingMember") : stateLabel(t, s)}
+              {COUNTED.has(s) ? (
+                <CountBadge
+                  count={counts[s] ?? 0}
+                  label={t("support:queue.stateCount", { count: counts[s] ?? 0 })}
+                />
+              ) : null}
             </button>
           ))}
         </fieldset>
