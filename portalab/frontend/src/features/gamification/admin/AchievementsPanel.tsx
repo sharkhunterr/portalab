@@ -13,7 +13,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import type { Value } from "../api";
 import { PLAY_KINDS, playName, StepFilters } from "./StepFilters";
 import {
@@ -358,8 +358,7 @@ function useSubmitError() {
   const t = useT();
   const [error, setError] = useState<string | null>(null);
   const fail = (failure: unknown) => {
-    const errors =
-      failure instanceof ApiError ? (failure.extensions.errors as string[] | undefined) : undefined;
+    const errors = problemErrors(failure);
     setError(
       failure instanceof ApiError
         ? [failure.message, ...(errors ?? [])].join(" — ")

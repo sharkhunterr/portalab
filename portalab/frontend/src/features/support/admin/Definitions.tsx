@@ -18,7 +18,7 @@ import { Dialog } from "../../../design-system/components/Overlays";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import type { FieldDef } from "../tickets/api";
 import { DEFAULT_PROBLEMS, PROBLEM_FIELD, problemIcon } from "../tickets/ReportMedia";
 import { FieldsBuilder } from "./FieldsBuilder";
@@ -106,8 +106,7 @@ const local = (iso?: string | null) => {
 
 function errorText(error: unknown, fallback: string): string {
   if (!(error instanceof ApiError)) return fallback;
-  const errors = error.extensions.errors as string[] | undefined;
-  return [error.message, ...(errors ?? [])].join(" — ");
+  return [error.message, ...problemErrors(error)].join(" — ");
 }
 
 export function FormEditor({ form, onDone }: { form?: FormRow; onDone: () => void }) {
@@ -344,15 +343,18 @@ function TypeEditor({
   const patch = (next: Partial<TypeRow>) => setDraft({ ...draft, ...next });
   const save = useMutation({
     mutationFn: async () => {
-      const { key, version: _v, ...body } = draft;
+      // issue 513: only what the type takes — the row read back also carries its version and date
+      const { key, label, workflow_key, fields, enabled, media, public: shared } = draft;
       return (
         await api.PUT("/api/v1/admin/support/types/{key}", {
           params: { path: { key } },
           body: {
-            ...body,
-            media: Boolean(body.media),
-            public: Boolean(body.public),
-            fields: body.fields as unknown as Array<Record<string, unknown>>,
+            label,
+            workflow_key,
+            enabled,
+            media: Boolean(media),
+            public: Boolean(shared),
+            fields: fields as unknown as Array<Record<string, unknown>>,
           },
         })
       ).data;

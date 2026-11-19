@@ -4,7 +4,7 @@ import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import {
   type Catalog,
   type Definition,
@@ -73,7 +73,9 @@ export function Editor({
     const failed = (error: unknown) =>
       setProblems(
         error instanceof ApiError
-          ? ((error.extensions.errors as string[] | undefined) ?? [error.message])
+          ? problemErrors(error).length
+            ? problemErrors(error)
+            : [error.message]
           : [t("automations:editor.failed")],
       );
     if (automationId) {

@@ -7,7 +7,7 @@ import { CheckboxField, SelectField } from "../../../design-system/components/Fi
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import type { CatalogEntry, Instance } from "../api";
 import { ConfigDialog } from "../edit/EditControls";
 import type { Cell } from "../edit/EditSession";
@@ -75,7 +75,7 @@ const VIEWS: Array<{ view: View; icon: string }> = [
 
 function errorText(error: unknown, fallback: string): string {
   if (!(error instanceof ApiError)) return fallback;
-  const errors = error.extensions.errors as string[] | undefined;
+  const errors = problemErrors(error);
   return [error.message, ...(errors ?? [])].join(" — ");
 }
 

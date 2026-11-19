@@ -6,7 +6,7 @@ import { Button } from "../../../design-system/components/Button";
 import { CheckboxField, SelectField, TextField } from "../../../design-system/components/Field";
 import { Icon } from "../../../design-system/components/Icon";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import { type Campaign, useCampaignAdmin } from "../api";
 
 /**
@@ -475,8 +475,7 @@ export function CampaignEditor({ campaign, onDone }: { campaign?: Campaign; onDo
     return out;
   };
   const fail = (failure: unknown) => {
-    const errors =
-      failure instanceof ApiError ? (failure.extensions.errors as string[] | undefined) : undefined;
+    const errors = problemErrors(failure);
     setError(
       failure instanceof ApiError ? [failure.message, ...(errors ?? [])].join(" — ") : String(failure),
     );

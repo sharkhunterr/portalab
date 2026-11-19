@@ -22,6 +22,26 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Issue 513: the problem's ``errors`` as text — a validator's messages as they are, a refused request's
+ * entries (``{loc, type}``) as « field (reason) » rather than « [object Object] ».
+ */
+export function problemErrors(error: unknown): string[] {
+  if (!(error instanceof ApiError)) return [];
+  const raw = error.extensions.errors;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((entry) => {
+    if (typeof entry === "string") return entry;
+    if (entry && typeof entry === "object") {
+      const { loc, type, msg, message } = entry as Record<string, unknown>;
+      const where = Array.isArray(loc) ? loc.filter((part) => part !== "body").join(".") : "";
+      const why = String(msg ?? message ?? type ?? "");
+      return where ? `${where} (${why})` : why;
+    }
+    return String(entry);
+  });
+}
+
 export function stateForError(error: unknown): FunctionalStateName {
   if (error instanceof ApiError) {
     if (error.status === 401 || error.status === 403) return "unauthorized";

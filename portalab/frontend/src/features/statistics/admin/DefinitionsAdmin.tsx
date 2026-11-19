@@ -15,7 +15,7 @@ import { Button } from "../../../design-system/components/Button";
 import { Icon } from "../../../design-system/components/Icon";
 import { FunctionalState } from "../../../design-system/state/FunctionalState";
 import { useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 
 /**
  * Statistic definitions (spec 017 T017; admin): the closed-set document is edited as validated JSON (the
@@ -59,7 +59,7 @@ export function DefinitionsAdmin() {
     onError: (error) => {
       if (error instanceof SyntaxError) setErrors([t("statistics:admin.invalidJson")]);
       else if (error instanceof ApiError)
-        setErrors(((error.extensions.errors as string[]) ?? [error.message]).map(String));
+        setErrors(problemErrors(error).length ? problemErrors(error) : [error.message]);
     },
   });
   async function confirmed(path: "activate" | "rebuild", key: string) {

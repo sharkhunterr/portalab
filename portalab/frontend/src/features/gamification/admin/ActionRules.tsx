@@ -12,7 +12,7 @@ import { Icon } from "../../../design-system/components/Icon";
 import { Dialog } from "../../../design-system/components/Overlays";
 import { useFormat } from "../../../i18n/format/useFormat";
 import { type Translate, useT } from "../../../i18n/hooks/useT";
-import { ApiError } from "../../../state/regions";
+import { ApiError, problemErrors } from "../../../state/regions";
 import { GameRuleBuilder, gameRuleChips, useProposedGameRules } from "../../games/RewardRules";
 import { type RewardRule, useRuleAdmin, useRules, type Value } from "../api";
 import { SimulationPanel } from "./SimulationPanel";
@@ -359,8 +359,7 @@ function RuleForm({
       if (publish && saved) await admin.publish.mutateAsync({ key, version: saved.version });
       onDone();
     } catch (failure) {
-      const errors =
-        failure instanceof ApiError ? (failure.extensions.errors as string[] | undefined) : undefined;
+      const errors = problemErrors(failure);
       setError(
         failure instanceof ApiError
           ? [failure.message, ...(errors ?? [])].join(" — ")
