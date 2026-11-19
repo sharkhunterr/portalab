@@ -2263,5 +2263,9 @@
   "setup.step.household.todo": "Choose how many profiles an account may hold",
   "setup.link.household": "My household",
   "setting.wiki.guide.enabled.label": "Portalab's member guide in the wiki",
-  "setting.wiki.guide.enabled.hint": "The guide's pages in English and French, each member reading their language, kept up to date by each release. A page you change or delete stays as you left it. Off: the pages the guide still owns are removed."
+  "setting.wiki.guide.enabled.hint": "The guide's pages in English and French, each member reading their language, kept up to date by each release. A page you change or delete stays as you left it. Off: the pages the guide still owns are removed.",
+  "setting.support.tickets.assigneeShownToRequester.label": "Assignment seen by the requester",
+  "setting.support.tickets.assigneeShownToRequester.hint": "What a member reads when their ticket is assigned: « the team », or the name of the person handling it.",
+  "setting.support.tickets.assigneeShownToRequester.choice.team": "The team",
+  "setting.support.tickets.assigneeShownToRequester.choice.name": "The person's name"
 }

@@ -1355,6 +1355,10 @@
     "advanced": true,
     "group": "security"
   },
+  "support.tickets.assigneeShownToRequester": {
+    "advanced": false,
+    "group": "communication"
+  },
   "support.tickets.enabled": {
     "advanced": false,
     "group": "communication"

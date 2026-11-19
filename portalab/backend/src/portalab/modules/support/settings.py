@@ -2,12 +2,16 @@
 ``support.incident.precheckMatchMode``; the ticket/attachment settings are consumed by Slice B."""
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from portalab.core.config_declaration import SettingCatalog, declare_setting, default_catalog
 
 OWNER = "module:support"
 TICKETS_ON = "support.tickets.enabled"
 INCIDENTS_ON = "support.incidents.enabled"
+# issue 511: whom a requester reads their ticket was assigned to — « the team » (default) or the person's name
+ASSIGNEE_SHOWN = "support.tickets.assigneeShownToRequester"
+AssigneeShown = Literal["team", "name"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +73,15 @@ def declare_support_settings(catalog: SettingCatalog = default_catalog) -> None:
             declare(
                 scope="global", key=key, schema=bool, default=True, owner=OWNER, description=f"{what} on."
             )
+    if ASSIGNEE_SHOWN not in known:
+        declare(
+            scope="global",
+            key=ASSIGNEE_SHOWN,
+            schema=AssigneeShown,
+            default="team",
+            owner=OWNER,
+            description="team: a requester reads « assigned to the team »; name: the assignee's name.",
+        )
 
 
 declare_support_settings()

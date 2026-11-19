@@ -2263,5 +2263,9 @@
   "setup.step.household.todo": "Choisir combien de profils un compte peut avoir",
   "setup.link.household": "Mon foyer",
   "setting.wiki.guide.enabled.label": "Le guide du membre de Portalab dans le wiki",
-  "setting.wiki.guide.enabled.hint": "Les pages du guide en anglais et en français, chaque membre les lit dans sa langue, mises à jour à chaque version. Une page que vous modifiez ou supprimez reste telle que vous l'avez laissée. Coupé : les pages que le guide possède encore sont retirées."
+  "setting.wiki.guide.enabled.hint": "Les pages du guide en anglais et en français, chaque membre les lit dans sa langue, mises à jour à chaque version. Une page que vous modifiez ou supprimez reste telle que vous l'avez laissée. Coupé : les pages que le guide possède encore sont retirées.",
+  "setting.support.tickets.assigneeShownToRequester.label": "Assignation vue par le demandeur",
+  "setting.support.tickets.assigneeShownToRequester.hint": "Ce que le membre lit quand son ticket est assigné : « l’équipe », ou le nom de la personne qui s’en occupe.",
+  "setting.support.tickets.assigneeShownToRequester.choice.team": "L’équipe",
+  "setting.support.tickets.assigneeShownToRequester.choice.name": "Le nom de la personne"
 }

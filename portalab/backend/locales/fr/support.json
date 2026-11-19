@@ -543,5 +543,6 @@
   "history.via.automation": "par une automatisation",
   "history.via.ai": "par l’assistant",
   "history.via.plugin": "par une extension",
-  "history.via.system": "par le portail"
+  "history.via.system": "par le portail",
+  "history.assignedTeam": "Assigné à l’équipe"
 }

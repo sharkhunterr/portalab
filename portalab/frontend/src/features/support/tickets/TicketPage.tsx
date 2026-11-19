@@ -114,7 +114,8 @@ export function TicketPage({ team = false }: { team?: boolean }) {
     const to = line.data.to ? String(line.data.to) : null;
     if (!to) return t("support:history.unassigned");
     const name = named(to);
-    if (!name) return t("support:history.assignment");
+    // issue 511: a requester reads « the team » unless the admin chose to name the assignee
+    if (!name) return data.staff ? t("support:history.assignment") : t("support:history.assignedTeam");
     const by = !line.data.via && line.actor && line.actor !== to ? named(line.actor) : null;
     return by ? t("support:history.assignedBy", { name, by }) : t("support:history.assignedTo", { name });
   };

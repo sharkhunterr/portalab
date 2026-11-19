@@ -543,5 +543,6 @@
   "history.via.automation": "by an automation",
   "history.via.ai": "by the assistant",
   "history.via.plugin": "by a plugin",
-  "history.via.system": "by the portal"
+  "history.via.system": "by the portal",
+  "history.assignedTeam": "Assigned to the team"
 }

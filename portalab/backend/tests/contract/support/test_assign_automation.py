@@ -9,8 +9,10 @@ import httpx
 import pytest
 
 from portalab.capabilities.support import TicketRequest
+from portalab.core.authz_port import Principal
 from portalab.core.errors import ValidationFailed
 from portalab.modules.automations.templates.loader import load
+from portalab.modules.support.settings import ASSIGNEE_SHOWN
 from tests.authz_fixtures import automation
 from tests.integration.identity.helpers import login
 from tests.integration.support.conftest import SupportHarness
@@ -94,3 +96,18 @@ async def test_the_thread_tells_the_team_who_and_how_and_keeps_the_team_anonymou
     await login(client, "ursula")
     member = (await client.get(f"/api/v1/tickets/{ticket}")).json()
     assert member["people"] == {} and member["staff"] is False
+
+
+async def test_the_requester_reads_the_team_unless_the_admin_names_the_assignee(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    """Issue 511: « assigned to the team » by default; the admin may tell the assignee's name, never more."""
+    ticket = await _ticket(support)
+    await support.module.tickets.assign(support.p("sam"), ticket, people["mona"])
+    await login(client, "ursula")
+    assert (await client.get(f"/api/v1/tickets/{ticket}")).json()["people"] == {}
+    await support.full.administration.config.set(
+        ASSIGNEE_SHOWN, "name", actor=Principal(user_id=people["boss"])
+    )
+    named = (await client.get(f"/api/v1/tickets/{ticket}")).json()["people"]
+    assert set(named) == {str(people["mona"])}  # the assignee — not sam, who assigned it, nor the requester

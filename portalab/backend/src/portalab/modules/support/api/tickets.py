@@ -12,6 +12,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Query, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from portalab.capabilities.config import CAPABILITY as CONFIG
 from portalab.capabilities.config import switched_on
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
 from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
@@ -25,7 +26,7 @@ from portalab.modules.support.api.incidents import support_module
 from portalab.modules.support.models import Ticket
 from portalab.modules.support.module import SupportModule
 from portalab.modules.support.permissions import INCIDENTS_MANAGE
-from portalab.modules.support.settings import TICKETS_ON
+from portalab.modules.support.settings import ASSIGNEE_SHOWN, TICKETS_ON
 from portalab.modules.support.tickets.service import TICKETS_CREATE, TICKETS_MANAGE, TicketView
 
 
@@ -229,7 +230,30 @@ async def shown(module: SupportModule, ticket_id: UUID, principal: Principal) ->
     out = detail(await module.tickets.view(ticket_id, principal))
     if out.staff:
         out.people = await _names(module, _people(out))
+    elif await _assignee_named(module):
+        # issue 511: the admin chose to tell the requester who took their ticket — its assignees only
+        out.people = await _names(module, _assignees(out))
     return out
+
+
+async def _assignee_named(module: SupportModule) -> bool:
+    providers = module.capabilities.system_providers(CONFIG)
+    if not providers:
+        return False
+    try:
+        return bool((await providers[0].provider.get(ASSIGNEE_SHOWN)).value == "name")
+    except Exception:  # unreadable: the default, « the team »
+        log.debug("support.assignee_shown_unreadable", exc_info=True)
+        return False
+
+
+def _assignees(out: TicketDetail) -> set[UUID]:
+    found = {out.assignee_id} if out.assignee_id else set()
+    for line in out.history:
+        if line.kind == "assignment":
+            with suppress(KeyError, ValueError):
+                found.add(UUID(str(line.data["to"])))
+    return found
 
 
 def _people(out: TicketDetail) -> set[UUID]:

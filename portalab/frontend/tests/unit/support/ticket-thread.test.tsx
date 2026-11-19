@@ -121,8 +121,17 @@ describe("a ticket's thread", () => {
     renderTicket(ticket(false, {}), false, URSULA);
     await screen.findByRole("heading", { name: "On test" });
     const [, auto, handed] = lines();
-    expect(auto).toContain("Assignment · by an automation");
-    expect(handed).toContain("Assignment");
+    // issue 511: « the team » by default
+    expect(auto).toContain("Assigned to the team · by an automation");
+    expect(handed).toContain("Assigned to the team");
     expect(handed).not.toContain("Sam");
+  });
+
+  it("names the assignee to the member when the admin chose to (issue 511)", async () => {
+    renderTicket(ticket(false, { [SAM]: "Sam" }), false, URSULA);
+    await screen.findByRole("heading", { name: "On test" });
+    const [, , handed] = lines();
+    expect(handed).toContain("Assigned to Sam");
+    expect(handed).not.toContain(" by ");
   });
 });
