@@ -17,6 +17,7 @@
   <a href="#connects-to-your-stack">Integrations</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="docs/README.md">Documentation</a> ·
+  <a href="#the-story-behind-portalab">The story</a> ·
   <a href="GITHUB_RELEASES.md">Release notes</a>
 </p>
 
@@ -323,7 +324,54 @@ sandboxed visual packs, encrypted secrets and backups. The checklist is in
 | Administrators | [Services](docs/admin/services.md) · [Members and roles](docs/admin/members-and-roles.md) · [Gamification and economy](docs/admin/gamification-and-economy.md) · [Content](docs/admin/content.md) · [Customisation](docs/admin/customization.md) · [AI and automations](docs/admin/ai-and-automations.md) |
 | Developers | [Module guides](portalab/docs/) · [Plugin authoring](portalab/docs/plugin-authoring.md) · [Visual packs](portalab/docs/visual-packs.md) |
 
+## The story behind Portalab
+
+I run a NAS for my family and friends, and the same messages kept coming: *"Why isn't the film I just
+asked for on Plex?"*, *"Why can't I get to the books any more?"*, *"Plex doesn't work"*… I no longer wanted
+to answer a flood of messages, and I wanted to offer something new: my whole ecosystem gathered in one
+place, with a playful game on top — optional, each member's choice. **Portalab was born.**
+
+### Built with AI
+
+**All of Portalab's code was written by AI.** Everything else is mine: I managed, supervised, specified,
+defined and tested the whole project myself — writing each spec between two baby bottles, testing every
+phase of development, thinking about continuous improvement and anticipating what the project will need in
+the long run.
+
+Why not write the code myself? I don't have the knowledge — and I would really love to learn to code, but
+I am a young dad and my time is very limited.
+
 ## Architecture
+
+```mermaid
+flowchart LR
+  browser["Members and administrators<br/>browser or phone"]
+  proxy["Reverse proxy<br/>TLS, optional"]
+
+  subgraph image["One Docker image"]
+    serve["serve<br/>API · interface · live updates"]
+    worker["worker<br/>jobs · periodic syncs · event consumers"]
+    migrate["migrate<br/>schema upgrades before each start"]
+  end
+
+  db[("PostgreSQL 16<br/>one schema per module<br/>job queue · event outbox")]
+  files[/"appdata<br/>images · cards · packs · plugins · backups"/]
+
+  stack["Your services, through connectors<br/>Plex · Jellyfin · Tautulli<br/>Overseerr / Jellyseerr · Sonarr · Radarr<br/>qBittorrent · Deluge · Maintainerr<br/>Grimmory · RomM · SUB/WAVE<br/>TMDB · TheTVDB · fanart.tv · SearXNG<br/>Ollama · OpenAI-compatible<br/>Authentik · OpenID Connect · Unraid · Glances"]
+
+  browser --> proxy --> serve
+  serve <--> db
+  worker <--> db
+  migrate --> db
+  serve --- files
+  worker --- files
+  serve --> stack
+  worker --> stack
+```
+
+The web process answers members and streams live updates; the worker runs the jobs and the periodic syncs
+with your services. Both share PostgreSQL: jobs, domain events and live notifications are written in the same
+transaction as the change they report, so nothing is announced that did not happen.
 
 | Part | Stack |
 | --- | --- |
@@ -331,8 +379,25 @@ sandboxed visual packs, encrypted secrets and backups. The checklist is in
 | Interface | React 19, TypeScript, Vite, TanStack Query, Radix UI, design tokens, Plus Jakarta Sans and Inter |
 | Delivery | one Docker image (read-only, non-root, no capabilities), PostgreSQL 16 |
 
-The code is organised in layers (`core ← capabilities ← modules | connectors ← app`) enforced by
-import-linter; plugins and visual packs only see their SDKs. English and French are included.
+The code is organised in layers, each importing only the ones below it — enforced by import-linter:
+
+```mermaid
+flowchart TB
+  app["app<br/>composition root · CLI · HTTP"]
+  modules["modules<br/>media · requests · support · gamification · …"]
+  connectors["connectors<br/>one per service"]
+  sdk["sdk<br/>the only door for plugins"]
+  caps["capabilities<br/>contracts between modules"]
+  core["core<br/>database · jobs · events · authorization"]
+  plugins(["plugins"])
+
+  app --> modules & connectors
+  modules & connectors --> sdk --> caps --> core
+  plugins -.-> sdk
+```
+
+Modules never import each other: they talk through capabilities and events. Plugins and visual packs only
+see their SDKs, and visual packs run sandboxed. English and French are included.
 
 ## Development
 
@@ -347,23 +412,8 @@ cd portalab/frontend && npm ci
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-## Releases
-
-Releases are cut from the repository root:
-
-```bash
-npm ci                      # release tooling (standard-version)
-npm run release:issues      # the GitLab issues closed since the last tag, by kind
-npm run release:dry         # preview the next version
-npm run release:full        # bump, CHANGELOG, tag, push — the tag pipeline does the rest
-```
-
-Before releasing, add the new version's notes at the top of [`GITHUB_RELEASES.md`](GITHUB_RELEASES.md)
-(`# vX.Y.Z`, with its closed issues by kind): they become the GitLab and GitHub release pages, and the
-release script refuses to run without them. The tag pipeline validates and tests both halves, builds the
-image, publishes it to Docker Hub, mirrors the repository to GitHub and creates both releases (see
-[`.gitlab-ci.yml`](.gitlab-ci.yml) for the CI/CD variables it expects). The screenshots are taken from a
-running portal with `portalab/scripts/guide_shots.mjs assets/screenshots/shots.json` (read-only).
+The screenshots are taken from a running portal with
+`portalab/scripts/guide_shots.mjs assets/screenshots/shots.json` (read-only).
 
 ## Brand
 
