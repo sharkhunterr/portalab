@@ -1,0 +1,24 @@
+{
+  "title": "New ticket: assign it to me",
+  "description": "Hand every new ticket to the automation's author (the one who creates it from this template). A ticket someone already took is left alone.",
+  "definition": {
+    "name": "Assign new tickets to me",
+    "trigger": {
+      "kind": "event",
+      "event_type": "ticket.created"
+    },
+    "steps": [
+      {
+        "id": "assign",
+        "action": "ticket.assign",
+        "params": {
+          "ticket": "${event.ticket}"
+        }
+      }
+    ],
+    "limits": {
+      "dedup_key": "${event.ticket}",
+      "dedup_window_s": 86400
+    }
+  }
+}

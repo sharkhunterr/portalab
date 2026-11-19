@@ -18,7 +18,7 @@ from portalab.capabilities.search import ActionDef, FacetDef, ParsedQuery, Provi
 from portalab.capabilities.search.fts import decode_cursor, encode_cursor, snippet
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authz_port import Principal
-from portalab.core.errors import Forbidden
+from portalab.core.errors import Forbidden, ValidationFailed
 from portalab.core.time import Clock, utc_now
 from portalab.modules.support.incidents.service import IncidentService
 from portalab.modules.support.models import FeedbackItem, Ticket
@@ -243,8 +243,28 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
         )
         return {"incident": str(view.id), "created": created}
 
+    async def assign_ticket(params: Mapping[str, Any], principal: Principal) -> Mapping[str, Any]:
+        """Issue 508: a ticket handed to someone — by default the automation's author (« assign to me »)."""
+        try:
+            ticket_id = UUID(str(params["ticket"]))
+            chosen = params.get("assignee")
+            assignee = UUID(str(chosen)) if chosen else tickets.user_of(principal)
+        except ValueError as exc:
+            raise ValidationFailed(
+                "Give a ticket and an assignee by their id.", code="ticket.invalid_assignee"
+            ) from exc
+        if assignee is None:
+            raise ValidationFailed("No one to assign the ticket to.", code="ticket.invalid_assignee")
+        current = await tickets.view(ticket_id, principal)
+        if current.ticket.assignee_id is not None and not params.get("reassign"):
+            # someone already took it: a rule never takes a ticket from a person
+            return {"ticket": str(ticket_id), "assignee": str(current.ticket.assignee_id), "changed": False}
+        # the version read: a person assigning it meanwhile wins (the rule fails, its retry sees it taken)
+        await tickets.assign(principal, ticket_id, assignee, if_match=current.ticket.version)
+        return {"ticket": str(ticket_id), "assignee": str(assignee), "changed": True}
+
     # 027: the parameters are declared, so the automation builder shows a field for each
-    for key, description, permission, run, idempotency, params in (
+    for key, description, permission, run, idempotency, params, required in (
         (
             "ticket.create",
             "Open a support ticket",
@@ -258,6 +278,7 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
                 "service_id": "uuid?",
                 "fields": "object?",
             },
+            ("title",),
         ),
         (
             "incident.create",
@@ -272,6 +293,16 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
                 "service_ids": "list[uuid]?",
                 "dedup_key": "string?",
             },
+            ("title",),
+        ),
+        (
+            "ticket.assign",
+            "Assign a support ticket",
+            TICKETS_MANAGE,
+            assign_ticket,
+            "idempotent: an assigned ticket is left as it is unless reassign",
+            {"ticket": "uuid", "assignee": "uuid?", "reassign": "bool?"},
+            ("ticket",),
         ),
     ):
         if registry.get(key) is None:
@@ -284,7 +315,7 @@ def register_actions(tickets: TicketService, incidents: IncidentService, registr
                     run=run,
                     owner=OWNER,
                     params_schema=params,
-                    required=("title",),
+                    required=required,
                 )
             )
 

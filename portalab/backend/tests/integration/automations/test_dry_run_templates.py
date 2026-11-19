@@ -68,6 +68,7 @@ async def test_templates(au: AutoHarness, client: AsyncClient) -> None:
         "parity-check-banner-end",
         "service-down-banner",  # issue 394: the degraded banner is an automation, no longer built in
         "service-back-banner-end",
+        "new-ticket-assign-to-me",  # issue 508: offered, never installed
     }
     # the harness registers no owner actions/events beyond tests: templates report what is missing
     assert all(not t["valid"] for t in templates.values())
