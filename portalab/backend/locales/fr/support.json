@@ -535,5 +535,13 @@
   "widget.my_tickets.title": "Mes tickets",
   "widget.queue.description": "Tickets ouverts non assignés.",
   "widget.queue.title": "File du support",
-  "workflows.hint": "Les états et transitions des tickets (réglage avancé, document JSON validé par le serveur)."
+  "workflows.hint": "Les états et transitions des tickets (réglage avancé, document JSON validé par le serveur).",
+  "history.assignedTo": "Assigné à {name}",
+  "history.assignedBy": "Assigné à {name} par {by}",
+  "history.unassigned": "Plus assigné",
+  "history.you": "toi",
+  "history.via.automation": "par une automatisation",
+  "history.via.ai": "par l’assistant",
+  "history.via.plugin": "par une extension",
+  "history.via.system": "par le portail"
 }

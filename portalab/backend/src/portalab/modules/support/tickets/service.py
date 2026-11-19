@@ -162,7 +162,8 @@ class TicketService:
                 seq=seq,
                 kind=kind,
                 actor_id=self.user_of(actor) if actor else None,
-                data=dict(data),
+                # issue 510: what an automation, the AI or a plugin did for someone says so in the thread
+                data={**data, "via": actor.channel} if actor and actor.channel != "user" else dict(data),
                 created_at=utc_now(self.clock),
             )
         )

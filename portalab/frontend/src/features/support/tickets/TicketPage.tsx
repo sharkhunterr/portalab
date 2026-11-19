@@ -17,7 +17,14 @@ import { PriorityBadge, StateBadge, stateLabel } from "./TicketBadges";
 
 type Line =
   | { kind: "comment"; at: string; id: string; body: string; internal: boolean; author: string | null }
-  | { kind: "event"; at: string; id: string; what: string; data: Record<string, unknown> };
+  | {
+      kind: "event";
+      at: string;
+      id: string;
+      what: string;
+      data: Record<string, unknown>;
+      actor: string | null;
+    };
 
 const EVENT_ICON: Record<string, string> = {
   created: "plus",
@@ -96,8 +103,21 @@ export function TicketPage({ team = false }: { team?: boolean }) {
         id: `h${h.seq}`,
         what: h.kind,
         data: h.data,
+        actor: h.actor_id ?? null,
       })),
   ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  // issue 510: staff read who the ticket went to, and who handed it over when someone else did
+  const people = data.people ?? {};
+  const named = (user: string | null) =>
+    user === meId ? t("support:history.you") : user ? (people[user] ?? null) : null;
+  const assignment = (line: Extract<Line, { kind: "event" }>) => {
+    const to = line.data.to ? String(line.data.to) : null;
+    if (!to) return t("support:history.unassigned");
+    const name = named(to);
+    if (!name) return t("support:history.assignment");
+    const by = !line.data.via && line.actor && line.actor !== to ? named(line.actor) : null;
+    return by ? t("support:history.assignedBy", { name, by }) : t("support:history.assignedTo", { name });
+  };
   const moveOf = (key: string | null) => transitions.find((tr) => String(tr.key) === key);
   const chosen = moveOf(move);
   const reset = () => {
@@ -251,8 +271,9 @@ export function TicketPage({ team = false }: { team?: boolean }) {
               <li key={line.id} className="feedback-event" data-kind={line.what}>
                 <Icon name={EVENT_ICON[line.what] ?? "check"} size={14} />
                 <span>
-                  {t(`support:history.${line.what}`)}
+                  {line.what === "assignment" ? assignment(line) : t(`support:history.${line.what}`)}
                   {line.what === "transition" ? ` → ${stateLabel(t, String(line.data.to))}` : ""}
+                  {line.data.via ? ` · ${t(`support:history.via.${String(line.data.via)}`)}` : ""}
                 </span>
                 <span className="feedback-event__when">{ago(line.at)}</span>
               </li>

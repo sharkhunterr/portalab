@@ -5,12 +5,14 @@ never installed: it uses the action with the new ticket's id only."""
 
 from uuid import UUID
 
+import httpx
 import pytest
 
 from portalab.capabilities.support import TicketRequest
 from portalab.core.errors import ValidationFailed
 from portalab.modules.automations.templates.loader import load
 from tests.authz_fixtures import automation
+from tests.integration.identity.helpers import login
 from tests.integration.support.conftest import SupportHarness
 
 pytestmark = pytest.mark.integration
@@ -74,3 +76,21 @@ async def test_the_assign_to_me_template_is_offered_with_the_new_tickets_id(supp
     assert set(step["params"]) <= set(action.params_schema)
     assert set(action.required_params()) <= set(step["params"])
     assert step["params"]["ticket"] == "${event.ticket}"  # ticket.created carries the ticket's id
+
+
+async def test_the_thread_tells_the_team_who_and_how_and_keeps_the_team_anonymous_to_the_member(
+    client: httpx.AsyncClient, support: SupportHarness, people: dict[str, UUID]
+) -> None:
+    """Issue 510: staff read the names and that an automation did it; the member reads neither."""
+    action = support.actions.get("ticket.assign")
+    assert action is not None
+    ticket = await _ticket(support)
+    await action.run({"ticket": str(ticket)}, automation(people["sam"]))
+    await login(client, "sam")
+    staff = (await client.get(f"/api/v1/tickets/{ticket}")).json()
+    [line] = [h for h in staff["history"] if h["kind"] == "assignment"]
+    assert line["data"] == {"from": None, "to": str(people["sam"]), "via": "automation"}
+    assert staff["people"][str(people["sam"])] and staff["people"][str(people["ursula"])]
+    await login(client, "ursula")
+    member = (await client.get(f"/api/v1/tickets/{ticket}")).json()
+    assert member["people"] == {} and member["staff"] is False

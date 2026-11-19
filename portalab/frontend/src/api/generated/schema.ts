@@ -22331,6 +22331,10 @@ export interface components {
             media_id?: string | null;
             /** Number */
             number: number;
+            /** People */
+            people?: {
+                [key: string]: string;
+            };
             /** Priority */
             priority: string;
             /** Reference */

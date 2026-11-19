@@ -25358,6 +25358,13 @@
             "title": "Number",
             "type": "integer"
           },
+          "people": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "People",
+            "type": "object"
+          },
           "priority": {
             "title": "Priority",
             "type": "string"

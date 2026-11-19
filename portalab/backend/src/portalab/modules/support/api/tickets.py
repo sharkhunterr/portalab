@@ -3,6 +3,7 @@ diagnosis draft), the requester's tickets, ticket detail, comments, attachments 
 (queue, transitions, assignment, tags, incident link, internal notes, bulk action on an incident's tickets).
 Mutations accept ``If-Match: <version>``."""
 
+from contextlib import suppress
 from datetime import datetime
 from typing import Annotated, Any, Literal
 from urllib.parse import quote
@@ -13,11 +14,13 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from portalab.capabilities.config import switched_on
 from portalab.capabilities.confirmations import CAPABILITY as CONFIRMATIONS
+from portalab.capabilities.identity_directory import CAPABILITY as DIRECTORY
 from portalab.capabilities.media_core import TECHNICAL_SHEETS
 from portalab.capabilities.support import TicketRequest
 from portalab.core.authorization import require
 from portalab.core.authz_port import Principal, ResourceRef
 from portalab.core.errors import Conflict, Forbidden, NotFound, Unavailable
+from portalab.core.logging import get_logger
 from portalab.modules.support.api.incidents import support_module
 from portalab.modules.support.models import Ticket
 from portalab.modules.support.module import SupportModule
@@ -32,6 +35,7 @@ async def tickets_on(request: Request) -> None:
         raise NotFound("The tickets are switched off.", code="support.tickets_off")
 
 
+log = get_logger("portalab.support")
 router = APIRouter(prefix="/api/v1", tags=["support"], dependencies=[Depends(tickets_on)])
 Module = Annotated[SupportModule, Depends(support_module)]
 Requester = Annotated[Principal, require(TICKETS_CREATE)]
@@ -135,6 +139,8 @@ class TicketDetail(TicketCard):
     history: list[TicketHistoryOut]
     transitions: list[dict[str, Any]]
     staff: bool
+    # issue 510: for staff, the names of the people the thread tells (requester, assignees, actors)
+    people: dict[str, str] = Field(default_factory=dict)
     # 027: the feedback it was made from — its form, when, its answers under their labels
     feedback: dict[str, Any] | None = None
 
@@ -215,6 +221,43 @@ def card(t: Ticket) -> TicketCard:
         updated_at=t.updated_at,
         media_id=t.media_id,
     )
+
+
+async def shown(module: SupportModule, ticket_id: UUID, principal: Principal) -> TicketDetail:
+    """A ticket as its viewer sees it; staff also get the names of the people its thread tells (issue 510)
+    — a member keeps seeing « the team », never who in it."""
+    out = detail(await module.tickets.view(ticket_id, principal))
+    if out.staff:
+        out.people = await _names(module, _people(out))
+    return out
+
+
+def _people(out: TicketDetail) -> set[UUID]:
+    found = {u for u in (out.requester_id, out.assignee_id) if u}
+    for line in out.history:
+        if line.actor_id:
+            found.add(line.actor_id)
+        if line.kind == "assignment":
+            for end in ("from", "to"):
+                with suppress(KeyError, ValueError):
+                    found.add(UUID(str(line.data[end])))
+    return found
+
+
+async def _names(module: SupportModule, users: set[UUID]) -> dict[str, str]:
+    directory = module.capabilities.system_providers(DIRECTORY)
+    names: dict[str, str] = {}
+    if not directory:
+        return names
+    for user in users:
+        try:
+            summary = await directory[0].provider.get_user_summary(user)
+        except Exception:  # an unknown or erased member: the line stays without a name
+            log.debug("support.ticket_name_unavailable", exc_info=True)
+            continue
+        if summary and summary.display_name:
+            names[str(user)] = summary.display_name
+    return names
 
 
 def detail(view: TicketView) -> TicketDetail:
@@ -304,7 +347,7 @@ async def create(principal: Requester, body: TicketCreateIn, module: Module) -> 
     )
     if body.draft_id is not None:
         await module.diagnosis.consume_draft(body.draft_id)
-    return detail(await module.tickets.view(ticket.id, principal))
+    return await shown(module, ticket.id, principal)
 
 
 @router.get("/media-tickets/open", response_model=dict[str, int])
@@ -372,7 +415,7 @@ async def attachment(principal: User, attachment_id: UUID, module: Module) -> Re
 
 @router.get("/tickets/{ticket_id}", response_model=TicketDetail)
 async def get_ticket(principal: User, ticket_id: UUID, module: Module) -> TicketDetail:
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.get("/tickets/{ticket_id}/media-sheet")
@@ -393,7 +436,7 @@ async def comment(
     principal: User, ticket_id: UUID, body: TicketCommentIn, module: Module, if_match: IfMatch = None
 ) -> TicketDetail:
     await module.tickets.comment(principal, ticket_id, body.body, if_match=version_of(if_match))
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.post(
@@ -441,7 +484,7 @@ async def transition(
     await module.tickets.transition(
         principal, ticket_id, body.transition, comment=body.comment, if_match=version_of(if_match)
     )
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 # --- staff ---------------------------------------------------------------------------------------------
@@ -481,13 +524,13 @@ async def assign(
     principal: Staff, ticket_id: UUID, body: TicketAssignIn, module: Module, if_match: IfMatch = None
 ) -> TicketDetail:
     await module.tickets.assign(principal, ticket_id, body.assignee_id, if_match=version_of(if_match))
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.post("/tickets/{ticket_id}/tags", response_model=TicketDetail)
 async def tags(principal: Staff, ticket_id: UUID, body: TicketTagsIn, module: Module) -> TicketDetail:
     await module.tickets.set_tags(principal, ticket_id, body.add, body.remove)
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.post("/tickets/{ticket_id}/link-incident", response_model=TicketDetail)
@@ -495,7 +538,7 @@ async def link_incident(
     principal: Staff, ticket_id: UUID, body: TicketIncidentIn, module: Module
 ) -> TicketDetail:
     await module.tickets.link_incident(principal, ticket_id, body.incident_id)
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.post("/tickets/{ticket_id}/internal-notes", response_model=TicketDetail)
@@ -503,7 +546,7 @@ async def internal_note(
     principal: Staff, ticket_id: UUID, body: TicketCommentIn, module: Module
 ) -> TicketDetail:
     await module.tickets.comment(principal, ticket_id, body.body, internal=True)
-    return detail(await module.tickets.view(ticket_id, principal))
+    return await shown(module, ticket_id, principal)
 
 
 @router.post("/admin/incidents/{incident_id}/tickets/bulk")
