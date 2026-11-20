@@ -76,47 +76,6 @@ export function PlayTimesFacts({ times }: { times: PlayTimes }) {
   );
 }
 
-/** 027: a game's facts as the game database tells them, for a game the library lacks (issue 368): its
- * platform, publisher and studios, release date, tags and play times. */
-export function GameFacts({ data }: { data: Data }) {
-  const t = useT();
-  const format = useFormat();
-  const studios = names(data.people).filter((c) => c !== data.publisher);
-  const rows = [
-    data.platform ? { key: "platform", value: String(data.platform) } : null,
-    data.publisher ? { key: "publisher", value: String(data.publisher) } : null,
-    studios.length ? { key: "studios", value: studios.join(", ") } : null,
-    data.released
-      ? { key: "releasedOn", value: format.date(`${String(data.released)}T12:00:00Z`, "long") }
-      : data.year
-        ? { key: "releasedOn", value: String(data.year) }
-        : null,
-  ].filter((row) => row !== null);
-  const tags = names(data.tags);
-  const times = (data.play_times && typeof data.play_times === "object" ? data.play_times : {}) as PlayTimes;
-  if (!rows.length && !tags.length && !Object.keys(times).length) return null;
-  return (
-    <>
-      <dl className="media-facts">
-        {rows.map((row) => (
-          <div key={row.key}>
-            <dt>{t(`media:facts.${row.key}`)}</dt>
-            <dd>{row.value}</dd>
-          </div>
-        ))}
-      </dl>
-      {tags.length ? (
-        <ul className="media-enriched__chips" aria-label={t("media:facts.tags")}>
-          {tags.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      ) : null}
-      <PlayTimesFacts times={times} />
-    </>
-  );
-}
-
 /**
  * Issue 467 — a game's page laid out like a film's: its facts as chips (released, platform, how long its
  * story takes), its summary, its genres, then its production (studios, publisher, platform, release) and

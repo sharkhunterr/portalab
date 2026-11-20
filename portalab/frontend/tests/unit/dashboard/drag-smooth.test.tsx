@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Instance } from "../../../src/features/dashboard/api";
 import { AnnounceProvider } from "../../../src/design-system/a11y/Announce";
+import type { Instance } from "../../../src/features/dashboard/api";
 import { DashboardGrid } from "../../../src/features/dashboard/grid/DashboardGrid";
 
 // Issue 496 — arranging the dashboard lagged on an older phone: every pointer move re-rendered every widget.
