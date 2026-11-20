@@ -55,6 +55,97 @@
 
 ---
 
+# v1.8.0
+
+## Portalab v1.8.0 — support tickets that reach the right person, follow any title, a lighter server
+
+**Support tickets now reach whoever handles them**: the assignee hears of every new ticket and of every
+move on it, the team's queue counts what is waiting, and an automation can hand each new ticket to someone.
+**Follow any title** — a film, a book, an audiobook, a game, an album — not only a series. **The server and
+the worker run much lighter**: tens of thousands of useless calls a day are gone, and CPU and memory drop.
+
+### Highlights
+
+- **Support, for the team**:
+  - the assignee is told when a ticket is handed to them, then of every reply, internal note, attachment
+    and change of state by someone else;
+  - the queue's tabs carry the number of open, in-progress and waiting tickets;
+  - each ticket in the queue says who opened it, when, and who handles it;
+  - the thread says whom a ticket went to, who handed it over, and when an automation did it.
+- **Support, for members** — the thread reads « Assigned to the team »; the administrator may show the
+  assignee's name instead (*Administration › Settings › Communication*).
+- **Assign new tickets automatically** — a new automation action, *assign a ticket*, and a ready-made
+  template, « New ticket: assign it to me », offered among the automation templates and never installed on
+  its own.
+- **Follow any title** — « Follow » on every work's page; *My feed* lists them as « Titles », and a title
+  followed before the library has it is announced when it arrives.
+- **Sheets of titles the library lacks** — a film's, a series' or a game's sheet shows its videos and
+  pictures and is laid out like a library title's page; a requested book or game follows its request's
+  journey, and a game's request asks for its platform.
+- **A balanced bingo card** — reading, playing and listening weigh like watching, only with what members
+  really do, and other squares each month.
+- **A lighter server** — one minute after a restart on a real portal: 230 → 27 database transactions per
+  second, worker CPU 28 → 6 %, PostgreSQL 12 → 4 %, web process memory 630 → 232 MB. A missing cover is
+  tried again once a day instead of every hour, and the job table's health check reads an index instead of
+  the whole table.
+
+### Closed issues
+
+#### Fixed
+
+- `bug` Renaming a ticket type failed with « The request is invalid. — [object Object] »; a type saves, and
+  a refused form in any administration editor names the field and the reason
+- `bug` The ticket thread said « Assignment » without telling whom; it names the assignee, who handed the
+  ticket over, and when an automation did it
+- `bug` On a phone, *My progression*'s gains chart and level-up cards overflowed their card; they stay
+  inside it
+- `bug` On a phone, the page widened sideways and the level-up sheet sat off-centre; premium ambiences were
+  blurred on older phones — the page keeps its width and ambiences their sharpness
+- `bug` The daily wheel widget did not fit its size and was cut; it fits its block, with words only where
+  there is room
+- `bug` The household dashboard's flame showed a different streak from *My progression*; it is the same
+  number everywhere
+- `bug` The header search showed one result per media type, and calendar items lost their series, poster,
+  kind and day; three titles per type with their totals, and calendar items keep them
+- `bug` A game's sheet outside the library was laid out unlike a library game's page; it uses the same
+  blocks, videos and pictures
+- `bug` « Recently requested » missed a book's or a game's cover, age rating and link, and « With the team »
+  was unclear; they show, and the step reads « Searching »
+- `bug` A requested game or book had no journey on its sheet, and a game's platform was neither asked nor
+  shown; both are there
+- `bug` The Seerr sync asked Seerr again for every request's title every hour (about 32,000 useless calls a
+  day); a title is kept across syncs
+- `bug` The visual packs refresh used about 400 MB of memory and 1.6 s at start; it now reads only what it
+  needs (471 → 93 MB)
+
+#### New
+
+- `feat` The assignee of a ticket is told of it and of every action on it; the queue counts its states, and
+  its tickets say who opened them, when, and who handles them
+- `feat` A requester reads « Assigned to the team » by default, or the assignee's name if the administrator
+  chooses
+- `feat` An automation can assign a ticket, with a « New ticket: assign it to me » template
+- `feat` Follow any title: a film, a book, an audiobook, a game, an album — not only a series
+- `feat` A film's or series' sheet outside the library shows its videos and pictures carousels
+- `feat` A bingo card with every kind of media, balanced, realistic and different each month
+
+#### Documentation and tooling
+
+- `doc` The README tells the story behind Portalab, how it is built with AI, and draws its architecture
+
+#### Improved
+
+- `improvement` Arranging dashboard widgets no longer lags on older phones
+- `improvement` The worker's event dispatch no longer opens about 230 transactions a second when idle
+- `improvement` Outbound HTTP requests no longer fill 85 % of the stored logs
+
+### Upgrading
+
+- `docker compose pull && docker compose up -d` (the migrations run before Portalab restarts); nothing
+  else to do.
+
+---
+
 # v1.7.0
 
 ## Portalab v1.7.0 — every age rating a title has, trailers and galleries, statistics you can trust
