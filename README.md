@@ -326,20 +326,22 @@ sandboxed visual packs, encrypted secrets and backups. The checklist is in
 
 ## The story behind Portalab
 
-I run a NAS for my family and friends, and the same messages kept coming: *"Why isn't the film I just
-asked for on Plex?"*, *"Why can't I get to the books any more?"*, *"Plex doesn't work"*… I no longer wanted
-to answer a flood of messages, and I wanted to offer something new: my whole ecosystem gathered in one
-place, with a playful game on top — optional, each member's choice. **Portalab was born.**
+I share my NAS with family and friends, and the same messages kept landing on my phone: *"Why isn't the
+film I just requested on Plex yet?"*, *"Why can't I open the books any more?"*, *"Plex isn't working"*… I
+wanted fewer messages to answer, and I wanted to give everyone something new: my whole ecosystem in one
+place, with a playful game on top for those who want it — and only for them. That is how **Portalab** was
+born.
 
 ### Built with AI
 
-**All of Portalab's code was written by AI.** Everything else is mine: I managed, supervised, specified,
-defined and tested the whole project myself — writing each spec between two baby bottles, testing every
-phase of development, thinking about continuous improvement and anticipating what the project will need in
-the long run.
+To be upfront: **every line of Portalab's code was written by AI.** Everything else is mine. I lead the
+project from start to finish — I decide what it should be, write each specification, steer and review the
+work, and test every phase of development myself. I keep looking for what to improve next, and plan where
+the project should go in the long run.
 
-Why not write the code myself? I don't have the knowledge — and I would really love to learn to code, but
-I am a young dad and my time is very limited.
+Why not write the code myself? I don't have the skills — and I would genuinely love to learn. But I am a
+young dad, and my free time fits between two bottle feeds. That is where Portalab gets built: one spec, one
+test, one idea at a time.
 
 ## Architecture
 
