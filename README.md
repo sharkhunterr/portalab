@@ -334,10 +334,11 @@ born.
 
 ### Built with AI
 
-To be upfront: **every line of Portalab's code was written by AI.** Everything else is mine. I lead the
-project from start to finish — I decide what it should be, write each specification, steer and review the
-work, and test every phase of development myself. I keep looking for what to improve next, and plan where
-the project should go in the long run.
+> [!NOTE]
+> **Every line of Portalab's code was written by AI.** Everything else is mine: I lead the project from
+> start to finish — I decide what it should be, write each specification, steer and review the work, and
+> test every phase of development myself. I keep looking for what to improve next, and plan where the
+> project should go in the long run.
 
 Why not write the code myself? I don't have the skills — and I would genuinely love to learn. But I am a
 young dad, and my free time fits between two bottle feeds. That is where Portalab gets built: one spec, one
