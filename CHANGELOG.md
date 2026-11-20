@@ -3,6 +3,40 @@
 All notable changes to Portalab. The release pages (GitLab, GitHub) show the curated notes of
 [GITHUB_RELEASES.md](GITHUB_RELEASES.md); this file is generated from the commits by `npm run release`.
 
+## [1.8.0](https://github.com/sharkhunterr/portalab/compare/v1.7.0...v1.8.0) (2026-11-20)
+
+
+### Features
+
+* **automations:** ticket.assign action and an 'assign new tickets to me' template ([5bab70a](https://github.com/sharkhunterr/portalab/commit/5bab70ad17130bd59a58e1dd78b758155c218f83))
+* **games:** a balanced bingo card — reading, playing and listening weigh like watching, only what members really do, other squares each month ([433f53f](https://github.com/sharkhunterr/portalab/commit/433f53f0ae563fee2a314104f71988f6b7510683))
+* **media:** a film's or series' page outside the library shows its videos and pictures carousels ([33bd95d](https://github.com/sharkhunterr/portalab/commit/33bd95dc5fe2bfce6380cfaadca2ee4525b0aa8c))
+* **media:** follow any title — a film, a book, an audiobook, a game, an album — not only a series ([305ea5d](https://github.com/sharkhunterr/portalab/commit/305ea5d52e3e357cd0c36db5b73420a8934d825f))
+* **support:** requesters read 'Assigned to the team', or the assignee's name by setting ([53581c7](https://github.com/sharkhunterr/portalab/commit/53581c7cda5086de40f6518e24b3d21f5823b7bf))
+* **support:** the assignee hears of their tickets; queue badges and who/when on cards ([6d70973](https://github.com/sharkhunterr/portalab/commit/6d70973b7090ff833295981832a498f71c9e605f))
+* **support:** the ticket thread names the assignee, who assigned it, and automations ([38bcb5f](https://github.com/sharkhunterr/portalab/commit/38bcb5fa5ac388825a7fc80758f0cc719e5e5410))
+
+
+### Bug Fixes
+
+* **gamification:** keep the gains chart and level-ups within their card on phones ([83efcb7](https://github.com/sharkhunterr/portalab/commit/83efcb73ea21161586aede000a8d775f9d0d423e))
+* **gamification:** the daily wheel is never cut — its rim inside its size, room for its shadow ([8134b4c](https://github.com/sharkhunterr/portalab/commit/8134b4cfd6ab7ace4c6c0a82e59ddeb5afc3c485))
+* **gamification:** the daily wheel widget fits its block, words only where there is room ([12bdc02](https://github.com/sharkhunterr/portalab/commit/12bdc02404be3c028f990cda26e45318bb077a27))
+* **household:** the family cards' flame is the progression streak, one number everywhere ([fab57f4](https://github.com/sharkhunterr/portalab/commit/fab57f4515cc42cd62e955b1de5392043e69e783))
+* **media:** a game's sheet laid out as a library game's page — production, videos and pictures carousel, follow ([d0538ea](https://github.com/sharkhunterr/portalab/commit/d0538ea8c3a71984db10b2ffa49c0cecf160a340))
+* **media:** recently requested books and games show their cover, age rating and sheet; « Searching » for the team's step ([23be1ec](https://github.com/sharkhunterr/portalab/commit/23be1ec092bcf71c6de7e6873b90ad5d6662fc7b))
+* **requests:** a game asked for names its platform, and its sheet follows the request like a film's page ([141e8ab](https://github.com/sharkhunterr/portalab/commit/141e8abc58d1e888c1f1806f2a7eebf9ed9e75e8))
+* **search:** header shows three titles per type with totals; calendar dates keep their series, poster, kind and day ([fe31950](https://github.com/sharkhunterr/portalab/commit/fe319509ecc75276cfb9b61db096876e93fb6500))
+* **search:** typeahead asks only for suggestions, tells a partial answer and asks again; the count opens all titles of a type ([180cce7](https://github.com/sharkhunterr/portalab/commit/180cce7ea56473477e05f8244bb5db8603b7ac87))
+* **shell:** nothing widens a phone's page (island preview, full header) so sheets stay centred; ambiences keep their sharpness on slower phones ([a518b7f](https://github.com/sharkhunterr/portalab/commit/a518b7f4229c9e45b31d54b083d07bd0c3d2d766))
+* **support:** saving a ticket type sends only its fields; readable validation errors ([66b4c3a](https://github.com/sharkhunterr/portalab/commit/66b4c3a909104c66e27e3c16ec47f913273bb489))
+
+
+### Performance Improvements
+
+* **dashboard:** arranging widgets no longer re-renders every widget at each pointer move — the moved one follows on its element, the grid renders on cell changes ([b0b0c89](https://github.com/sharkhunterr/portalab/commit/b0b0c893ae9befed08151a5b07bb0d8fe3ad55b6))
+* lighter server and worker — packs refresh, idle event dispatch, job counts, chatty logs, repeated calls ([954c329](https://github.com/sharkhunterr/portalab/commit/954c32915de5cf6853d45ee69982fd4d1faedf4a))
+
 ## [1.7.0](https://github.com/sharkhunterr/portalab/compare/v1.6.0...v1.7.0) (2026-11-17)
 
 
